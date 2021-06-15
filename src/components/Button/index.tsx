@@ -8,9 +8,10 @@ interface IButtonProps {
   filled?: boolean;
   disabled?: boolean;
   marginRight?: number;
+  big?: boolean;
 }
 
-const Button: React.FC<IButtonProps> = ({ children, filled, onClick, disabled, marginRight }) => {
+const Button: React.FC<IButtonProps> = ({ children, filled, onClick, disabled, marginRight, big }) => {
   const handleClick = () => {
     if (disabled) return;
     if (!onClick) return;
@@ -20,11 +21,11 @@ const Button: React.FC<IButtonProps> = ({ children, filled, onClick, disabled, m
   return (
     <div
       role="button"
-      tabIndex="0"
+      tabIndex={0}
       onClick={handleClick}
       onKeyDown={() => {}}
       style={{ marginRight: marginRight || 10 }}
-      className={`${s.button} ${filled && s.filled}`}
+      className={`${s.button} ${filled && s.filled} ${big && s.big}`}
     >
       {children}
     </div>

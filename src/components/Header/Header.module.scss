@@ -1,14 +1,17 @@
 @import '../../styles/vars';
 @import '../../styles/mixins/flex.scss';
+@import '../../styles/mixins/container.scss';
+@import '../../styles/mixins/gradient-text.scss';
 
 .container {
-  max-width: 1130px;
-  margin: 0 auto;
-  padding: 0 15px;
+  @include container;
 }
 
 .header {
-  padding-top: 22px;
+  position: absolute;
+  width: 100%;
+  top: 22px;
+  left: 0;
 }
 .inner {
   @include flex(row, center, space-between);
@@ -78,13 +81,10 @@
     background: $gradient;
     transition: 0.4s ease;
   }
-
+  // gradient text
   &:hover {
     font-weight: 700;
-    background: $gradient;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: $gradient-replacement;
+    @include gradient-text($gradient, $gradient-replacement);
   }
 
   &:hover::after {
@@ -93,7 +93,6 @@
 }
 
 // right side
-.buttons{
-    @include flex(row, center);
+.buttons {
+  @include flex(row, center);
 }
-

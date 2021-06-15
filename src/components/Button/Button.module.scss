@@ -1,6 +1,8 @@
 @import '../../styles/vars';
 
 .button {
+  display: inline-block;
+  background-color: #000;
   border: 1px solid $blue;
   border-radius: 2px;
   color: $blue;
@@ -13,6 +15,10 @@
   &.filled, &:hover{
       background-color: $blue;
       color: #fff;
+  }
+
+  &.big{
+    padding: 20px;
   }
 }
 

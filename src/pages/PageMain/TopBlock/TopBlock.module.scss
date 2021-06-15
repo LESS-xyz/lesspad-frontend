@@ -1,0 +1,31 @@
+@import '../../../styles/vars';
+@import '../../../styles/mixins/container.scss';
+@import '../../../styles/mixins/flex.scss';
+@import '../../../styles/mixins/gradient-text.scss';
+
+.container {
+  @include container;
+}
+
+.inner {
+  height: 100vh;
+  @include flex(row, center);
+}
+.top {
+  background: url('../../../assets/img/sections/home/bg-main.svg') right no-repeat;
+}
+// block
+.block {
+}
+.title {
+  font-size: 50px;
+  margin-bottom: 30px;
+  line-height: 1.3;
+  @include gradient-text($gradient, $gradient-replacement);
+}
+.subtitle {
+  font-size: 20px;
+  line-height: 1.5;
+  max-width: 500px;
+  margin-bottom: 30px;
+}
