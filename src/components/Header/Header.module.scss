@@ -1,0 +1,99 @@
+@import '../../styles/vars';
+@import '../../styles/mixins/flex.scss';
+
+.container {
+  max-width: 1130px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+.header {
+  padding-top: 22px;
+}
+.inner {
+  @include flex(row, center, space-between);
+}
+
+// left side
+.left {
+  @include flex(row, center);
+  height: 41px;
+}
+.logo {
+  font-size: 31px;
+  letter-spacing: -0.6px;
+  color: #dcdcdc;
+  margin-right: 70px;
+  @include flex(row, center);
+  span {
+    color: $blue;
+  }
+}
+.logo_img {
+  height: 41px;
+}
+
+.logo_text {
+  height: 35px;
+  padding-left: 15px;
+}
+
+.navigation {
+  height: inherit;
+  @include flex(row, center);
+}
+.nav_link {
+  height: inherit;
+  @include flex(row, center, center);
+  cursor: pointer;
+  font-size: 15px;
+  letter-spacing: -0.468947px;
+  margin-right: 40px;
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+
+  &:last-child {
+    margin-right: 0;
+  }
+
+  // to fix font-weight twitching
+  &::before {
+    content: attr(data-text);
+    font-weight: 700;
+    visibility: hidden;
+    height: 0;
+    overflow: hidden;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  &::after {
+    content: '';
+    height: 2px;
+    width: 0%;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background: $gradient;
+    transition: 0.4s ease;
+  }
+
+  &:hover {
+    font-weight: 700;
+    background: $gradient;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: $gradient-replacement;
+  }
+
+  &:hover::after {
+    width: 100%;
+  }
+}
+
+// right side
+.buttons{
+    @include flex(row, center);
+}
+

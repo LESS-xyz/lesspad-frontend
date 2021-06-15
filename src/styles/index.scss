@@ -1,0 +1,10 @@
+@import './reset';
+@import './vars';
+@import './fonts';
+
+body {
+  background-color: $background;
+  font-family: Celias, sans-serif;
+  font-weight: normal;
+  color: #fff;
+}

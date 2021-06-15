@@ -1,0 +1,19 @@
+@import '../../styles/vars';
+
+.button {
+  border: 1px solid $blue;
+  border-radius: 2px;
+  color: $blue;
+  padding: 8px 10px;
+  font-size: 16px;
+  letter-spacing: -0.531474px;
+  cursor: pointer;
+  transition: .4s ease;
+
+  &.filled, &:hover{
+      background-color: $blue;
+      color: #fff;
+  }
+}
+
+
