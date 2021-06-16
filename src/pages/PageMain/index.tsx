@@ -1,11 +1,18 @@
 import s from './PageMain.module.scss';
+
 import TopBlock from './TopBlock';
+import FeaturedProject from './FeaturedProjects';
+import PoolsinVoting from './PoolsinVoting/index';
+import FeaturedAlumni from './FeaturedAlumni';
 
 const PageMain: React.FC = () => {
   return (
-    <section className={s.page}>
+    <main className={s.page}>
       <TopBlock />
-    </section>
+      <FeaturedProject />
+      <PoolsinVoting />
+      <FeaturedAlumni />
+    </main>
   );
 };
 

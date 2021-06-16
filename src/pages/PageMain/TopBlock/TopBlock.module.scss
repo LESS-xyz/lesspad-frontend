@@ -9,10 +9,15 @@
 
 .inner {
   height: 100vh;
+
   @include flex(row, center);
 }
 .top {
+  background: linear-gradient(147.05deg, #1c0e40 0%, #000000 77.02%, #000000 90.56%);
+}
+.bg_img {
   background: url('../../../assets/img/sections/home/bg-main.svg') right no-repeat;
+  background-size: contain;
 }
 // block
 .block {

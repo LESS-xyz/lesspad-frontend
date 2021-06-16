@@ -1,5 +1,6 @@
 import React from 'react';
 import { Header } from './components';
+import Footer from './components/Footer/index';
 import { MainPage } from './pages';
 
 export const App: React.FC = () => {
@@ -7,6 +8,7 @@ export const App: React.FC = () => {
     <div className="App">
       <Header />
       <MainPage />
+      <Footer />
     </div>
   );
 };

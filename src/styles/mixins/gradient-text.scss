@@ -1,4 +1,7 @@
-@mixin gradient-text($gradient, $gradient-replacement) {
+@mixin gradient-text(
+  $gradient: linear-gradient(90deg, #6f45ff 0%, #ff6365 100%),
+  $gradient-replacement: #9e4fcd
+) {
   background: $gradient;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;

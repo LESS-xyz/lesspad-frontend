@@ -1,0 +1,29 @@
+@import '../../../styles/mixins/container.scss';
+@import '../../../styles/vars';
+
+.block{
+    padding-top: 90px;
+}
+
+.container {
+  @include container(1330px);
+}
+
+.title {
+  font-size: 40px;
+  text-align: center;
+  color: $grey;
+  margin-bottom: 70px;
+}
+
+.logos {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.logo {
+  width: 25%;
+  margin-bottom: 90px;
+}
+    
