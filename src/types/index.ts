@@ -3,3 +3,10 @@ export enum CardConditions {
   inVoting = 'inVoting',
   closed = 'closed',
 }
+
+
+export enum cryptos {
+  BNB = 'BNB',
+  ETH = 'ETH',
+  POLKADOT = 'POLKADOT',
+}

@@ -1,25 +1,27 @@
 @import '../../styles/vars';
 
 .button {
-  display: inline-block;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  height: 35px;
   background-color: #000;
   border: 1px solid $blue;
   border-radius: 2px;
   color: $blue;
-  padding: 8px 10px;
+  padding: 0 10px;
   font-size: 16px;
   letter-spacing: -0.531474px;
   cursor: pointer;
-  transition: .4s ease;
+  transition: 0.4s ease;
 
-  &.filled, &:hover{
-      background-color: $blue;
-      color: #fff;
+  &.filled,
+  &:hover {
+    background-color: $blue;
+    color: #fff;
   }
 
-  &.big{
-    padding: 20px;
+  &.big {
+    padding: 10px 20px;
   }
 }
-
-

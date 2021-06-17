@@ -25,20 +25,33 @@
 
 // header styles
 .header {
+  @include flex(row, center, space-between);
   border-radius: 2px;
   padding: 15px 10px;
   margin-bottom: 12px;
-
+  &_title {
+    font-weight: 700;
+    font-size: 16px;
+  }
   &.inVoting {
     background: rgba(111, 69, 255, 0.2);
+    .header_title {
+      @include gradient-text($gradient);
+    }
   }
 
   &.closed {
     background: $gradient;
+    .header_title {
+      color: #ffffff;
+    }
   }
 
   &.notOpened {
     background: rgba(214, 208, 235, 0.2);
+    .header_title {
+      color: #b9b6c3;
+    }
   }
 }
 
@@ -105,15 +118,30 @@
   @include flex(row, center, space-between);
 }
 
+.progress_bar__extra {
+  @include flex(row, center);
+}
+
+.thumbup_img {
+  cursor: pointer;
+  margin-left: 10px;
+}
+
 // footer
 .footer {
   @include flex(row, center, space-between);
 }
 
-.first_line {
+.first_line,
+.second_line {
   width: 100%;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+}
+
+.second_line {
+  padding-top: 8px;
 }
 
 .footer_title {
@@ -125,9 +153,14 @@
   font-weight: bold;
   font-size: 22px;
   @include gradient-text($gradient);
-  padding-top: 10px;
 }
 
+.footer_links {
+  @include flex(row, center);
+}
 .footer_link {
-  height: 36px;
+  cursor: pointer;
+  &:first-child {
+    margin-right: 8px;
+  }
 }

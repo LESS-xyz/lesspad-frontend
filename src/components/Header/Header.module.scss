@@ -15,6 +15,7 @@
 }
 .inner {
   @include flex(row, center, space-between);
+  position: relative;
 }
 
 // left side
@@ -95,4 +96,26 @@
 // right side
 .buttons {
   @include flex(row, center);
+}
+
+.button_body {
+  @include flex(row, center);
+}
+.crypto_logo {
+  height: 24px;
+  width: 24px;
+  margin-right: 10px;
+}
+.arrow {
+  transition: 0.4s ease;
+  &.active {
+    transform: rotate(180deg);
+  }
+}
+.current_crypto {
+  margin-right: 5px;
+  max-width: 65px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

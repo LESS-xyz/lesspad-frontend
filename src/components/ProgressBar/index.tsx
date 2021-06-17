@@ -13,7 +13,7 @@ const ProgressBar: React.FC<IBarProps> = ({ totalAmount, currentAmount, type }) 
   if (width > 100) width = 100;
 
   return (
-    <div className={s.bar_body} style={type === CardConditions.inVoting ? { width: '75%' } : {}}>
+    <div className={s.bar_body} style={type === CardConditions.inVoting ? { width: '70%' } : {}}>
       <div style={{ width: `${width}%` }} className={s.bar_gradient} />
       {width === 100 && (
         <div className={s.checkmark}>
