@@ -1,9 +1,8 @@
 import React from 'react';
-
-import './App.scss';
+import { ProjectPage } from './pages';
 
 export const App: React.FC = () => {
   return (
-    <div className="">app</div>
+    <ProjectPage />
   );
 };
