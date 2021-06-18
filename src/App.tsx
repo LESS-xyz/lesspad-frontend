@@ -9,7 +9,7 @@ export const App: React.FC = () => {
       <Header />
       <AllPoolsPage  />
       <Footer />
-      {/* test commit */}
+      {/* test commit 2 */}
     </div>
   );
 };
