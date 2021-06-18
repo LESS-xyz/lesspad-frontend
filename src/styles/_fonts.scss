@@ -1,0 +1,8 @@
+@import './mixins/main';
+//Celias
+@include font-face('Celias', '../assets/fonts/Celias-Regular', normal);
+@include font-face('Celias', '../assets/fonts/Celias-Medium', 500);
+@include font-face('Celias', '../assets/fonts/Celias-Bold', 700);
+
+//Popins
+@include font-face('Poppins', '../assets/fonts/Poppins-Bold', 700);

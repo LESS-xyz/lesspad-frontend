@@ -1,9 +1,14 @@
 import React from 'react';
-
-import './App.scss';
+import { Header } from './components';
+import Footer from './components/Footer/index';
+import { AllPoolsPage } from './pages';
 
 export const App: React.FC = () => {
   return (
-    <div className="">app</div>
+    <div className="App">
+      <Header />
+      <AllPoolsPage  />
+      <Footer />
+    </div>
   );
 };

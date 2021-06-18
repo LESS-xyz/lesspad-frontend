@@ -1,0 +1,33 @@
+@import '../../styles/vars';
+@import '../../styles/mixins/flex.scss';
+
+.selector {
+  width: 100%;
+  height: 100%;
+  color: $blue;
+  background: #100825;
+  border: 1px solid $blue;
+  border-radius: 1px;
+  cursor: pointer;
+  position: relative;
+  z-index: 101;
+}
+
+.currentOption {
+  height: 100%;
+  padding: 0 20px;
+  @include flex(row, center, space-between);
+}
+
+.option {
+  background-color: #100825;
+  position: relative;
+  z-index: 100;
+  height: 100%;
+  @include flex(row, center);
+  padding-left: 20px;
+
+  &:hover {
+    background-color: #21164f;
+  }
+}

@@ -1,0 +1,24 @@
+@import '../../styles/vars';
+
+.bar_body {
+  position: relative;
+  width: 100%;
+  background: rgba(238, 238, 238, 0.1);
+  border-radius: 12px;
+  height: 14px;
+}
+
+.bar_gradient {
+  border-radius: 12px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: $gradient;
+}
+
+.checkmark {
+  position: absolute;
+  top: -3px;
+  right: -5px;
+}

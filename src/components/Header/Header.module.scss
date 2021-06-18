@@ -1,0 +1,121 @@
+@import '../../styles/vars';
+@import '../../styles/mixins/flex.scss';
+@import '../../styles/mixins/container.scss';
+@import '../../styles/mixins/gradient-text.scss';
+
+.container {
+  @include container;
+}
+
+.header {
+  position: absolute;
+  width: 100%;
+  top: 22px;
+  left: 0;
+}
+.inner {
+  @include flex(row, center, space-between);
+  position: relative;
+}
+
+// left side
+.left {
+  @include flex(row, center);
+  height: 41px;
+}
+.logo {
+  font-size: 31px;
+  letter-spacing: -0.6px;
+  color: #dcdcdc;
+  margin-right: 70px;
+  @include flex(row, center);
+  span {
+    color: $blue;
+  }
+}
+.logo_img {
+  height: 41px;
+}
+
+.logo_text {
+  height: 35px;
+  padding-left: 15px;
+}
+
+.navigation {
+  height: inherit;
+  @include flex(row, center);
+}
+.nav_link {
+  height: inherit;
+  @include flex(row, center, center);
+  cursor: pointer;
+  font-size: 15px;
+  letter-spacing: -0.468947px;
+  margin-right: 40px;
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+
+  &:last-child {
+    margin-right: 0;
+  }
+
+  // to fix font-weight twitching
+  &::before {
+    content: attr(data-text);
+    font-weight: 700;
+    visibility: hidden;
+    height: 0;
+    overflow: hidden;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  &::after {
+    content: '';
+    height: 2px;
+    width: 0%;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background: $gradient;
+    transition: 0.4s ease;
+  }
+  // gradient text
+  &:hover {
+    font-weight: 700;
+    @include gradient-text($gradient, $gradient-replacement);
+  }
+
+  &:hover::after {
+    width: 100%;
+  }
+}
+
+// right side
+.buttons {
+  @include flex(row, center);
+}
+
+.button_body {
+  @include flex(row, center);
+}
+.crypto_logo {
+  height: 24px;
+  width: 24px;
+  margin-right: 10px;
+}
+.arrow {
+  transition: 0.4s ease;
+  &.active {
+    transform: rotate(180deg);
+  }
+}
+.current_crypto {
+  margin-right: 5px;
+  max-width: 65px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
