@@ -1,0 +1,70 @@
+@import '../../../styles/mixins/gradient-text.scss';
+@import '../../../styles/mixins/flex.scss';
+
+.table {
+  background: var(--table-background);
+  margin-bottom: 25px;
+}
+.inner {
+  padding-top: 20px;
+}
+
+.table_header {
+  display: grid;
+  grid-template-columns: 0.65fr 1fr 1fr 1fr 1fr 1fr 2fr;
+  grid-column-gap: 25px;
+  padding-bottom: 20px;
+}
+
+.cell {
+  color: var(--blue);
+  font-weight: 700;
+}
+
+.voting {
+  text-align: center;
+}
+
+// row
+.row {
+  display: grid;
+  grid-template-columns: 0.65fr 1fr 1fr 1fr 1fr 1fr 2fr;
+  grid-column-gap: 25px;
+  border-radius: 10px;
+  &.filled {
+    background-color: var(--table-row-filled-background);
+  }
+}
+
+.row_cell {
+  font-size: 16px;
+  font-weight: 400;
+  padding: 17px 0;
+  display: flex;
+  align-items: center;
+
+  &.img {
+    padding-left: 20px;
+    mix-blend-mode: luminosity;
+    img {
+      height: 48px;
+      width: 48px;
+      border-radius: 50%;
+    }
+  }
+  &.price {
+    font-weight: 700;
+    @include gradient-text;
+  }
+  &.likes {
+    @include flex(row, center, space-around);
+  }
+}
+
+.likes {
+  @include flex(row, center);
+  &_img {
+    height: 24px;
+    margin-right: 10px;
+  }
+}

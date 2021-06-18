@@ -1,9 +1,7 @@
-@import '../../styles/vars';
-
 .bar_body {
   position: relative;
   width: 100%;
-  background: rgba(238, 238, 238, 0.1);
+  background: var(--progress-bar-background);
   border-radius: 12px;
   height: 14px;
 }
@@ -14,7 +12,7 @@
   top: 0;
   left: 0;
   height: 100%;
-  background: $gradient;
+  background: var(--gradient);
 }
 
 .checkmark {

@@ -1,0 +1,47 @@
+:root {
+  // common styles
+  --blue: #6f45ff;
+  --gradient: linear-gradient(90deg, #6f45ff 0%, #ff6365 100%);
+  --gradient-replacement: #9e4fcd;
+  --grey: #c2c2c2;
+  --gradient-background: linear-gradient(147.05deg, #1c0e40 0%, #000000 77.02%, #000000 90.56%);
+
+  //body
+  --body-background-color: #000000;
+  --body-color: #fff;
+
+  //header
+  --header-logo-color: #dcdcdc;
+  --header-popup-option-background: rgba(103, 77, 246, 0.2);
+
+  //footer
+  --footer-background: #1a103d;
+  --footer-line-background: #ffffff;
+  --footer-social-icon-background: rgba(255, 255, 255, 0.1);
+
+  //main page
+  --pools-in-voting-background: rgba(103, 77, 246, 0.1);
+
+  //token card
+  --card-background: linear-gradient(90deg, #040404 0%, #1c0e40 100%);
+  --card-header-background-in-voting: rgba(111, 69, 255, 0.2);
+  --card-header-background-not-opened: rgba(214, 208, 235, 0.2);
+  --card-header-color-closed: #fff;
+  --card-header-color-not-opened: #b9b6c3;
+  --card-progress-bar-subinfo-color: #fff;
+  --card-footer-title-color: rgba(255, 255, 255, 0.5);
+
+  //progress-bar in token card
+  --progress-bar-background: rgba(238, 238, 238, 0.1);
+
+  //table
+  --table-background: linear-gradient(90deg, #040404 0%, #1c0e40 100%);
+  --table-row-filled-background: rgba(103, 77, 246, 0.2);
+
+  //selector on all pools page
+  --selector-background: #100825;
+  --selector-hover-background: #21164f;
+
+  //custom input
+  --input-color: #fff;
+}
