@@ -71,7 +71,11 @@ const AllPoolsPage: React.FC = () => {
               />
             </div>
             <div className={s.selector}>
-              <Selector fn={setCurrentOption} defaultOption="All" othersOptions={['Ended', 'In Voting', 'Not Opened']} />
+              <Selector
+                fn={setCurrentOption}
+                defaultOption="All"
+                othersOptions={['Ended', 'In Voting', 'Not Opened']}
+              />
             </div>
           </div>
           <div className={s.cards}>

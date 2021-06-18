@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import s from './Selector.module.scss';
+import arrow from '../../assets/img/icons/arrow-gradient-fill.svg';
 
 interface ISelectorProps {
   defaultOption: string;
@@ -21,6 +22,7 @@ const Selector: React.FC<ISelectorProps> = ({ defaultOption, othersOptions, fn }
         className={s.currentOption}
       >
         {currentOption}
+        <img src={arrow} alt="arrow" />
       </div>
       {isOpen && (
         <>

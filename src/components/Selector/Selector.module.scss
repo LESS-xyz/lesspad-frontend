@@ -15,8 +15,8 @@
 
 .currentOption {
   height: 100%;
-  padding-left: 20px;
-  @include flex(row, center);
+  padding: 0 20px;
+  @include flex(row, center, space-between);
 }
 
 .option {
@@ -28,6 +28,6 @@
   padding-left: 20px;
 
   &:hover {
-    background-color: #21164F;
+    background-color: #21164f;
   }
 }

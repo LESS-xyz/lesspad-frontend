@@ -7,8 +7,8 @@
 
 .button {
   @include flex(row, center, center);
-  width: 45px;
-  height: 45px;
+  width: 47px;
+  height: 47px;
   border: 1px solid $blue;
   cursor: pointer;
   border-radius: 2px;
@@ -21,8 +21,6 @@
     background: $gradient;
     border: none;
     color: #fff;
-    width: 47px;
-    height: 47px;
   }
   &:last-child {
     margin-right: 0;

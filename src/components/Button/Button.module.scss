@@ -4,12 +4,13 @@
   display: inline-flex;
   justify-content: center;
   align-items: center;
-  height: 35px;
+  // height: 35px;
   background-color: #000;
   border: 1px solid $blue;
   border-radius: 2px;
   color: $blue;
-  padding: 0 10px;
+  padding: 10px;
+  height: 42px;
   font-size: 16px;
   letter-spacing: -0.531474px;
   cursor: pointer;
@@ -22,6 +23,7 @@
   }
 
   &.big {
-    padding: 10px 20px;
+    padding: 20px;
+    height: inherit;
   }
 }

@@ -7,7 +7,7 @@ export const App: React.FC = () => {
   return (
     <div className="App">
       <Header />
-      <AllPoolsPage />
+      <AllPoolsPage  />
       <Footer />
     </div>
   );
