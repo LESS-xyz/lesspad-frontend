@@ -2,7 +2,7 @@
 @import '../../styles/mixins/gradient-text.scss';
 
 .card {
-  width: 33.33333333%;
+  width: 100%;
   display: inline-block;
   margin-bottom: 30px;
 }
@@ -16,10 +16,6 @@
   background: var(--card-background);
   padding: 10px 10px 20px;
   height: 430px;
-}
-
-.wrapper {
-  padding: 0 15px;
 }
 
 // header styles

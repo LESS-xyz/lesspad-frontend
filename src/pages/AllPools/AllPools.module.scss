@@ -1,5 +1,6 @@
 @import '../../styles/mixins/container.scss';
 @import '../../styles/mixins/flex.scss';
+@import '../../styles/mixins/media.scss';
 
 .container {
   @include container;
@@ -19,8 +20,11 @@
 }
 
 .cards {
-  @include flex(row, center);
-  margin: 0 -15px;
+  width: 100%;
+  display: grid;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 15px;
 }
 .control_panel {
   @include flex(row, center, space-between);

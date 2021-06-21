@@ -19,6 +19,9 @@
 }
 
 .cards {
-  @include flex(row);
-  margin: 0 -15px;
+  width: 100%;
+  display: grid;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 15px;
 }
