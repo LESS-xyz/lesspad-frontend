@@ -53,7 +53,7 @@ const Header: React.FC = () => {
               <Button filled marginRight={20} onClick={() => alert('Click')}>
                 Connect Wallet
               </Button>
-              <Button>Create Pool</Button>
+              <Button to="/create-pool">Create Pool</Button>
               <Button marginRight={0} onClick={() => setIsPopUpOpen(!isPopUpOpen)}>
                 <div className={s.button_body}>
                   <div className={s.crypto_logo}>
