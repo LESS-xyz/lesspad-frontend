@@ -1,0 +1,21 @@
+@import '../../../styles/mixins/container.scss';
+@import '../../../styles/mixins/flex.scss';
+
+.block {
+  background-color: var(--about-powered-by-background);
+  padding: 47px 0;
+  text-align: center;
+}
+.container {
+  @include container;
+}
+.title {
+  font-size: 24px;
+  text-align: center;
+  letter-spacing: -0.531474px;
+  margin-bottom: 40px;
+}
+
+.logos {
+  @include flex(row, center, space-between);
+}
