@@ -9,6 +9,7 @@ interface IButtonProps {
   disabled?: boolean;
   marginRight?: number;
   big?: boolean;
+  long?: boolean;
 }
 
 const Button: React.FC<IButtonProps> = ({
@@ -18,6 +19,7 @@ const Button: React.FC<IButtonProps> = ({
   disabled,
   marginRight,
   big,
+  long,
 }) => {
   const handleClick = () => {
     if (disabled) return;
@@ -31,7 +33,7 @@ const Button: React.FC<IButtonProps> = ({
       tabIndex={0}
       onClick={handleClick}
       onKeyDown={() => {}}
-      style={{ marginRight: marginRight ?? 10 }}
+      style={{ marginRight: marginRight ?? 10, minWidth: long ? '150px' : '' }}
       className={`${s.button} ${filled && s.filled} ${big && s.big}`}
     >
       {children}

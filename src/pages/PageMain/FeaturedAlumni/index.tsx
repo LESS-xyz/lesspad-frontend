@@ -1,5 +1,4 @@
 import s from './FeaturedAlumni.module.scss';
-import logo1 from '../../../assets/img/sections/alumni-logos/logo-1.svg';
 
 const LogoBlock: React.FC<{ img: string }> = ({ img }) => {
   return (
@@ -11,15 +10,19 @@ const LogoBlock: React.FC<{ img: string }> = ({ img }) => {
   );
 };
 
-const FeaturedAlumni: React.FC = () => {
-  const alumnies = [logo1, logo1, logo1, logo1, logo1, logo1, logo1, logo1];
+interface IFeaturedAlumniProps {
+  logos: Array<string>;
+  title: string;
+}
+
+const FeaturedAlumni: React.FC<IFeaturedAlumniProps> = ({ logos, title }) => {
   return (
     <section className={s.block}>
       <div className={s.container}>
         <div className={s.inner}>
-          <div className={s.title}>Featured Alumni</div>
+          <div className={s.title}>{title}</div>
           <div className={s.logos}>
-            {alumnies.map((logo) => (
+            {logos.map((logo) => (
               <LogoBlock img={logo} />
             ))}
           </div>
