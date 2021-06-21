@@ -1,0 +1,27 @@
+@import '../../styles/mixins/flex.scss';
+@import '../../styles/mixins/container.scss';
+
+.page {
+  padding-top: 160px;
+  min-height: 100vh;
+  background: var(--gradient-background);
+}
+
+.container {
+  @include container;
+}
+
+.inner {
+}
+
+.title {
+  font-size: 40px;
+  line-height: 51px;
+  text-align: center;
+  color: var(--grey);
+  margin-bottom: 60px;
+}
+
+.input {
+  margin-bottom: 30px;
+}

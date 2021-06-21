@@ -3,9 +3,9 @@ import TokenCard from '../../components/TokenCard/index';
 import { CardConditions, cryptos } from '../../types/index';
 import logo1 from '../../assets/img/sections/token-card/logo-1.png';
 import { useState } from 'react';
-import searcgImg from '../../assets/img/icons/search.svg';
 import Pagination from '../../components/Pagination/index';
 import Selector from '../../components/Selector/index';
+import Input from '../../components/Input/index';
 
 const cardsExample = [
   {
@@ -60,13 +60,9 @@ const AllPoolsPage: React.FC = () => {
           </div>
           <div className={s.control_panel}>
             <div className={s.input}>
-              <div className={s.input_img}>
-                <img src={searcgImg} alt="searcgImg" />
-              </div>
-              <input
+              <Input
                 value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                type="text"
+                onChange={(str: string) => setInputValue(str)}
                 placeholder="Search by Name, Token contract address, Token description"
               />
             </div>

@@ -1,11 +1,10 @@
-@import '../../styles/vars';
 @import '../../styles/mixins/container.scss';
 .container {
   @include container;
 }
 
 .footer {
-  background-color: $footerBg;
+  background-color: var(--footer-background);
   padding-top: 50px;
   text-align: center;
   padding-bottom: 25px;
@@ -44,7 +43,7 @@
 .line {
   width: 100%;
   height: 1px;
-  background: #ffffff;
+  background: var(--footer-line-background);
   opacity: 0.2;
   margin-bottom: 25px;
 }
@@ -57,7 +56,7 @@
 
 .info_text {
   font-size: 14px;
-  color: $grey;
+  color: var(--grey);
 }
 
 .social_links {
@@ -68,12 +67,12 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--footer-social-icon-background);
   display: flex;
   justify-content: center;
   align-items: center;
   margin-right: 16px;
-  &:last-child{
-      margin-right: 0;
+  &:last-child {
+    margin-right: 0;
   }
 }

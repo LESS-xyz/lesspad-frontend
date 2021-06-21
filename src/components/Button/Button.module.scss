@@ -1,14 +1,11 @@
-@import '../../styles/vars';
-
 .button {
   display: inline-flex;
   justify-content: center;
   align-items: center;
-  // height: 35px;
   background-color: #000;
-  border: 1px solid $blue;
+  border: 1px solid var(--blue);
   border-radius: 2px;
-  color: $blue;
+  color: var(--blue);
   padding: 10px;
   height: 42px;
   font-size: 16px;
@@ -18,7 +15,7 @@
 
   &.filled,
   &:hover {
-    background-color: $blue;
+    background-color: var(--blue);
     color: #fff;
   }
 

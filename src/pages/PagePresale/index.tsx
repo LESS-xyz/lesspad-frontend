@@ -1,0 +1,64 @@
+import s from './PagePresale.module.scss';
+import Table from './Table/index';
+import logo1 from '../../assets/img/sections/logos/logo1.png';
+import Input from '../../components/Input/index';
+import { useState } from 'react';
+
+const tableDataExample = [
+  {
+    logo: logo1,
+    name: 'XOLO Finance',
+    priceBNB: 1.23,
+    softcap: 532,
+    hardcap: 116224,
+    daysBeforeOpen: 1,
+    likesPercent: 53.58,
+    dislikesPercent: 34,
+  },
+  {
+    logo: logo1,
+    name: 'Tease Fans',
+    priceBNB: 0.000023,
+    softcap: 123,
+    hardcap: 1124,
+    daysBeforeOpen: 43,
+    likesPercent: 87.58,
+    dislikesPercent: 2,
+  },
+  {
+    logo: logo1,
+    name: 'Tease Fans',
+    priceBNB: 0.000023,
+    softcap: 544,
+    hardcap: 65764,
+    daysBeforeOpen: 5,
+    likesPercent: 12.58,
+    dislikesPercent: 78,
+  },
+];
+
+const PagePresale: React.FC = () => {
+  const [inputValue, setInputValue] = useState('');
+  return (
+    <div className={s.page}>
+      <div className={s.container}>
+        <div className={s.inner}>
+          <div className={s.title}>Presale Voting</div>
+          <div className={s.input}>
+            <Input
+              big
+              value={inputValue}
+              onChange={(str: string) => setInputValue(str)}
+              placeholder="Search by Name, Token contract address, Token description"
+            />
+          </div>
+          <div className={s.table}>
+            <Table data={tableDataExample} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default PagePresale;

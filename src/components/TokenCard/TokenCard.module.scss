@@ -1,9 +1,8 @@
-@import '../../styles/vars';
 @import '../../styles/mixins/flex.scss';
 @import '../../styles/mixins/gradient-text.scss';
 
 .card {
-  width: 33%;
+  width: 100%;
   display: inline-block;
   margin-bottom: 30px;
 }
@@ -14,13 +13,9 @@
 }
 .inner {
   @include flex(column, normal, normal, nowrap);
-  background: linear-gradient(90deg, #040404 0%, #1c0e40 100%);
+  background: var(--card-background);
   padding: 10px 10px 20px;
   height: 430px;
-}
-
-.wrapper {
-  padding: 0 15px;
 }
 
 // header styles
@@ -34,23 +29,23 @@
     font-size: 16px;
   }
   &.inVoting {
-    background: rgba(111, 69, 255, 0.2);
+    background: var(--card-header-background-in-voting);
     .header_title {
-      @include gradient-text($gradient);
+      @include gradient-text();
     }
   }
 
   &.closed {
-    background: $gradient;
+    background: var(--gradient);
     .header_title {
-      color: #ffffff;
+      color: var(--card-header-color-closed);
     }
   }
 
   &.notOpened {
-    background: rgba(214, 208, 235, 0.2);
+    background: var(--card-header-background-not-opened);
     .header_title {
-      color: #b9b6c3;
+      color: var(--card-header-color-not-opened);
     }
   }
 }
@@ -90,7 +85,7 @@
 .token_fees {
   font-weight: bold;
   font-size: 26px;
-  @include gradient-text($gradient, $gradient-replacement);
+  @include gradient-text;
 }
 
 // body
@@ -113,7 +108,7 @@
 
 .progress_bar__subinfo {
   font-size: 16px;
-  color: #ffffff;
+  color: var(--card-progress-bar-subinfo-color);
   opacity: 0.5;
   @include flex(row, center, space-between);
 }
@@ -145,14 +140,13 @@
 }
 
 .footer_title {
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--card-footer-title-color);
   font-size: 14px;
-  // margin-bottom: 7px;
 }
 .liquidity_percent {
   font-weight: bold;
   font-size: 22px;
-  @include gradient-text($gradient);
+  @include gradient-text;
 }
 
 .footer_links {
