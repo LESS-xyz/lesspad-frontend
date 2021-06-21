@@ -18,12 +18,10 @@ type TypeApprove = {
   contractAbi: any;
 };
 
-export default class MetamaskService {
+export default class Web3ProviderService {
   public provider: any;
 
   public web3Provider: any;
-
-  // public allowanceTarget: string;
 
   public addresses: any;
 
@@ -31,7 +29,6 @@ export default class MetamaskService {
     this.provider = (window as any).ethereum;
     this.web3Provider = new Web3(this.provider);
     this.addresses = config.addresses;
-    // this.allowanceTarget = this.addresses[config.netType].allowanceTarget;
   }
 
   public checkNetwork = async () => {
@@ -50,6 +47,10 @@ export default class MetamaskService {
 
   public connect = async () => {
     return this.provider.request({ method: 'eth_requestAccounts' });
+  };
+
+  public disconnect = async () => {
+    return this.provider.close();
   };
 
   public getBalance = async (address: string) => {

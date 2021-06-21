@@ -15,11 +15,12 @@ const Button: React.FC<IButtonProps> = ({
   children,
   filled,
   onClick,
-  disabled,
+  disabled = false,
   marginRight,
   big,
 }) => {
   const handleClick = () => {
+    console.log('handleClick:');
     if (disabled) return;
     if (!onClick) return;
     onClick();

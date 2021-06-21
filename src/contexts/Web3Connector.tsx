@@ -2,7 +2,7 @@ import React, { createContext, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { modalActions, userActions, walletActions } from '../redux/actions';
-import Web3Provider from '../services/Metamask';
+import Web3Provider from '../services/Web3Provider';
 import { getFromStorage, setToStorage } from '../utils/localStorage';
 
 const web3ConnectorContext = createContext<any>({
@@ -79,6 +79,7 @@ const Web3Connector: React.FC = ({ children }) => {
 
   const init: any = React.useCallback(() => {
     try {
+      console.log('Web3Connector init:');
       let web3;
       if (walletType === 'walletConnect') {
         web3 = new Web3Provider();

@@ -1,6 +1,6 @@
 const IS_PRODUCTION = true;
 const IS_TESTING_ON_ROPSTEN = false;
-const SHOW_CONSOLE_LOGS = false;
+const SHOW_CONSOLE_LOGS = true;
 
 export default {
   IS_PRODUCTION,
@@ -10,9 +10,9 @@ export default {
   isMainnetOrTestnet: IS_PRODUCTION ? 'mainnet' : 'testnet',
   netType: IS_PRODUCTION ? 'mainnet' : IS_TESTING_ON_ROPSTEN ? 'ropsten' : 'kovan',
   links: {
-    twitter: 'https://twitter.com/bitgeario',
-    telegram: 'https://t.me/bitgear',
-    medium: 'https://medium.com/bitgear.io ',
+    twitter: 'https://twitter.com/',
+    telegram: 'https://t.me/',
+    medium: 'https://medium.com/',
     github: 'https://github.com/',
     reddit: 'https://www.reddit.com/',
     discord: 'https://discord.gg/',
