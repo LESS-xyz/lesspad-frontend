@@ -1,13 +1,33 @@
 import { Header } from './components';
 import Footer from './components/Footer/index';
-import { MainPage } from './pages';
+import { AllPoolsPage, PresalePage, MainPage, Page404 } from './pages';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+} from "react-router-dom";
 
 export const App: React.FC = () => {
   return (
-    <div className="App">
-      <Header />
-      <MainPage />
-      <Footer />
-    </div>
+    <Router>
+      <div className="App">
+        <Header />
+        <Switch>
+          <Route path="/" exact>
+            <MainPage />
+          </Route>
+          <Route path="/pools">
+            <AllPoolsPage />
+          </Route>
+          <Route path="/presale">
+            <PresalePage />
+          </Route>
+          <Route path="*">
+            <Page404 />
+          </Route>
+        </Switch>
+        <Footer />
+      </div>
+    </Router>
   );
 };

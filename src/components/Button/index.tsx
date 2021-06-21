@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 import s from './Button.module.scss';
 
@@ -9,6 +10,7 @@ interface IButtonProps {
   disabled?: boolean;
   marginRight?: number;
   big?: boolean;
+  to?: string;
 }
 
 const Button: React.FC<IButtonProps> = ({
@@ -18,6 +20,7 @@ const Button: React.FC<IButtonProps> = ({
   disabled,
   marginRight,
   big,
+  to,
 }) => {
   const handleClick = () => {
     if (disabled) return;
@@ -25,6 +28,18 @@ const Button: React.FC<IButtonProps> = ({
     onClick();
   };
 
+  if (to) {
+    return (
+      <Link
+        to={to}
+        onKeyDown={() => {}}
+        style={{ marginRight: marginRight ?? 10 }}
+        className={`${s.button} ${filled && s.filled} ${big && s.big}`}
+      >
+        {children}
+      </Link>
+    );
+  }
   return (
     <div
       role="button"

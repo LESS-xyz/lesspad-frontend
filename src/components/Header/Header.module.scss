@@ -27,6 +27,7 @@
   letter-spacing: -0.6px;
   color: var(--header-logo-color);
   margin-right: 70px;
+  text-decoration: none;
   @include flex(row, center);
   span {
     color: var(--blue);
@@ -44,6 +45,10 @@
 .navigation {
   height: inherit;
   @include flex(row, center);
+  a {
+    color: var(--header-logo-color);
+    text-decoration: none;
+  }
 }
 .nav_link {
   height: inherit;

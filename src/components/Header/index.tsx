@@ -7,6 +7,9 @@ import { useState } from 'react';
 import ethLogo from '../../assets/img/icons/eth-logo-colorful.svg';
 import bnbLogo from '../../assets/img/icons/bnb-logo-colorful.svg';
 import polkaLogo from '../../assets/img/icons/polkadot-logo-colorful.svg';
+import {
+  Link
+} from "react-router-dom";
 
 const cryptoLogos = new Map();
 cryptoLogos.set('Ethereum', ethLogo);
@@ -24,7 +27,7 @@ const Header: React.FC = () => {
             <PopUp setIsPopUpOpen={setIsPopUpOpen} setCurrentCrypto={setCurrentCrypto} />
           )}
           <div className={s.left}>
-            <div className={s.logo}>
+            <Link to="/" className={s.logo}>
               <div className={s.logo_img}>
                 <img src={logo} alt="Less-logo" />
               </div>
@@ -32,17 +35,17 @@ const Header: React.FC = () => {
                 less
                 <span>pad</span>
               </div>
-            </div>
+            </Link>
             <nav className={s.navigation}>
-              <div className={s.nav_link} data-text="Pools">
+              <Link to="/pools" className={s.nav_link} data-text="Pools">
                 Pools
-              </div>
-              <div className={s.nav_link} data-text="Voting">
+              </Link>
+              <Link to="/voting" className={s.nav_link} data-text="Voting">
                 Voting
-              </div>
-              <div className={s.nav_link} data-text="Stacking">
+              </Link>
+              <Link to="/staking" className={s.nav_link} data-text="Stacking">
                 Staking
-              </div>
+              </Link>
             </nav>
           </div>
           <div className={s.right}>

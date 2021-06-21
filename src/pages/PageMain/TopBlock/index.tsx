@@ -17,7 +17,7 @@ const TopBlock: React.FC = () => {
                 BSC
               </div>
               <div className={s.buttons}>
-                <Button big>View All Pools</Button>
+                <Button big to="/pools">View All Pools</Button>
                 <Button big>Buy Less</Button>
               </div>
             </div>
