@@ -32,13 +32,17 @@ export default {
   chainIds: {
     mainnet: {
       'Ethereum': {
-        name: 'Mainnet',
+        name: 'Ethereum',
         // first id should be a number 1. other ids cause error in tradeLimit function.
         id: [1, '0x1', '0x01'],
       },
       'Binance-Smart-Chain': {
         name: 'Binance smart chain',
         id: [56, '0x38'],
+      },
+      'Matic': {
+        name: 'Matic',
+        id: [137, '0x137'],
       },
     },
     testnet: {

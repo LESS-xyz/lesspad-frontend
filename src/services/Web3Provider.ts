@@ -37,7 +37,7 @@ export default class Web3ProviderService {
     const usedNet = chainIdsByType.Ethereum.id;
     const netVersion = this.provider.chainId;
     const neededNetName = chainIdsByType.Ethereum.name;
-    console.log('MetamaskService checkNetwork:', usedNet, netVersion, neededNetName);
+    console.log('Web3ProviderService checkNetwork:', usedNet, netVersion, neededNetName);
     if (usedNet.includes(netVersion)) return { status: 'SUCCESS', data: usedNet[0] };
     return {
       status: 'ERROR',
@@ -87,7 +87,7 @@ export default class Web3ProviderService {
       const totalSupply = await contract.methods.totalSupply().call();
       return new BigNumber(totalSupply).toString(10);
     } catch (e) {
-      console.error('MetamaskService totalSupply:', e);
+      console.error('Web3ProviderService totalSupply:', e);
       return '0';
     }
   };
@@ -99,7 +99,7 @@ export default class Web3ProviderService {
     contractAbi,
   }: TypeAllowance) => {
     try {
-      console.log('MetamaskService allowance', {
+      console.log('Web3ProviderService allowance', {
         userAddress,
         allowanceTarget,
         contractAddress,
@@ -109,7 +109,7 @@ export default class Web3ProviderService {
       const allowance = await contract.methods.allowance(userAddress, allowanceTarget).call();
       return +allowance;
     } catch (e) {
-      console.error('MetamaskService allowance:', e);
+      console.error('Web3ProviderService allowance:', e);
       return 0;
     }
   };
@@ -126,7 +126,7 @@ export default class Web3ProviderService {
       const contract = new this.web3Provider.eth.Contract(contractAbi, contractAddress);
       return contract.methods.approve(allowanceTarget, totalSupply).send({ from: userAddress });
     } catch (e) {
-      console.error('MetamaskService approve:', e);
+      console.error('Web3ProviderService approve:', e);
       return null;
     }
   };
@@ -144,10 +144,10 @@ export default class Web3ProviderService {
       const prevPrevBlock = await this.web3Provider.eth.getBlock(latestBlock.number - 2);
       const interval1 = latestBlock.timestamp - prevBlock.timestamp;
       const interval2 = prevBlock.timestamp - prevPrevBlock.timestamp;
-      console.log('MetamaskService getLastBlockInverval:', latestBlock, prevBlock);
+      console.log('Web3ProviderService getLastBlockInverval:', latestBlock, prevBlock);
       return { status: 'SUCCESS', data: ((interval1 + interval2) / 2) * 1000 };
     } catch (e) {
-      console.error('MetamaskService getLastBlockInverval:', e);
+      console.error('Web3ProviderService getLastBlockInverval:', e);
       return { status: 'ERROR', data: null };
     }
   };

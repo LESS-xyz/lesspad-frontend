@@ -20,7 +20,6 @@ const Button: React.FC<IButtonProps> = ({
   big,
 }) => {
   const handleClick = () => {
-    console.log('handleClick:');
     if (disabled) return;
     if (!onClick) return;
     onClick();
