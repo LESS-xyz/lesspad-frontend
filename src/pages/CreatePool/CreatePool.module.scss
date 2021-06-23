@@ -20,75 +20,6 @@
   margin-bottom: 70px;
 }
 
-.presale_type {
-  border-radius: 2px;
-  width: 100%;
-  margin-bottom: 40px;
-
-  &__title {
-    font-size: 16px;
-    text-transform: uppercase;
-    opacity: 0.6;
-    margin-bottom: 22px;
-  }
-
-  &__inner {
-    padding: 10px;
-    background: rgba(103, 77, 246, 0.2);
-    @include grid;
-  }
-
-  &__button {
-    cursor: pointer;
-    text-align: center;
-    padding: 16px;
-    border: 1px solid var(--blue);
-    border-radius: 2px;
-
-    &.active {
-      background: var(--gradient);
-    }
-  }
-}
-// input
-.input {
-  margin-bottom: 40px;
-  input {
-    width: 100%;
-    padding: 17px 19px;
-    color: #fff;
-    font-weight: 700;
-    font-size: 20px;
-    background-color: #000;
-    border: 2px solid var(--blue);
-    border-radius: 2px;
-  }
-
-  &_title {
-    font-weight: 700;
-    font-size: 16px;
-    text-transform: uppercase;
-    color: var(--blue);
-    margin-bottom: 8px;
-  }
-
-  &_subtitle {
-    margin-top: 10px;
-    font-size: 15px;
-  }
-
-  &.invalid {
-    input {
-      color: var(--create-pool-input-invalid-color);
-      border-color: var(--create-pool-input-invalid-color);
-    }
-
-    .input_title {
-      color: var(--create-pool-input-invalid-color);
-    }
-  }
-}
-
 .calender {
   position: fixed;
   top: 50%;
@@ -111,7 +42,7 @@
     padding: 17px 19px;
     @include flex(row, center);
   }
-  
+
   &_title {
     font-weight: 700;
     font-size: 16px;
@@ -132,22 +63,6 @@
   &_img {
     height: 24px;
     cursor: pointer;
-  }
-}
-
-.invalid_err {
-  margin-top: 14px;
-  display: flex;
-  align-items: center;
-
-  &__img {
-    height: 24px;
-    margin-right: 10px;
-    font-size: 15px;
-  }
-
-  &__text {
-    color: var(--create-pool-input-invalid-color);
   }
 }
 
