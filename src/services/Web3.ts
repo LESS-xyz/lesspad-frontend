@@ -22,7 +22,7 @@ type TypeApprove = {
   contractAbi: any;
 };
 
-export default class Web3ProviderService {
+export default class Web3Service {
   public provider: any;
 
   public web3Provider: any;

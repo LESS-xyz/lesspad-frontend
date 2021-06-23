@@ -2,11 +2,11 @@ import React, { createContext, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { modalActions, userActions, walletActions } from '../redux/actions';
-import Web3Provider from '../services/Web3Provider';
+import Web3 from '../services/Web3';
 import { getFromStorage, setToStorage } from '../utils/localStorage';
 
 const web3ConnectorContext = createContext<any>({
-  web3Provider: {},
+  web3: {},
 });
 
 type TypeModalParams = {
@@ -77,7 +77,7 @@ const Web3Connector: React.FC = ({ children }) => {
 
   const init: any = React.useCallback(() => {
     try {
-      const web3 = new Web3Provider({ chainType });
+      const web3 = new Web3({ chainType });
       // if (walletType === 'walletConnect') {
       //   web3 = new Web3Provider({ chainType });
       // } else if (walletType === 'metamask') {
@@ -115,7 +115,7 @@ const Web3Connector: React.FC = ({ children }) => {
   }, [initCounter, type, chainType]);
 
   return (
-    <web3ConnectorContext.Provider value={{ web3Provider }}>
+    <web3ConnectorContext.Provider value={{ web3: web3Provider }}>
       {children}
     </web3ConnectorContext.Provider>
   );

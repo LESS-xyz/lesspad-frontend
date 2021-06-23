@@ -1,11 +1,13 @@
+import React, { useEffect, useState } from 'react';
+
 import s from './AllPools.module.scss';
 import TokenCard from '../../components/TokenCard/index';
 import { CardConditions, cryptos } from '../../types/index';
 import logo1 from '../../assets/img/sections/token-card/logo-1.png';
-import { useState } from 'react';
 import Pagination from '../../components/Pagination/index';
 import Selector from '../../components/Selector/index';
 import Search from '../../components/Search/index';
+import { useContractsContext } from "../../contexts/ContractsContext";
 
 const cardsExample = [
   {
@@ -49,8 +51,27 @@ const cardsExample = [
 ];
 
 const AllPoolsPage: React.FC = () => {
+  const { ContractLessLibrary } = useContractsContext();
+
   const [inputValue, setInputValue] = useState('');
   const [currentOption, setCurrentOption] = useState('All');
+
+  const getPresalesCount = async () => {
+    try {
+      const count = await ContractLessLibrary.getPresalesCount();
+      console.log('AllPoolsPage getPresalesCount:', count);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  useEffect(() => {
+    if (!ContractLessLibrary) return;
+    console.log('AllPoolsPage useEffect:')
+    getPresalesCount();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ContractLessLibrary])
+
   return (
     <section className={s.page}>
       <div className={s.container}>
