@@ -22,11 +22,11 @@ const CreatePoolPage: React.FC = () => {
   const [whitelistValues, setWhitelistValues] = useState('');
 
   // стейт календарей открыт/закрыт
-  const [isPublic, setIsPublic] = useState(true);
   const [isCalendar1, setIsCalendar1] = useState(false);
   const [isCalendar2, setIsCalendar2] = useState(false);
 
   // чекбоксы
+  const [isPublic, setIsPublic] = useState(true);
   const [isLiquidity, setIsLiquidity] = useState(false);
   const [isAutomatically, setIsAutomatically] = useState(false);
   const [isVesting, setIsVesting] = useState(false);
@@ -47,6 +47,10 @@ const CreatePoolPage: React.FC = () => {
       pricePerTokenOnTheExchanger,
       timeToPlaceLiquidity,
       numberOfDaysToLockLPTokens,
+      whitelistValues,
+      isLiquidity,
+      isAutomatically,
+      isVesting,
     });
   };
 
