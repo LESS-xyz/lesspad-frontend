@@ -10,4 +10,8 @@ export default {
     type: 'WALLET:SET_CHAIN_ID',
     payload,
   }),
+  setChainType: (payload: string) => ({
+    type: 'WALLET:SET_CHAIN_TYPE',
+    payload,
+  }),
 };

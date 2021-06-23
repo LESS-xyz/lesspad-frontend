@@ -1,5 +1,5 @@
-const IS_PRODUCTION = true;
-const IS_TESTING_ON_ROPSTEN = false;
+const IS_PRODUCTION = false;
+const IS_TESTING_ON_ROPSTEN = true;
 const SHOW_CONSOLE_LOGS = true;
 
 export default {
@@ -33,7 +33,6 @@ export default {
     mainnet: {
       'Ethereum': {
         name: 'Ethereum',
-        // first id should be a number 1. other ids cause error in tradeLimit function.
         id: [1, '0x1', '0x01'],
       },
       'Binance-Smart-Chain': {
@@ -58,6 +57,11 @@ export default {
       'Binance-Smart-Chain': {
         name: 'Binance smart chain testnet',
         id: [97, '0x61'],
+      },
+      // todo
+      'Matic': {
+        name: 'Matic testnet',
+        id: [137, '0x137'],
       },
     },
   },

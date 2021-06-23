@@ -22,7 +22,7 @@ const Web3Connector: React.FC = ({ children }) => {
   const walletType = getFromStorage('walletType');
   // eslint-disable-next-line react-hooks/exhaustive-deps
 
-  const { counter: initCounter, type } = useSelector(({ wallet }: any) => wallet);
+  const { counter: initCounter, type, chainType } = useSelector(({ wallet }: any) => wallet);
   const dispatch = useDispatch();
   const setUserData = React.useCallback((props: any) => dispatch(userActions.setUserData(props)), [
     dispatch,
@@ -71,7 +71,7 @@ const Web3Connector: React.FC = ({ children }) => {
         console.error('login:', e);
         setToStorage('walletType', '');
         // init();
-        window.location.reload();
+        // window.location.reload();
       }
     },
     [setUserData, toggleModal, setChainId],
@@ -79,13 +79,13 @@ const Web3Connector: React.FC = ({ children }) => {
 
   const init: any = React.useCallback(() => {
     try {
-      console.log('Web3Connector init:');
-      let web3;
-      if (walletType === 'walletConnect') {
-        web3 = new Web3Provider();
-      } else if (walletType === 'metamask') {
-        web3 = new Web3Provider();
-      }
+      const web3 = new Web3Provider({ chainType });
+      // if (walletType === 'walletConnect') {
+      //   web3 = new Web3Provider({ chainType });
+      // } else if (walletType === 'metamask') {
+      //   web3 = new Web3Provider({ chainType });
+      // }
+      console.log('Web3Connector init:', web3);
       if (!web3) return;
 
       if (walletType !== 'walletConnect') {
@@ -109,11 +109,12 @@ const Web3Connector: React.FC = ({ children }) => {
     } catch (e) {
       console.error('init:', e);
     }
-  }, [walletType, login]);
+  }, [walletType, login, chainType]);
 
   React.useEffect(() => {
     init();
-  }, [initCounter, type, init]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initCounter, type, chainType]);
 
   return (
     <web3ConnectorContext.Provider value={{ web3Provider }}>

@@ -3,6 +3,10 @@ import Web3 from 'web3';
 
 import config from '../config';
 
+type TypeConstructorProps = {
+  chainType: string;
+};
+
 type TypeAllowance = {
   userAddress: string;
   allowanceTarget: string;
@@ -25,7 +29,10 @@ export default class Web3ProviderService {
 
   public addresses: any;
 
-  constructor() {
+  public chainType: string;
+
+  constructor({ chainType }: TypeConstructorProps) {
+    this.chainType = chainType;
     this.provider = (window as any).ethereum;
     this.web3Provider = new Web3(this.provider);
     this.addresses = config.addresses;
@@ -33,11 +40,11 @@ export default class Web3ProviderService {
 
   public checkNetwork = async () => {
     const { chainIds } = config;
-    const chainIdsByType = chainIds[config.IS_PRODUCTION ? 'mainnet' : 'testnet'];
-    const usedNet = chainIdsByType.Ethereum.id;
+    const chainIdsByType: any = chainIds[config.IS_PRODUCTION ? 'mainnet' : 'testnet'];
+    const usedNet = chainIdsByType[this.chainType].id;
     const netVersion = this.provider.chainId;
-    const neededNetName = chainIdsByType.Ethereum.name;
-    console.log('Web3ProviderService checkNetwork:', usedNet, netVersion, neededNetName);
+    const neededNetName = chainIdsByType[this.chainType].name;
+    console.log('Web3ProviderService checkNetwork:', { usedNet, netVersion, neededNetName });
     if (usedNet.includes(netVersion)) return { status: 'SUCCESS', data: usedNet[0] };
     return {
       status: 'ERROR',

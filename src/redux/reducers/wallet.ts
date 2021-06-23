@@ -1,7 +1,12 @@
+import { getFromStorage, setToStorage } from "../../utils/localStorage";
+
+const defaultChainType = getFromStorage('chainType');
+
 const initialState = {
   counter: 0,
   type: '',
   chainId: null,
+  chainType: defaultChainType || 'Ethereum',
 };
 
 export default (state = initialState, params: any) => {
@@ -24,6 +29,12 @@ export default (state = initialState, params: any) => {
       return {
         ...state,
         ...{ chainId: params.payload },
+      };
+    case 'WALLET:SET_CHAIN_TYPE':
+      setToStorage('chainType', params.payload);
+      return {
+        ...state,
+        ...{ chainType: params.payload },
       };
     default:
       return state;

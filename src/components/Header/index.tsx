@@ -6,24 +6,25 @@ import PopUp from './PopUp';
 import { useState } from 'react';
 import ethLogo from '../../assets/img/icons/eth-logo-colorful.svg';
 import bnbLogo from '../../assets/img/icons/bnb-logo-colorful.svg';
-import polkaLogo from '../../assets/img/icons/polkadot-logo-colorful.svg';
+import maticLogo from '../../assets/img/icons/matic-logo.svg';
 import { useDispatch, useSelector } from 'react-redux';
 import { walletActions, userActions } from '../../redux/actions';
 import { setToStorage } from '../../utils/localStorage';
 
 const cryptoLogos = new Map();
 cryptoLogos.set('Ethereum', ethLogo);
-cryptoLogos.set('Binance Smart Chain', bnbLogo);
-cryptoLogos.set('PolkaDot', polkaLogo);
+cryptoLogos.set('Binance-Smart-Chain', bnbLogo);
+cryptoLogos.set('Matic', maticLogo);
 
 const Header: React.FC = () => {
   const [isPopUpOpen, setIsPopUpOpen] = useState(false);
-  const [currentCrypto, setCurrentCrypto] = useState('Ethereum');
 
   const { address: userAddress } = useSelector(({ user }: any) => user);
+  const { chainType } = useSelector(({ wallet }: any) => wallet);
 
   const dispatch = useDispatch();
   const setWalletType = (props: string) => dispatch(walletActions.setWalletType(props));
+  const setChainType = (props: string) => dispatch(walletActions.setChainType(props));
   const setUserData = (props: any) => dispatch(userActions.setUserData(props));
 
   const handleConnectWallet = () => {
@@ -49,7 +50,7 @@ const Header: React.FC = () => {
       <div className={s.container}>
         <div className={s.inner}>
           {isPopUpOpen && (
-            <PopUp setIsPopUpOpen={setIsPopUpOpen} setCurrentCrypto={setCurrentCrypto} />
+            <PopUp setIsPopUpOpen={setIsPopUpOpen} setCurrentCrypto={setChainType} />
           )}
           <div className={s.left}>
             <div className={s.logo}>
@@ -88,9 +89,9 @@ const Header: React.FC = () => {
               <Button marginRight={0} onClick={() => setIsPopUpOpen(!isPopUpOpen)}>
                 <div className={s.button_body}>
                   <div className={s.crypto_logo}>
-                    <img src={cryptoLogos.get(currentCrypto)} alt="crypto-logo" />
+                    <img src={cryptoLogos.get(chainType)} alt="crypto-logo" />
                   </div>
-                  <div className={s.current_crypto}>{currentCrypto}</div>
+                  <div className={s.current_crypto}>{chainType}</div>
                   <div className={`${s.arrow} ${isPopUpOpen && s.active}`}>
                     <img src={arrow} alt="arrow" />
                   </div>
