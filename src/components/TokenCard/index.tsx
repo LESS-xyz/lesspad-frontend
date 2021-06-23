@@ -2,7 +2,8 @@ import s from './TokenCard.module.scss';
 import { CardConditions, cryptos } from '../../types/index';
 import ProgressBar from '../ProgressBar/index';
 import Icon from '../Icon/index';
-// icons
+import { Link } from 'react-router-dom';
+
 import thumbup from '../../assets/img/sections/token-card/thumb-up.svg';
 import telegramActive from '../../assets/img/icons/telegram-active.svg';
 import telegramDisabled from '../../assets/img/icons/telegram-disabled.svg';
@@ -69,7 +70,7 @@ const TokenCard: React.FC<ITokenCardProps> = ({
   cryptoType,
 }) => {
   return (
-    <div className={s.card}>
+    <Link to="/pool" className={s.card}>
       <div className={s.inner}>
         <div className={`${s.header} ${s[type]}`}>
           <div className={s.header_icon}>
@@ -181,7 +182,7 @@ const TokenCard: React.FC<ITokenCardProps> = ({
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
 

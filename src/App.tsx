@@ -1,6 +1,6 @@
 import { Header } from './components';
 import Footer from './components/Footer/index';
-import { AllPoolsPage, PresalePage, MainPage, Page404, CreatePoolPage, AboutPage } from './pages';
+import { AllPoolsPage, PageVoting, MainPage, Page404, CreatePoolPage, AboutPage } from './pages';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { Modal } from './components/Modal';
 
@@ -16,8 +16,8 @@ export const App: React.FC = () => {
           <Route path="/pools">
             <AllPoolsPage />
           </Route>
-          <Route path="/presale">
-            <PresalePage />
+          <Route path="/voting">
+            <PageVoting />
           </Route>
           <Route path="/create-pool">
             <CreatePoolPage />

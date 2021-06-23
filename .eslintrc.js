@@ -97,16 +97,7 @@ module.exports = {
     'import/no-duplicates': 'error',
     'import/no-extraneous-dependencies': 'off',
     'import/prefer-default-export': 'off',
-    'import/extensions': [
-      'error',
-      'ignorePackages',
-      {
-        js: 'never',
-        jsx: 'never',
-        ts: 'never',
-        tsx: 'never',
-      },
-    ],
+    'import/extensions': 'off',
     'no-confusing-arrow': ['error', { allowParens: false }],
     'no-underscore-dangle': ['error', { allow: ['__typename'] }],
     'simple-import-sort/sort': [
