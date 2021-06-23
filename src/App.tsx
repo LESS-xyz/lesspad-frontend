@@ -1,12 +1,11 @@
 import { Header } from './components';
 import Footer from './components/Footer/index';
-import { AllPoolsPage, PresalePage, MainPage, Page404 } from './pages';
+import { AllPoolsPage, PresalePage, MainPage, Page404, CreatePoolPage } from './pages';
 import {
   BrowserRouter as Router,
   Switch,
   Route,
 } from "react-router-dom";
-import { MainPage } from './pages';
 import { Modal } from "./components/Modal";
 
 export const App: React.FC = () => {
@@ -24,17 +23,16 @@ export const App: React.FC = () => {
           <Route path="/presale">
             <PresalePage />
           </Route>
+          <Route path="/create-pool">
+            <CreatePoolPage />
+          </Route>
           <Route path="*">
             <Page404 />
           </Route>
         </Switch>
         <Footer />
       </div>
-    </Router>
-    <div className="App">
-      <Header />
-      <Footer />
       <Modal />
-    </div>
+    </Router>
   );
 };
