@@ -2,9 +2,36 @@
 @import './fonts';
 @import './theme';
 
+@font-face {
+  font-family: 'Celias';
+  src: url('../assets/fonts/Celias.ttf');
+}
+
+@font-face {
+  font-family: 'Celias Bold';
+  src: url('../assets/fonts/Celias-Bold.ttf');
+}
+
+@font-face {
+  font-family: 'Poppins Bold';
+  src: url('../assets/fonts/Poppins-Bold.ttf');
+}
+
+:root {
+  --body-text-color: #fff;
+  --body-bg-color: linear-gradient(to bottom right, #1c0e40, #040404 50%);
+}
+
 body {
-  background-color: var(--body-background-color);
+  margin: 0;
+
+  box-sizing: border-box;
+
   font-family: Celias, sans-serif;
   font-weight: normal;
+
   color: var(--body-color);
+  background-color: var(--body-background-color);
+  background-repeat: no-repeat;
 }
+
