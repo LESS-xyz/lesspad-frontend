@@ -1,11 +1,14 @@
-import s from './AllPools.module.scss';
-import TokenCard from '../../components/TokenCard/index';
-import { CardConditions, cryptos } from '../../types/index';
+import React, { useEffect, useState } from 'react';
+
 import logo1 from '../../assets/img/sections/token-card/logo-1.png';
-import { useState } from 'react';
 import Pagination from '../../components/Pagination/index';
-import Selector from '../../components/Selector/index';
 import Search from '../../components/Search/index';
+import Selector from '../../components/Selector/index';
+import TokenCard from '../../components/TokenCard/index';
+import { useContractsContext } from '../../contexts/ContractsContext';
+import { CardConditions, cryptos } from '../../types/index';
+
+import s from './AllPools.module.scss';
 
 const cardsExample = [
   {
@@ -49,8 +52,29 @@ const cardsExample = [
 ];
 
 const AllPoolsPage: React.FC = () => {
-  const [inputValue, setInputValue] = useState('');
-  const [currentOption, setCurrentOption] = useState('All');
+  const { ContractLessLibrary } = useContractsContext();
+
+  const [inputValue, setInputValue] = useState<string>('');
+  const [currentOption, setCurrentOption] = useState<string>('All');
+  const [presalesAddresses, setPresalesAddresses] = useState<any>([]);
+
+  const getPresalesAddresses = async () => {
+    try {
+      const addresses = await ContractLessLibrary.getPresalesAddresses();
+      if (addresses) setPresalesAddresses(addresses);
+      console.log('AllPoolsPage getPresalesAddresses:', addresses);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  useEffect(() => {
+    if (!ContractLessLibrary) return;
+    console.log('AllPoolsPage useEffect:');
+    getPresalesAddresses();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ContractLessLibrary]);
+
   return (
     <section className={s.page}>
       <div className={s.container}>
@@ -75,9 +99,21 @@ const AllPoolsPage: React.FC = () => {
             </div>
           </div>
           <div className={s.cards}>
-            {cardsExample.map((card) => (
-              <TokenCard {...card} />
-            ))}
+            {presalesAddresses.map((address: string) => {
+              const props = {
+                type: CardConditions.closed,
+                cryptoType: cryptos.ETH,
+                logo: logo1,
+                name: 'XOLO Financies',
+                cost: '0.0000345',
+                totalAmount: 3454,
+                currentAmount: 2343,
+                minPercent: 45,
+                liquidityPercent: 56,
+                daysBeforeOpening: 4,
+              };
+              return <TokenCard key={address} address={address} {...props} />;
+            })}
             {cardsExample.map((card) => (
               <TokenCard {...card} />
             ))}

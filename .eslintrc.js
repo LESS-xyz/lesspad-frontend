@@ -139,6 +139,7 @@ module.exports = {
     'no-continue': 'warn',
     'no-await-in-loop': 'warn',
     'spaced-comment': 'off',
+    'lines-between-class-members': 'off',
   },
   settings: {
     'import/resolver': {

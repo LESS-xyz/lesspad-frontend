@@ -55,6 +55,8 @@
 .token_info {
   @include flex(row, center);
   margin-bottom: 20px;
+  text-decoration: none;
+  color: var(--card-header-color-closed);
 }
 .token_logo {
   width: 64px;
