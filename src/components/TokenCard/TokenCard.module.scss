@@ -4,6 +4,8 @@
 .card {
   width: 100%;
   display: inline-block;
+  text-decoration: none;
+  color: var(--card-header-color-closed);
 }
 .card_container {
   height: inherit;

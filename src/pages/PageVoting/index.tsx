@@ -37,7 +37,7 @@ const tableDataExample = [
   },
 ];
 
-const PagePresale: React.FC = () => {
+const PageVoting: React.FC = () => {
   const [inputValue, setInputValue] = useState('');
   return (
     <div className={s.page}>
@@ -61,4 +61,4 @@ const PagePresale: React.FC = () => {
   );
 };
 
-export default PagePresale;
+export default PageVoting;
