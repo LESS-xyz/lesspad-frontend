@@ -33,7 +33,6 @@ export const App: React.FC = () => {
     </Router>
     <div className="App">
       <Header />
-      <MainPage />
       <Footer />
       <Modal />
     </div>

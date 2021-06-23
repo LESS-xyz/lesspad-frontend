@@ -4,7 +4,6 @@ export enum CardConditions {
   closed = 'closed',
 }
 
-
 export enum cryptos {
   BNB = 'BNB',
   ETH = 'ETH',

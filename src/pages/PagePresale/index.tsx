@@ -1,7 +1,7 @@
 import s from './PagePresale.module.scss';
 import Table from './Table/index';
 import logo1 from '../../assets/img/sections/logos/logo1.png';
-import Input from '../../components/Input/index';
+import Search from '../../components/Search/index';
 import { useState } from 'react';
 
 const tableDataExample = [
@@ -45,7 +45,7 @@ const PagePresale: React.FC = () => {
         <div className={s.inner}>
           <div className={s.title}>Presale Voting</div>
           <div className={s.input}>
-            <Input
+            <Search
               big
               value={inputValue}
               onChange={(str: string) => setInputValue(str)}
