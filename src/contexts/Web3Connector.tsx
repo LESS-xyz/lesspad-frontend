@@ -20,7 +20,6 @@ const Web3Connector: React.FC = ({ children }) => {
   const [web3Provider, setWeb3Provider] = React.useState<any>(null);
 
   const walletType = getFromStorage('walletType');
-  // eslint-disable-next-line react-hooks/exhaustive-deps
 
   const { counter: initCounter, type, chainType } = useSelector(({ wallet }: any) => wallet);
   const dispatch = useDispatch();
@@ -35,7 +34,6 @@ const Web3Connector: React.FC = ({ children }) => {
     (props: string) => dispatch(walletActions.setChainId(props)),
     [dispatch],
   );
-  // const walletInit = React.useCallback(() => dispatch(walletActions.walletInit()), [dispatch]);
 
   const login = React.useCallback(
     async (web3: any) => {

@@ -6,8 +6,8 @@ import PopUp from './PopUp';
 import { useState } from 'react';
 import ethLogo from '../../assets/img/icons/eth-logo-colorful.svg';
 import bnbLogo from '../../assets/img/icons/bnb-logo-colorful.svg';
-import { Link } from 'react-router-dom';
 import maticLogo from '../../assets/img/icons/matic-logo.svg';
+import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
 import { walletActions, userActions } from '../../redux/actions';
 import { setToStorage } from '../../utils/localStorage';
@@ -70,6 +70,9 @@ const Header: React.FC = () => {
               </Link>
               <Link to="/staking" className={s.nav_link} data-text="Stacking">
                 Staking
+              </Link>
+              <Link to="/about" className={s.nav_link} data-text="Stacking">
+                About
               </Link>
             </nav>
           </div>
