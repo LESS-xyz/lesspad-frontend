@@ -9,25 +9,25 @@ module.exports = {
             true,
             { ignorePseudoClasses: ['focus-visible', 'global'] },
         ],
-        'rule-empty-line-before': ['always', { except: ['after-single-line-comment', 'first-nested'] }],
+        'rule-empty-line-before': ['never', { except: ['after-single-line-comment', 'first-nested'] }],
         'declaration-empty-line-before': ['never', { ignore: ['after-declaration'] }],
         'string-quotes': 'single',
         'order/order': ['custom-properties', 'declarations', 'rules'],
         'order/properties-order': [
             {
-                emptyLineBefore: 'always',
+                emptyLineBefore: 'never',
                 properties: ['all'],
             },
             {
-                emptyLineBefore: 'always',
+                emptyLineBefore: 'never',
                 properties: ['content', 'quotes', 'counter-reset', 'counter-increment', 'resize'],
             },
             {
-                emptyLineBefore: 'always',
+                emptyLineBefore: 'never',
                 properties: ['position', 'z-index', 'top', 'right', 'left', 'bottom'],
             },
             {
-                emptyLineBefore: 'always',
+                emptyLineBefore: 'never',
                 properties: [
                     'margin',
                     'margin-top',
@@ -42,7 +42,7 @@ module.exports = {
                 ],
             },
             {
-                emptyLineBefore: 'always',
+                emptyLineBefore: 'never',
                 properties: [
                     'display',
                     'visibility',
@@ -62,7 +62,7 @@ module.exports = {
                 ],
             },
             {
-                emptyLineBefore: 'always',
+                emptyLineBefore: 'never',
                 properties: [
                     'box-sizing',
                     'width',
@@ -74,7 +74,7 @@ module.exports = {
                 ],
             },
             {
-                emptyLineBefore: 'always',
+                emptyLineBefore: 'never',
                 properties: [
                     'table-layout',
                     'empty-cells',
@@ -88,7 +88,7 @@ module.exports = {
                 ],
             },
             {
-                emptyLineBefore: 'always',
+                emptyLineBefore: 'never',
                 properties: [
                     'font',
                     'font-family',
@@ -131,15 +131,15 @@ module.exports = {
                 ],
             },
             {
-                emptyLineBefore: 'always',
+                emptyLineBefore: 'never',
                 properties: ['cursor', 'user-select', 'pointer-events'],
             },
             {
-                emptyLineBefore: 'always',
+                emptyLineBefore: 'never',
                 properties: ['nav-index', 'nav-up', 'nav-right', 'nav-down', 'nav-left'],
             },
             {
-                emptyLineBefore: 'always',
+                emptyLineBefore: 'never',
                 properties: [
                     'color',
                     'background',
@@ -195,7 +195,7 @@ module.exports = {
                 ],
             },
             {
-                emptyLineBefore: 'always',
+                emptyLineBefore: 'never',
                 properties: [
                     'transition',
                     'transition-duration',

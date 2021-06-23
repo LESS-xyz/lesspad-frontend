@@ -1,0 +1,95 @@
+@import '../../styles/_theme2';
+@import '../../styles/mixins/flex';
+@import '../../styles/mixins/media';
+
+.modalOpen {
+  @include flex(column, center, center);
+  position: fixed;
+  z-index: 100000000;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  opacity: 1;
+  transition: opacity 0.3s;
+}
+
+.modalClosed {
+  @include flex(column, center, center);
+  position: fixed;
+  z-index: 100000000;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background-color: rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.modalContainer {
+  @include flex(column, center, normal, nowrap);
+  position: relative;
+  margin: 10px;
+  padding: 20px 30px;
+  overflow: auto;
+  min-width: 300px;
+  max-width: 600px;
+  min-height: 150px;
+  max-height: 100vh;
+  font-size: 20px;
+  line-height: 26px;
+  text-align: center;
+  color: $color-text-primary;
+  background-color: $color-bg;
+  border: 1px solid var(--blue);
+  border-radius: 2px;
+
+  @include b('mobile') {
+    width: 100%;
+    padding: 20px 10px;
+    margin: 0px;
+  }
+}
+
+.modalContainerFullPage {
+  position: absolute;
+  width: 100%;
+  margin: 0;
+  border-radius: 0;
+  border: none;
+  padding: 10px 30px;
+
+  @include b('mobile') {
+    width: 100%;
+    padding: 10px;
+    margin: 0px;
+  }
+}
+
+.modalImage {
+  width: 40px;
+  height: 40px;
+}
+
+.modalHeader {
+  @include flex(row,center,center);
+  width: calc(100% - 46px);
+  padding: 0;
+  width: 100%;
+  font-weight: 700;
+  font-size: 24px;
+  text-align: center;
+}
+
+.modalClose {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  width: 20px;
+  height: 20px;
+  padding: 10px;
+  cursor: pointer;
+}
