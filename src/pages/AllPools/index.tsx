@@ -115,10 +115,10 @@ const AllPoolsPage: React.FC = () => {
               return <TokenCard key={address} address={address} {...props} />;
             })}
             {cardsExample.map((card) => (
-              <TokenCard address="address" {...card} />
+              <TokenCard {...card} />
             ))}
             {cardsExample.map((card) => (
-              <TokenCard address="address" {...card} />
+              <TokenCard {...card} />
             ))}
           </div>
           <div className={s.pagination}>

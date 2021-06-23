@@ -1,6 +1,6 @@
 // import BigNumber from 'bignumber.js/bignumber';
 import Web3 from 'web3';
-import config from '../config';
+import config from '../../config';
 
 type TypeConstructorProps = {
   web3Provider: any;

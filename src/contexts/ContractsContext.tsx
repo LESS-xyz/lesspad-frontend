@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 
-import ContractLessLibraryService from '../services/ContractLessLibrary';
+import ContractLessLibraryService from '../services/contracts/ContractLessLibrary';
+import ContractPresalePublicService from '../services/contracts/ContractPresalePublic';
 import { useWeb3ConnectorContext } from './Web3Connector';
 import { useSelector } from "react-redux";
 
@@ -13,14 +14,19 @@ const ContractsContext: React.FC = ({ children }) => {
 
   const { chainType } = useSelector(({ wallet }: any) => wallet);
 
-  const [ContractLessLibrary, setContractLessLibrary] = useState<any>();
   const [value, setValue] = useState<any>({});
 
   const init: any = useCallback(() => {
     try {
-      const NewContractLessLibrary = new ContractLessLibraryService({ web3Provider: web3.provider, chainType });
-      console.log('ContractsContext init:', { web3Provider: web3.provider, chainType, NewContractLessLibrary });
-      setContractLessLibrary(NewContractLessLibrary);
+      const ContractLessLibrary = new ContractLessLibraryService({ web3Provider: web3.provider, chainType });
+      const ContractPresalePublic = new ContractPresalePublicService({ web3Provider: web3.provider, chainType });
+      // console.log('ContractsContext init:', { web3Provider: web3.provider, chainType, NewContractLessLibrary });
+      if (!ContractLessLibrary) return;
+      const newValue = {
+        ContractLessLibrary,
+        ContractPresalePublic,
+      }
+      setValue(newValue);
     } catch (e) {
       console.error('ContractsContext init:', e);
     }
@@ -28,20 +34,10 @@ const ContractsContext: React.FC = ({ children }) => {
 
   useEffect(() => {
     if (!web3) return;
+    if (!chainType) return;
     init();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [web3]);
-
-  useEffect(() => {
-    if (!web3) return;
-    if (!chainType) return;
-    if (!ContractLessLibrary) return;
-    const newValue = {
-      ContractLessLibrary,
-    }
-    setValue(newValue);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ContractLessLibrary]);
 
   return (
     <contractsContext.Provider value={value}>

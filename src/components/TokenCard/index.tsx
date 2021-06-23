@@ -18,6 +18,8 @@ import ETHwhite from '../../assets/img/icons/ETH-white.svg';
 import ETHgradient from '../../assets/img/icons/ETH-gradient.svg';
 import POLKADOTwhite from '../../assets/img/icons/polkadot-white.svg';
 import POLKADOTgradient from '../../assets/img/icons/polkadot-gradient.svg';
+import { useContractsContext } from "../../contexts/ContractsContext";
+import { useEffect, useState } from "react";
 
 interface ITokenCardProps {
   address?: string;
@@ -54,26 +56,51 @@ const iconsHeader2 = {
   inVoting: shareGradient,
 };
 
-const TokenCard: React.FC<ITokenCardProps> = ({
-  address,
-  type,
-  logo,
-  name,
-  cost,
-  totalAmount,
-  currentAmount,
-  minPercent,
-  yesCounter,
-  noCounter,
-  liquidityPercent,
-  telegramLink,
-  chainLink,
-  daysBeforeOpening,
-  cryptoType,
-}) => {
-  console.log('address', address)
+const TokenCard: React.FC<ITokenCardProps> = (props) => {
+  const {
+    address,
+    type,
+    logo,
+    name,
+    cost,
+    totalAmount,
+    currentAmount,
+    minPercent,
+    yesCounter,
+    noCounter,
+    liquidityPercent,
+    chainLink,
+    daysBeforeOpening,
+    cryptoType,
+  } = props;
+  const { ContractPresalePublic } = useContractsContext();
+
+  const [info, setInfo] = useState<any>();
+
+  const getInfo = async () => {
+    try {
+      const newInfo = await ContractPresalePublic.getInfo({ contractAddress: address });
+      if (newInfo) setInfo(newInfo);
+      console.log('TokenCard getInfo:', newInfo);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  useEffect(() => {
+    if (!ContractPresalePublic) return;
+    getInfo();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ContractPresalePublic]);
+
+  if (!address) return null; // todo
+  if (!info) return null; // todo
+
+  const { linkTwitter, hardCap } = info;
+  console.log('TokenCard info:', info);
+
   return (
-    <Link to="/pool" className={s.card}>
+    <div className={s.card}>
       <div className={s.inner}>
         <div className={`${s.header} ${s[type]}`}>
           <div className={s.header_icon}>
@@ -91,12 +118,12 @@ const TokenCard: React.FC<ITokenCardProps> = ({
           </div>
         </div>
         <div className={s.card_container}>
-          <div className={s.token_info}>
+          <Link to={`/pool/${address}`} className={s.token_info}>
             <div className={s.token_logo}>
               <img src={logo} alt="token-logo" />
             </div>
             <div className={s.token_name}>{name}</div>
-          </div>
+          </Link>
 
           <div className={s.token_cost}>
             <div className={s.token_price}>{cost} BNB per Token</div>
@@ -125,7 +152,7 @@ const TokenCard: React.FC<ITokenCardProps> = ({
                     {((currentAmount / totalAmount) * 100).toFixed(2)}%
                   </div>
                   <div className={s.progress_bar__info_right}>
-                    {currentAmount.toFixed(2)} / {totalAmount.toFixed(2)}
+                    {currentAmount.toFixed(2)} / {hardCap.toFixed(2)}
                   </div>
                 </div>
                 <div className={s.progress_bar__subinfo}>
@@ -171,7 +198,7 @@ const TokenCard: React.FC<ITokenCardProps> = ({
               <div className={s.liquidity_percent}>{liquidityPercent}%</div>
               <div className={s.footer_links}>
                 <div className={s.footer_link}>
-                  <a href={telegramLink}>
+                  <a href={linkTwitter}>
                     <Icon onHover={telegramActive} defaultIcon={telegramDisabled} />
                   </a>
                 </div>
@@ -185,7 +212,7 @@ const TokenCard: React.FC<ITokenCardProps> = ({
           </div>
         </div>
       </div>
-    </Link>
+    </div>
   );
 };
 
