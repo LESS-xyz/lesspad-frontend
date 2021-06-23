@@ -73,6 +73,9 @@ const Header: React.FC = () => {
               <Link to="/staking" className={s.nav_link} data-text="Stacking">
                 Staking
               </Link>
+              <Link to="/about" className={s.nav_link} data-text="Stacking">
+                About
+              </Link>
             </nav>
           </div>
           <div className={s.right}>
