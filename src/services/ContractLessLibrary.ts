@@ -24,7 +24,7 @@ export default class ContractLessLibraryService {
 
   public getPresalesCount = async () => {
     try {
-      console.log('ContractLessLibraryService getPresalesCount:', this.contractAbi, this.contractAddress)
+      // console.log('ContractLessLibraryService getPresalesCount:', this.contractAbi, this.contractAddress)
       const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
       const result = await contract.methods.getPresalesCount().call();
       return result;
@@ -34,9 +34,33 @@ export default class ContractLessLibraryService {
     }
   };
 
+  public getPresalesAddresses = async () => {
+    try {
+      // console.log('ContractLessLibraryService getPresalesAddresses:', this.contractAbi, this.contractAddress)
+      const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
+      const count = await contract.methods.getPresalesCount().call();
+      const addresses = [];
+      if (count) {
+        for (let i = 0; i < count; i += 1) {
+          const address = await contract.methods.getPresaleAddress(i).call();
+          addresses.push(address)
+        }
+      }
+      return addresses;
+    } catch (e) {
+      console.error('ContractLessLibraryService getPresalesAddresses:', e);
+      return null;
+    }
+  };
+
   public getMinVoterBalance = async () => {
-    const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
-    const balance = await contract.methods.getMinVoterBalance().call();
-    return balance;
+    try {
+      const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
+      const balance = await contract.methods.getMinVoterBalance().call();
+      return balance;
+    } catch (e) {
+      console.error('ContractLessLibraryService getMinVoterBalance:', e);
+      return null;
+    }
   };
 }

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 
 import ContractLessLibraryService from '../services/ContractLessLibrary';
 import { useWeb3ConnectorContext } from './Web3Connector';
@@ -16,7 +16,7 @@ const ContractsContext: React.FC = ({ children }) => {
   const [ContractLessLibrary, setContractLessLibrary] = useState<any>();
   const [value, setValue] = useState<any>({});
 
-  const init: any = React.useCallback(() => {
+  const init: any = useCallback(() => {
     try {
       const NewContractLessLibrary = new ContractLessLibraryService({ web3Provider: web3.provider, chainType });
       console.log('ContractsContext init:', { web3Provider: web3.provider, chainType, NewContractLessLibrary });
@@ -26,13 +26,13 @@ const ContractsContext: React.FC = ({ children }) => {
     }
   }, [web3, chainType]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!web3) return;
     init();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [web3]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!web3) return;
     if (!chainType) return;
     if (!ContractLessLibrary) return;

@@ -20,6 +20,7 @@ import POLKADOTwhite from '../../assets/img/icons/polkadot-white.svg';
 import POLKADOTgradient from '../../assets/img/icons/polkadot-gradient.svg';
 
 interface ITokenCardProps {
+  address?: string;
   type: CardConditions;
   cryptoType: cryptos;
   logo: string;
@@ -54,6 +55,7 @@ const iconsHeader2 = {
 };
 
 const TokenCard: React.FC<ITokenCardProps> = ({
+  address,
   type,
   logo,
   name,
@@ -69,6 +71,7 @@ const TokenCard: React.FC<ITokenCardProps> = ({
   daysBeforeOpening,
   cryptoType,
 }) => {
+  console.log('address', address)
   return (
     <Link to="/pool" className={s.card}>
       <div className={s.inner}>
