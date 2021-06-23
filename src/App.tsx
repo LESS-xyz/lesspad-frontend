@@ -1,12 +1,16 @@
 import { Header } from './components';
 import Footer from './components/Footer/index';
-import { AllPoolsPage, PageVoting, MainPage, Page404, CreatePoolPage, AboutPage } from './pages';
 import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-} from "react-router-dom";
-import { Modal } from "./components/Modal";
+  AllPoolsPage,
+  PageVoting,
+  MainPage,
+  Page404,
+  CreatePoolPage,
+  AboutPage,
+  StakingPage,
+} from './pages';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { Modal } from './components/Modal';
 
 export const App: React.FC = () => {
   return (
@@ -25,6 +29,9 @@ export const App: React.FC = () => {
           </Route>
           <Route path="/create-pool">
             <CreatePoolPage />
+          </Route>
+          <Route path="/staking">
+            <StakingPage />
           </Route>
           <Route path="/about">
             <AboutPage />

@@ -1,0 +1,88 @@
+@import '../../styles/mixins/container.scss';
+@import '../../styles/mixins/gradient-text.scss';
+@import '../../styles/mixins/grid.scss';
+@import '../../styles/mixins/flex.scss';
+
+.page {
+  padding-top: 170px;
+  background: var(--gradient-background);
+  min-height: 100vh;
+}
+
+.container {
+  @include container(1000px);
+}
+
+.title {
+  font-size: 40px;
+  text-align: center;
+  color: var(--grey);
+  margin-bottom: 49px;
+}
+
+.balance {
+  background: var(--staking-balance-background);
+
+  &_inner {
+    padding: 40px;
+    text-align: center;
+  }
+
+  &_title {
+    span {
+      @include gradient-text;
+    }
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+
+  &_bnb {
+    font-weight: 500;
+    font-size: 16px;
+    margin-bottom: 5px;
+  }
+
+  &_usd {
+    color: var(--grey);
+    margin-bottom: 20px;
+  }
+
+  &_subinfo {
+    color: var(--staking-subinfo-color);
+    margin-bottom: 24px;
+  }
+
+  &_amount {
+    border-radius: 2px;
+    background-color: var(--staking-amount-background);
+    margin-bottom: 30px;
+
+    &__inner {
+      width: 100%;
+      padding: 20px 0;
+      @include grid(repeat(3, 1fr));
+      align-items: center;
+    }
+
+    &__money {
+      font-weight: 500;
+      font-size: 36px;
+    }
+
+    &__img {
+      height: 28px;
+    }
+  }
+
+  &_button {
+    cursor: pointer;
+    display: inline-block;
+    padding: 16px 80px;
+    background: var(--gradient);
+  }
+}
+
+.small_balances {
+  margin-top: 20px;
+  @include grid(repeat(2, 1fr), 1fr, 20px);
+}

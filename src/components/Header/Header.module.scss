@@ -87,12 +87,14 @@
     transition: 0.4s ease;
   }
   // gradient text
-  &:hover {
+  &:hover,
+  &.active {
     font-weight: 700;
     @include gradient-text;
   }
 
-  &:hover::after {
+  &:hover::after,
+  &.active::after {
     width: 100%;
   }
 }
