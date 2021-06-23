@@ -6,10 +6,7 @@ import PopUp from './PopUp';
 import { useState } from 'react';
 import ethLogo from '../../assets/img/icons/eth-logo-colorful.svg';
 import bnbLogo from '../../assets/img/icons/bnb-logo-colorful.svg';
-import polkaLogo from '../../assets/img/icons/polkadot-logo-colorful.svg';
-import {
-  Link
-} from "react-router-dom";
+import { Link } from 'react-router-dom';
 import maticLogo from '../../assets/img/icons/matic-logo.svg';
 import { useDispatch, useSelector } from 'react-redux';
 import { walletActions, userActions } from '../../redux/actions';
@@ -38,7 +35,7 @@ const Header: React.FC = () => {
     } catch (e) {
       console.error(e);
     }
-  }
+  };
 
   const handleDisconnect = () => {
     try {
@@ -53,9 +50,7 @@ const Header: React.FC = () => {
     <header className={s.header}>
       <div className={s.container}>
         <div className={s.inner}>
-          {isPopUpOpen && (
-            <PopUp setIsPopUpOpen={setIsPopUpOpen} setCurrentCrypto={setChainType} />
-          )}
+          {isPopUpOpen && <PopUp setIsPopUpOpen={setIsPopUpOpen} setCurrentCrypto={setChainType} />}
           <div className={s.left}>
             <Link to="/" className={s.logo}>
               <div className={s.logo_img}>
@@ -80,15 +75,15 @@ const Header: React.FC = () => {
           </div>
           <div className={s.right}>
             <div className={s.buttons}>
-              {!userAddress ?
+              {!userAddress ? (
                 <Button filled marginRight={20} onClick={handleConnectWallet}>
                   Connect Wallet
                 </Button>
-                :
+              ) : (
                 <Button filled marginRight={20} onClick={handleDisconnect}>
                   {`${userAddress.slice(0, 10)}...`}
                 </Button>
-              }
+              )}
               <Button to="/create-pool">Create Pool</Button>
               <Button marginRight={0} onClick={() => setIsPopUpOpen(!isPopUpOpen)}>
                 <div className={s.button_body}>

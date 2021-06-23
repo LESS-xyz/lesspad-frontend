@@ -16,7 +16,6 @@ ReactDOM.render(
     <Web3Connector>
       <App />
     </Web3Connector>
-  </Provider>
-  ,
+  </Provider>,
   document.getElementById('root'),
 );
