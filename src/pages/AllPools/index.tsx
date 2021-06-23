@@ -5,7 +5,7 @@ import logo1 from '../../assets/img/sections/token-card/logo-1.png';
 import { useState } from 'react';
 import Pagination from '../../components/Pagination/index';
 import Selector from '../../components/Selector/index';
-import Input from '../../components/Input/index';
+import Search from '../../components/Search/index';
 
 const cardsExample = [
   {
@@ -60,7 +60,7 @@ const AllPoolsPage: React.FC = () => {
           </div>
           <div className={s.control_panel}>
             <div className={s.input}>
-              <Input
+              <Search
                 value={inputValue}
                 onChange={(str: string) => setInputValue(str)}
                 placeholder="Search by Name, Token contract address, Token description"

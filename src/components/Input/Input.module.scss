@@ -1,32 +1,54 @@
+// input
 .input {
-  width: 100%;
-  position: relative;
-  &_img {
-    position: absolute;
-    top: 9px;
-    left: 24px;
-  }
+  margin-bottom: 40px;
   input {
-    box-sizing: border-box;
-    color: var(--input-color);
-    font-size: 15px;
-    padding: 12px 20px 12px 55px;
     width: 100%;
-    border: 1px solid var(--blue);
-    border-radius: 1px;
-    background-color: transparent;
-    letter-spacing: 0.035em;
-    &::placeholder {
-      color: var(--blue);
-    }
+    padding: 17px 19px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 20px;
+    background-color: #000;
+    border: 2px solid var(--blue);
+    border-radius: 2px;
   }
 
-  &.big {
+  &_title {
+    font-weight: 700;
+    font-size: 16px;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 8px;
+  }
+
+  &_subtitle {
+    margin-top: 10px;
+    font-size: 15px;
+  }
+
+  &.invalid {
     input {
-      padding: 20px 20px 20px 55px;
+      color: var(--create-pool-input-invalid-color);
+      border-color: var(--create-pool-input-invalid-color);
     }
-    .input_img {
-      top: 17px;
+
+    .input_title {
+      color: var(--create-pool-input-invalid-color);
     }
+  }
+}
+
+.invalid_err {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+
+  &__img {
+    height: 24px;
+    margin-right: 10px;
+    font-size: 15px;
+  }
+
+  &__text {
+    color: var(--create-pool-input-invalid-color);
   }
 }
