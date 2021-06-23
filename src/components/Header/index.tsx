@@ -7,7 +7,7 @@ import { useState } from 'react';
 import ethLogo from '../../assets/img/icons/eth-logo-colorful.svg';
 import bnbLogo from '../../assets/img/icons/bnb-logo-colorful.svg';
 import maticLogo from '../../assets/img/icons/matic-logo.svg';
-import { Link } from "react-router-dom";
+import { NavLink } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { walletActions, userActions } from '../../redux/actions';
 import { setToStorage } from '../../utils/localStorage';
@@ -52,7 +52,7 @@ const Header: React.FC = () => {
         <div className={s.inner}>
           {isPopUpOpen && <PopUp setIsPopUpOpen={setIsPopUpOpen} setCurrentCrypto={setChainType} />}
           <div className={s.left}>
-            <Link to="/" className={s.logo}>
+            <NavLink to="/" className={s.logo}>
               <div className={s.logo_img}>
                 <img src={logo} alt="Less-logo" />
               </div>
@@ -60,20 +60,40 @@ const Header: React.FC = () => {
                 less
                 <span>pad</span>
               </div>
-            </Link>
+            </NavLink>
             <nav className={s.navigation}>
-              <Link to="/pools" className={s.nav_link} data-text="Pools">
+              <NavLink
+                to="/pools"
+                activeClassName={s.active}
+                className={s.nav_link}
+                data-text="Pools"
+              >
                 Pools
-              </Link>
-              <Link to="/voting" className={s.nav_link} data-text="Voting">
+              </NavLink>
+              <NavLink
+                to="/voting"
+                activeClassName={s.active}
+                className={s.nav_link}
+                data-text="Voting"
+              >
                 Voting
-              </Link>
-              <Link to="/staking" className={s.nav_link} data-text="Stacking">
+              </NavLink>
+              <NavLink
+                to="/staking"
+                activeClassName={s.active}
+                className={s.nav_link}
+                data-text="Stacking"
+              >
                 Staking
-              </Link>
-              <Link to="/about" className={s.nav_link} data-text="Stacking">
+              </NavLink>
+              <NavLink
+                to="/about"
+                activeClassName={s.active}
+                className={s.nav_link}
+                data-text="Stacking"
+              >
                 About
-              </Link>
+              </NavLink>
             </nav>
           </div>
           <div className={s.right}>
