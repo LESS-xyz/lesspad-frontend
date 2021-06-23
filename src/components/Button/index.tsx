@@ -18,7 +18,7 @@ const Button: React.FC<IButtonProps> = ({
   children,
   filled,
   onClick,
-  disabled,
+  disabled = false,
   marginRight,
   big,
   long,

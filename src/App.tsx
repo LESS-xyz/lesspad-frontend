@@ -6,6 +6,8 @@ import {
   Switch,
   Route,
 } from "react-router-dom";
+import { MainPage } from './pages';
+import { Modal } from "./components/Modal";
 
 export const App: React.FC = () => {
   return (
@@ -29,5 +31,11 @@ export const App: React.FC = () => {
         <Footer />
       </div>
     </Router>
+    <div className="App">
+      <Header />
+      <MainPage />
+      <Footer />
+      <Modal />
+    </div>
   );
 };

@@ -10,21 +10,51 @@ import polkaLogo from '../../assets/img/icons/polkadot-logo-colorful.svg';
 import {
   Link
 } from "react-router-dom";
+import maticLogo from '../../assets/img/icons/matic-logo.svg';
+import { useDispatch, useSelector } from 'react-redux';
+import { walletActions, userActions } from '../../redux/actions';
+import { setToStorage } from '../../utils/localStorage';
 
 const cryptoLogos = new Map();
 cryptoLogos.set('Ethereum', ethLogo);
-cryptoLogos.set('Binance Smart Chain', bnbLogo);
-cryptoLogos.set('PolkaDot', polkaLogo);
+cryptoLogos.set('Binance-Smart-Chain', bnbLogo);
+cryptoLogos.set('Matic', maticLogo);
 
 const Header: React.FC = () => {
   const [isPopUpOpen, setIsPopUpOpen] = useState(false);
-  const [currentCrypto, setCurrentCrypto] = useState('Ethereum');
+
+  const { address: userAddress } = useSelector(({ user }: any) => user);
+  const { chainType } = useSelector(({ wallet }: any) => wallet);
+
+  const dispatch = useDispatch();
+  const setWalletType = (props: string) => dispatch(walletActions.setWalletType(props));
+  const setChainType = (props: string) => dispatch(walletActions.setChainType(props));
+  const setUserData = (props: any) => dispatch(userActions.setUserData(props));
+
+  const handleConnectWallet = () => {
+    try {
+      setToStorage('walletType', 'metamask');
+      setWalletType('metamask');
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  const handleDisconnect = () => {
+    try {
+      setToStorage('walletType', '');
+      setUserData({ address: undefined, balance: 0 });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   return (
     <header className={s.header}>
       <div className={s.container}>
         <div className={s.inner}>
           {isPopUpOpen && (
-            <PopUp setIsPopUpOpen={setIsPopUpOpen} setCurrentCrypto={setCurrentCrypto} />
+            <PopUp setIsPopUpOpen={setIsPopUpOpen} setCurrentCrypto={setChainType} />
           )}
           <div className={s.left}>
             <Link to="/" className={s.logo}>
@@ -50,16 +80,22 @@ const Header: React.FC = () => {
           </div>
           <div className={s.right}>
             <div className={s.buttons}>
-              <Button filled marginRight={20} onClick={() => alert('Click')}>
-                Connect Wallet
-              </Button>
+              {!userAddress ?
+                <Button filled marginRight={20} onClick={handleConnectWallet}>
+                  Connect Wallet
+                </Button>
+                :
+                <Button filled marginRight={20} onClick={handleDisconnect}>
+                  {`${userAddress.slice(0, 10)}...`}
+                </Button>
+              }
               <Button to="/create-pool">Create Pool</Button>
               <Button marginRight={0} onClick={() => setIsPopUpOpen(!isPopUpOpen)}>
                 <div className={s.button_body}>
                   <div className={s.crypto_logo}>
-                    <img src={cryptoLogos.get(currentCrypto)} alt="crypto-logo" />
+                    <img src={cryptoLogos.get(chainType)} alt="crypto-logo" />
                   </div>
-                  <div className={s.current_crypto}>{currentCrypto}</div>
+                  <div className={s.current_crypto}>{chainType}</div>
                   <div className={`${s.arrow} ${isPopUpOpen && s.active}`}>
                     <img src={arrow} alt="arrow" />
                   </div>
