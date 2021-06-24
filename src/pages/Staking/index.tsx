@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import s from './Staking.module.scss';
 import Button from '../../components/Button/index';
 import maxImg from '../../assets/img/icons/max.svg';
 
 const StakingPage: React.FC = () => {
+  const [stakeValue, setStakeValue] = useState('');
+  const [unstakeValue, setUnstakeValue] = useState('');
+
   return (
     <div className={s.page}>
       <div className={s.container}>
@@ -33,8 +36,14 @@ const StakingPage: React.FC = () => {
                 <div className={s.balance_usd}>$0.0 USD</div>
                 <div className={s.balance_amount}>
                   <div className={s.balance_amount__inner}>
-                    <div />
-                    <div className={s.balance_amount__money}>0.0343</div>
+                    <div className={s.balance_amount__money}>
+                      <input
+                        type="text"
+                        placeholder="0.0"
+                        value={stakeValue}
+                        onChange={(e) => setStakeValue(e.target.value.replace(/[^\d.,]/g, ''))}
+                      />
+                    </div>
                     <div className={s.balance_amount__img}>
                       <img src={maxImg} alt="maxImg" />
                     </div>
@@ -52,8 +61,14 @@ const StakingPage: React.FC = () => {
                 <div className={s.balance_usd}>$0.0 USD</div>
                 <div className={s.balance_amount}>
                   <div className={s.balance_amount__inner}>
-                    <div />
-                    <div className={s.balance_amount__money}>7.4545</div>
+                    <div className={s.balance_amount__money}>
+                      <input
+                        type="text"
+                        placeholder="0.0"
+                        value={unstakeValue}
+                        onChange={(e) => setUnstakeValue(e.target.value.replace(/[^\d.,]/g, ''))}
+                      />
+                    </div>
                     <div className={s.balance_amount__img}>
                       <img src={maxImg} alt="maxImg" />
                     </div>
