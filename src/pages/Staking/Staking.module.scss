@@ -60,16 +60,34 @@
     &__inner {
       width: 100%;
       padding: 20px 0;
-      @include grid(repeat(3, 1fr));
+      position: relative;
       align-items: center;
     }
 
     &__money {
       font-weight: 500;
       font-size: 36px;
+      padding: 0 80px;
+      input {
+        font-weight: 500;
+        font-size: 36px;
+        color: #fff;
+        width: 100%;
+        background: transparent;
+        border: none;
+        text-align: center;
+      }
+      input::placeholder {
+        font-weight: 500;
+        font-size: 36px;
+        color: #fff;
+      }
     }
 
     &__img {
+      position: absolute;
+      top: 30px;
+      right: 17px;
       height: 28px;
     }
   }
