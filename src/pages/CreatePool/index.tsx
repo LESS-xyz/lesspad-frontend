@@ -17,6 +17,7 @@ const CreatePoolPage: React.FC = () => {
   const [pricePerTokenOnTheExchanger, setPricePerTokenOnTheExchanger] = useState('');
   const [timeToPlaceLiquidity, setTimeToPlaceLiquidity] = useState('');
   const [numberOfDaysToLockLPTokens, setNumberOfDaysToLockLPTokens] = useState('');
+  const [vestingPercent, setVestingPercent] = useState('');
 
   // инпут для Certified type
   const [whitelistValues, setWhitelistValues] = useState('');
@@ -51,6 +52,7 @@ const CreatePoolPage: React.FC = () => {
       isLiquidity,
       isAutomatically,
       isVesting,
+      vestingPercent,
     });
   };
 
@@ -179,6 +181,13 @@ const CreatePoolPage: React.FC = () => {
                     optionOne="Vesting"
                     optionTwo="Without vesting"
                   />
+                  {isVesting && (
+                    <Input
+                      title="Vesting Percent"
+                      value={vestingPercent}
+                      onChange={setVestingPercent}
+                    />
+                  )}
                 </>
               )}
               <div className={s.button}>
