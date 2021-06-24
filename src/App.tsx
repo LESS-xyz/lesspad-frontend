@@ -8,11 +8,11 @@ import {
   CreatePoolPage,
   AboutPage,
   StakingPage,
+  ProjectPage,
 } from './pages';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { Modal } from './components/Modal';
 import React from 'react';
-import { ProjectPage } from './pages';
 
 export const App: React.FC = () => {
   return (
@@ -37,6 +37,9 @@ export const App: React.FC = () => {
           </Route>
           <Route path="/about">
             <AboutPage />
+          </Route>
+          <Route path="/pool">
+            <ProjectPage />
           </Route>
           <Route path="*">
             <Page404 />

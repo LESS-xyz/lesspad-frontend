@@ -11,15 +11,17 @@ export default class ContractLessLibraryService {
   public web3: any;
   public contractAddress: any;
   public contractAbi: any;
+  public contractName: any;
 
   constructor(props: TypeConstructorProps) {
     const { web3Provider, chainType } = props;
     const { addresses, isMainnetOrTestnet, abis }: any = config;
+    const addressesOfNetType = addresses[isMainnetOrTestnet];
+    const abisOfNetType = abis[isMainnetOrTestnet];
     this.web3 = new Web3(web3Provider);
-    const addressesNew = addresses[isMainnetOrTestnet];
-    this.contractAddress = addressesNew[chainType].LessLibrary;
-    const abisNew = abis[isMainnetOrTestnet];
-    this.contractAbi = abisNew[chainType].LessLibrary;
+    this.contractName = 'LessLibrary';
+    this.contractAddress = addressesOfNetType[chainType][this.contractName];
+    this.contractAbi = abisOfNetType[chainType][this.contractName];
   }
 
   public getPresalesCount = async () => {
