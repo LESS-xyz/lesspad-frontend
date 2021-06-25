@@ -69,14 +69,14 @@ export default {
     mainnet: {
       // todo
       // 'Ethereum': {
-      //   Token: '0xa372d1d35041714092900B233934fB2D002755E2',
+      //   LessToken: '0xa372d1d35041714092900B233934fB2D002755E2',
       //   LessLibrary: '0x46589Ab934277E44A5060f3273761b86396d5429',
       //   Staking: '0xF4Fa7Fd880Eb889B4829126d89C4F09304B73270',
       //   PresaleFactory: '0xB9733F217111A845A268d1D98EE91800907860e2',
       //   PresalePublic: '0xeA63Bfc235c1f70BE88287BCed13A42550C40DF3',
       // },
       // 'Binance-Smart-Chain': {
-      //   Token: '0xa372d1d35041714092900B233934fB2D002755E2',
+      //   LessToken: '0xa372d1d35041714092900B233934fB2D002755E2',
       //   LessLibrary: '0x46589Ab934277E44A5060f3273761b86396d5429',
       //   Staking: '0xF4Fa7Fd880Eb889B4829126d89C4F09304B73270',
       //   PresaleFactory: '0xB9733F217111A845A268d1D98EE91800907860e2',
@@ -85,7 +85,7 @@ export default {
     },
     testnet: {
       'Ethereum': {
-        Token: '0xa372d1d35041714092900B233934fB2D002755E2',
+        LessToken: '0xa372d1d35041714092900B233934fB2D002755E2',
         LessLibrary: '0x46589Ab934277E44A5060f3273761b86396d5429',
         Staking: '0xF4Fa7Fd880Eb889B4829126d89C4F09304B73270',
         PresaleFactory: '0xB9733F217111A845A268d1D98EE91800907860e2',
@@ -93,7 +93,7 @@ export default {
       },
       'Binance-Smart-Chain': {
         // todo
-        // Token: '0xa372d1d35041714092900B233934fB2D002755E2',
+        // LessToken: '0xa372d1d35041714092900B233934fB2D002755E2',
         // LessLibrary: '0x46589Ab934277E44A5060f3273761b86396d5429',
         // Staking: '0xF4Fa7Fd880Eb889B4829126d89C4F09304B73270',
         // PresaleFactory: '0xB9733F217111A845A268d1D98EE91800907860e2',
@@ -105,7 +105,7 @@ export default {
     mainnet: {},
     testnet: {
       Ethereum: {
-        Token: [
+        LessToken: [
           {
             inputs: [
               { internalType: 'string', name: 'name', type: 'string' },
