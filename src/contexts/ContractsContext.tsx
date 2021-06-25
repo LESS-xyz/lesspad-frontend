@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useCallback, useEffect } fr
 
 import ContractLessLibraryService from '../services/contracts/ContractLessLibrary';
 import ContractPresalePublicService from '../services/contracts/ContractPresalePublic';
+import ContractPresaleFactoryService from '../services/contracts/ContractPresaleFactory';
 import { useWeb3ConnectorContext } from './Web3Connector';
 import { useSelector } from "react-redux";
 
@@ -20,11 +21,13 @@ const ContractsContext: React.FC = ({ children }) => {
     try {
       const ContractLessLibrary = new ContractLessLibraryService({ web3Provider: web3.provider, chainType });
       const ContractPresalePublic = new ContractPresalePublicService({ web3Provider: web3.provider, chainType });
+      const ContractPresaleFactory = new ContractPresaleFactoryService({ web3Provider: web3.provider, chainType });
       // console.log('ContractsContext init:', { web3Provider: web3.provider, chainType, NewContractLessLibrary });
       if (!ContractLessLibrary) return;
       const newValue = {
         ContractLessLibrary,
         ContractPresalePublic,
+        ContractPresaleFactory,
       }
       setValue(newValue);
     } catch (e) {

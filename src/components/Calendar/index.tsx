@@ -3,7 +3,7 @@ import { useState } from 'react';
 import arrow from '../../assets/img/icons/arrow-calendar.svg';
 
 interface ICalendarProps {
-  onChange: (date: Date) => void;
+  onChange: (date: number) => void;
   closeCalendar: () => void;
 }
 
@@ -73,9 +73,10 @@ const Calendar: React.FC<ICalendarProps> = ({ onChange, closeCalendar }) => {
   };
 
   const handleDayPick = (day: Date) => {
-    onChange(day);
+    onChange(day.getTime());
     closeCalendar();
   };
+
   return (
     <div className={s.calendar}>
       <div className={s.calendar_header}>

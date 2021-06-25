@@ -4,56 +4,129 @@ import Calendar from '../../components/Calendar/index';
 import calendarImg from '../../assets/img/icons/calendar.svg';
 import Input from '../../components/Input/index';
 import Checkbox from '../../components/Checkbox/index';
+import { useContractsContext } from "../../contexts/ContractsContext";
+import { useSelector } from "react-redux";
+import BigNumber from "bignumber.js/bignumber";
 
 const CreatePoolPage: React.FC = () => {
-  const [tokenContractValue, setTokenContractValue] = useState('');
-  const [tokenPriceValue, setTokenPriceValue] = useState('');
+  const { ContractPresaleFactory } = useContractsContext();
+  const [saleTitle, setSaleTitle] = useState<string>('Boris');
+  const [description, setDescription] = useState<string>('');
+  const [tokenAddress, setTokenAddress] = useState<string>('0xa372d1d35041714092900B233934fB2D002755E2');
+  const [tokenPriceInWei, setTokenPriceInWei] = useState<string>('0');
   // инпуты для Public type
-  const [softCapValue, setSoftCapValue] = useState('');
-  const [hardCapValue, setHardCapValue] = useState('');
-  const [date1, setDate1] = useState<Date | null>(null);
-  const [date2, setDate2] = useState<Date | null>(null);
-  const [liquidityPercent, setLiquidityPercent] = useState('');
-  const [pricePerTokenOnTheExchanger, setPricePerTokenOnTheExchanger] = useState('');
-  const [timeToPlaceLiquidity, setTimeToPlaceLiquidity] = useState('');
-  const [numberOfDaysToLockLPTokens, setNumberOfDaysToLockLPTokens] = useState('');
-  const [vestingPercent, setVestingPercent] = useState('');
-
+  const [softCapInWei, setSoftCapInWei] = useState<string>('0');
+  const [hardCapInWei, setHardCapInWei] = useState<string>('0');
+  const [openTime, setOpenTime] = useState<number>(0);
+  const [closeTime, setCloseTime] = useState<number>(0);
+  const [liquidityPercent, setLiquidityPercent] = useState<string>('0');
+  const [liquidityPercentageAllocation, setLiquidityPercentageAllocation] = useState<string>('0');
+  const [listingPriceInWei, setListingPriceInWei] = useState<string>('0');
+  const [lpTokensLockDurationInDays, setLpTokensLockDurationInDays] = useState('0');
+  const [vestingPercent, setVestingPercent] = useState<string>('0');
+  const [liquidityAllocationTime, setLiquidityAllocationTime] = useState<number>(0);
   // инпут для Certified type
-  const [whitelistValues, setWhitelistValues] = useState('');
-
+  const [whitelist, setWhitelist] = useState<string>('');
+  // links
+  const [linkLogo, setLinkLogo] = useState<string>('');
+  const [linkWebsite, setLinkWebsite] = useState<string>('');
+  const [linkTelegram, setLinkTelegram] = useState<string>('');
+  const [linkGithub, setLinkGithub] = useState<string>('');
+  const [linkTwitter, setLinkTwitter] = useState<string>('');
+  const [whitepaper, setWhitepaper] = useState<string>('');
   // стейт календарей открыт/закрыт
-  const [isCalendar1, setIsCalendar1] = useState(false);
-  const [isCalendar2, setIsCalendar2] = useState(false);
-
+  const [isCalendar1, setIsCalendar1] = useState<boolean>(false);
+  const [isCalendar2, setIsCalendar2] = useState<boolean>(false);
+  const [isCalendarLiquidityAllocationTime, setIsCalendarLiquidityAllocationTime] = useState<boolean>(false);
   // чекбоксы
-  const [isPublic, setIsPublic] = useState(true);
-  const [isLiquidity, setIsLiquidity] = useState(false);
-  const [isAutomatically, setIsAutomatically] = useState(false);
-  const [isVesting, setIsVesting] = useState(false);
-  const [isWhiteList, setIsWhiteList] = useState(false);
+  const [isPublic, setIsPublic] = useState<boolean>(true);
+  const [isLiquidity, setIsLiquidity] = useState<boolean>(false);
+  const [isAutomatically, setIsAutomatically] = useState<boolean>(false);
+  const [isVesting, setIsVesting] = useState<boolean>(false);
+  const [isWhiteListed, setIsWhiteListed] = useState<boolean>(false);
+  const [isFormSubmitted, setIsFormSubmitted] = useState<boolean>(false);
 
-  // form submit
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const { address: userAddress } = useSelector(({ user }: any) => user);
+
+  const minInvestInWei = new BigNumber(10).pow(10).toString(10); // todo
+  const maxInvestInWei = new BigNumber(10).pow(20).toString(10); // todo
+  const presaleType = isPublic ? 1 : 0;
+  const whitelistArray = whitelist ? whitelist.split(',') : [];
+
+  const handleError = (value: any, message?: string) => {
+    if (isFormSubmitted && !value) return message || 'Enter value';
+    return undefined;
+  }
+
+  const validateForm = () => {
+    if (!saleTitle) return false;
+    if (!tokenAddress) return false;
+    if (!tokenPriceInWei) return false;
+    if (!softCapInWei) return false;
+    if (!hardCapInWei) return false;
+    if (!maxInvestInWei) return false;
+    if (!minInvestInWei) return false;
+    if (!openTime) return false;
+    if (!closeTime) return false;
+    // if (!presaleType) return false;
+    // if (!liquidityPercent) return false;
+    // if (!whitelistArray) return false;
+    // if (!listingPriceInWei) return false;
+    // if (!lpTokensLockDurationInDays) return false;
+    // if (!liquidityPercentageAllocation) return false;
+    // if (!liquidityAllocationTime) return false;
+    return true;
+  }
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log({
-      isPublic,
-      tokenContractValue,
-      tokenPriceValue,
-      softCapValue,
-      hardCapValue,
-      date1,
-      date2,
-      liquidityPercent,
-      pricePerTokenOnTheExchanger,
-      timeToPlaceLiquidity,
-      numberOfDaysToLockLPTokens,
-      whitelistValues,
+    console.log('handleSubmit:', { vestingPercent })
+    if (!validateForm()) {
+      setIsFormSubmitted(true);
+      // return; // todo
+    }
+    // порядок полей менять нельзя!
+    const presaleInfo = [
+      tokenAddress,
+      tokenPriceInWei,
+      softCapInWei,
+      hardCapInWei,
+      maxInvestInWei,
+      minInvestInWei, // 5
+      openTime,
+      closeTime,
+      presaleType,
       isLiquidity,
-      isAutomatically,
+      isAutomatically, // 10
+      isWhiteListed,
+      whitelistArray,
       isVesting,
-      vestingPercent,
-    });
+    ]
+    // порядок полей менять нельзя!
+    const presalePancakeSwapInfo = [
+      listingPriceInWei,
+      lpTokensLockDurationInDays,
+      liquidityPercentageAllocation,
+      liquidityAllocationTime,
+    ]
+    // порядок полей менять нельзя!
+    const presaleStringInfo = [
+      saleTitle,
+      linkTelegram,
+      linkGithub,
+      linkTwitter,
+      linkWebsite,
+      linkLogo,
+      description,
+      whitepaper,
+    ]
+
+    console.log({ isPublic, presaleInfo, presalePancakeSwapInfo, presaleStringInfo })
+    setIsFormSubmitted(true);
+    const resultCreatePresalePublic = await ContractPresaleFactory.createPresalePublic({
+      userAddress, presaleInfo, presalePancakeSwapInfo, presaleStringInfo
+    })
+    console.log('CreatePool handleSubmit', resultCreatePresalePublic)
   };
 
   return (
@@ -71,21 +144,48 @@ const CreatePoolPage: React.FC = () => {
           <div className={s.page_body}>
             <form action="" onSubmit={(e) => handleSubmit(e)}>
               <Input
-                value={tokenContractValue}
-                onChange={setTokenContractValue}
-                title="BEP20 Token Contract"
+                title="Sale title"
+                value={saleTitle}
+                onChange={setSaleTitle}
+                error={handleError(saleTitle)}
               />
-              <Input value={tokenPriceValue} onChange={setTokenPriceValue} title="Token Price" />
+              <Input
+                title="Description"
+                value={description}
+                onChange={setDescription}
+              />
+              <Input
+                title="Token Contract Address"
+                value={tokenAddress}
+                onChange={setTokenAddress}
+                error={handleError(tokenAddress)}
+              />
+              <Input
+                title="Token Price (in wei)"
+                value={tokenPriceInWei}
+                onChange={setTokenPriceInWei}
+                error={handleError(tokenPriceInWei)}
+              />
               <div className={s.small_inputs}>
-                <Input value={softCapValue} onChange={setSoftCapValue} title="Soft Cap" />
-                <Input value={hardCapValue} onChange={setHardCapValue} title="Hard Cap" />
+                <Input
+                  title="Soft Cap (in wei)"
+                  value={softCapInWei}
+                  onChange={setSoftCapInWei}
+                  error={handleError(softCapInWei)}
+                />
+                <Input
+                  title="Hard Cap (in wei)"
+                  value={hardCapInWei}
+                  onChange={setHardCapInWei}
+                  error={handleError(hardCapInWei)}
+                />
               </div>
               {/* date pickers */}
               <div className={s.small_inputs}>
                 <div className={s.datePicker}>
-                  <div className={s.datePicker_title}>Date 1</div>
+                  <div className={s.datePicker_title}>Open date</div>
                   <div className={s.datePicker_inner}>
-                    <div className={s.datePicker_value}>{date1?.toLocaleDateString()}</div>
+                    <div className={s.datePicker_value}>{new Date(openTime)?.toLocaleDateString()}</div>
                     <div
                       className={s.datePicker_img}
                       role="button"
@@ -99,14 +199,14 @@ const CreatePoolPage: React.FC = () => {
                   <div className={s.datePicker_subtitle}>In Your Timezone</div>
                 </div>
                 <div className={s.datePicker}>
-                  <div className={s.datePicker_title}>Date 1</div>
+                  <div className={s.datePicker_title}>Close date</div>
                   <div className={s.datePicker_inner}>
-                    <div className={s.datePicker_value}>{date2?.toLocaleDateString()}</div>
+                    <div className={s.datePicker_value}>{new Date(closeTime)?.toLocaleDateString()}</div>
                     <div
                       className={s.datePicker_img}
                       role="button"
                       tabIndex={-1}
-                      onClick={() => setIsCalendar2(true)}
+                      onClick={() => setIsCalendarLiquidityAllocationTime(true)}
                       onKeyDown={() => {}}
                     >
                       <img src={calendarImg} alt="calendarImg" />
@@ -130,26 +230,45 @@ const CreatePoolPage: React.FC = () => {
               {(isPublic || isLiquidity) && (
                 <>
                   <Input
+                    title="Liquidity Percent"
                     value={liquidityPercent}
                     onChange={setLiquidityPercent}
-                    title="Liquidity Percent"
+                    // error={handleError(liquidityPercent)}
                   />
                   <Input
-                    value={pricePerTokenOnTheExchanger}
-                    onChange={setPricePerTokenOnTheExchanger}
-                    title="Price Per Token On The Exchanger"
+                    title="Liquidity Percentage allocation"
+                    value={liquidityPercentageAllocation}
+                    onChange={setLiquidityPercentageAllocation}
+                    // error={handleError(liquidityPercentageAllocation)}
                   />
                   <Input
-                    invalid
-                    value={timeToPlaceLiquidity}
-                    onChange={setTimeToPlaceLiquidity}
-                    title="Time To Place Liquidity"
+                    title="Listing price (in wei)"
+                    value={listingPriceInWei}
+                    onChange={setListingPriceInWei}
+                    // error={handleError(listingPriceInWei)}
                   />
                   <Input
-                    value={numberOfDaysToLockLPTokens}
-                    onChange={setNumberOfDaysToLockLPTokens}
                     title="Number Of Days To Lock LP Tokens"
+                    value={lpTokensLockDurationInDays}
+                    onChange={setLpTokensLockDurationInDays}
+                    // error={handleError(lpTokensLockDurationInDays)}
                   />
+                  <div className={s.datePicker}>
+                    <div className={s.datePicker_title}>Liquidity Allocation Time</div>
+                    <div className={s.datePicker_inner}>
+                      <div className={s.datePicker_value}>{new Date(liquidityAllocationTime)?.toLocaleDateString()}</div>
+                      <div
+                        className={s.datePicker_img}
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => setIsCalendarLiquidityAllocationTime(true)}
+                        onKeyDown={() => {}}
+                      >
+                        <img src={calendarImg} alt="calendarImg" />
+                      </div>
+                    </div>
+                    <div className={s.datePicker_subtitle}>In Your Timezone</div>
+                  </div>
                   {!isPublic && (
                     <Checkbox
                       defaultValue={isAutomatically}
@@ -165,14 +284,18 @@ const CreatePoolPage: React.FC = () => {
               {!isPublic && (
                 <>
                   <Checkbox
-                    defaultValue={isWhiteList}
-                    onChange={setIsWhiteList}
+                    defaultValue={isWhiteListed}
+                    onChange={setIsWhiteListed}
                     checkboxTitle="Whitelist / without whitelist"
                     optionOne="Whitelist"
                     optionTwo="Without whitelist"
                   />
-                  {isWhiteList && (
-                    <Input title="Adresses" value={whitelistValues} onChange={setWhitelistValues} />
+                  {isWhiteListed && (
+                    <Input
+                      title="Adresses"
+                      value={whitelist}
+                      onChange={setWhitelist}
+                    />
                   )}
                   <Checkbox
                     defaultValue={isVesting}
@@ -182,14 +305,48 @@ const CreatePoolPage: React.FC = () => {
                     optionTwo="Without vesting"
                   />
                   {isVesting && (
-                    <Input
-                      title="Vesting Percent"
-                      value={vestingPercent}
-                      onChange={setVestingPercent}
-                    />
+                    <>
+                      <Input
+                        title="Vesting Percent"
+                        value={vestingPercent}
+                        onChange={setVestingPercent}
+                      />
+                    </>
                   )}
                 </>
               )}
+
+              <Input
+                value={linkLogo}
+                onChange={setLinkLogo}
+                title="Link to logo"
+              />
+              <Input
+                value={linkWebsite}
+                onChange={setLinkWebsite}
+                title="Link to Website"
+              />
+              <Input
+                value={linkTelegram}
+                onChange={setLinkTelegram}
+                title="Link to Telegram"
+              />
+              <Input
+                value={linkGithub}
+                onChange={setLinkGithub}
+                title="Link to Github"
+              />
+              <Input
+                value={linkTwitter}
+                onChange={setLinkTwitter}
+                title="Link to Twitter"
+              />
+              <Input
+                value={whitepaper}
+                onChange={setWhitepaper}
+                title="Whitepaper"
+              />
+
               <div className={s.button}>
                 <button type="submit" className={s.button_submit}>
                   Next
@@ -200,7 +357,7 @@ const CreatePoolPage: React.FC = () => {
           {isCalendar1 && (
             <div className={s.calender}>
               <Calendar
-                onChange={(date: Date) => setDate1(date)}
+                onChange={(date: number) => setOpenTime(date)}
                 closeCalendar={() => setIsCalendar1(false)}
               />
             </div>
@@ -208,8 +365,16 @@ const CreatePoolPage: React.FC = () => {
           {isCalendar2 && (
             <div className={s.calender}>
               <Calendar
-                onChange={(date: Date) => setDate2(date)}
+                onChange={(date: number) => setCloseTime(date)}
                 closeCalendar={() => setIsCalendar2(false)}
+              />
+            </div>
+          )}
+          {isCalendarLiquidityAllocationTime && (
+            <div className={s.calender}>
+              <Calendar
+                onChange={(date: number) => setLiquidityAllocationTime(date)}
+                closeCalendar={() => setIsCalendarLiquidityAllocationTime(false)}
               />
             </div>
           )}
