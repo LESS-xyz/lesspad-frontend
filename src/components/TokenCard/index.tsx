@@ -97,7 +97,6 @@ const TokenCard: React.FC<ITokenCardProps> = (props) => {
   if (!info) return null; // todo
 
   const { linkTwitter, hardCap } = info;
-  console.log('TokenCard info:', info);
 
   return (
     <div className={s.card}>

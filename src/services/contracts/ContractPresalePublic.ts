@@ -33,16 +33,25 @@ export default class ContractPresalePublicService {
     try {
       // console.log('ContractPresalePublicService getInfo:', this.contractAbi, this.contractAddress)
       const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
-
+      // get token decimals
       const tokenAddress = await contract.methods.token().call();
       const contractToken = new this.web3.eth.Contract(ERC20Abi, tokenAddress);
       const decimals = await contractToken.methods.decimals().call();
-
+      // methods
+      const listingPrice = await contract.methods.listingPrice().call();
+      const softCap = await contract.methods.softCap().call();
       const hardCap = await contract.methods.hardCap().call();
-      const hardCapFormatted = +new BigNumber(hardCap).dividedBy(new BigNumber(10).pow(decimals));
       const linkTwitter = await contract.methods.linkTwitter().call();
-
+      const saleTitle = await contract.methods.saleTitle().call();
+      // format
+      const listingPriceFormatted = +new BigNumber(listingPrice).dividedBy(new BigNumber(10).pow(decimals));
+      const softCapFormatted = +new BigNumber(softCap).dividedBy(new BigNumber(10).pow(decimals));
+      const hardCapFormatted = +new BigNumber(hardCap).dividedBy(new BigNumber(10).pow(decimals));
+      // result
       const info = {
+        saleTitle: this.web3.utils.hexToString(saleTitle),
+        listingPrice: listingPriceFormatted,
+        softCap: softCapFormatted,
         hardCap: hardCapFormatted,
         linkTwitter: this.web3.utils.hexToString(linkTwitter),
       }
