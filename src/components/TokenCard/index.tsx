@@ -61,7 +61,7 @@ const TokenCard: React.FC<ITokenCardProps> = (props) => {
     address,
     type,
     logo,
-    name,
+    // name,
     cost,
     totalAmount,
     currentAmount,
@@ -96,7 +96,7 @@ const TokenCard: React.FC<ITokenCardProps> = (props) => {
   if (!address) return null; // todo
   if (!info) return null; // todo
 
-  const { linkTwitter, hardCap } = info;
+  const { linkTwitter, hardCap, softCap, saleTitle } = info;
 
   return (
     <div className={s.card}>
@@ -121,7 +121,7 @@ const TokenCard: React.FC<ITokenCardProps> = (props) => {
             <div className={s.token_logo}>
               <img src={logo} alt="token-logo" />
             </div>
-            <div className={s.token_name}>{name}</div>
+            <div className={s.token_name}>{saleTitle}</div>
           </Link>
 
           <div className={s.token_cost}>
@@ -151,7 +151,7 @@ const TokenCard: React.FC<ITokenCardProps> = (props) => {
                     {((currentAmount / totalAmount) * 100).toFixed(2)}%
                   </div>
                   <div className={s.progress_bar__info_right}>
-                    {currentAmount.toFixed(2)} / {hardCap.toFixed(2)}
+                    {softCap.toFixed(2)} / {hardCap.toFixed(2)}
                   </div>
                 </div>
                 <div className={s.progress_bar__subinfo}>
