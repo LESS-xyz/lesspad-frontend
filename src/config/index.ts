@@ -99,8 +99,10 @@ export default {
       // },
       'Ethereum': {
         LessToken: '0xa372d1d35041714092900b233934fb2d002755e2',
-        LessLibrary: '0x42d58A23259Fb09A02384d80772Ee8236ef63732',
-        Staking: '0x2D01C2d1adA5D0311A8d16aDA865662a3658C91F',
+        // LessLibrary: '0x42d58A23259Fb09A02384d80772Ee8236ef63732',
+        LessLibrary: '0x4b01de89936046228d87dad26b7796ea8f424fa4',
+        // Staking: '0x2D01C2d1adA5D0311A8d16aDA865662a3658C91F',
+        Staking: '0xf3016a3c8ddd673535a058b2b86aa6299639e933',
         // PresaleFactory: '0xe9e9a8bacEC4894bDCBf4F63f57A9A5F0D8432BD',
         PresaleFactory: '0x33918Fa73f367000c0911d8dD5949684e4ca3468',
         PresalePublic: '0xeA63Bfc235c1f70BE88287BCed13A42550C40DF3', // todo
