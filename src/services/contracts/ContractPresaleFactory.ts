@@ -34,18 +34,26 @@ export default class ContractPresaleFactoryService {
   public createPresalePublic = async (props: TypeGetInfoProps) => {
     try {
       const { userAddress, presaleInfo, presalePancakeSwapInfo, presaleStringInfo } = props;
+      const valueInWei = this.web3.utils.toWei('0.05', 'ether');
       const presaleStringInfoFormatted = presaleStringInfo.map((item: string, ii: number) => {
         const hex = this.web3.utils.toHex(item);
         const zeros = new Array(66 - hex.length).fill('0').join('');
         if (ii <= 4) return hex + zeros;
         return item;
       });
-      console.log('ContractPresalePublicService createPresalePublic:', userAddress, presaleStringInfoFormatted)
+      console.log('ContractPresaleFactoryService createPresalePublic:', { valueInWei, userAddress, presaleStringInfoFormatted });
       const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
-      const result = await contract.methods.createPresalePublic(presaleInfo, presalePancakeSwapInfo, presaleStringInfoFormatted).send({ from: userAddress });
+      const result = await contract.methods.createPresalePublic(
+        presaleInfo,
+        presalePancakeSwapInfo,
+        presaleStringInfoFormatted
+      ).send({
+        from: userAddress,
+        value: valueInWei
+      });
       return result;
     } catch (e) {
-      console.error('ContractLessLibraryService getInfo:', e);
+      console.error('ContractPresaleFactoryService createPresalePublic:', e);
       return null;
     }
   };

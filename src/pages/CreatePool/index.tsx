@@ -10,21 +10,26 @@ import BigNumber from "bignumber.js/bignumber";
 
 const CreatePoolPage: React.FC = () => {
   const { ContractPresaleFactory } = useContractsContext();
-  const [saleTitle, setSaleTitle] = useState<string>('Boris');
+
+  const defaultOpenTime = new Date().getTime();
+  const defaultCloseTime = new Date().getTime() + 1000 * 60 * 60 * 24;
+  const defaultLiquidityAllocationTime = new Date().getTime() + 1000 * 60 * 60 * 48;
+
+  const [saleTitle, setSaleTitle] = useState<string>('Rnb');
   const [description, setDescription] = useState<string>('');
   const [tokenAddress, setTokenAddress] = useState<string>('0xa372d1d35041714092900B233934fB2D002755E2');
-  const [tokenPriceInWei, setTokenPriceInWei] = useState<string>('0');
+  const [tokenPriceInWei, setTokenPriceInWei] = useState<string>('1000000000000000000');
   // инпуты для Public type
-  const [softCapInWei, setSoftCapInWei] = useState<string>('0');
-  const [hardCapInWei, setHardCapInWei] = useState<string>('0');
-  const [openTime, setOpenTime] = useState<number>(0);
-  const [closeTime, setCloseTime] = useState<number>(0);
+  const [softCapInWei, setSoftCapInWei] = useState<string>('1000000000000000000');
+  const [hardCapInWei, setHardCapInWei] = useState<string>('2000000000000000000');
+  const [openTime, setOpenTime] = useState<number>(defaultOpenTime);
+  const [closeTime, setCloseTime] = useState<number>(defaultCloseTime);
   const [liquidityPercent, setLiquidityPercent] = useState<string>('0');
   const [liquidityPercentageAllocation, setLiquidityPercentageAllocation] = useState<string>('0');
   const [listingPriceInWei, setListingPriceInWei] = useState<string>('0');
   const [lpTokensLockDurationInDays, setLpTokensLockDurationInDays] = useState('0');
   const [vestingPercent, setVestingPercent] = useState<string>('0');
-  const [liquidityAllocationTime, setLiquidityAllocationTime] = useState<number>(0);
+  const [liquidityAllocationTime, setLiquidityAllocationTime] = useState<number>(defaultLiquidityAllocationTime);
   // инпут для Certified type
   const [whitelist, setWhitelist] = useState<string>('');
   // links
@@ -50,8 +55,8 @@ const CreatePoolPage: React.FC = () => {
 
   const minInvestInWei = new BigNumber(10).pow(10).toString(10); // todo
   const maxInvestInWei = new BigNumber(10).pow(20).toString(10); // todo
-  const presaleType = isPublic ? 1 : 0;
-  const whitelistArray = whitelist ? whitelist.split(',') : [];
+  // const presaleType = isPublic ? 1 : 0;
+  // const whitelistArray = whitelist ? whitelist.split(',') : [];
 
   const handleError = (value: any, message?: string) => {
     if (isFormSubmitted && !value) return message || 'Enter value';
@@ -85,22 +90,57 @@ const CreatePoolPage: React.FC = () => {
       setIsFormSubmitted(true);
       // return; // todo
     }
+    // struct PresaleInfo {
+    //   address tokenAddress;
+    //   uint256 tokenPriceInWei;
+    //   uint256 hardCapInWei;
+    //   uint256 softCapInWei;
+    //   uint256 openTime;
+    //   uint256 closeTime;
+    // }
+    //
+    // struct CertifiedAddition {
+    //   bool liquidity;
+    //   bool automatically;
+    //   bool vesting;
+    //   bool whitelisted;
+    //   address[] whitelist;
+    // }
+    //
+    // struct PresalePancakeSwapInfo {
+    //   uint256 listingPriceInWei;
+    //   uint256 lpTokensLockDurationInDays;
+    //   uint8 liquidityPercentageAllocation;
+    //   uint256 liquidityAllocationTime;
+    // }
+    //
+    // struct PresaleStringInfo {
+    //   bytes32 saleTitle;
+    //   bytes32 linkTelegram;
+    //   bytes32 linkGithub;
+    //   bytes32 linkTwitter;
+    //   bytes32 linkWebsite;
+    //   string linkLogo;
+    //   string description;
+    //   string whitepaper;
+    // }
+
     // порядок полей менять нельзя!
     const presaleInfo = [
       tokenAddress,
       tokenPriceInWei,
-      softCapInWei,
       hardCapInWei,
-      maxInvestInWei,
-      minInvestInWei, // 5
+      softCapInWei,
+      // maxInvestInWei,
+      // minInvestInWei, // 5
       openTime,
       closeTime,
-      presaleType,
-      isLiquidity,
-      isAutomatically, // 10
-      isWhiteListed,
-      whitelistArray,
-      isVesting,
+      // presaleType,
+      // isLiquidity,
+      // isAutomatically, // 10
+      // isWhiteListed,
+      // whitelistArray,
+      // isVesting,
     ]
     // порядок полей менять нельзя!
     const presalePancakeSwapInfo = [

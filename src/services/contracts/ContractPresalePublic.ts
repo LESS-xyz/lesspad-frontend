@@ -57,7 +57,7 @@ export default class ContractPresalePublicService {
       }
       return info;
     } catch (e) {
-      console.error('ContractLessLibraryService getInfo:', e);
+      console.error('ContractPresalePublicService getInfo:', e);
       return null;
     }
   };
