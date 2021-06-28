@@ -11,6 +11,7 @@ type TypeGetStakedBalanceProps = {
 };
 
 type TypeStakeProps = {
+  userAddress: string;
   amount: string;
 };
 
@@ -43,11 +44,11 @@ export default class ContractStakingService {
     }
   };
 
-  public stake = async ({ amount }: TypeStakeProps) => {
+  public stake = async ({ amount, userAddress }: TypeStakeProps) => {
     try {
       // console.log('ContractPresalePublicService getInfo:', this.contractAbi, this.contractAddress)
       const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
-      const result = await contract.methods.stake(amount).call();
+      const result = await contract.methods.stake(amount).send({ from: userAddress });
       return result;
     } catch (e) {
       console.error('ContractStakingService stake:', e);
@@ -55,11 +56,11 @@ export default class ContractStakingService {
     }
   };
 
-  public unstake = async ({ amount }: TypeStakeProps) => {
+  public unstake = async ({ amount, userAddress }: TypeStakeProps) => {
     try {
       // console.log('ContractPresalePublicService getInfo:', this.contractAbi, this.contractAddress)
       const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
-      const result = await contract.methods.unstake(amount).call();
+      const result = await contract.methods.unstake(amount).send({ from: userAddress });
       return result;
     } catch (e) {
       console.error('ContractStakingService stake:', e);

@@ -64,7 +64,11 @@ const StakingPage: React.FC = () => {
         const resultApprove = await ContractLessToken.approve({ userAddress, amount: stakeValueBN });
         console.log('Staking stake resultApprove:', resultApprove);
       };
-      const result = await ContractStaking.stake({ amount: stakeValueBN });
+      const result = await ContractStaking.stake({ userAddress, amount: stakeValueBN });
+      if (result) {
+        getLessTokenBalance();
+        getStakedBalance();
+      }
       console.log('Staking stake:', result);
     } catch (e) {
       console.error(e);
@@ -78,7 +82,11 @@ const StakingPage: React.FC = () => {
       const decimalsBN = web3.utils.toBN(decimals);
       const unstakeValueBN = new BN(unstakeValue).mul(ten.pow(decimalsBN)).toString(10);
       console.log('Staking unstake unstakeValueBN:', unstakeValueBN);
-      const result = await ContractStaking.unstake({ amount: unstakeValueBN });
+      const result = await ContractStaking.unstake({ userAddress, amount: unstakeValueBN });
+      if (result) {
+        getLessTokenBalance();
+        getStakedBalance();
+      }
       console.log('Staking stake:', result);
     } catch (e) {
       console.error(e);
