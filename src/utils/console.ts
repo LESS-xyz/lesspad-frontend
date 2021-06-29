@@ -1,8 +1,11 @@
 const styles = {
   App: 'color: black; font-weight: bold;',
-  PageMarketsContent: 'color: #065a66; font-weight: bold;',
-  CoinMarketCapService: 'color: grey; font-weight: bold;',
-  ModalContentQuotes: 'color: #996655; font-weight: bold;',
+  AllPoolsPage: 'color: #065a66; font-weight: bold;',
+  login: 'color: grey; font-weight: bold;',
+  ContractPresalePublicService: 'color: #996655; font-weight: bold;',
+  ContractLessTokenService: 'color: #996655; font-weight: bold;',
+  ContractLessLibraryService: 'color: #996655; font-weight: bold;',
+  yyy: 'color: #996655; font-weight: bold;',
 };
 
 export const stylizeConsole = ({ showConsoleLog = true }) => {

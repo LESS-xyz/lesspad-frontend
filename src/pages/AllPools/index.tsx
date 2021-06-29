@@ -54,15 +54,26 @@ const cardsExample = [
 const AllPoolsPage: React.FC = () => {
   const { ContractLessLibrary } = useContractsContext();
 
-  const [inputValue, setInputValue] = useState<string>('');
+  const [search, setSearch] = useState<string>('');
   const [currentOption, setCurrentOption] = useState<string>('All');
-  const [presalesAddresses, setPresalesAddresses] = useState<any>([]);
+  // const [presalesAddresses, setPresalesAddresses] = useState<any>([]);
+  const [presalesInfo, setPresalesInfo] = useState<any>([]);
 
-  const getPresalesAddresses = async () => {
+  // const getPresalesAddresses = async () => {
+  //   try {
+  //     const addresses = await ContractLessLibrary.getPresalesAddresses();
+  //     if (addresses) setPresalesAddresses(addresses);
+  //     console.log('AllPoolsPage getPresalesAddresses:', addresses);
+  //   } catch (e) {
+  //     console.error(e);
+  //   }
+  // };
+
+  const getArrForSearch = async () => {
     try {
-      const addresses = await ContractLessLibrary.getPresalesAddresses();
-      if (addresses) setPresalesAddresses(addresses);
-      console.log('AllPoolsPage getPresalesAddresses:', addresses);
+      const arrForSearch = await ContractLessLibrary.getArrForSearch();
+      if (arrForSearch) setPresalesInfo(arrForSearch);
+      console.log('AllPoolsPage getArrForSearch:', arrForSearch);
     } catch (e) {
       console.error(e);
     }
@@ -71,7 +82,8 @@ const AllPoolsPage: React.FC = () => {
   useEffect(() => {
     if (!ContractLessLibrary) return;
     console.log('AllPoolsPage useEffect:');
-    getPresalesAddresses();
+    // getPresalesAddresses();
+    getArrForSearch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ContractLessLibrary]);
 
@@ -85,8 +97,8 @@ const AllPoolsPage: React.FC = () => {
           <div className={s.control_panel}>
             <div className={s.input}>
               <Search
-                value={inputValue}
-                onChange={(str: string) => setInputValue(str)}
+                value={search}
+                onChange={(str: string) => setSearch(str)}
                 placeholder="Search by Name, Token contract address, Token description"
               />
             </div>
@@ -99,12 +111,19 @@ const AllPoolsPage: React.FC = () => {
             </div>
           </div>
           <div className={s.cards}>
-            {presalesAddresses.map((address: string) => {
+            {presalesInfo.map((item: any) => {
+              const { address = '', title = '', description = '' } = item;
+              if (search) {
+                const isAddressInSearch = address.toLowerCase().includes(search.toLowerCase());
+                const isTitleInSearch = title.toLowerCase().includes(search.toLowerCase());
+                const isDescriptionInSearch = description.toLowerCase().includes(search.toLowerCase());
+                if (!isAddressInSearch && !isTitleInSearch && !isDescriptionInSearch) return null;
+              };
               const props = {
+                name: 'Pool',
                 type: CardConditions.closed,
                 cryptoType: cryptos.ETH,
                 logo: logo1,
-                name: 'XOLO Financies',
                 cost: '0.0000345',
                 totalAmount: 3454,
                 currentAmount: 2343,

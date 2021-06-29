@@ -1,4 +1,3 @@
-// import BigNumber from 'bignumber.js/bignumber';
 import Web3 from 'web3';
 import config from '../../config';
 
@@ -62,6 +61,35 @@ export default class ContractLessLibraryService {
       return balance;
     } catch (e) {
       console.error('ContractLessLibraryService getMinVoterBalance:', e);
+      return null;
+    }
+  };
+
+  public getArrForSearch = async () => {
+    try {
+      const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
+      const arrForSearch = await contract.methods.getArrForSearch().call();
+      const arrForSearchFormatted = arrForSearch.map((item: any) => {
+        let {
+          description,
+          title,
+        } = item;
+        const {
+          isCertified,
+          presaleAddress,
+        } = item;
+        if (description === '') description = '0x';
+        if (title === '') title = '0x';
+        return {
+          description: this.web3.utils.hexToString(description),
+          isCertified,
+          address: presaleAddress,
+          title: this.web3.utils.hexToString(title),
+        }
+      })
+      return arrForSearchFormatted;
+    } catch (e) {
+      console.error('ContractLessLibraryService getArrForSearch:', e);
       return null;
     }
   };

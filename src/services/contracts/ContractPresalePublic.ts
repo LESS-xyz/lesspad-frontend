@@ -1,7 +1,8 @@
-import BigNumber from 'bignumber.js/bignumber';
 import Web3 from 'web3';
 import config from '../../config';
-import ERC20Abi from "../../data/ERC20Abi";
+// import ERC20Abi from "../../data/ERC20Abi";
+//
+// const { BN }: any = Web3.utils;
 
 type TypeConstructorProps = {
   web3Provider: any;
@@ -34,25 +35,29 @@ export default class ContractPresalePublicService {
       // console.log('ContractPresalePublicService getInfo:', this.contractAbi, this.contractAddress)
       const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
       // get token decimals
-      const tokenAddress = await contract.methods.token().call();
-      const contractToken = new this.web3.eth.Contract(ERC20Abi, tokenAddress);
-      const decimals = await contractToken.methods.decimals().call();
-      // methods
-      const listingPrice = await contract.methods.listingPrice().call();
-      const softCap = await contract.methods.softCap().call();
-      const hardCap = await contract.methods.hardCap().call();
-      const linkTwitter = await contract.methods.linkTwitter().call();
-      const saleTitle = await contract.methods.saleTitle().call();
-      // format
-      const listingPriceFormatted = +new BigNumber(listingPrice).dividedBy(new BigNumber(10).pow(decimals));
-      const softCapFormatted = +new BigNumber(softCap).dividedBy(new BigNumber(10).pow(decimals));
-      const hardCapFormatted = +new BigNumber(hardCap).dividedBy(new BigNumber(10).pow(decimals));
+      // const generalInfo = await contract.methods.generalInfo().call();
+      const uniswapInfo = await contract.methods.uniswapInfo().call();
+      const stringInfo = await contract.methods.stringInfo().call();
+      console.log('ContractPresalePublicService getInfo:', { uniswapInfo, stringInfo });
+      // const tokenAddress = generalInfo[0];
+      // const contractToken = new this.web3.eth.Contract(ERC20Abi, tokenAddress);
+      // const decimals = await contractToken.methods.decimals().call();
+      // // methods
+      // const softCap = await contract.methods.softCap().call();
+      // const hardCap = await contract.methods.hardCap().call();
+      // const linkTwitter = await contract.methods.linkTwitter().call();
+      // const saleTitle = await contract.methods.saleTitle().call();
+      // // format
+      // const softCapFormatted = +new BN(softCap).div(new BN(10).pow(decimals));
+      // const hardCapFormatted = +new BN(hardCap).div(new BN(10).pow(decimals));
       // result
+      const {
+        linkTwitter
+      } = stringInfo;
       const info = {
-        saleTitle: this.web3.utils.hexToString(saleTitle),
-        listingPrice: listingPriceFormatted,
-        softCap: softCapFormatted,
-        hardCap: hardCapFormatted,
+        // saleTitle: this.web3.utils.hexToString(saleTitle),
+        // softCap: softCapFormatted,
+        // hardCap: hardCapFormatted,
         linkTwitter: this.web3.utils.hexToString(linkTwitter),
       }
       return info;

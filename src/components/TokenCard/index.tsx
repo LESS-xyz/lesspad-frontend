@@ -96,7 +96,7 @@ const TokenCard: React.FC<ITokenCardProps> = (props) => {
   if (!address) return null; // todo
   if (!info) return null; // todo
 
-  const { linkTwitter, hardCap, softCap, saleTitle } = info;
+  const { linkTwitter, hardCap = 0, softCap = 0, saleTitle = 'Title' } = info;
 
   return (
     <div className={s.card}>
