@@ -63,7 +63,7 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
     try {
       const newInfo = await ContractPresalePublic.getInfo({ contractAddress: address });
       if (newInfo) setInfo(newInfo);
-      console.log('TableRow getInfo:', newInfo);
+      // console.log('TableRow getInfo:', newInfo);
     } catch (e) {
       console.error('TableRow getInfo:', e);
     }
@@ -100,7 +100,7 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ContractPresalePublic, address]);
 
-  console.log('TableRow:', address, info);
+  // console.log('TableRow:', address, info);
 
   if (!address) return null; // todo
   if (!info) return null; // todo
