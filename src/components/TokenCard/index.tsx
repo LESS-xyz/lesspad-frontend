@@ -81,7 +81,7 @@ const TokenCard: React.FC<ITokenCardProps> = (props) => {
     try {
       const newInfo = await ContractPresalePublic.getInfo({ contractAddress: address });
       if (newInfo) setInfo(newInfo);
-      console.log('TokenCard getInfo:', newInfo);
+      // console.log('TokenCard getInfo:', newInfo);
     } catch (e) {
       console.error(e);
     }

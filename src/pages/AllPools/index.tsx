@@ -10,46 +10,46 @@ import { CardConditions, cryptos } from '../../types/index';
 
 import s from './AllPools.module.scss';
 
-const cardsExample = [
-  {
-    type: CardConditions.inVoting,
-    cryptoType: cryptos.BNB,
-    logo: logo1,
-    name: 'XOLO Financies',
-    cost: '0.0000345',
-    totalAmount: 3454,
-    currentAmount: 2343,
-    minPercent: 45,
-    liquidityPercent: 56,
-    daysBeforeOpening: 4,
-    yesCounter: 12321,
-    noCounter: 4455,
-  },
-  {
-    type: CardConditions.closed,
-    cryptoType: cryptos.ETH,
-    logo: logo1,
-    name: 'XOLO Financies',
-    cost: '0.0000345',
-    totalAmount: 3454,
-    currentAmount: 2343,
-    minPercent: 45,
-    liquidityPercent: 56,
-    daysBeforeOpening: 4,
-  },
-  {
-    type: CardConditions.notOpened,
-    cryptoType: cryptos.BNB,
-    logo: logo1,
-    name: 'XOLO Financies',
-    cost: '0.0000345',
-    totalAmount: 3454,
-    currentAmount: 2343,
-    minPercent: 45,
-    liquidityPercent: 56,
-    daysBeforeOpening: 4,
-  },
-];
+// const cardsExample = [
+//   {
+//     type: CardConditions.inVoting,
+//     cryptoType: cryptos.BNB,
+//     logo: logo1,
+//     name: 'XOLO Financies',
+//     cost: '0.0000345',
+//     totalAmount: 3454,
+//     currentAmount: 2343,
+//     minPercent: 45,
+//     liquidityPercent: 56,
+//     daysBeforeOpening: 4,
+//     yesCounter: 12321,
+//     noCounter: 4455,
+//   },
+//   {
+//     type: CardConditions.closed,
+//     cryptoType: cryptos.ETH,
+//     logo: logo1,
+//     name: 'XOLO Financies',
+//     cost: '0.0000345',
+//     totalAmount: 3454,
+//     currentAmount: 2343,
+//     minPercent: 45,
+//     liquidityPercent: 56,
+//     daysBeforeOpening: 4,
+//   },
+//   {
+//     type: CardConditions.notOpened,
+//     cryptoType: cryptos.BNB,
+//     logo: logo1,
+//     name: 'XOLO Financies',
+//     cost: '0.0000345',
+//     totalAmount: 3454,
+//     currentAmount: 2343,
+//     minPercent: 45,
+//     liquidityPercent: 56,
+//     daysBeforeOpening: 4,
+//   },
+// ];
 
 const AllPoolsPage: React.FC = () => {
   const { ContractLessLibrary } = useContractsContext();
@@ -58,6 +58,12 @@ const AllPoolsPage: React.FC = () => {
   const [currentOption, setCurrentOption] = useState<string>('All');
   // const [presalesAddresses, setPresalesAddresses] = useState<any>([]);
   const [presalesInfo, setPresalesInfo] = useState<any>([]);
+  const [page, setPage] = useState<number>(0);
+
+  const itemsOnPage = 6;
+  let countOfPages = +(presalesInfo.length / itemsOnPage).toFixed();
+  const moduloOfPages = presalesInfo.length % itemsOnPage;
+  if (moduloOfPages > 0) countOfPages += 1;
 
   // const getPresalesAddresses = async () => {
   //   try {
@@ -78,6 +84,8 @@ const AllPoolsPage: React.FC = () => {
       console.error(e);
     }
   };
+
+  const handleChangePage = (p: number) => setPage(p);
 
   useEffect(() => {
     if (!ContractLessLibrary) return;
@@ -111,8 +119,9 @@ const AllPoolsPage: React.FC = () => {
             </div>
           </div>
           <div className={s.cards}>
-            {presalesInfo.map((item: any) => {
+            {presalesInfo.map((item: any, ii: number) => {
               const { address = '', title = '', description = '' } = item;
+              if (ii < page * itemsOnPage && ii >= (page + 1) * itemsOnPage) return null;
               if (search) {
                 const isAddressInSearch = address.toLowerCase().includes(search.toLowerCase());
                 const isTitleInSearch = title.toLowerCase().includes(search.toLowerCase());
@@ -131,17 +140,12 @@ const AllPoolsPage: React.FC = () => {
                 liquidityPercent: 56,
                 daysBeforeOpening: 4,
               };
-              return <TokenCard key={address} address={address} {...props} />;
+              // eslint-disable-next-line react/no-array-index-key
+              return <TokenCard key={JSON.stringify(item) + ii} address={address} {...props} />;
             })}
-            {cardsExample.map((card) => (
-              <TokenCard {...card} />
-            ))}
-            {cardsExample.map((card) => (
-              <TokenCard {...card} />
-            ))}
           </div>
           <div className={s.pagination}>
-            <Pagination />
+            <Pagination countOfPages={countOfPages} onChange={handleChangePage} />
           </div>
         </div>
       </div>
