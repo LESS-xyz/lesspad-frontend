@@ -66,5 +66,11 @@
   &_img {
     height: 24px;
     margin-right: 10px;
+    cursor: pointer;
   }
+}
+
+.messageContainer {
+  @include flex(row, center);
+  height: 100%;
 }

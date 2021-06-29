@@ -2,8 +2,9 @@ import s from './Table.module.scss';
 import thumbUpGreen from '../../../assets/img/icons/thumb-up-green.svg';
 import thumbUpRed from '../../../assets/img/icons/thumb-up-red.svg';
 import { useContractsContext } from "../../../contexts/ContractsContext";
-import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { modalActions } from "../../../redux/actions";
 
 interface ITableRow {
   address?: string;
@@ -20,6 +21,13 @@ interface ITableRow {
 interface ITableRowProps extends ITableRow {
   index: number;
 }
+
+type TypeModalParams = {
+  open: boolean;
+  text?: string | React.ReactElement;
+  header?: string | React.ReactElement;
+  delay?: number;
+};
 
 const TableRow: React.FC<ITableRowProps> = (props) => {
   const {
@@ -38,7 +46,14 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
 
   const [info, setInfo] = useState<any>();
 
+  const { address: userAddress } = useSelector(({ user }: any) => user);
   const { chainType } = useSelector(({ wallet }: any) => wallet);
+
+  const dispatch = useDispatch();
+  const toggleModal = React.useCallback(
+    (params: TypeModalParams) => dispatch(modalActions.toggleModal(params)),
+    [dispatch],
+  );
 
   const isEthereum = chainType === 'Ethereum';
   const isBinanceSmartChain = chainType === 'Binance-Smart-Chain';
@@ -48,9 +63,33 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
     try {
       const newInfo = await ContractPresalePublic.getInfo({ contractAddress: address });
       if (newInfo) setInfo(newInfo);
-      console.log('TokenCard getInfo:', newInfo);
+      console.log('TableRow getInfo:', newInfo);
     } catch (e) {
-      console.error(e);
+      console.error('TableRow getInfo:', e);
+    }
+  };
+
+  const vote = async (yes: boolean) => {
+    try {
+      const resultVote = await ContractPresalePublic.vote({
+        userAddress,
+        contractAddress: address,
+        yes,
+      });
+      let message = 'Voting succeded'
+      if (!resultVote) {
+        message = 'Voting not succeded'
+      }
+      toggleModal({
+        open: true,
+        text: (
+          <div className={s.messageContainer}>
+            <div>{message}</div>
+          </div>
+        ),
+      });
+    } catch (e) {
+      console.error('TableRow vote:', e);
     }
   };
 
@@ -82,7 +121,13 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
       </div>
       <div className={`${s.row_cell} ${s.likes}`}>
         <div className={s.likes}>
-          <div className={s.likes_img}>
+          <div
+            className={s.likes_img}
+            role="button"
+            tabIndex={0}
+            onKeyDown={() => {}}
+            onClick={() => vote(true)}
+          >
             <img src={thumbUpGreen} alt="thumbUpGreen" />
           </div>
           <div className={s.likes_data}>
@@ -90,7 +135,13 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
           </div>
         </div>
         <div className={s.likes}>
-          <div className={s.likes_img}>
+          <div
+            className={s.likes_img}
+            role="button"
+            tabIndex={0}
+            onKeyDown={() => {}}
+            onClick={() => vote(false)}
+          >
             <img src={thumbUpRed} alt="thumbUpRed" />
           </div>
           <div className={s.likes_data}>

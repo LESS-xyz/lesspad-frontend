@@ -13,6 +13,12 @@ type TypeGetInfoProps = {
   contractAddress: string;
 };
 
+type TypeVoteProps = {
+  userAddress: string;
+  contractAddress: string;
+  yes: boolean;
+};
+
 export default class ContractPresalePublicService {
   public web3: any;
   public contractAddress: any;
@@ -25,6 +31,7 @@ export default class ContractPresalePublicService {
     const addressesOfNetType = addresses[isMainnetOrTestnet];
     const abisOfNetType = abis[isMainnetOrTestnet];
     this.web3 = new Web3(web3Provider);
+    // this.web3.eth.handleRevert = true;
     this.contractName = 'PresalePublic';
     this.contractAddress = addressesOfNetType[chainType][this.contractName];
     this.contractAbi = abisOfNetType[chainType][this.contractName];
@@ -63,6 +70,18 @@ export default class ContractPresalePublicService {
       return info;
     } catch (e) {
       console.error('ContractPresalePublicService getInfo:', e);
+      return null;
+    }
+  };
+
+  public vote = async (props: TypeVoteProps) => {
+    try {
+      const { userAddress, contractAddress, yes } = props;
+      const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
+      const result = await contract.methods.vote(yes).send({ from: userAddress });
+      return result;
+    } catch (e) {
+      console.error('ContractLessLibraryService vote:', e);
       return null;
     }
   };

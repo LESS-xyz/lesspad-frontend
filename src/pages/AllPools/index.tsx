@@ -121,6 +121,7 @@ const AllPoolsPage: React.FC = () => {
           <div className={s.cards}>
             {presalesInfo.map((item: any, ii: number) => {
               const { address = '', title = '', description = '' } = item;
+              // todo: fix pagination
               if (ii < page * itemsOnPage && ii >= (page + 1) * itemsOnPage) return null;
               if (search) {
                 const isAddressInSearch = address.toLowerCase().includes(search.toLowerCase());

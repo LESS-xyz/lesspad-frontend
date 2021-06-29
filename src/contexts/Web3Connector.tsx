@@ -22,6 +22,7 @@ const Web3Connector: React.FC = ({ children }) => {
   const walletType = getFromStorage('walletType');
 
   const { counter: initCounter, type, chainType } = useSelector(({ wallet }: any) => wallet);
+
   const dispatch = useDispatch();
   const setUserData = React.useCallback((props: any) => dispatch(userActions.setUserData(props)), [
     dispatch,
