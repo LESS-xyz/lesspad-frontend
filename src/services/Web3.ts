@@ -158,4 +158,21 @@ export default class Web3Service {
       return { status: 'ERROR', data: null };
     }
   };
+
+  public subscribe = async (type: string, callback: any) => {
+    try {
+      return await this.web3Provider.eth.subscribe(type, callback);
+    } catch (e) {
+      console.error('Web3ProviderService subscribe:', e);
+      return false;
+    }
+  }
+
+  public clearSubscriptions = async () => {
+    try {
+      await this.web3Provider.eth.clearSubscriptions();
+    } catch (e) {
+      console.error('Web3ProviderService clearSubscriptions:', e);
+    }
+  }
 }

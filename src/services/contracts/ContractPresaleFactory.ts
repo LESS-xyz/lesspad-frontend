@@ -34,7 +34,7 @@ export default class ContractPresaleFactoryService {
   public createPresalePublic = async (props: TypeGetInfoProps) => {
     try {
       const { userAddress, presaleInfo, presalePancakeSwapInfo, presaleStringInfo } = props;
-      const valueInWei = this.web3.utils.toWei('0.05', 'ether');
+      const valueInWei = this.web3.utils.toWei('0.5', 'ether'); // todo
       const presaleStringInfoFormatted = presaleStringInfo.map((item: string, ii: number) => {
         const hex = this.web3.utils.toHex(item);
         const zeros = new Array(66 - hex.length).fill('0').join('');

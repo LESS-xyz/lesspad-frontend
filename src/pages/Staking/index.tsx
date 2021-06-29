@@ -5,6 +5,7 @@ import maxImg from '../../assets/img/icons/max.svg';
 import { useContractsContext } from "../../contexts/ContractsContext";
 import { useSelector } from "react-redux";
 import web3 from 'web3';
+import config from '../../config';
 
 const { BN }: any = web3.utils;
 
@@ -58,10 +59,12 @@ const StakingPage: React.FC = () => {
       const decimalsBN = web3.utils.toBN(decimals);
       const stakeValueBN = new BN(stakeValue).mul(ten.pow(decimalsBN)).toString(10);
       console.log('Staking stake stakeValueBN:', stakeValueBN);
-      const allowance = await ContractLessToken.allowance({ userAddress });
+      const { addresses }: any = config;
+      const spender = addresses[config.isMainnetOrTestnet][chainType].Staking;
+      const allowance = await ContractLessToken.allowance({ userAddress, spender });
       console.log('Staking stake allowance:', allowance);
       if (allowance < stakeValueBN) {
-        const resultApprove = await ContractLessToken.approve({ userAddress, amount: stakeValueBN });
+        const resultApprove = await ContractLessToken.approve({ userAddress, spender, amount: stakeValueBN });
         console.log('Staking stake resultApprove:', resultApprove);
       };
       const result = await ContractStaking.stake({ userAddress, amount: stakeValueBN });

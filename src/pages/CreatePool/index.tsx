@@ -7,9 +7,12 @@ import Checkbox from '../../components/Checkbox/index';
 import { useContractsContext } from "../../contexts/ContractsContext";
 import { useSelector } from "react-redux";
 import BigNumber from "bignumber.js/bignumber";
+import config from "../../config";
+import { useWeb3ConnectorContext } from "../../contexts/Web3Connector";
 
 const CreatePoolPage: React.FC = () => {
-  const { ContractPresaleFactory } = useContractsContext();
+  const { web3 } = useWeb3ConnectorContext();
+  const { ContractPresaleFactory, ContractLessToken } = useContractsContext();
 
   const defaultOpenTime = new Date().getTime();
   const defaultCloseTime = new Date().getTime() + 1000 * 60 * 60 * 24;
@@ -25,8 +28,8 @@ const CreatePoolPage: React.FC = () => {
   const [openTime, setOpenTime] = useState<number>(defaultOpenTime);
   const [closeTime, setCloseTime] = useState<number>(defaultCloseTime);
   const [liquidityPercent, setLiquidityPercent] = useState<string>('0');
-  const [liquidityPercentageAllocation, setLiquidityPercentageAllocation] = useState<string>('0');
-  const [listingPriceInWei, setListingPriceInWei] = useState<string>('0');
+  const [liquidityPercentageAllocation, setLiquidityPercentageAllocation] = useState<string>('1');
+  const [listingPriceInWei, setListingPriceInWei] = useState<string>('1000000000000000000');
   const [lpTokensLockDurationInDays, setLpTokensLockDurationInDays] = useState('0');
   const [vestingPercent, setVestingPercent] = useState<string>('0');
   const [liquidityAllocationTime, setLiquidityAllocationTime] = useState<number>(defaultLiquidityAllocationTime);
@@ -51,6 +54,7 @@ const CreatePoolPage: React.FC = () => {
   const [isWhiteListed, setIsWhiteListed] = useState<boolean>(false);
   const [isFormSubmitted, setIsFormSubmitted] = useState<boolean>(false);
 
+  const { chainType } = useSelector(({ wallet }: any) => wallet);
   const { address: userAddress } = useSelector(({ user }: any) => user);
 
   const minInvestInWei = new BigNumber(10).pow(10).toString(10); // todo
@@ -83,90 +87,129 @@ const CreatePoolPage: React.FC = () => {
     return true;
   }
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    console.log('handleSubmit:', { vestingPercent })
-    if (!validateForm()) {
-      setIsFormSubmitted(true);
-      // return; // todo
+  const approve = async () => {
+    try {
+      const totalSupply = await ContractLessToken.totalSupply();
+      console.log('Staking stake stakeValueBN:', totalSupply);
+      const { addresses }: any = config;
+      const spender = addresses[config.isMainnetOrTestnet][chainType].PresaleFactory;
+      console.log('Staking stake spender:', spender);
+      const allowance = await ContractLessToken.allowance({ userAddress, spender });
+      console.log('Staking stake allowance:', allowance);
+      if (allowance < totalSupply) {
+        const resultApprove = await ContractLessToken.approve({ userAddress, spender, amount: totalSupply });
+        console.log('Staking stake resultApprove:', resultApprove);
+        return true;
+      };
+      return true;
+    } catch (e) {
+      console.error('CreatePool approve:', e);
+      return false;
     }
-    // struct PresaleInfo {
-    //   address tokenAddress;
-    //   uint256 tokenPriceInWei;
-    //   uint256 hardCapInWei;
-    //   uint256 softCapInWei;
-    //   uint256 openTime;
-    //   uint256 closeTime;
-    // }
-    //
-    // struct CertifiedAddition {
-    //   bool liquidity;
-    //   bool automatically;
-    //   bool vesting;
-    //   bool whitelisted;
-    //   address[] whitelist;
-    // }
-    //
-    // struct PresalePancakeSwapInfo {
-    //   uint256 listingPriceInWei;
-    //   uint256 lpTokensLockDurationInDays;
-    //   uint8 liquidityPercentageAllocation;
-    //   uint256 liquidityAllocationTime;
-    // }
-    //
-    // struct PresaleStringInfo {
-    //   bytes32 saleTitle;
-    //   bytes32 linkTelegram;
-    //   bytes32 linkGithub;
-    //   bytes32 linkTwitter;
-    //   bytes32 linkWebsite;
-    //   string linkLogo;
-    //   string description;
-    //   string whitepaper;
-    // }
+  }
 
-    // порядок полей менять нельзя!
-    const presaleInfo = [
-      tokenAddress,
-      tokenPriceInWei,
-      hardCapInWei,
-      softCapInWei,
-      // maxInvestInWei,
-      // minInvestInWei, // 5
-      openTime,
-      closeTime,
-      // presaleType,
-      // isLiquidity,
-      // isAutomatically, // 10
-      // isWhiteListed,
-      // whitelistArray,
-      // isVesting,
-    ]
-    // порядок полей менять нельзя!
-    const presalePancakeSwapInfo = [
-      listingPriceInWei,
-      lpTokensLockDurationInDays,
-      liquidityPercentageAllocation,
-      liquidityAllocationTime,
-    ]
-    // порядок полей менять нельзя!
-    const presaleStringInfo = [
-      saleTitle,
-      linkTelegram,
-      linkGithub,
-      linkTwitter,
-      linkWebsite,
-      linkLogo,
-      description,
-      whitepaper,
-    ]
+  const subscribeEvent = async (type: string) => {
+    try {
+      await web3.subscribe(type, console.log)
+      return true;
+    } catch (e) {
+      console.error('CreatePool subscribeEvent:', e);
+      return false;
+    }
+  }
 
-    console.log({ isPublic, presaleInfo, presalePancakeSwapInfo, presaleStringInfo })
-    setIsFormSubmitted(true);
-    const resultCreatePresalePublic = await ContractPresaleFactory.createPresalePublic({
-      userAddress, presaleInfo, presalePancakeSwapInfo, presaleStringInfo
-    })
-    console.log('CreatePool handleSubmit', resultCreatePresalePublic)
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    try {
+      event.preventDefault();
+      console.log('handleSubmit:', { vestingPercent })
+      if (!validateForm()) {
+        setIsFormSubmitted(true);
+        // return; // todo
+      }
+      // struct PresaleInfo {
+      //   address tokenAddress;
+      //   uint256 tokenPriceInWei;
+      //   uint256 hardCapInWei;
+      //   uint256 softCapInWei;
+      //   uint256 openTime;
+      //   uint256 closeTime;
+      // }
+      //
+      // struct CertifiedAddition {
+      //   bool liquidity;
+      //   bool automatically;
+      //   bool vesting;
+      //   bool whitelisted;
+      //   address[] whitelist;
+      // }
+      //
+      // struct PresalePancakeSwapInfo {
+      //   uint256 listingPriceInWei;
+      //   uint256 lpTokensLockDurationInDays;
+      //   uint8 liquidityPercentageAllocation;
+      //   uint256 liquidityAllocationTime;
+      // }
+      //
+      // struct PresaleStringInfo {
+      //   bytes32 saleTitle;
+      //   bytes32 linkTelegram;
+      //   bytes32 linkGithub;
+      //   bytes32 linkTwitter;
+      //   bytes32 linkWebsite;
+      //   string linkLogo;
+      //   string description;
+      //   string whitepaper;
+      // }
+
+      // порядок полей менять нельзя!
+      const presaleInfo = [
+        tokenAddress,
+        tokenPriceInWei,
+        hardCapInWei,
+        softCapInWei,
+        // maxInvestInWei,
+        // minInvestInWei, // 5
+        openTime,
+        closeTime,
+        // presaleType,
+        // isLiquidity,
+        // isAutomatically, // 10
+        // isWhiteListed,
+        // whitelistArray,
+        // isVesting,
+      ]
+      // порядок полей менять нельзя!
+      const presalePancakeSwapInfo = [
+        listingPriceInWei,
+        lpTokensLockDurationInDays,
+        liquidityPercentageAllocation,
+        liquidityAllocationTime,
+      ]
+      // порядок полей менять нельзя!
+      const presaleStringInfo = [
+        saleTitle,
+        linkTelegram,
+        linkGithub,
+        linkTwitter,
+        linkWebsite,
+        linkLogo,
+        description,
+        whitepaper,
+      ]
+
+      console.log({ isPublic, presaleInfo, presalePancakeSwapInfo, presaleStringInfo })
+      setIsFormSubmitted(true);
+      const resultApprove = await approve();
+      if (!resultApprove) return;
+      const resultCreatePresalePublic = await ContractPresaleFactory.createPresalePublic({
+        userAddress, presaleInfo, presalePancakeSwapInfo, presaleStringInfo
+      })
+      console.log('CreatePool handleSubmit', resultCreatePresalePublic)
+      if (resultCreatePresalePublic) await subscribeEvent('PublicPresaleCreated');
+    } catch (e) {
+      console.error('CreatePool handleSubmit:', e);
+      console.error(e);
+    }
   };
 
   return (
