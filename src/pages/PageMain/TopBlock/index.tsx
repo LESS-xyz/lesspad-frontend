@@ -18,7 +18,7 @@ const TopBlock: React.FC = () => {
               </div>
               <div className={s.buttons}>
                 <Button big to="/pools">View All Pools</Button>
-                <Button big>Buy Less</Button>
+                <Button href="https://exchange.pancakeswap.finance/#/swap?outputCurrency=0xb698ac9bc82c718d8eba9590564b9a5aa53d58e6" big>Buy Less</Button>
               </div>
             </div>
           </div>

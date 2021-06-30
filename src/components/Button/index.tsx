@@ -12,24 +12,40 @@ interface IButtonProps {
   big?: boolean;
   long?: boolean;
   to?: string;
+  href?: string;
 }
 
-const Button: React.FC<IButtonProps> = ({
-  children,
-  filled,
-  onClick,
-  disabled = false,
-  marginRight,
-  big,
-  long,
-  to,
-}) => {
+const Button: React.FC<IButtonProps> = (props) => {
+  const {
+    children,
+    filled,
+    onClick,
+    disabled = false,
+    marginRight,
+    big,
+    long,
+    to,
+    href,
+  } = props;
   const handleClick = () => {
     if (disabled) return;
     if (!onClick) return;
     onClick();
   };
 
+  if (href) {
+    return (
+      <a
+        href={href}
+        target="_blank"
+        style={{ marginRight: marginRight ?? 10 }}
+        className={`${s.button} ${filled && s.filled} ${big && s.big}`}
+        rel="noreferrer"
+      >
+        {children}
+      </a>
+    );
+  }
   if (to) {
     return (
       <Link
