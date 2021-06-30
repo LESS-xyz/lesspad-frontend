@@ -1,18 +1,22 @@
-import { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from "react-redux";
+import Web3 from 'web3';
+
 import s from './CreatePool.module.scss';
 import Calendar from '../../components/Calendar/index';
 import calendarImg from '../../assets/img/icons/calendar.svg';
 import Input from '../../components/Input/index';
 import Checkbox from '../../components/Checkbox/index';
 import { useContractsContext } from "../../contexts/ContractsContext";
-import { useSelector } from "react-redux";
-import BigNumber from "bignumber.js/bignumber";
 import config from "../../config";
 import { useWeb3ConnectorContext } from "../../contexts/Web3Connector";
+import { modalActions } from "../../redux/actions";
+
+const { BN }: any = Web3.utils;
 
 const CreatePoolPage: React.FC = () => {
   const { web3 } = useWeb3ConnectorContext();
-  const { ContractPresaleFactory, ContractLessToken } = useContractsContext();
+  const { ContractPresaleFactory, ContractLessToken, ContractStaking, ContractLessLibrary } = useContractsContext();
 
   const defaultOpenTime = new Date().getTime();
   const defaultCloseTime = new Date().getTime() + 1000 * 60 * 60 * 24;
@@ -57,8 +61,14 @@ const CreatePoolPage: React.FC = () => {
   const { chainType } = useSelector(({ wallet }: any) => wallet);
   const { address: userAddress } = useSelector(({ user }: any) => user);
 
-  const minInvestInWei = new BigNumber(10).pow(10).toString(10); // todo
-  const maxInvestInWei = new BigNumber(10).pow(20).toString(10); // todo
+  const dispatch = useDispatch();
+  const toggleModal = React.useCallback(
+    (params) => dispatch(modalActions.toggleModal(params)),
+    [dispatch],
+  );
+
+  const minInvestInWei = new BN(10).pow(new BN(10)).toString(10); // todo
+  const maxInvestInWei = new BN(10).pow(new BN(20)).toString(10); // todo
   // const presaleType = isPublic ? 1 : 0;
   // const whitelistArray = whitelist ? whitelist.split(',') : [];
 
@@ -85,6 +95,31 @@ const CreatePoolPage: React.FC = () => {
     // if (!liquidityPercentageAllocation) return false;
     // if (!liquidityAllocationTime) return false;
     return true;
+  }
+
+  const checkStakingBalance = async () => {
+    try {
+      const decimals = await ContractLessToken.decimals();
+      const minCreatorStakedBalance = await ContractLessLibrary.getMinCreatorStakedBalance();
+      const minCreatorStakedBalanceInEther = new BN(minCreatorStakedBalance).div(new BN(10).pow(new BN(decimals))).toString(10);
+      const balance = await ContractStaking.getStakedBalance({ userAddress });
+      const balanceInEther = new BN(balance).div(new BN(10).pow(new BN(decimals))).toString(10);
+      // console.log('CreatePool checkStakingBalance:', { minCreatorStakedBalanceInEther, balanceInEther });
+      if (balance < minCreatorStakedBalance)
+        toggleModal({
+          open: true,
+          text: (
+            <div className={s.messageContainer}>
+              <p>To be able to create new pool, please stake {minCreatorStakedBalanceInEther} LESS</p>
+              <p>Your staking balance is: {balanceInEther} LESS</p>
+            </div>
+          ),
+        });
+      return true;
+    } catch (e) {
+      console.error('CreatePool checkStakingBalance:', e);
+      return false;
+    }
   }
 
   const approve = async () => {
@@ -211,6 +246,15 @@ const CreatePoolPage: React.FC = () => {
       console.error(e);
     }
   };
+
+  useEffect(() => {
+    if (!ContractLessToken) return;
+    if (!ContractLessLibrary) return;
+    if (!ContractStaking) return;
+    if (!userAddress) return;
+    checkStakingBalance()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ContractLessToken, ContractLessLibrary, ContractStaking, userAddress])
 
   return (
     <section className={s.page}>

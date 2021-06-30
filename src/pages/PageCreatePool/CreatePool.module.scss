@@ -83,3 +83,8 @@
     margin: 0 auto;
   }
 }
+
+.messageContainer {
+  @include flex(row, center);
+  height: 100%;
+}

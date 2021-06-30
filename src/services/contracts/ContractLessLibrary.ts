@@ -65,6 +65,17 @@ export default class ContractLessLibraryService {
     }
   };
 
+  public getMinCreatorStakedBalance = async () => {
+    try {
+      const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
+      const balance = await contract.methods.getMinCreatorStakedBalance().call();
+      return balance;
+    } catch (e) {
+      console.error('ContractLessLibraryService getMinCreatorStakedBalance:', e);
+      return null;
+    }
+  };
+
   public getArrForSearch = async () => {
     try {
       const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);

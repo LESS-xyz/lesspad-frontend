@@ -22,13 +22,6 @@ interface ITableRowProps extends ITableRow {
   index: number;
 }
 
-type TypeModalParams = {
-  open: boolean;
-  text?: string | React.ReactElement;
-  header?: string | React.ReactElement;
-  delay?: number;
-};
-
 const TableRow: React.FC<ITableRowProps> = (props) => {
   const {
     address,
@@ -51,7 +44,7 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
 
   const dispatch = useDispatch();
   const toggleModal = React.useCallback(
-    (params: TypeModalParams) => dispatch(modalActions.toggleModal(params)),
+    (params) => dispatch(modalActions.toggleModal(params)),
     [dispatch],
   );
 
