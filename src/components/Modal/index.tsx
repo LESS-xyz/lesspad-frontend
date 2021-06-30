@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-// import { ReactComponent as IconClose } from '../../assets/icons/close.svg';
+import { ReactComponent as IconClose } from '../../assets/img/icons/close.svg';
 import { modalActions } from '../../redux/actions';
 
 import s from './style.module.scss';
@@ -21,7 +21,7 @@ type TypeModalParams = {
 export const Modal: React.FC = React.memo(() => {
   const ref = React.useRef<HTMLDivElement>(null);
 
-  const { open, text, header, delay, fullPage, onClose } = useSelector(
+  const { open, text, header, delay, fullPage, onClose, noCloseButton } = useSelector(
     ({ modal }: TypeModalParams) => modal,
   );
 
@@ -59,7 +59,7 @@ export const Modal: React.FC = React.memo(() => {
   return (
     <div className={`${open ? s.modalOpen : s.modalClosed}`} ref={ref}>
       <div className={`${s.modalContainer} ${fullPage && s.modalContainerFullPage}`}>
-        {/*{!noCloseButton && <IconClose onClick={handleClose} className={s.modalClose} />}*/}
+        {!noCloseButton && <IconClose onClick={handleClose} className={s.modalClose} />}
         <div className={s.modalHeader}>{header}</div>
         {text}
       </div>
