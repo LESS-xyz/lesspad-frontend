@@ -18,9 +18,10 @@ const CreatePoolPage: React.FC = () => {
   const { web3 } = useWeb3ConnectorContext();
   const { ContractPresaleFactory, ContractLessToken, ContractStaking, ContractLessLibrary } = useContractsContext();
 
-  const defaultOpenTime = new Date().getTime();
-  const defaultCloseTime = new Date().getTime() + 1000 * 60 * 60 * 24;
-  const defaultLiquidityAllocationTime = new Date().getTime() + 1000 * 60 * 60 * 48;
+  const defaultOpenVotingTime = new Date().getTime() + 1000 * 60 * 60 * 24;
+  const defaultOpenTime = defaultOpenVotingTime + 1000 * 60 * 60 * 24 + 1000 * 60 * 10;
+  const defaultCloseTime = defaultOpenTime + 1000 * 60 * 60 * 24;
+  const defaultLiquidityAllocationTime = defaultCloseTime + 1000 * 60 * 60 * 24;
 
   const [saleTitle, setSaleTitle] = useState<string>('Rnb');
   const [description, setDescription] = useState<string>('');
@@ -29,6 +30,7 @@ const CreatePoolPage: React.FC = () => {
   // инпуты для Public type
   const [softCapInWei, setSoftCapInWei] = useState<string>('1000000000000000000');
   const [hardCapInWei, setHardCapInWei] = useState<string>('2000000000000000000');
+  const [openVotingTime, setOpenVotingTime] = useState<number>(defaultOpenVotingTime);
   const [openTime, setOpenTime] = useState<number>(defaultOpenTime);
   const [closeTime, setCloseTime] = useState<number>(defaultCloseTime);
   const [liquidityPercent, setLiquidityPercent] = useState<string>('0');
@@ -47,6 +49,7 @@ const CreatePoolPage: React.FC = () => {
   const [linkTwitter, setLinkTwitter] = useState<string>('');
   const [whitepaper, setWhitepaper] = useState<string>('');
   // стейт календарей открыт/закрыт
+  const [isCalendarVoting, setIsCalendarVoting] = useState<boolean>(false);
   const [isCalendar1, setIsCalendar1] = useState<boolean>(false);
   const [isCalendar2, setIsCalendar2] = useState<boolean>(false);
   const [isCalendarLiquidityAllocationTime, setIsCalendarLiquidityAllocationTime] = useState<boolean>(false);
@@ -93,7 +96,65 @@ const CreatePoolPage: React.FC = () => {
     // if (!listingPriceInWei) return false;
     // if (!lpTokensLockDurationInDays) return false;
     // if (!liquidityPercentageAllocation) return false;
-    // if (!liquidityAllocationTime) return false;
+    // if (!liquidityAllocationTime) return false;x
+    return true;
+  }
+
+  const checkTime = () => {
+    // openTime > block.timestamp &&
+    // openVotingTime + safeLibrary.getVotingTime() + 86400 <= openTime &&
+    // openTime < closeTime &&
+    // closeTime < _cakeInfo.liquidityAllocationTime,
+    // todo block timestamp
+    const isOpenTimeMoreThanBlockTimestamp = openTime > new Date().getTime();
+    // todo getVotingTime, check ms/s
+    const isOpenVotingTimePlus24LessThanOpenTime = openVotingTime + 600 * 1000 + 86400 * 1000 <= openTime;
+    const isOpenTimeLessThanCloseTime = openTime < closeTime;
+    const isCloseTimeLessThanLiquidityAllocationTime = closeTime < liquidityAllocationTime;
+    if (!isOpenTimeMoreThanBlockTimestamp) {
+      toggleModal({
+        open: true,
+        text: (
+          <div className={s.messageContainer}>
+            <p>Open time should be more than last block time</p>
+          </div>
+        ),
+      });
+      return false
+    };
+    if (!isOpenVotingTimePlus24LessThanOpenTime) {
+      toggleModal({
+        open: true,
+        text: (
+          <div className={s.messageContainer}>
+            <p>Open time should be less or equal to: open voting time + voting time + 24H</p>
+          </div>
+        ),
+      });
+      return false
+    };
+    if (!isOpenTimeLessThanCloseTime) {
+      toggleModal({
+        open: true,
+        text: (
+          <div className={s.messageContainer}>
+            <p>Open time should be less than close time</p>
+          </div>
+        ),
+      });
+      return false
+    };
+    if (!isCloseTimeLessThanLiquidityAllocationTime) {
+      toggleModal({
+        open: true,
+        text: (
+          <div className={s.messageContainer}>
+            <p>Close time should be less than liquidity allocation time</p>
+          </div>
+        ),
+      });
+      return false
+    };
     return true;
   }
 
@@ -161,41 +222,7 @@ const CreatePoolPage: React.FC = () => {
         setIsFormSubmitted(true);
         // return; // todo
       }
-      // struct PresaleInfo {
-      //   address tokenAddress;
-      //   uint256 tokenPriceInWei;
-      //   uint256 hardCapInWei;
-      //   uint256 softCapInWei;
-      //   uint256 openTime;
-      //   uint256 closeTime;
-      // }
-      //
-      // struct CertifiedAddition {
-      //   bool liquidity;
-      //   bool automatically;
-      //   bool vesting;
-      //   bool whitelisted;
-      //   address[] whitelist;
-      // }
-      //
-      // struct PresalePancakeSwapInfo {
-      //   uint256 listingPriceInWei;
-      //   uint256 lpTokensLockDurationInDays;
-      //   uint8 liquidityPercentageAllocation;
-      //   uint256 liquidityAllocationTime;
-      // }
-      //
-      // struct PresaleStringInfo {
-      //   bytes32 saleTitle;
-      //   bytes32 linkTelegram;
-      //   bytes32 linkGithub;
-      //   bytes32 linkTwitter;
-      //   bytes32 linkWebsite;
-      //   string linkLogo;
-      //   string description;
-      //   string whitepaper;
-      // }
-
+      if (!checkTime) return;
       // порядок полей менять нельзя!
       const presaleInfo = [
         tokenAddress,
@@ -204,6 +231,7 @@ const CreatePoolPage: React.FC = () => {
         softCapInWei,
         // maxInvestInWei,
         // minInvestInWei, // 5
+        openVotingTime,
         openTime,
         closeTime,
         // presaleType,
@@ -308,6 +336,22 @@ const CreatePoolPage: React.FC = () => {
                 />
               </div>
               {/* date pickers */}
+              <div className={s.datePicker}>
+                <div className={s.datePicker_title}>Open voting date</div>
+                <div className={s.datePicker_inner}>
+                  <div className={s.datePicker_value}>{new Date(openVotingTime)?.toLocaleDateString()}</div>
+                  <div
+                    className={s.datePicker_img}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => setIsCalendarVoting(true)}
+                    onKeyDown={() => {}}
+                  >
+                    <img src={calendarImg} alt="calendarImg" />
+                  </div>
+                </div>
+                <div className={s.datePicker_subtitle}>In Your Timezone</div>
+              </div>
               <div className={s.small_inputs}>
                 <div className={s.datePicker}>
                   <div className={s.datePicker_title}>Open date</div>
@@ -481,6 +525,14 @@ const CreatePoolPage: React.FC = () => {
               </div>
             </form>
           </div>
+          {isCalendarVoting && (
+            <div className={s.calender}>
+              <Calendar
+                onChange={(date: number) => setOpenVotingTime(date)}
+                closeCalendar={() => setIsCalendarVoting(false)}
+              />
+            </div>
+          )}
           {isCalendar1 && (
             <div className={s.calender}>
               <Calendar
