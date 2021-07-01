@@ -5,7 +5,7 @@ import ERC20Abi from "../data/ERC20Abi";
 import PresalePublicAbi from "../data/PresalePublicAbi";
 
 const IS_PRODUCTION = false;
-const IS_TESTING_ON_ROPSTEN = true;
+const IS_TESTING_ON_ROPSTEN = false;
 const SHOW_CONSOLE_LOGS = true;
 
 export default {
@@ -26,11 +26,11 @@ export default {
     policy: '',
   },
   apis: {
-    alchemy: IS_PRODUCTION
-      ? 'https://eth.alchemyapi.io/v2/'
+    '0x': IS_PRODUCTION
+      ? 'https://api.0x.org'
       : IS_TESTING_ON_ROPSTEN
-      ? 'https://eth-ropsten.alchemyapi.io/v2/'
-      : 'https://eth-kovan.alchemyapi.io/v2/',
+        ? 'https://ropsten.api.0x.org/'
+        : 'https://kovan.api.0x.org/',
   },
   keys: {
     infura: '',
@@ -98,13 +98,18 @@ export default {
       //   PresalePublic: '0xeA63Bfc235c1f70BE88287BCed13A42550C40DF3',
       // },
       'Ethereum': {
-        LessToken: '0xa372d1d35041714092900b233934fb2d002755e2',
+        // LessToken: '0xa372d1d35041714092900b233934fb2d002755e2',
+        // LessToken: '0xa372d1d35041714092900b233934fb2d002755e2',
+        LessToken: '0xE29dA66439BcBdB71D508f41bAd13250F561E38f',
         // LessLibrary: '0x42d58A23259Fb09A02384d80772Ee8236ef63732',
-        LessLibrary: '0x4b01de89936046228d87dad26b7796ea8f424fa4',
+        // LessLibrary: '0x4b01de89936046228d87dad26b7796ea8f424fa4',
+        LessLibrary: '0x46d240A3627Ebf2F507C91c9aA604d6535cCb07a',
         // Staking: '0x2D01C2d1adA5D0311A8d16aDA865662a3658C91F',
-        Staking: '0xf3016a3c8ddd673535a058b2b86aa6299639e933',
+        // Staking: '0xf3016a3c8ddd673535a058b2b86aa6299639e933',
+        Staking: '0x1756715185E7d1AF64ec555591A6B8ea64D07f8E',
         // PresaleFactory: '0xe9e9a8bacEC4894bDCBf4F63f57A9A5F0D8432BD',
-        PresaleFactory: '0x33918Fa73f367000c0911d8dD5949684e4ca3468',
+        // PresaleFactory: '0x33918Fa73f367000c0911d8dD5949684e4ca3468',
+        PresaleFactory: '0x8DD3992F6968C08283F8cDB3f6e41d10dBa2Df5c',
         PresalePublic: '0xeA63Bfc235c1f70BE88287BCed13A42550C40DF3', // todo
       },
       'Binance-Smart-Chain': {
