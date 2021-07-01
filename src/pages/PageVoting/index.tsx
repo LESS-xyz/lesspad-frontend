@@ -2,7 +2,7 @@ import s from './PagePresale.module.scss';
 import Table from './Table/index';
 // import logo1 from '../../assets/img/sections/logos/logo1.png';
 import Search from '../../components/Search/index';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useContractsContext } from "../../contexts/ContractsContext";
 
 // const tableDataExample = [
@@ -50,7 +50,8 @@ const PageVoting: React.FC = () => {
       const arrForSearch = await ContractLessLibrary.getArrForSearch();
       if (arrForSearch) setPresalesInfo(arrForSearch);
       console.log('PageVoting getArrForSearch:', arrForSearch);
-      const presalesAddressesFilteredNew = arrForSearch.map((item: any) => item.address);
+      let presalesAddressesFilteredNew = arrForSearch.map((item: any) => item.address);
+      presalesAddressesFilteredNew = presalesAddressesFilteredNew.concat(presalesAddressesFilteredNew, presalesAddressesFilteredNew, presalesAddressesFilteredNew, presalesAddressesFilteredNew, presalesAddressesFilteredNew, presalesAddressesFilteredNew)
       setPresalesAddressesFiltered(presalesAddressesFilteredNew);
     } catch (e) {
       console.error(e);

@@ -5,6 +5,7 @@ import { useContractsContext } from "../../../contexts/ContractsContext";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { modalActions } from "../../../redux/actions";
+import Pagination from "../../../components/Pagination";
 
 interface ITableRow {
   address?: string;
@@ -153,9 +154,39 @@ interface ITableProps {
 const Table: React.FC<ITableProps> = ({ data }) => {
   const { chainType } = useSelector(({ wallet }: any) => wallet);
 
+  const [page, setPage] = useState<number>(0);
+  const [dataFiltered, setDataFiltrered] = useState<any[]>(data);
+
+  const itemsOnPage = 12;
+  let countOfPages = +(data.length / itemsOnPage).toFixed();
+  const moduloOfPages = data.length % itemsOnPage;
+  if (moduloOfPages > 0) countOfPages += 1;
+
   const isEthereum = chainType === 'Ethereum';
   const isBinanceSmartChain = chainType === 'Binance-Smart-Chain';
   const currency = isEthereum ? 'ETH' : isBinanceSmartChain ? 'BNB' : 'MATIC';
+
+  const handleChangePage = (p: number) => {
+    setPage(p);
+  }
+
+  const filterData = () => {
+    try {
+      const newData = data.filter((item: any, index: number) => {
+        if (index < page * itemsOnPage || index >= (page + 1) * itemsOnPage) return false;
+        return true;
+      })
+      setDataFiltrered(newData);
+      console.log('newData:', data, newData);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  useEffect(()=>{
+    filterData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[page, data])
 
   if (!data) return null;
   return (
@@ -171,10 +202,16 @@ const Table: React.FC<ITableProps> = ({ data }) => {
           <div className={`${s.voting} ${s.cell}`}>Voting</div>
         </div>
         <div className={s.table_body}>
-          {data.map((address, index) => (
-            <TableRow key={JSON.stringify(address)} index={index + 1} address={address} />
-          ))}
+          {dataFiltered.map((address, index) => {
+            return (
+              // eslint-disable-next-line react/no-array-index-key
+              <TableRow key={JSON.stringify(address) + index} index={index + 1} address={address} />
+            )
+          })}
         </div>
+      </div>
+      <div className={s.pagination}>
+        <Pagination countOfPages={countOfPages} onChange={handleChangePage} />
       </div>
     </div>
   );

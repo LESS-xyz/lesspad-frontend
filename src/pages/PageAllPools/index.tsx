@@ -60,10 +60,10 @@ const AllPoolsPage: React.FC = () => {
   const [presalesInfo, setPresalesInfo] = useState<any>([]);
   const [page, setPage] = useState<number>(0);
 
-  const itemsOnPage = 6;
-  let countOfPages = +(presalesInfo.length / itemsOnPage).toFixed();
+  const itemsOnPage = 3;
+  let countOfPages = Math.floor(+(presalesInfo.length / itemsOnPage));
   const moduloOfPages = presalesInfo.length % itemsOnPage;
-  if (moduloOfPages > 0) countOfPages += 1;
+  if (countOfPages > 0 && moduloOfPages > 0) countOfPages += 1;
 
   // const getPresalesAddresses = async () => {
   //   try {
@@ -78,7 +78,7 @@ const AllPoolsPage: React.FC = () => {
   const getArrForSearch = async () => {
     try {
       const arrForSearch = await ContractLessLibrary.getArrForSearch();
-      if (arrForSearch) setPresalesInfo(arrForSearch);
+      if (arrForSearch) setPresalesInfo([...arrForSearch, ...arrForSearch, ...arrForSearch, ...arrForSearch, ...arrForSearch]);
       console.log('AllPoolsPage getArrForSearch:', arrForSearch);
     } catch (e) {
       console.error(e);
@@ -122,7 +122,7 @@ const AllPoolsPage: React.FC = () => {
             {presalesInfo.map((item: any, ii: number) => {
               const { address = '', title = '', description = '' } = item;
               // todo: fix pagination
-              if (ii < page * itemsOnPage && ii >= (page + 1) * itemsOnPage) return null;
+              if (ii < page * itemsOnPage || ii >= (page + 1) * itemsOnPage) return null;
               if (search) {
                 const isAddressInSearch = address.toLowerCase().includes(search.toLowerCase());
                 const isTitleInSearch = title.toLowerCase().includes(search.toLowerCase());

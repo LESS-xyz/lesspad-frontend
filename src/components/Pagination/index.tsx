@@ -21,7 +21,7 @@ const Button: React.FC<IButtonProps> = ({ page, currentPage, onClick }) => {
       onClick={() => onClick(page)}
       className={`${s.button} ${currentPage === page && s.active}`}
     >
-      {page}
+      {page + 1}
     </div>
   );
 };
@@ -31,8 +31,8 @@ const Pagination: React.FC<TypePaginationProps> = (props) => {
     countOfPages = 0,
     onChange = () => {},
   } = props;
-  const [currentPage, setCurrentPage] = useState(1);
-  console.log('Pagination:', currentPage);
+  const [currentPage, setCurrentPage] = useState(0);
+  console.log('Pagination:', currentPage, countOfPages);
 
   const arrayOfPages = new Array(countOfPages).fill(0);
 
@@ -44,8 +44,16 @@ const Pagination: React.FC<TypePaginationProps> = (props) => {
   return (
     <div className={s.pagination}>
       {countOfPages > 1 && currentPage < 4 && arrayOfPages.map((item: number, ii: number) => {
-        // eslint-disable-next-line react/no-array-index-key
-        return (<Button key={`button-${ii}`} onClick={handleChange} currentPage={currentPage} page={ii + 1}/>)
+        /*eslint-disable*/
+        return (
+          <Button
+            key={`button-${ii}`}
+            onClick={handleChange}
+            currentPage={currentPage}
+            page={ii}
+          />
+        )
+        /*eslint-enable*/
       })}
       {countOfPages > 4 && currentPage >= 4 &&
         <>
