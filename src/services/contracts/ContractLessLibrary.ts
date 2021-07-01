@@ -92,10 +92,10 @@ export default class ContractLessLibraryService {
         if (description === '') description = '0x';
         if (title === '') title = '0x';
         return {
-          description: this.web3.utils.hexToString(description),
+          description,
           isCertified,
           address: presaleAddress,
-          title: this.web3.utils.hexToString(title),
+          title,
         }
       })
       return arrForSearchFormatted;

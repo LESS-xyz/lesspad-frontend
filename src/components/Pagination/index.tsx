@@ -44,7 +44,8 @@ const Pagination: React.FC<TypePaginationProps> = (props) => {
   return (
     <div className={s.pagination}>
       {countOfPages > 1 && currentPage < 4 && arrayOfPages.map((item: number, ii: number) => {
-        return (<Button onClick={handleChange} currentPage={currentPage} page={ii + 1}/>)
+        // eslint-disable-next-line react/no-array-index-key
+        return (<Button key={`button-${ii}`} onClick={handleChange} currentPage={currentPage} page={ii + 1}/>)
       })}
       {countOfPages > 4 && currentPage >= 4 &&
         <>
