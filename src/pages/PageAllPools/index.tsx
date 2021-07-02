@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { v4 as uuid } from 'uuid';
 
 import logo1 from '../../assets/img/sections/token-card/logo-1.png';
 import Pagination from '../../components/Pagination/index';
@@ -54,7 +55,6 @@ import { useSelector } from "react-redux";
 const AllPoolsPage: React.FC = () => {
   const [search, setSearch] = useState<string>('');
   const [currentOption, setCurrentOption] = useState<string>('All');
-  // const [presalesAddresses, setPresalesAddresses] = useState<any>([]);
   const [page, setPage] = useState<number>(0);
 
   const { pools } = useSelector(({ pool }: any) => pool);
@@ -63,16 +63,6 @@ const AllPoolsPage: React.FC = () => {
   let countOfPages = Math.floor(+(pools.length / itemsOnPage));
   const moduloOfPages = pools.length % itemsOnPage;
   if (countOfPages > 0 && moduloOfPages > 0) countOfPages += 1;
-
-  // const getPresalesAddresses = async () => {
-  //   try {
-  //     const addresses = await ContractLessLibrary.getPresalesAddresses();
-  //     if (addresses) setPresalesAddresses(addresses);
-  //     console.log('AllPoolsPage getPresalesAddresses:', addresses);
-  //   } catch (e) {
-  //     console.error(e);
-  //   }
-  // };
 
   const handleChangePage = (p: number) => setPage(p);
 
@@ -123,7 +113,7 @@ const AllPoolsPage: React.FC = () => {
                 daysBeforeOpening: 4,
               };
               // eslint-disable-next-line react/no-array-index-key
-              return <TokenCard key={JSON.stringify(item) + ii} address={address} {...props} />;
+              return <TokenCard key={uuid()} address={address} {...props} />;
             })}
           </div>
           <div className={s.pagination}>

@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 import web3 from 'web3';
 import config from '../../config';
 
+const { chainSymbols }: any = config;
 const { BN }: any = web3.utils;
 
 const StakingPage: React.FC = () => {
@@ -20,9 +21,7 @@ const StakingPage: React.FC = () => {
   const { chainType } = useSelector(({ wallet }: any) => wallet);
   const { address: userAddress, balance: userBalance } = useSelector(({ user }: any) => user);
 
-  const isEthereum = chainType === 'Ethereum';
-  const isBinanceSmartChain = chainType === 'Binance-Smart-Chain';
-  const currency = isEthereum ? 'ETH' : isBinanceSmartChain ? 'BNB' : 'MATIC';
+  const currency = chainSymbols[chainType];
 
   const getLessTokenBalance = async () => {
     try {

@@ -35,6 +35,11 @@ export default {
   keys: {
     infura: '',
   },
+  chainSymbols: {
+    'Ethereum': 'ETH',
+    'Binance-Smart-Chain': 'BNB',
+    'Matic': 'MATIC',
+  },
   chainIds: {
     mainnet: {
       'Ethereum': {
