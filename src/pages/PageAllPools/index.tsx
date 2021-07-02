@@ -60,7 +60,7 @@ const AllPoolsPage: React.FC = () => {
   const [presalesInfo, setPresalesInfo] = useState<any>([]);
   const [page, setPage] = useState<number>(0);
 
-  const itemsOnPage = 3;
+  const itemsOnPage = 6;
   let countOfPages = Math.floor(+(presalesInfo.length / itemsOnPage));
   const moduloOfPages = presalesInfo.length % itemsOnPage;
   if (countOfPages > 0 && moduloOfPages > 0) countOfPages += 1;
@@ -78,7 +78,7 @@ const AllPoolsPage: React.FC = () => {
   const getArrForSearch = async () => {
     try {
       const arrForSearch = await ContractLessLibrary.getArrForSearch();
-      if (arrForSearch) setPresalesInfo([...arrForSearch, ...arrForSearch, ...arrForSearch, ...arrForSearch, ...arrForSearch]);
+      if (arrForSearch) setPresalesInfo(arrForSearch);
       console.log('AllPoolsPage getArrForSearch:', arrForSearch);
     } catch (e) {
       console.error(e);

@@ -31,7 +31,7 @@ const Pagination: React.FC<TypePaginationProps> = (props) => {
     countOfPages = 0,
     onChange = () => {},
   } = props;
-  const [currentPage, setCurrentPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState<number>(0);
   console.log('Pagination:', currentPage, countOfPages);
 
   const arrayOfPages = new Array(countOfPages).fill(0);
@@ -43,7 +43,7 @@ const Pagination: React.FC<TypePaginationProps> = (props) => {
 
   return (
     <div className={s.pagination}>
-      {countOfPages > 1 && currentPage < 4 && arrayOfPages.map((item: number, ii: number) => {
+      {countOfPages > 1 && countOfPages <= 5 && currentPage < 4 && arrayOfPages.map((item: number, ii: number) => {
         /*eslint-disable*/
         return (
           <Button
@@ -55,18 +55,24 @@ const Pagination: React.FC<TypePaginationProps> = (props) => {
         )
         /*eslint-enable*/
       })}
-      {countOfPages > 4 && currentPage >= 4 &&
+      {countOfPages > 5 && currentPage < 4 &&
         <>
+          <Button onClick={handleChange} currentPage={currentPage} page={0} />
           <Button onClick={handleChange} currentPage={currentPage} page={1} />
+          <Button onClick={handleChange} currentPage={currentPage} page={2} />
+          <Button onClick={handleChange} currentPage={currentPage} page={3} />
+          <Button onClick={handleChange} currentPage={currentPage} page={4} />
+        </>
+      }
+      {countOfPages > 5 && currentPage >= 4 &&
+        <>
+          <Button onClick={handleChange} currentPage={currentPage} page={0} />
           <Button onClick={handleChange} currentPage={currentPage} page={currentPage - 1} />
           <Button onClick={handleChange} currentPage={currentPage} page={currentPage} />
-          {currentPage < countOfPages &&
+          {currentPage + 1 < countOfPages &&
             <Button onClick={handleChange} currentPage={currentPage} page={currentPage + 1} />
           }
         </>
-      }
-      {countOfPages > 0 && currentPage >= 4 &&
-        <Button onClick={handleChange} currentPage={currentPage} page={countOfPages} />
       }
     </div>
   );

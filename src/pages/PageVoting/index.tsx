@@ -50,8 +50,9 @@ const PageVoting: React.FC = () => {
       const arrForSearch = await ContractLessLibrary.getArrForSearch();
       if (arrForSearch) setPresalesInfo(arrForSearch);
       console.log('PageVoting getArrForSearch:', arrForSearch);
-      let presalesAddressesFilteredNew = arrForSearch.map((item: any) => item.address);
-      presalesAddressesFilteredNew = presalesAddressesFilteredNew.concat(presalesAddressesFilteredNew, presalesAddressesFilteredNew, presalesAddressesFilteredNew, presalesAddressesFilteredNew, presalesAddressesFilteredNew, presalesAddressesFilteredNew)
+      const presalesAddressesFilteredNew = arrForSearch.map((item: any) => item.address);
+      // let presalesAddressesFilteredNew = arrForSearch.map((item: any) => item.address);
+      // presalesAddressesFilteredNew = presalesAddressesFilteredNew.concat(presalesAddressesFilteredNew, presalesAddressesFilteredNew, presalesAddressesFilteredNew, presalesAddressesFilteredNew, presalesAddressesFilteredNew, presalesAddressesFilteredNew, presalesAddressesFilteredNew, presalesAddressesFilteredNew);
       setPresalesAddressesFiltered(presalesAddressesFilteredNew);
     } catch (e) {
       console.error(e);
