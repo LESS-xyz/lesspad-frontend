@@ -3,7 +3,7 @@ import Table from './Table/index';
 // import logo1 from '../../assets/img/sections/logos/logo1.png';
 import Search from '../../components/Search/index';
 import React, { useEffect, useState } from 'react';
-import { useContractsContext } from "../../contexts/ContractsContext";
+import { useSelector } from "react-redux";
 
 // const tableDataExample = [
 //   {
@@ -39,31 +39,16 @@ import { useContractsContext } from "../../contexts/ContractsContext";
 // ];
 
 const PageVoting: React.FC = () => {
-  const { ContractLessLibrary } = useContractsContext();
-
   const [search, setSearch] = useState<string>('');
-  const [presalesInfo, setPresalesInfo] = useState<any[]>([]);
   const [presalesAddressesFiltered, setPresalesAddressesFiltered] = useState<any[]>([]);
 
-  const getArrForSearch = async () => {
-    try {
-      const arrForSearch = await ContractLessLibrary.getArrForSearch();
-      if (arrForSearch) setPresalesInfo(arrForSearch);
-      console.log('PageVoting getArrForSearch:', arrForSearch);
-      const presalesAddressesFilteredNew = arrForSearch.map((item: any) => item.address);
-      // let presalesAddressesFilteredNew = arrForSearch.map((item: any) => item.address);
-      // presalesAddressesFilteredNew = presalesAddressesFilteredNew.concat(presalesAddressesFilteredNew, presalesAddressesFilteredNew, presalesAddressesFilteredNew, presalesAddressesFilteredNew, presalesAddressesFilteredNew, presalesAddressesFilteredNew, presalesAddressesFilteredNew, presalesAddressesFilteredNew);
-      setPresalesAddressesFiltered(presalesAddressesFilteredNew);
-    } catch (e) {
-      console.error(e);
-    }
-  };
+  const { pools } = useSelector(({ pool }: any) => pool);
 
   const filterTable = async () => {
     try {
-      const presalesInfoNew = presalesInfo.filter((item) => {
+      const presalesInfoNew = pools.filter((item: any) => {
         const { address = '', title = '', description = '' } = item;
-        if (search) {
+        if (search && search !== '') {
           const isAddressInSearch = address.toLowerCase().includes(search.toLowerCase());
           const isTitleInSearch = title.toLowerCase().includes(search.toLowerCase());
           const isDescriptionInSearch = description.toLowerCase().includes(search.toLowerCase());
@@ -79,17 +64,11 @@ const PageVoting: React.FC = () => {
   };
 
   useEffect(() => {
-    if (!ContractLessLibrary) return;
-    getArrForSearch();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ContractLessLibrary]);
-
-  useEffect(() => {
-    if (!ContractLessLibrary) return;
-    if (!search) return;
+    if (!pools || !pools.length) return;
+    // console.log('PageVoting pools:', pools)
     filterTable();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ContractLessLibrary, search]);
+  }, [pools, search]);
 
   return (
     <div className={s.page}>

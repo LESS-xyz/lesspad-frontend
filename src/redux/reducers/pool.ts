@@ -1,15 +1,16 @@
 const initialState = {
-  data: [],
+  pools: [],
 };
 
 export default (state = initialState, params: any) => {
   switch (params.type) {
-    case 'TABLE:SET_DATA':
+    case 'POOL:SET_POOLS':
+      // console.log('POOL:SET_POOLS', params.payload)
       // eslint-disable-next-line no-case-declarations
       const newState = JSON.parse(
         JSON.stringify({
           ...state,
-          ...params.payload,
+          ...{ pools: params.payload },
         }),
       );
       return newState;

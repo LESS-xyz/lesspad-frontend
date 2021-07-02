@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import logo1 from '../../assets/img/sections/token-card/logo-1.png';
 import Pagination from '../../components/Pagination/index';
 import Search from '../../components/Search/index';
 import Selector from '../../components/Selector/index';
 import TokenCard from '../../components/TokenCard/index';
-import { useContractsContext } from '../../contexts/ContractsContext';
 import { CardConditions, cryptos } from '../../types/index';
 
 import s from './AllPools.module.scss';
+import { useSelector } from "react-redux";
 
 // const cardsExample = [
 //   {
@@ -52,17 +52,16 @@ import s from './AllPools.module.scss';
 // ];
 
 const AllPoolsPage: React.FC = () => {
-  const { ContractLessLibrary } = useContractsContext();
-
   const [search, setSearch] = useState<string>('');
   const [currentOption, setCurrentOption] = useState<string>('All');
   // const [presalesAddresses, setPresalesAddresses] = useState<any>([]);
-  const [presalesInfo, setPresalesInfo] = useState<any>([]);
   const [page, setPage] = useState<number>(0);
 
+  const { pools } = useSelector(({ pool }: any) => pool);
+
   const itemsOnPage = 6;
-  let countOfPages = Math.floor(+(presalesInfo.length / itemsOnPage));
-  const moduloOfPages = presalesInfo.length % itemsOnPage;
+  let countOfPages = Math.floor(+(pools.length / itemsOnPage));
+  const moduloOfPages = pools.length % itemsOnPage;
   if (countOfPages > 0 && moduloOfPages > 0) countOfPages += 1;
 
   // const getPresalesAddresses = async () => {
@@ -75,25 +74,7 @@ const AllPoolsPage: React.FC = () => {
   //   }
   // };
 
-  const getArrForSearch = async () => {
-    try {
-      const arrForSearch = await ContractLessLibrary.getArrForSearch();
-      if (arrForSearch) setPresalesInfo(arrForSearch);
-      console.log('AllPoolsPage getArrForSearch:', arrForSearch);
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
   const handleChangePage = (p: number) => setPage(p);
-
-  useEffect(() => {
-    if (!ContractLessLibrary) return;
-    console.log('AllPoolsPage useEffect:');
-    // getPresalesAddresses();
-    getArrForSearch();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ContractLessLibrary]);
 
   return (
     <section className={s.page}>
@@ -119,7 +100,7 @@ const AllPoolsPage: React.FC = () => {
             </div>
           </div>
           <div className={s.cards}>
-            {presalesInfo.map((item: any, ii: number) => {
+            {pools.map((item: any, ii: number) => {
               const { address = '', title = '', description = '' } = item;
               // todo: fix pagination
               if (ii < page * itemsOnPage || ii >= (page + 1) * itemsOnPage) return null;
