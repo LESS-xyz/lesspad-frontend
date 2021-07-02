@@ -1,3 +1,5 @@
+import { Helmet } from "react-helmet";
+
 import { Header } from './components';
 import Footer from './components/Footer/index';
 import {
@@ -41,6 +43,16 @@ export const App: React.FC = () => {
 
   return (
     <Router>
+      <Helmet>
+        <meta charSet="utf-8" />
+        <title>Lesspad</title>
+        <meta
+          name="description"
+          content="Multi-Chain Decentralized
+Fundraising Capital"
+        />
+      </Helmet>
+
       <div className="App">
         <Header />
         <Switch>

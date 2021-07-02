@@ -1,6 +1,7 @@
 import React from 'react';
+import { Helmet } from 'react-helmet';
+import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { useSelector } from "react-redux";
 
 import Github from '../../../assets/img/icons/gh-icon.svg';
 import Link from '../../../assets/img/icons/link-icon.svg';
@@ -22,6 +23,7 @@ const Pool: React.FC = () => {
 
   const currency = chainSymbols[chainType];
   const explorer = explorers[chainType];
+  const name = 'Pool';
 
   const row1 = [
     {
@@ -178,6 +180,12 @@ const Pool: React.FC = () => {
 
   return (
     <div className="container">
+      <Helmet>
+        <meta charSet="utf-8" />
+        <title>{name} | Lesspad</title>
+        <meta name="description" content={`Pool. ${name}.`} />
+      </Helmet>
+
       <div className="preview">
         <div className="description">
           <img className="icon-logo" src={Logo} alt="Logo" />
@@ -320,8 +328,8 @@ const Pool: React.FC = () => {
           <p>
             The BSCstarter team does not endorse, support or otherwise perform any due diligence on
             the projects listed on its platform. As always, please DO YOUR OWN RESEARCH before
-            investing any of your hard-earned {currency} into these projects and never invest more than you
-            are willing to lose.
+            investing any of your hard-earned {currency} into these projects and never invest more
+            than you are willing to lose.
           </p>
           <p>
             <b>PLEASE NOTE THAT WE CANNOT ACCEPT INVESTMENT FROM THE FOLLOWING COUNTRIES:</b>

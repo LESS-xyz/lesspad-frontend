@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { Helmet } from 'react-helmet';
+import { useSelector } from 'react-redux';
 import { v4 as uuid } from 'uuid';
 
 import logo1 from '../../assets/img/sections/token-card/logo-1.png';
@@ -9,7 +11,6 @@ import TokenCard from '../../components/TokenCard/index';
 import { CardConditions, cryptos } from '../../types/index';
 
 import s from './AllPools.module.scss';
-import { useSelector } from "react-redux";
 
 // const cardsExample = [
 //   {
@@ -68,6 +69,16 @@ const AllPoolsPage: React.FC = () => {
 
   return (
     <section className={s.page}>
+      <Helmet>
+        <meta charSet="utf-8" />
+        <title>All pools | Lesspad</title>
+        <meta
+          name="description"
+          content="Multi-Chain Decentralized
+Fundraising Capital"
+        />
+      </Helmet>
+
       <div className={s.container}>
         <div className={s.inner}>
           <div className={s.title}>
@@ -97,9 +108,11 @@ const AllPoolsPage: React.FC = () => {
               if (search) {
                 const isAddressInSearch = address.toLowerCase().includes(search.toLowerCase());
                 const isTitleInSearch = title.toLowerCase().includes(search.toLowerCase());
-                const isDescriptionInSearch = description.toLowerCase().includes(search.toLowerCase());
+                const isDescriptionInSearch = description
+                  .toLowerCase()
+                  .includes(search.toLowerCase());
                 if (!isAddressInSearch && !isTitleInSearch && !isDescriptionInSearch) return null;
-              };
+              }
               const props = {
                 name: 'Pool',
                 type: CardConditions.closed,

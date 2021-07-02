@@ -1,22 +1,29 @@
 import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from "react-redux";
+import { Helmet } from 'react-helmet';
+import { useDispatch, useSelector } from 'react-redux';
 import Web3 from 'web3';
 
-import s from './CreatePool.module.scss';
-import Calendar from '../../components/Calendar/index';
 import calendarImg from '../../assets/img/icons/calendar.svg';
-import Input from '../../components/Input/index';
+import Calendar from '../../components/Calendar/index';
 import Checkbox from '../../components/Checkbox/index';
-import { useContractsContext } from "../../contexts/ContractsContext";
-import config from "../../config";
-import { useWeb3ConnectorContext } from "../../contexts/Web3Connector";
-import { modalActions } from "../../redux/actions";
+import Input from '../../components/Input/index';
+import config from '../../config';
+import { useContractsContext } from '../../contexts/ContractsContext';
+import { useWeb3ConnectorContext } from '../../contexts/Web3Connector';
+import { modalActions } from '../../redux/actions';
+
+import s from './CreatePool.module.scss';
 
 const { BN }: any = Web3.utils;
 
 const CreatePoolPage: React.FC = () => {
   const { web3 } = useWeb3ConnectorContext();
-  const { ContractPresaleFactory, ContractLessToken, ContractStaking, ContractLessLibrary } = useContractsContext();
+  const {
+    ContractPresaleFactory,
+    ContractLessToken,
+    ContractStaking,
+    ContractLessLibrary,
+  } = useContractsContext();
 
   const defaultOpenVotingTime = new Date().getTime() + 1000 * 60 * 60 * 24;
   const defaultOpenTime = defaultOpenVotingTime + 1000 * 60 * 60 * 24 + 1000 * 60 * 10;
@@ -25,7 +32,9 @@ const CreatePoolPage: React.FC = () => {
 
   const [saleTitle, setSaleTitle] = useState<string>('Rnb');
   const [description, setDescription] = useState<string>('');
-  const [tokenAddress, setTokenAddress] = useState<string>('0xa372d1d35041714092900B233934fB2D002755E2');
+  const [tokenAddress, setTokenAddress] = useState<string>(
+    '0xa372d1d35041714092900B233934fB2D002755E2',
+  );
   const [tokenPriceInWei, setTokenPriceInWei] = useState<string>('1000000000000000000');
   // инпуты для Public type
   const [softCapInWei, setSoftCapInWei] = useState<string>('1000000000000000000');
@@ -38,7 +47,9 @@ const CreatePoolPage: React.FC = () => {
   const [listingPriceInWei, setListingPriceInWei] = useState<string>('1000000000000000000');
   const [lpTokensLockDurationInDays, setLpTokensLockDurationInDays] = useState('0');
   const [vestingPercent, setVestingPercent] = useState<string>('0');
-  const [liquidityAllocationTime, setLiquidityAllocationTime] = useState<number>(defaultLiquidityAllocationTime);
+  const [liquidityAllocationTime, setLiquidityAllocationTime] = useState<number>(
+    defaultLiquidityAllocationTime,
+  );
   // инпут для Certified type
   const [whitelist, setWhitelist] = useState<string>('');
   // links
@@ -52,7 +63,10 @@ const CreatePoolPage: React.FC = () => {
   const [isCalendarVoting, setIsCalendarVoting] = useState<boolean>(false);
   const [isCalendar1, setIsCalendar1] = useState<boolean>(false);
   const [isCalendar2, setIsCalendar2] = useState<boolean>(false);
-  const [isCalendarLiquidityAllocationTime, setIsCalendarLiquidityAllocationTime] = useState<boolean>(false);
+  const [
+    isCalendarLiquidityAllocationTime,
+    setIsCalendarLiquidityAllocationTime,
+  ] = useState<boolean>(false);
   // чекбоксы
   const [isPublic, setIsPublic] = useState<boolean>(true);
   const [isLiquidity, setIsLiquidity] = useState<boolean>(false);
@@ -65,10 +79,9 @@ const CreatePoolPage: React.FC = () => {
   const { address: userAddress } = useSelector(({ user }: any) => user);
 
   const dispatch = useDispatch();
-  const toggleModal = React.useCallback(
-    (params) => dispatch(modalActions.toggleModal(params)),
-    [dispatch],
-  );
+  const toggleModal = React.useCallback((params) => dispatch(modalActions.toggleModal(params)), [
+    dispatch,
+  ]);
 
   const minInvestInWei = new BN(10).pow(new BN(10)).toString(10); // todo
   const maxInvestInWei = new BN(10).pow(new BN(20)).toString(10); // todo
@@ -78,7 +91,7 @@ const CreatePoolPage: React.FC = () => {
   const handleError = (value: any, message?: string) => {
     if (isFormSubmitted && !value) return message || 'Enter value';
     return undefined;
-  }
+  };
 
   const validateForm = () => {
     if (!saleTitle) return false;
@@ -98,7 +111,7 @@ const CreatePoolPage: React.FC = () => {
     // if (!liquidityPercentageAllocation) return false;
     // if (!liquidityAllocationTime) return false;x
     return true;
-  }
+  };
 
   const checkTime = () => {
     // openTime > block.timestamp &&
@@ -108,7 +121,8 @@ const CreatePoolPage: React.FC = () => {
     // todo block timestamp
     const isOpenTimeMoreThanBlockTimestamp = openTime > new Date().getTime();
     // todo getVotingTime, check ms/s
-    const isOpenVotingTimePlus24LessThanOpenTime = openVotingTime + 600 * 1000 + 86400 * 1000 <= openTime;
+    const isOpenVotingTimePlus24LessThanOpenTime =
+      openVotingTime + 600 * 1000 + 86400 * 1000 <= openTime;
     const isOpenTimeLessThanCloseTime = openTime < closeTime;
     const isCloseTimeLessThanLiquidityAllocationTime = closeTime < liquidityAllocationTime;
     if (!isOpenTimeMoreThanBlockTimestamp) {
@@ -120,8 +134,8 @@ const CreatePoolPage: React.FC = () => {
           </div>
         ),
       });
-      return false
-    };
+      return false;
+    }
     if (!isOpenVotingTimePlus24LessThanOpenTime) {
       toggleModal({
         open: true,
@@ -131,8 +145,8 @@ const CreatePoolPage: React.FC = () => {
           </div>
         ),
       });
-      return false
-    };
+      return false;
+    }
     if (!isOpenTimeLessThanCloseTime) {
       toggleModal({
         open: true,
@@ -142,8 +156,8 @@ const CreatePoolPage: React.FC = () => {
           </div>
         ),
       });
-      return false
-    };
+      return false;
+    }
     if (!isCloseTimeLessThanLiquidityAllocationTime) {
       toggleModal({
         open: true,
@@ -153,16 +167,18 @@ const CreatePoolPage: React.FC = () => {
           </div>
         ),
       });
-      return false
-    };
+      return false;
+    }
     return true;
-  }
+  };
 
   const checkStakingBalance = async () => {
     try {
       const decimals = await ContractLessToken.decimals();
       const minCreatorStakedBalance = await ContractLessLibrary.getMinCreatorStakedBalance();
-      const minCreatorStakedBalanceInEther = new BN(minCreatorStakedBalance).div(new BN(10).pow(new BN(decimals))).toString(10);
+      const minCreatorStakedBalanceInEther = new BN(minCreatorStakedBalance)
+        .div(new BN(10).pow(new BN(decimals)))
+        .toString(10);
       const balance = await ContractStaking.getStakedBalance({ userAddress });
       const balanceInEther = new BN(balance).div(new BN(10).pow(new BN(decimals))).toString(10);
       // console.log('CreatePool checkStakingBalance:', { minCreatorStakedBalanceInEther, balanceInEther });
@@ -171,7 +187,9 @@ const CreatePoolPage: React.FC = () => {
           open: true,
           text: (
             <div className={s.messageContainer}>
-              <p>To be able to create new pool, please stake {minCreatorStakedBalanceInEther} LESS</p>
+              <p>
+                To be able to create new pool, please stake {minCreatorStakedBalanceInEther} LESS
+              </p>
               <p>Your staking balance is: {balanceInEther} LESS</p>
             </div>
           ),
@@ -181,7 +199,7 @@ const CreatePoolPage: React.FC = () => {
       console.error('CreatePool checkStakingBalance:', e);
       return false;
     }
-  }
+  };
 
   const approve = async () => {
     try {
@@ -193,31 +211,35 @@ const CreatePoolPage: React.FC = () => {
       const allowance = await ContractLessToken.allowance({ userAddress, spender });
       console.log('Staking stake allowance:', allowance);
       if (allowance < totalSupply) {
-        const resultApprove = await ContractLessToken.approve({ userAddress, spender, amount: totalSupply });
+        const resultApprove = await ContractLessToken.approve({
+          userAddress,
+          spender,
+          amount: totalSupply,
+        });
         console.log('Staking stake resultApprove:', resultApprove);
         return true;
-      };
+      }
       return true;
     } catch (e) {
       console.error('CreatePool approve:', e);
       return false;
     }
-  }
+  };
 
   const subscribeEvent = async (type: string) => {
     try {
-      await web3.subscribe(type, console.log)
+      await web3.subscribe(type, console.log);
       return true;
     } catch (e) {
       console.error('CreatePool subscribeEvent:', e);
       return false;
     }
-  }
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     try {
       event.preventDefault();
-      console.log('handleSubmit:', { vestingPercent })
+      console.log('handleSubmit:', { vestingPercent });
       if (!validateForm()) {
         setIsFormSubmitted(true);
         // return; // todo
@@ -240,14 +262,14 @@ const CreatePoolPage: React.FC = () => {
         // isWhiteListed,
         // whitelistArray,
         // isVesting,
-      ]
+      ];
       // порядок полей менять нельзя!
       const presalePancakeSwapInfo = [
         listingPriceInWei,
         lpTokensLockDurationInDays,
         liquidityPercentageAllocation,
         liquidityAllocationTime,
-      ]
+      ];
       // порядок полей менять нельзя!
       const presaleStringInfo = [
         saleTitle,
@@ -258,16 +280,19 @@ const CreatePoolPage: React.FC = () => {
         linkLogo,
         description,
         whitepaper,
-      ]
+      ];
 
-      console.log({ isPublic, presaleInfo, presalePancakeSwapInfo, presaleStringInfo })
+      console.log({ isPublic, presaleInfo, presalePancakeSwapInfo, presaleStringInfo });
       setIsFormSubmitted(true);
       const resultApprove = await approve();
       if (!resultApprove) return;
       const resultCreatePresalePublic = await ContractPresaleFactory.createPresalePublic({
-        userAddress, presaleInfo, presalePancakeSwapInfo, presaleStringInfo
-      })
-      console.log('CreatePool handleSubmit', resultCreatePresalePublic)
+        userAddress,
+        presaleInfo,
+        presalePancakeSwapInfo,
+        presaleStringInfo,
+      });
+      console.log('CreatePool handleSubmit', resultCreatePresalePublic);
       if (resultCreatePresalePublic) await subscribeEvent('PublicPresaleCreated');
     } catch (e) {
       console.error('CreatePool handleSubmit:', e);
@@ -280,12 +305,18 @@ const CreatePoolPage: React.FC = () => {
     if (!ContractLessLibrary) return;
     if (!ContractStaking) return;
     if (!userAddress) return;
-    checkStakingBalance()
+    checkStakingBalance();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ContractLessToken, ContractLessLibrary, ContractStaking, userAddress])
+  }, [ContractLessToken, ContractLessLibrary, ContractStaking, userAddress]);
 
   return (
     <section className={s.page}>
+      <Helmet>
+        <meta charSet="utf-8" />
+        <title>Create pool | Lesspad</title>
+        <meta name="description" content="Create pool" />
+      </Helmet>
+
       <div className={s.container}>
         <div className={s.inner}>
           <div className={s.title}>Create Pool</div>
@@ -304,11 +335,7 @@ const CreatePoolPage: React.FC = () => {
                 onChange={setSaleTitle}
                 error={handleError(saleTitle)}
               />
-              <Input
-                title="Description"
-                value={description}
-                onChange={setDescription}
-              />
+              <Input title="Description" value={description} onChange={setDescription} />
               <Input
                 title="Token Contract Address"
                 value={tokenAddress}
@@ -339,7 +366,9 @@ const CreatePoolPage: React.FC = () => {
               <div className={s.datePicker}>
                 <div className={s.datePicker_title}>Open voting date</div>
                 <div className={s.datePicker_inner}>
-                  <div className={s.datePicker_value}>{new Date(openVotingTime)?.toLocaleDateString()}</div>
+                  <div className={s.datePicker_value}>
+                    {new Date(openVotingTime)?.toLocaleDateString()}
+                  </div>
                   <div
                     className={s.datePicker_img}
                     role="button"
@@ -356,7 +385,9 @@ const CreatePoolPage: React.FC = () => {
                 <div className={s.datePicker}>
                   <div className={s.datePicker_title}>Open date</div>
                   <div className={s.datePicker_inner}>
-                    <div className={s.datePicker_value}>{new Date(openTime)?.toLocaleDateString()}</div>
+                    <div className={s.datePicker_value}>
+                      {new Date(openTime)?.toLocaleDateString()}
+                    </div>
                     <div
                       className={s.datePicker_img}
                       role="button"
@@ -372,7 +403,9 @@ const CreatePoolPage: React.FC = () => {
                 <div className={s.datePicker}>
                   <div className={s.datePicker_title}>Close date</div>
                   <div className={s.datePicker_inner}>
-                    <div className={s.datePicker_value}>{new Date(closeTime)?.toLocaleDateString()}</div>
+                    <div className={s.datePicker_value}>
+                      {new Date(closeTime)?.toLocaleDateString()}
+                    </div>
                     <div
                       className={s.datePicker_img}
                       role="button"
@@ -427,7 +460,9 @@ const CreatePoolPage: React.FC = () => {
                   <div className={s.datePicker}>
                     <div className={s.datePicker_title}>Liquidity Allocation Time</div>
                     <div className={s.datePicker_inner}>
-                      <div className={s.datePicker_value}>{new Date(liquidityAllocationTime)?.toLocaleDateString()}</div>
+                      <div className={s.datePicker_value}>
+                        {new Date(liquidityAllocationTime)?.toLocaleDateString()}
+                      </div>
                       <div
                         className={s.datePicker_img}
                         role="button"
@@ -462,11 +497,7 @@ const CreatePoolPage: React.FC = () => {
                     optionTwo="Without whitelist"
                   />
                   {isWhiteListed && (
-                    <Input
-                      title="Adresses"
-                      value={whitelist}
-                      onChange={setWhitelist}
-                    />
+                    <Input title="Adresses" value={whitelist} onChange={setWhitelist} />
                   )}
                   <Checkbox
                     defaultValue={isVesting}
@@ -487,36 +518,12 @@ const CreatePoolPage: React.FC = () => {
                 </>
               )}
 
-              <Input
-                value={linkLogo}
-                onChange={setLinkLogo}
-                title="Link to logo"
-              />
-              <Input
-                value={linkWebsite}
-                onChange={setLinkWebsite}
-                title="Link to Website"
-              />
-              <Input
-                value={linkTelegram}
-                onChange={setLinkTelegram}
-                title="Link to Telegram"
-              />
-              <Input
-                value={linkGithub}
-                onChange={setLinkGithub}
-                title="Link to Github"
-              />
-              <Input
-                value={linkTwitter}
-                onChange={setLinkTwitter}
-                title="Link to Twitter"
-              />
-              <Input
-                value={whitepaper}
-                onChange={setWhitepaper}
-                title="Whitepaper"
-              />
+              <Input value={linkLogo} onChange={setLinkLogo} title="Link to logo" />
+              <Input value={linkWebsite} onChange={setLinkWebsite} title="Link to Website" />
+              <Input value={linkTelegram} onChange={setLinkTelegram} title="Link to Telegram" />
+              <Input value={linkGithub} onChange={setLinkGithub} title="Link to Github" />
+              <Input value={linkTwitter} onChange={setLinkTwitter} title="Link to Twitter" />
+              <Input value={whitepaper} onChange={setWhitepaper} title="Whitepaper" />
 
               <div className={s.button}>
                 <button type="submit" className={s.button_submit}>

@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import s from './Staking.module.scss';
-import Button from '../../components/Button/index';
-import maxImg from '../../assets/img/icons/max.svg';
-import { useContractsContext } from "../../contexts/ContractsContext";
-import { useSelector } from "react-redux";
+import { Helmet } from 'react-helmet';
+import { useSelector } from 'react-redux';
 import web3 from 'web3';
+
+import maxImg from '../../assets/img/icons/max.svg';
+import Button from '../../components/Button/index';
 import config from '../../config';
+import { useContractsContext } from '../../contexts/ContractsContext';
+
+import s from './Staking.module.scss';
 
 const { chainSymbols }: any = config;
 const { BN }: any = web3.utils;
@@ -63,9 +66,13 @@ const StakingPage: React.FC = () => {
       const allowance = await ContractLessToken.allowance({ userAddress, spender });
       console.log('Staking stake allowance:', allowance);
       if (allowance < stakeValueBN) {
-        const resultApprove = await ContractLessToken.approve({ userAddress, spender, amount: stakeValueBN });
+        const resultApprove = await ContractLessToken.approve({
+          userAddress,
+          spender,
+          amount: stakeValueBN,
+        });
         console.log('Staking stake resultApprove:', resultApprove);
-      };
+      }
       const result = await ContractStaking.stake({ userAddress, amount: stakeValueBN });
       if (result) {
         getLessTokenBalance();
@@ -105,6 +112,12 @@ const StakingPage: React.FC = () => {
 
   return (
     <div className={s.page}>
+      <Helmet>
+        <meta charSet="utf-8" />
+        <title>Staking | Lesspad</title>
+        <meta name="description" content="Staking" />
+      </Helmet>
+
       <div className={s.container}>
         <div className={s.inner}>
           <div className={s.title}>Your Wallet</div>
@@ -113,7 +126,9 @@ const StakingPage: React.FC = () => {
               <div className={s.balance_title}>
                 <span>{currency}</span> Balance
               </div>
-              <div className={s.balance_bnb}>{userBalance} {currency}</div>
+              <div className={s.balance_bnb}>
+                {userBalance} {currency}
+              </div>
               <div className={s.balance_usd}>0 USD</div>
               <div className={s.balance_subinfo}>
                 You have earned 0 BNB. Click now &apos;Claim Rewards&apos; to add the amount to your
@@ -145,7 +160,9 @@ const StakingPage: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                <Button long onClick={stake}>Stake</Button>
+                <Button long onClick={stake}>
+                  Stake
+                </Button>
               </div>
             </div>
             <div className={s.balance}>
@@ -170,7 +187,9 @@ const StakingPage: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                <Button long onClick={unstake}>Unstake</Button>
+                <Button long onClick={unstake}>
+                  Unstake
+                </Button>
               </div>
             </div>
           </div>

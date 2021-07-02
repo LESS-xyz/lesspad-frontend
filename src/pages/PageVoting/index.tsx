@@ -1,9 +1,13 @@
-import s from './PagePresale.module.scss';
-import Table from './Table/index';
+import React, { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet';
+import { useSelector } from 'react-redux';
+
 // import logo1 from '../../assets/img/sections/logos/logo1.png';
 import Search from '../../components/Search/index';
-import React, { useEffect, useState } from 'react';
-import { useSelector } from "react-redux";
+
+import Table from './Table/index';
+
+import s from './PagePresale.module.scss';
 
 // const tableDataExample = [
 //   {
@@ -55,7 +59,7 @@ const PageVoting: React.FC = () => {
           if (!isAddressInSearch && !isTitleInSearch && !isDescriptionInSearch) return false;
         }
         return true;
-      })
+      });
       const presalesAddressesFilteredNew = presalesInfoNew.map((item: any) => item.address);
       setPresalesAddressesFiltered(presalesAddressesFilteredNew);
     } catch (e) {
@@ -72,6 +76,12 @@ const PageVoting: React.FC = () => {
 
   return (
     <div className={s.page}>
+      <Helmet>
+        <meta charSet="utf-8" />
+        <title>Voting | Lesspad</title>
+        <meta name="description" content="Voting" />
+      </Helmet>
+
       <div className={s.container}>
         <div className={s.inner}>
           <div className={s.title}>Presale Voting</div>
