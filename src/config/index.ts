@@ -40,6 +40,11 @@ export default {
     'Binance-Smart-Chain': 'BNB',
     'Matic': 'MATIC',
   },
+  explorers: {
+    'Ethereum': 'https://etherscan.io',
+    'Binance-Smart-Chain': 'https://bscscan.io',
+    'Matic': 'https://polygonscan.com',
+  },
   chainIds: {
     mainnet: {
       'Ethereum': {

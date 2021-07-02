@@ -13,7 +13,7 @@ import config from '../../../config';
 
 import './index.scss';
 
-const { chainSymbols }: any = config;
+const { chainSymbols, explorers }: any = config;
 
 const Pool: React.FC = () => {
   const { address }: any = useParams();
@@ -21,6 +21,7 @@ const Pool: React.FC = () => {
   const { chainType } = useSelector(({ wallet }: any) => wallet);
 
   const currency = chainSymbols[chainType];
+  const explorer = explorers[chainType];
 
   const row1 = [
     {
@@ -186,7 +187,9 @@ const Pool: React.FC = () => {
               Autonomous interest rate protocol for on-chain lending and borrowing
             </div>
             <div className="subscription">
-              <div className="subscription-text">{address}</div>
+              <a href={`${explorer}/token/${address}`} className="subscription-text">
+                {address}
+              </a>
               <img className="icon-subscribe" src={Subscribe} alt="Subscribe" />
             </div>
           </div>
