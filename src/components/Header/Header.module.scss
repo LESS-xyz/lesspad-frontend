@@ -15,6 +15,25 @@ $height-header-mobile: 52px;
   }
 }
 
+.background {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1001;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.backgroundBottom {
+  position: absolute;
+  bottom: -30px;
+  right: 0;
+  z-index: 1001;
+  width: 100%;
+  pointer-events: none;
+  overflow: hidden;
+}
+
 .header {
   position: absolute;
   width: 100%;
@@ -59,6 +78,26 @@ $height-header-mobile: 52px;
   @include flex(row, center);
   span {
     color: var(--blue);
+  }
+}
+
+.logo_menu_mobile {
+  @include flex(row, center, flex-end);
+  position: absolute;
+  width: calc(100% - 30px);
+  pointer-events: none;
+  box-sizing: border-box;
+
+  > a {
+    @include flex(row, center, center);
+    font-size: 31px;
+    letter-spacing: -0.6px;
+    color: var(--header-logo-color);
+    text-decoration: none;
+    pointer-events: auto;
+    span {
+      color: var(--blue);
+    }
   }
 }
 

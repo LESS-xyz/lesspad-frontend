@@ -10,6 +10,8 @@ import { ReactComponent as IconClose } from '../../assets/img/icons/close-color.
 import ethLogo from '../../assets/img/icons/eth-logo.svg';
 import logo from '../../assets/img/icons/logo.svg';
 import maticLogo from '../../assets/img/icons/matic-logo.svg';
+import { ReactComponent as ImageBackgroundBottom } from '../../assets/img/sections/header/header-menu-background-bottom.svg';
+import { ReactComponent as ImageBackground } from '../../assets/img/sections/header/header-menu-background.svg';
 import { userActions, walletActions } from '../../redux/actions';
 import { setToStorage } from '../../utils/localStorage';
 import Button from '../Button/index';
@@ -24,10 +26,6 @@ cryptoLogos.set('Binance-Smart-Chain', bnbLogo);
 cryptoLogos.set('Matic', maticLogo);
 
 const Header: React.FC = () => {
-  // $mediaWidthLaptop: 1440px;
-  // $mediaWidthDesktop: 1024px;
-  // $mediaWidthTablet: 768px;
-  // $mediaWidthMobile: 550px;
   const isDesktop = useMedia({ minWidth: 1024 });
 
   const [isPopUpOpen, setIsPopUpOpen] = useState<boolean>(false);
@@ -77,6 +75,8 @@ const Header: React.FC = () => {
             </div>
           )}
           <div className={`${s.container_menu_mobile} ${openMenu && s.open}`}>
+            <ImageBackground className={s.background} />
+            <ImageBackgroundBottom className={s.backgroundBottom} />
             <div className={s.menu_mobile_header}>
               <div
                 className={s.menu_button}
@@ -86,6 +86,17 @@ const Header: React.FC = () => {
                 onClick={() => setOpenMenu(false)}
               >
                 <IconClose />
+              </div>
+              <div className={s.logo_menu_mobile}>
+                <NavLink to="/">
+                  <div className={s.logo_img_mobile}>
+                    <img src={logo} alt="Less-logo" />
+                  </div>
+                  <div className={s.logo_text_mobile}>
+                    less
+                    <span>pad</span>
+                  </div>
+                </NavLink>
               </div>
             </div>
             <div className={s.inner_container_menu_mobile}>
