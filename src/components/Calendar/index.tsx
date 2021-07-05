@@ -10,6 +10,8 @@ interface ICalendarProps {
 }
 
 const Calendar: React.FC<ICalendarProps> = ({ onChange, closeCalendar }) => {
+  const refCalendar = React.useRef<HTMLDivElement>(null);
+
   const monthes = [
     'January',
     'February',
@@ -78,6 +80,20 @@ const Calendar: React.FC<ICalendarProps> = ({ onChange, closeCalendar }) => {
     onChange(day.getTime());
     closeCalendar();
   };
+
+  const handleClickOutside = (e: any) => {
+    if (!refCalendar?.current?.contains(e.target)) {
+      closeCalendar();
+    }
+  };
+
+  React.useEffect(() => {
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className={s.calendar}>
