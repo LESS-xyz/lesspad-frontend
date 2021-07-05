@@ -11,8 +11,9 @@
   font-size: 16px;
   letter-spacing: -0.531474px;
   cursor: pointer;
-  transition: 0.4s ease;
+  transition: background-color 0.4s ease, color 0.4s ease;
   text-decoration: none;
+  box-sizing: border-box;
 
   &.filled,
   &:hover {
@@ -24,4 +25,8 @@
     padding: 20px;
     height: inherit;
   }
+}
+
+.fullWidth {
+  width: 100%;
 }

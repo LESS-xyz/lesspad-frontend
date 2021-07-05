@@ -10,10 +10,11 @@ interface IPopUpProps {
   setCurrentCrypto?: (a: string) => void;
   setIsPopUpOpen: Dispatch<SetStateAction<boolean>>;
   refButton?: any;
+  style?: any;
 }
 
 const PopUp: React.FC<IPopUpProps> = (props) => {
-  const { setCurrentCrypto = () => {}, setIsPopUpOpen, refButton } = props;
+  const { setCurrentCrypto = () => {}, setIsPopUpOpen, refButton, style = {} } = props;
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -50,7 +51,7 @@ const PopUp: React.FC<IPopUpProps> = (props) => {
   }, []);
 
   return (
-    <div className={`${s.popup} ${isOpen && s.active}`} ref={refPopup}>
+    <div className={`${s.popup} ${isOpen && s.active}`} ref={refPopup} style={style}>
       <div className={s.inner}>
         {options.map((option, index) => (
           <div

@@ -1,9 +1,18 @@
 @import '../../styles/mixins/flex.scss';
 @import '../../styles/mixins/container.scss';
 @import '../../styles/mixins/gradient-text.scss';
+@import '../../styles/mixins/media';
+
+$height-header-mobile: 52px;
 
 .container {
-  @include container;
+  max-width: 1130px;
+  padding: 0 15px;
+  margin: 0 auto;
+
+  @include b('tablet') {
+    padding: 5px 10px;
+  }
 }
 
 .header {
@@ -11,7 +20,17 @@
   width: 100%;
   top: 22px;
   left: 0;
+
+  @include b('tablet') {
+    position: absolute;
+    width: 100%;
+    top: 0px;
+    height: $height-header-mobile;
+    left: 0;
+    background: var(--body-background-color);
+  }
 }
+
 .inner {
   @include flex(row, center, space-between);
   position: relative;
@@ -22,6 +41,15 @@
   @include flex(row, center);
   height: 41px;
 }
+
+.menu_button {
+  @include flex(row, center, center);
+  width: 55px;
+  cursor: pointer;
+  padding: 10px 15px;
+  user-select: none;
+}
+
 .logo {
   font-size: 31px;
   letter-spacing: -0.6px;
@@ -33,13 +61,49 @@
     color: var(--blue);
   }
 }
+
+.logo_mobile {
+  @include flex(row, center, center);
+  position: absolute;
+  width: 100%;
+  pointer-events: none;
+
+  >a {
+    @include flex(row, center, center);
+    font-size: 31px;
+    letter-spacing: -0.6px;
+    color: var(--header-logo-color);
+    text-decoration: none;
+    pointer-events: auto;
+    span {
+      color: var(--blue);
+    }
+  }
+}
+
 .logo_img {
   height: 41px;
+  img {
+    height: 100%;
+  }
+}
+
+.logo_img_mobile {
+  height: 24px;
+  img {
+    height: 100%;
+  }
 }
 
 .logo_text {
   height: 35px;
   padding-left: 15px;
+}
+
+.logo_text_mobile {
+  font-size: 17px;
+  line-height: 22px;
+  padding-left: 8px;
 }
 
 .navigation {
@@ -105,8 +169,14 @@
 }
 
 .button_body {
-  @include flex(row, center);
+  @include flex(row, center, space-between, nowrap);
+  width: 100%;
 }
+
+.button_body_left {
+  @include flex(row, center, normal, nowrap);
+}
+
 .crypto_logo {
   height: 24px;
   width: 24px;
@@ -116,16 +186,76 @@
     width: 24px;
   }
 }
+
 .arrow {
   transition: 0.4s ease;
   &.active {
     transform: rotate(180deg);
   }
 }
+
 .current_crypto {
   margin-right: 5px;
   max-width: 65px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+
+  @include b('tablet') {
+    max-width: none;
+  }
+}
+
+.container_menu_mobile {
+  box-sizing: border-box;
+  position: fixed;
+  top: 0;
+  left: 0;
+  visibility: hidden;
+  width: 100vw;
+  height: 100%;
+  background: var(--body-background-color);
+  z-index: 1000;
+}
+
+.inner_container_menu_mobile {
+  @include flex(column, normal, normal, nowrap);
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  padding: 15px 0 0 0;
+}
+
+.open {
+  visibility: visible;
+}
+
+.menu_mobile_item {
+  padding: 15px 20px;
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 28px;
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--color-text-primary);
+}
+
+.active_menu_mobile_item {
+  > div {
+    width: max-content;
+    @include gradient-text;
+  }
+}
+
+.menu_mobile_header {
+  @include flex(row, center);
+  height: $height-header-mobile;
+  padding: 5px 10px;
+}
+
+.container_menu_mobile_bottom {
+  @include flex(column, normal, normal, nowrap);
+  margin: 35px 0 0 0;
+  padding: 0 20px;
+  width: 100%;
 }

@@ -1,5 +1,6 @@
 :root {
   // common styles
+  --color-text-primary: #fff;
   --blue: #6f45ff;
   --gradient: linear-gradient(90deg, #6f45ff 0%, #ff6365 100%);
   --gradient-replacement: #9e4fcd;
@@ -57,4 +58,8 @@
   --staking-balance-background: linear-gradient(90deg, #040404 0%, #1c0e40 100%);
   --staking-amount-background: rgba(103, 77, 246, 0.2);
   --staking-subinfo-color: #5454d4;
+
+  //scrollbar
+  --color-scrollbar-bg: rgba(103, 77, 246, 0.2);
+  --color-scrollbar: #6f45ff;
 }

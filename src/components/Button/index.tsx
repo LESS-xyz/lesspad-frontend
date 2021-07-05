@@ -13,10 +13,24 @@ interface IButtonProps {
   long?: boolean;
   to?: string;
   href?: string;
+  fullWidth?: boolean;
+  style?: any;
 }
 
 const Button: React.FC<IButtonProps> = (props) => {
-  const { children, filled, onClick, disabled = false, marginRight, big, long, to, href } = props;
+  const {
+    children,
+    filled,
+    onClick,
+    disabled = false,
+    marginRight,
+    big,
+    long,
+    to,
+    href,
+    fullWidth = false,
+    style,
+  } = props;
   const handleClick = () => {
     if (disabled) return;
     if (!onClick) return;
@@ -28,8 +42,8 @@ const Button: React.FC<IButtonProps> = (props) => {
       <a
         href={href}
         target="_blank"
-        style={{ marginRight: marginRight ?? 10 }}
-        className={`${s.button} ${filled && s.filled} ${big && s.big}`}
+        style={{ ...style, marginRight: marginRight ?? 10 }}
+        className={`${s.button} ${filled && s.filled} ${big && s.big} ${fullWidth && s.fullWidth}`}
         rel="noreferrer"
       >
         {children}
@@ -41,8 +55,8 @@ const Button: React.FC<IButtonProps> = (props) => {
       <Link
         to={to}
         onKeyDown={() => {}}
-        style={{ marginRight: marginRight ?? 10 }}
-        className={`${s.button} ${filled && s.filled} ${big && s.big}`}
+        style={{ ...style, marginRight: marginRight ?? 10 }}
+        className={`${s.button} ${filled && s.filled} ${big && s.big} ${fullWidth && s.fullWidth}`}
       >
         {children}
       </Link>
@@ -54,8 +68,8 @@ const Button: React.FC<IButtonProps> = (props) => {
       tabIndex={0}
       onClick={handleClick}
       onKeyDown={() => {}}
-      style={{ marginRight: marginRight ?? 10, minWidth: long ? '150px' : '' }}
-      className={`${s.button} ${filled && s.filled} ${big && s.big}`}
+      style={{ ...style, marginRight: marginRight ?? 10, minWidth: long ? '150px' : '' }}
+      className={`${s.button} ${filled && s.filled} ${big && s.big} ${fullWidth && s.fullWidth}`}
     >
       {children}
     </div>
