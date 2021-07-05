@@ -1,4 +1,5 @@
 import Web3 from 'web3';
+
 import config from '../../config';
 
 type TypeConstructorProps = {
@@ -17,8 +18,11 @@ type TypeStakeProps = {
 
 export default class ContractStakingService {
   public web3: any;
+
   public contractAddress: any;
+
   public contractAbi: any;
+
   public contractName: any;
 
   constructor(props: TypeConstructorProps) {

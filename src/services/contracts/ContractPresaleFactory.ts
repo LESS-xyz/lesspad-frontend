@@ -1,5 +1,6 @@
 // import BigNumber from 'bignumber.js/bignumber';
 import Web3 from 'web3';
+
 import config from '../../config';
 
 type TypeConstructorProps = {
@@ -16,8 +17,11 @@ type TypeGetInfoProps = {
 
 export default class ContractPresaleFactoryService {
   public web3: any;
+
   public contractAddress: any;
+
   public contractAbi: any;
+
   public contractName: any;
 
   constructor(props: TypeConstructorProps) {
@@ -41,16 +45,18 @@ export default class ContractPresaleFactoryService {
         if (ii <= 4) return hex + zeros;
         return item;
       });
-      console.log('ContractPresaleFactoryService createPresalePublic:', { valueInWei, userAddress, presaleStringInfoFormatted });
-      const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
-      const result = await contract.methods.createPresalePublic(
-        presaleInfo,
-        presalePancakeSwapInfo,
-        presaleStringInfoFormatted
-      ).send({
-        from: userAddress,
-        value: valueInWei
+      console.log('ContractPresaleFactoryService createPresalePublic:', {
+        valueInWei,
+        userAddress,
+        presaleStringInfoFormatted,
       });
+      const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
+      const result = await contract.methods
+        .createPresalePublic(presaleInfo, presalePancakeSwapInfo, presaleStringInfoFormatted)
+        .send({
+          from: userAddress,
+          value: valueInWei,
+        });
       return result;
     } catch (e) {
       console.error('ContractPresaleFactoryService createPresalePublic:', e);

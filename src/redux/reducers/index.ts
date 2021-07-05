@@ -1,10 +1,10 @@
 import { combineReducers } from 'redux';
 
 import modal from './modal';
+import pool from './pool';
 import status from './status';
 import user from './user';
 import wallet from './wallet';
-import pool from './pool';
 
 export default combineReducers({
   user,

@@ -1,4 +1,4 @@
-import { getFromStorage, setToStorage } from "../../utils/localStorage";
+import { getFromStorage, setToStorage } from '../../utils/localStorage';
 
 const defaultChainType = getFromStorage('chainType');
 

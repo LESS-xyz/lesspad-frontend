@@ -1,6 +1,8 @@
-import { useState } from 'react';
-import s from './Selector.module.scss';
+import React, { useState } from 'react';
+
 import arrow from '../../assets/img/icons/arrow-gradient-fill.svg';
+
+import s from './Selector.module.scss';
 
 interface ISelectorProps {
   defaultOption: string;

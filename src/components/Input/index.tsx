@@ -1,6 +1,8 @@
-import s from './Input.module.scss';
+import React, { useState } from 'react';
+
 import cancelIcon from '../../assets/img/icons/cancel.svg';
-import { useState } from 'react';
+
+import s from './Input.module.scss';
 
 interface IInputProps {
   title: string;
@@ -21,7 +23,12 @@ const Input: React.FC<IInputProps> = (props) => {
   return (
     <div className={`${s.input} ${error ? s.invalid : ''}`}>
       <div className={s.input_title}>{title}</div>
-      <input required={required} value={inputVal} onChange={(e) => handleChange(e.target.value)} type="text" />
+      <input
+        required={required}
+        value={inputVal}
+        onChange={(e) => handleChange(e.target.value)}
+        type="text"
+      />
       {subtitle && <div className={s.input_subtitle}>{subtitle}</div>}
       {error && (
         <div className={s.invalid_err}>

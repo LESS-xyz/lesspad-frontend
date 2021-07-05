@@ -1,6 +1,8 @@
 import React from 'react';
-import { Switch, Route, useRouteMatch } from "react-router-dom";
-import Page404 from "../Page404";
+import { Route, Switch, useRouteMatch } from 'react-router-dom';
+
+import Page404 from '../Page404';
+
 import Pool from './Pool';
 
 const Project: React.FC = () => {

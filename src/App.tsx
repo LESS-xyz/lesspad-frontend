@@ -1,23 +1,23 @@
-import { Helmet } from "react-helmet";
+import React, { useEffect } from 'react';
+import { Helmet } from 'react-helmet';
+import { useDispatch } from 'react-redux';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
-import { Header } from './components';
 import Footer from './components/Footer/index';
+import { Modal } from './components/Modal';
+import { useContractsContext } from './contexts/ContractsContext';
+import { poolActions } from './redux/actions';
+import { Header } from './components';
 import {
+  AboutPage,
   AllPoolsPage,
-  PageVoting,
+  CreatePoolPage,
   MainPage,
   Page404,
-  CreatePoolPage,
-  AboutPage,
-  StakingPage,
+  PageVoting,
   ProjectPage,
+  StakingPage,
 } from './pages';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import { Modal } from './components/Modal';
-import React, { useEffect } from 'react';
-import { useDispatch } from "react-redux";
-import { poolActions } from "./redux/actions";
-import { useContractsContext } from "./contexts/ContractsContext";
 
 export const App: React.FC = () => {
   const { ContractLessLibrary } = useContractsContext();

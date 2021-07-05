@@ -1,6 +1,9 @@
-import s from './ProgressBar.module.scss';
+import React from 'react';
+
 import checkmark from '../../assets/img/sections/token-card/checkmark.svg';
 import { CardConditions } from '../../types/index';
+
+import s from './ProgressBar.module.scss';
 
 interface IBarProps {
   totalAmount: number;

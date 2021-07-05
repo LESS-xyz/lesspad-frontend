@@ -1,5 +1,8 @@
-import s from './TopBlock.module.scss';
+import React from 'react';
+
 import Button from '../../../components/Button/index';
+
+import s from './TopBlock.module.scss';
 
 const TopBlock: React.FC = () => {
   return (

@@ -1,14 +1,14 @@
-import { useSelector } from "react-redux";
-import React from "react";
-import { v4 as uuid } from 'uuid';
+import React from 'react';
+import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-
-import s from './FeaturedProjects.module.scss';
-import TokenCard from '../../../components/TokenCard/index';
-import { CardConditions, cryptos } from '../../../types/index';
+import { v4 as uuid } from 'uuid';
 
 import logo1 from '../../../assets/img/sections/token-card/logo-1.png';
 import logo2 from '../../../assets/img/sections/token-card/logo-2.png';
+import TokenCard from '../../../components/TokenCard/index';
+import { CardConditions, cryptos } from '../../../types/index';
+
+import s from './FeaturedProjects.module.scss';
 
 const cardsExample = [
   {
@@ -53,7 +53,7 @@ const FeaturedProject: React.FC = () => {
           <div className={s.title}>Featured Projects</div>
           <div className={s.cards}>
             {pools.slice(0, 5).map((item: any) => {
-              const { address = '', title = '', } = item;
+              const { address = '', title = '' } = item;
               const props = {
                 name: title || 'Pool',
                 type: CardConditions.closed,
@@ -66,9 +66,7 @@ const FeaturedProject: React.FC = () => {
                 liquidityPercent: 56,
                 daysBeforeOpening: 4,
               };
-              return (
-                <TokenCard key={uuid()} address={address} {...props} />
-              )
+              return <TokenCard key={uuid()} address={address} {...props} />;
             })}
             {emptyCards.map((element) => (
               <Link to="/create-pool" key={element} className={s.emptyCard} />

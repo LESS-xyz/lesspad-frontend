@@ -1,8 +1,8 @@
-import LessLibraryAbi from "../data/LessLibraryAbi";
-import StakingAbi from "../data/StakingAbi";
-import PresaleFactoryAbi from "../data/PresaleFactoryAbi";
-import ERC20Abi from "../data/ERC20Abi";
-import PresalePublicAbi from "../data/PresalePublicAbi";
+import ERC20Abi from '../data/ERC20Abi';
+import LessLibraryAbi from '../data/LessLibraryAbi';
+import PresaleFactoryAbi from '../data/PresaleFactoryAbi';
+import PresalePublicAbi from '../data/PresalePublicAbi';
+import StakingAbi from '../data/StakingAbi';
 
 const IS_PRODUCTION = false;
 const IS_TESTING_ON_ROPSTEN = false;
@@ -29,8 +29,8 @@ export default {
     '0x': IS_PRODUCTION
       ? 'https://api.0x.org'
       : IS_TESTING_ON_ROPSTEN
-        ? 'https://ropsten.api.0x.org/'
-        : 'https://kovan.api.0x.org/',
+      ? 'https://ropsten.api.0x.org/'
+      : 'https://kovan.api.0x.org/',
   },
   keys: {
     infura: '',

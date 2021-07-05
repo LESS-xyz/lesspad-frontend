@@ -1,4 +1,5 @@
 import Web3 from 'web3';
+
 import config from '../../config';
 
 type TypeConstructorProps = {
@@ -8,8 +9,11 @@ type TypeConstructorProps = {
 
 export default class ContractLessLibraryService {
   public web3: any;
+
   public contractAddress: any;
+
   public contractAbi: any;
+
   public contractName: any;
 
   constructor(props: TypeConstructorProps) {
@@ -44,7 +48,7 @@ export default class ContractLessLibraryService {
       if (count) {
         for (let i = 0; i < count; i += 1) {
           const address = await contract.methods.getPresaleAddress(i).call();
-          addresses.push(address)
+          addresses.push(address);
         }
       }
       return addresses;
@@ -81,14 +85,8 @@ export default class ContractLessLibraryService {
       const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
       const arrForSearch = await contract.methods.getArrForSearch().call();
       const arrForSearchFormatted = arrForSearch.map((item: any) => {
-        let {
-          description,
-          title,
-        } = item;
-        const {
-          isCertified,
-          presaleAddress,
-        } = item;
+        let { description, title } = item;
+        const { isCertified, presaleAddress } = item;
         if (description === '') description = '0x';
         if (title === '') title = '0x';
         return {
@@ -96,8 +94,8 @@ export default class ContractLessLibraryService {
           isCertified,
           address: presaleAddress,
           title,
-        }
-      })
+        };
+      });
       return arrForSearchFormatted;
     } catch (e) {
       console.error('ContractLessLibraryService getArrForSearch:', e);

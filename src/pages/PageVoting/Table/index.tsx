@@ -1,11 +1,13 @@
-import s from './Table.module.scss';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+
 import thumbUpGreen from '../../../assets/img/icons/thumb-up-green.svg';
 import thumbUpRed from '../../../assets/img/icons/thumb-up-red.svg';
-import { useContractsContext } from "../../../contexts/ContractsContext";
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { modalActions } from "../../../redux/actions";
-import Pagination from "../../../components/Pagination";
+import Pagination from '../../../components/Pagination';
+import { useContractsContext } from '../../../contexts/ContractsContext';
+import { modalActions } from '../../../redux/actions';
+
+import s from './Table.module.scss';
 
 interface ITableRow {
   address?: string;
@@ -44,10 +46,9 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
   const { chainType } = useSelector(({ wallet }: any) => wallet);
 
   const dispatch = useDispatch();
-  const toggleModal = React.useCallback(
-    (params) => dispatch(modalActions.toggleModal(params)),
-    [dispatch],
-  );
+  const toggleModal = React.useCallback((params) => dispatch(modalActions.toggleModal(params)), [
+    dispatch,
+  ]);
 
   const isEthereum = chainType === 'Ethereum';
   const isBinanceSmartChain = chainType === 'Binance-Smart-Chain';
@@ -70,9 +71,9 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
         contractAddress: address,
         yes,
       });
-      let message = 'Voting succeded'
+      let message = 'Voting succeded';
       if (!resultVote) {
-        message = 'Voting not succeded'
+        message = 'Voting not succeded';
       }
       toggleModal({
         open: true,
@@ -108,8 +109,12 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
       </div>
       <div className={`${s.row_cell} ${s.name}`}>{saleTitle}</div>
       <div className={`${s.row_cell} ${s.price}`}>{listingPrice}</div>
-      <div className={s.row_cell}>{softCap} {currency}</div>
-      <div className={s.row_cell}>{hardCap} {currency}</div>
+      <div className={s.row_cell}>
+        {softCap} {currency}
+      </div>
+      <div className={s.row_cell}>
+        {hardCap} {currency}
+      </div>
       <div className={s.row_cell}>
         {daysBeforeOpen} {daysBeforeOpen && daysBeforeOpen > 1 ? 'days' : 'day'}
       </div>
@@ -139,7 +144,10 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
             <img src={thumbUpRed} alt="thumbUpRed" />
           </div>
           <div className={s.likes_data}>
-            {likesPercent && dislikesPercent && (likesPercent < 10 ? +`0${likesPercent}` : dislikesPercent).toFixed(2)}%
+            {likesPercent &&
+              dislikesPercent &&
+              (likesPercent < 10 ? +`0${likesPercent}` : dislikesPercent).toFixed(2)}
+            %
           </div>
         </div>
       </div>
@@ -168,25 +176,25 @@ const Table: React.FC<ITableProps> = ({ data }) => {
 
   const handleChangePage = (p: number) => {
     setPage(p);
-  }
+  };
 
   const filterData = () => {
     try {
       const newData = data.filter((item: any, index: number) => {
         if (index < page * itemsOnPage || index >= (page + 1) * itemsOnPage) return false;
         return true;
-      })
+      });
       setDataFiltrered(newData);
       console.log('newData:', data, newData);
     } catch (e) {
       console.error(e);
     }
-  }
+  };
 
-  useEffect(()=>{
+  useEffect(() => {
     filterData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[page, data])
+  }, [page, data]);
 
   if (!data) return null;
   return (
@@ -206,7 +214,7 @@ const Table: React.FC<ITableProps> = ({ data }) => {
             return (
               // eslint-disable-next-line react/no-array-index-key
               <TableRow key={JSON.stringify(address) + index} index={index + 1} address={address} />
-            )
+            );
           })}
         </div>
       </div>

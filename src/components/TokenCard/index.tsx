@@ -1,25 +1,26 @@
-import s from './TokenCard.module.scss';
-import { CardConditions, cryptos } from '../../types/index';
-import ProgressBar from '../ProgressBar/index';
-import Icon from '../Icon/index';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import thumbup from '../../assets/img/sections/token-card/thumb-up.svg';
-import telegramActive from '../../assets/img/icons/telegram-active.svg';
-import telegramDisabled from '../../assets/img/icons/telegram-disabled.svg';
+import BNBgradient from '../../assets/img/icons/BNB-gradient.svg';
+import BNBwhite from '../../assets/img/icons/BNB-white.svg';
 import chainActive from '../../assets/img/icons/chain-active.svg';
 import chainDisabled from '../../assets/img/icons/chain-disabled.svg';
-import shareGradient from '../../assets/img/icons/share-gradient.svg';
-import shareWhite from '../../assets/img/icons/share-white.svg';
-import shareGrey from '../../assets/img/icons/share-grey.svg';
-import BNBwhite from '../../assets/img/icons/BNB-white.svg';
-import BNBgradient from '../../assets/img/icons/BNB-gradient.svg';
-import ETHwhite from '../../assets/img/icons/ETH-white.svg';
 import ETHgradient from '../../assets/img/icons/ETH-gradient.svg';
-import POLKADOTwhite from '../../assets/img/icons/polkadot-white.svg';
+import ETHwhite from '../../assets/img/icons/ETH-white.svg';
 import POLKADOTgradient from '../../assets/img/icons/polkadot-gradient.svg';
-import { useContractsContext } from "../../contexts/ContractsContext";
-import { useEffect, useState } from "react";
+import POLKADOTwhite from '../../assets/img/icons/polkadot-white.svg';
+import shareGradient from '../../assets/img/icons/share-gradient.svg';
+import shareGrey from '../../assets/img/icons/share-grey.svg';
+import shareWhite from '../../assets/img/icons/share-white.svg';
+import telegramActive from '../../assets/img/icons/telegram-active.svg';
+import telegramDisabled from '../../assets/img/icons/telegram-disabled.svg';
+import thumbup from '../../assets/img/sections/token-card/thumb-up.svg';
+import { useContractsContext } from '../../contexts/ContractsContext';
+import { CardConditions, cryptos } from '../../types/index';
+import Icon from '../Icon/index';
+import ProgressBar from '../ProgressBar/index';
+
+import s from './TokenCard.module.scss';
 
 interface ITokenCardProps {
   address?: string;

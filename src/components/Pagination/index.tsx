@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
+
 import s from './Pagination.module.scss';
 
 type TypePaginationProps = {
   countOfPages: number;
   onChange: (page: number) => void;
-}
+};
 
 interface IButtonProps {
   currentPage: number;
@@ -27,10 +28,7 @@ const Button: React.FC<IButtonProps> = ({ page, currentPage, onClick }) => {
 };
 
 const Pagination: React.FC<TypePaginationProps> = (props) => {
-  const {
-    countOfPages = 0,
-    onChange = () => {},
-  } = props;
+  const { countOfPages = 0, onChange = () => {} } = props;
   const [currentPage, setCurrentPage] = useState<number>(0);
   console.log('Pagination:', currentPage, countOfPages);
 
@@ -39,11 +37,14 @@ const Pagination: React.FC<TypePaginationProps> = (props) => {
   const handleChange = (page: number) => {
     setCurrentPage(page);
     onChange(page);
-  }
+  };
 
   return (
     <div className={s.pagination}>
-      {countOfPages > 1 && countOfPages <= 5 && currentPage < 4 && arrayOfPages.map((item: number, ii: number) => {
+      {countOfPages > 1 &&
+        countOfPages <= 5 &&
+        currentPage < 4 &&
+        arrayOfPages.map((item: number, ii: number) => {
         /*eslint-disable*/
         return (
           <Button
@@ -53,9 +54,9 @@ const Pagination: React.FC<TypePaginationProps> = (props) => {
             page={ii}
           />
         )
-        /*eslint-enable*/
-      })}
-      {countOfPages > 5 && currentPage < 4 &&
+        /* eslint-enable */
+        })}
+      {countOfPages > 5 && currentPage < 4 && (
         <>
           <Button onClick={handleChange} currentPage={currentPage} page={0} />
           <Button onClick={handleChange} currentPage={currentPage} page={1} />
@@ -63,17 +64,17 @@ const Pagination: React.FC<TypePaginationProps> = (props) => {
           <Button onClick={handleChange} currentPage={currentPage} page={3} />
           <Button onClick={handleChange} currentPage={currentPage} page={4} />
         </>
-      }
-      {countOfPages > 5 && currentPage >= 4 &&
+      )}
+      {countOfPages > 5 && currentPage >= 4 && (
         <>
           <Button onClick={handleChange} currentPage={currentPage} page={0} />
           <Button onClick={handleChange} currentPage={currentPage} page={currentPage - 1} />
           <Button onClick={handleChange} currentPage={currentPage} page={currentPage} />
-          {currentPage + 1 < countOfPages &&
+          {currentPage + 1 < countOfPages && (
             <Button onClick={handleChange} currentPage={currentPage} page={currentPage + 1} />
-          }
+          )}
         </>
-      }
+      )}
     </div>
   );
 };

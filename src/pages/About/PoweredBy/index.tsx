@@ -1,7 +1,10 @@
-import s from './PoweredBy.module.scss';
+import React from 'react';
+
 import binanceLogo from '../../../assets/img/sections/about-page/binance-logo.svg';
 import ethereumLogo from '../../../assets/img/sections/about-page/ethereum-logo.svg';
 import polygonLogo from '../../../assets/img/sections/about-page/polygon-logo.svg';
+
+import s from './PoweredBy.module.scss';
 
 const PoweredBy: React.FC = () => {
   const logos = [binanceLogo, ethereumLogo, polygonLogo];

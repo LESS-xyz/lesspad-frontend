@@ -1,6 +1,8 @@
-import s from './Search.module.scss';
+import React, { useState } from 'react';
+
 import searcgImg from '../../assets/img/icons/search.svg';
-import { useState } from 'react';
+
+import s from './Search.module.scss';
 
 interface IInputProps {
   onChange: (str: string) => void;

@@ -16,17 +16,7 @@ interface IButtonProps {
 }
 
 const Button: React.FC<IButtonProps> = (props) => {
-  const {
-    children,
-    filled,
-    onClick,
-    disabled = false,
-    marginRight,
-    big,
-    long,
-    to,
-    href,
-  } = props;
+  const { children, filled, onClick, disabled = false, marginRight, big, long, to, href } = props;
   const handleClick = () => {
     if (disabled) return;
     if (!onClick) return;

@@ -1,8 +1,10 @@
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import s from './PopUp.module.scss';
-import ethLogo from '../../../assets/img/icons/eth-logo.svg';
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
+
 import bnbLogo from '../../../assets/img/icons/bnb-logo.svg';
+import ethLogo from '../../../assets/img/icons/eth-logo.svg';
 import maticLogo from '../../../assets/img/icons/matic-logo.svg';
+
+import s from './PopUp.module.scss';
 
 interface IPopUpProps {
   setCurrentCrypto?: (a: string) => void;

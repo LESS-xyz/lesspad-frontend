@@ -166,7 +166,7 @@ export default class Web3Service {
       console.error('Web3ProviderService subscribe:', e);
       return false;
     }
-  }
+  };
 
   public clearSubscriptions = async () => {
     try {
@@ -174,5 +174,5 @@ export default class Web3Service {
     } catch (e) {
       console.error('Web3ProviderService clearSubscriptions:', e);
     }
-  }
+  };
 }

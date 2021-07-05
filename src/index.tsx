@@ -1,13 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-
-import { App } from './App';
-import { stylizeConsole } from './utils/console';
-import config from './config';
 import { Provider } from 'react-redux';
-import store from './redux/store';
-import Web3Connector from './contexts/Web3Connector';
+
 import ContractsContext from './contexts/ContractsContext';
+import Web3Connector from './contexts/Web3Connector';
+import store from './redux/store';
+import { stylizeConsole } from './utils/console';
+import { App } from './App';
+import config from './config';
+
 import './styles/index.scss';
 
 stylizeConsole({ showConsoleLog: config.SHOW_CONSOLE_LOGS });

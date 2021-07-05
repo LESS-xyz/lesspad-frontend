@@ -1,10 +1,13 @@
-import s from './FiveTiers.module.scss';
-import Button from '../../../components/Button/index';
+import React from 'react';
+
 import tier1 from '../../../assets/img/sections/about-page/tier-1.svg';
 import tier2 from '../../../assets/img/sections/about-page/tier-2.svg';
 import tier3 from '../../../assets/img/sections/about-page/tier-3.svg';
 import tier4 from '../../../assets/img/sections/about-page/tier-4.svg';
 import tier5 from '../../../assets/img/sections/about-page/tier-5.svg';
+import Button from '../../../components/Button/index';
+
+import s from './FiveTiers.module.scss';
 
 interface ITierCardProps {
   img: string;

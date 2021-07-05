@@ -1,16 +1,19 @@
-import s from './Header.module.scss';
-import logo from '../../assets/img/icons/logo.svg';
-import arrow from '../../assets/img/icons/arrow-down-gradient.svg';
-import Button from '../Button/index';
-import PopUp from './PopUp';
-import { useState } from 'react';
-import ethLogo from '../../assets/img/icons/eth-logo-colorful.svg';
-import bnbLogo from '../../assets/img/icons/bnb-logo-colorful.svg';
-import maticLogo from '../../assets/img/icons/matic-logo.svg';
-import { NavLink } from 'react-router-dom';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { walletActions, userActions } from '../../redux/actions';
+import { NavLink } from 'react-router-dom';
+
+import arrow from '../../assets/img/icons/arrow-down-gradient.svg';
+import bnbLogo from '../../assets/img/icons/bnb-logo-colorful.svg';
+import ethLogo from '../../assets/img/icons/eth-logo-colorful.svg';
+import logo from '../../assets/img/icons/logo.svg';
+import maticLogo from '../../assets/img/icons/matic-logo.svg';
+import { userActions, walletActions } from '../../redux/actions';
 import { setToStorage } from '../../utils/localStorage';
+import Button from '../Button/index';
+
+import PopUp from './PopUp';
+
+import s from './Header.module.scss';
 
 const cryptoLogos = new Map();
 cryptoLogos.set('Ethereum', ethLogo);

@@ -1,4 +1,5 @@
 import Web3 from 'web3';
+
 import config from '../../config';
 // import ERC20Abi from "../../data/ERC20Abi";
 //
@@ -21,8 +22,11 @@ type TypeVoteProps = {
 
 export default class ContractPresalePublicService {
   public web3: any;
+
   public contractAddress: any;
+
   public contractAbi: any;
+
   public contractName: any;
 
   constructor(props: TypeConstructorProps) {
@@ -58,15 +62,13 @@ export default class ContractPresalePublicService {
       // const softCapFormatted = +new BN(softCap).div(new BN(10).pow(decimals));
       // const hardCapFormatted = +new BN(hardCap).div(new BN(10).pow(decimals));
       // result
-      const {
-        linkTwitter
-      } = stringInfo;
+      const { linkTwitter } = stringInfo;
       const info = {
         // saleTitle: this.web3.utils.hexToString(saleTitle),
         // softCap: softCapFormatted,
         // hardCap: hardCapFormatted,
         linkTwitter: this.web3.utils.hexToString(linkTwitter),
-      }
+      };
       return info;
     } catch (e) {
       console.error('ContractPresalePublicService getInfo:', e);

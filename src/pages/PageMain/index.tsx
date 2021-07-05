@@ -1,9 +1,13 @@
-import s from './PageMain.module.scss';
-import TopBlock from './TopBlock';
-import FeaturedProject from './FeaturedProjects';
+import React from 'react';
+
+import logo1 from '../../assets/img/sections/alumni-logos/logo-1.svg';
+
 import PoolsinVoting from './PoolsinVoting/index';
 import FeaturedAlumni from './FeaturedAlumni';
-import logo1 from '../../assets/img/sections/alumni-logos/logo-1.svg';
+import FeaturedProject from './FeaturedProjects';
+import TopBlock from './TopBlock';
+
+import s from './PageMain.module.scss';
 
 const alumniLogos = [logo1, logo1, logo1, logo1, logo1, logo1, logo1, logo1];
 

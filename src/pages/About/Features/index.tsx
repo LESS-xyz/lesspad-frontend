@@ -1,7 +1,10 @@
-import s from './Features.module.scss';
+import React from 'react';
+
 import vector1 from '../../../assets/img/sections/about-page/vector-1.svg';
 import vector2 from '../../../assets/img/sections/about-page/vector-2.svg';
 import vector3 from '../../../assets/img/sections/about-page/vector-3.svg';
+
+import s from './Features.module.scss';
 
 const Features: React.FC = () => {
   return (

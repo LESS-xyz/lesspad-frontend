@@ -1,4 +1,5 @@
 import Web3 from 'web3';
+
 import config from '../../config';
 
 type TypeConstructorProps = {
@@ -13,8 +14,11 @@ type TypeStakeProps = {
 
 export default class ContractLessToken {
   public web3: any;
+
   public contractAddress: string;
+
   public contractAbi: any;
+
   public contractName: string;
 
   constructor(props: TypeConstructorProps) {

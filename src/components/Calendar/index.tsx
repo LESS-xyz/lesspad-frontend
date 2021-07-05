@@ -1,6 +1,8 @@
-import s from './Calendar.module.scss';
-import { useState } from 'react';
+import React, { useState } from 'react';
+
 import arrow from '../../assets/img/icons/arrow-calendar.svg';
+
+import s from './Calendar.module.scss';
 
 interface ICalendarProps {
   onChange: (date: number) => void;

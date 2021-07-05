@@ -1,3 +1,5 @@
+import React from 'react';
+
 import s from './FeaturedAlumni.module.scss';
 
 const LogoBlock: React.FC<{ img: string }> = ({ img }) => {

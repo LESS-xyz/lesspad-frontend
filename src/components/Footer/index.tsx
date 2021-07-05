@@ -1,9 +1,12 @@
-import s from './Footer.module.scss';
-import logo from '../../assets/img/icons/logo-small.svg';
-import twitter from '../../assets/img/icons/twitter.svg';
+import React from 'react';
+
 import github from '../../assets/img/icons/github.svg';
+import logo from '../../assets/img/icons/logo-small.svg';
 import medium from '../../assets/img/icons/medium.svg';
 import telegram from '../../assets/img/icons/telegram.svg';
+import twitter from '../../assets/img/icons/twitter.svg';
+
+import s from './Footer.module.scss';
 
 const Footer: React.FC = () => {
   return (

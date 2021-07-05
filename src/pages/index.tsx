@@ -5,4 +5,4 @@ export { default as AboutPage } from './About';
 export { default as CreatePoolPage } from './PageCreatePool';
 export { default as Page404 } from './Page404';
 export { default as StakingPage } from './PageStaking';
-export { default as ProjectPage} from './PagePool';
+export { default as ProjectPage } from './PagePool';
