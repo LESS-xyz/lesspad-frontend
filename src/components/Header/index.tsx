@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { NavLink } from 'react-router-dom';
 
 import arrow from '../../assets/img/icons/arrow-down-gradient.svg';
-import bnbLogo from '../../assets/img/icons/bnb-logo-colorful.svg';
-import ethLogo from '../../assets/img/icons/eth-logo-colorful.svg';
+import bnbLogo from '../../assets/img/icons/bnb-logo.svg';
+import ethLogo from '../../assets/img/icons/eth-logo.svg';
 import logo from '../../assets/img/icons/logo.svg';
 import maticLogo from '../../assets/img/icons/matic-logo.svg';
 import { userActions, walletActions } from '../../redux/actions';
@@ -25,6 +25,8 @@ const Header: React.FC = () => {
 
   const { address: userAddress } = useSelector(({ user }: any) => user);
   const { chainType } = useSelector(({ wallet }: any) => wallet);
+
+  const refButtonPopup = React.useRef<HTMLDivElement>(null);
 
   const dispatch = useDispatch();
   const setWalletType = (props: string) => dispatch(walletActions.setWalletType(props));
@@ -53,7 +55,6 @@ const Header: React.FC = () => {
     <header className={s.header}>
       <div className={s.container}>
         <div className={s.inner}>
-          {isPopUpOpen && <PopUp setIsPopUpOpen={setIsPopUpOpen} setCurrentCrypto={setChainType} />}
           <div className={s.left}>
             <NavLink to="/" className={s.logo}>
               <div className={s.logo_img}>
@@ -111,7 +112,7 @@ const Header: React.FC = () => {
                 </Button>
               )}
               <Button to="/create-pool">Create Pool</Button>
-              <Button marginRight={0} onClick={() => setIsPopUpOpen(!isPopUpOpen)}>
+              <Button marginRight={0} onClick={() => setIsPopUpOpen(true)}>
                 <div className={s.button_body}>
                   <div className={s.crypto_logo}>
                     <img src={cryptoLogos.get(chainType)} alt="crypto-logo" />
@@ -124,6 +125,13 @@ const Header: React.FC = () => {
               </Button>
             </div>
           </div>
+          {isPopUpOpen && (
+            <PopUp
+              setIsPopUpOpen={setIsPopUpOpen}
+              setCurrentCrypto={setChainType}
+              refButton={refButtonPopup}
+            />
+          )}
         </div>
       </div>
     </header>

@@ -12,7 +12,7 @@ const TopBlock: React.FC = () => {
           <div className={s.inner}>
             <div className={s.block}>
               <div className={s.title}>
-                Multi-Chain Decenetralized <br /> Fundraising Capital
+                Multi-Chain Decentralized <br /> Fundraising Capital
               </div>
               <div className={s.subtitle}>
                 Filter through the messy landscape where rugs overshadow the great potential of a

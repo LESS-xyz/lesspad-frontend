@@ -9,12 +9,15 @@ import s from './PopUp.module.scss';
 interface IPopUpProps {
   setCurrentCrypto?: (a: string) => void;
   setIsPopUpOpen: Dispatch<SetStateAction<boolean>>;
+  refButton?: any;
 }
 
 const PopUp: React.FC<IPopUpProps> = (props) => {
-  const { setCurrentCrypto = () => {}, setIsPopUpOpen } = props;
+  const { setCurrentCrypto = () => {}, setIsPopUpOpen, refButton } = props;
 
   const [isOpen, setIsOpen] = useState(false);
+
+  const refPopup = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setIsOpen(true);
@@ -32,8 +35,22 @@ const PopUp: React.FC<IPopUpProps> = (props) => {
     setIsPopUpOpen(false);
   };
 
+  const handleClickOutside = (e: any) => {
+    if (!refPopup?.current?.contains(e.target) && !refButton?.current?.contains(e.target)) {
+      setIsPopUpOpen(false);
+    }
+  };
+
+  React.useEffect(() => {
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
-    <div className={`${s.popup} ${isOpen && s.active}`}>
+    <div className={`${s.popup} ${isOpen && s.active}`} ref={refPopup}>
       <div className={s.inner}>
         {options.map((option, index) => (
           <div

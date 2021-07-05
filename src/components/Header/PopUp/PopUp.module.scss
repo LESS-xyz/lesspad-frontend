@@ -1,4 +1,6 @@
 @import '../../../styles/mixins/gradient-text.scss';
+@import '../../../styles/mixins/flex';
+
 .popup {
   position: absolute;
   right: 0;
@@ -22,8 +24,7 @@
   padding: 10px 0;
 }
 .option {
-  display: flex;
-  align-items: center;
+  @include flex(row, center);
   position: relative;
   cursor: pointer;
   padding: 10px 20px;
