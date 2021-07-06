@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useSelector } from 'react-redux';
+import useMedia from 'use-media';
 import { v4 as uuid } from 'uuid';
 
 import logo1 from '../../assets/img/sections/token-card/logo-1.png';
@@ -60,6 +61,8 @@ const AllPoolsPage: React.FC = () => {
 
   const { pools } = useSelector(({ pool }: any) => pool);
 
+  const isMobile = useMedia({ maxWidth: 768 });
+
   const itemsOnPage = 6;
   let countOfPages = Math.floor(+(pools.length / itemsOnPage));
   const moduloOfPages = pools.length % itemsOnPage;
@@ -87,6 +90,7 @@ Fundraising Capital"
           <div className={s.control_panel}>
             <div className={s.input}>
               <Search
+                big={isMobile}
                 value={search}
                 onChange={(str: string) => setSearch(str)}
                 placeholder="Search by Name, Token contract address, Token description"

@@ -1,6 +1,7 @@
 @import '../../styles/mixins/container.scss';
 @import '../../styles/mixins/flex.scss';
 @import '../../styles/mixins/media.scss';
+@import '../../styles/mixins/grid';
 
 .container {
   @include container;
@@ -20,23 +21,45 @@
 }
 
 .cards {
+  @include grid(1fr 1fr 1fr, 1fr, 30px);
   width: 100%;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-gap: 30px;
+
+  @include b('tablet') {
+    @include grid(1fr 1fr, 1fr, 30px);
+  }
+
+  @include b('mobile') {
+    @include grid(1fr, 1fr, 30px);
+  }
 }
+
 .control_panel {
   @include flex(row, center, space-between);
   margin-bottom: 50px;
+
+  @include b('mobile') {
+    @include flex(column, center, normal, nowrap);
+    width: 100%;
+  }
 }
+
 .input {
   width: 72%;
-  height: 42px;
+
+  @include b('mobile') {
+    width: 100%;
+    margin: 10px 0 !important;
+  }
 }
 
 .selector {
   width: 25%;
   height: 42px;
+
+  @include b('mobile') {
+    width: 100%;
+    margin: 10px 0;
+  }
 }
 
 .pagination {
