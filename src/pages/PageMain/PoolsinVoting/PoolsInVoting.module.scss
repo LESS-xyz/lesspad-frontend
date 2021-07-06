@@ -1,10 +1,17 @@
 @import '../../../styles/mixins/container.scss';
 @import '../../../styles/mixins/flex.scss';
+@import '../../../styles/mixins/grid';
+@import '../../../styles/mixins/media';
 
 .block {
   padding-top: 90px;
   padding-bottom: 110px;
   background-color: var(--pools-in-voting-background);
+
+  @include b('mobile') {
+    padding-top: 40px;
+    padding-bottom: 20px;
+  }
 }
 
 .container {
@@ -16,12 +23,23 @@
   text-align: center;
   color: var(--grey);
   margin-bottom: 70px;
+
+  @include b('mobile') {
+    font-size: 26px;
+    line-height: 33px;
+    margin-bottom: 20px;
+  }
 }
 
 .cards {
+  @include grid(1fr 1fr 1fr, 1fr, 30px);
   width: 100%;
-  display: grid;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-gap: 30px;
+
+  @include b('tablet') {
+    @include grid(1fr 1fr, 1fr, 30px);
+  }
+
+  @include b('mobile') {
+    @include grid(1fr, 1fr, 30px);
+  }
 }

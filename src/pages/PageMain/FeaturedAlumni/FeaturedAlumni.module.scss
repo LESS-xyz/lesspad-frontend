@@ -1,4 +1,6 @@
 @import '../../../styles/mixins/container.scss';
+@import '../../../styles/mixins/grid';
+@import '../../../styles/mixins/media';
 
 .block {
   padding-top: 90px;
@@ -13,6 +15,12 @@
   text-align: center;
   color: var(--grey);
   margin-bottom: 70px;
+
+  @include b('mobile') {
+    font-size: 26px;
+    line-height: 33px;
+    margin-bottom: 40px;
+  }
 }
 
 .logos {

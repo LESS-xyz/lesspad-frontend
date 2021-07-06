@@ -39,6 +39,7 @@ $height-header-mobile: 52px;
   width: 100%;
   top: 22px;
   left: 0;
+  z-index: 999;
 
   @include b('tablet') {
     position: absolute;
