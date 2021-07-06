@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import useMedia from 'use-media';
 
 import thumbUpGreen from '../../../assets/img/icons/thumb-up-green.svg';
 import thumbUpRed from '../../../assets/img/icons/thumb-up-red.svg';
@@ -49,6 +50,8 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
   const toggleModal = React.useCallback((params) => dispatch(modalActions.toggleModal(params)), [
     dispatch,
   ]);
+
+  const isMobile = useMedia({ maxWidth: 768 });
 
   const isEthereum = chainType === 'Ethereum';
   const isBinanceSmartChain = chainType === 'Binance-Smart-Chain';
@@ -104,50 +107,74 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
 
   return (
     <div className={`${s.row} ${index % 2 === 1 && s.filled}`}>
-      <div className={`${s.row_cell} ${s.img}`}>
-        <img src={logo} alt="logo" />
+      {isMobile ? (
+        <div className={`${s.row_cell} ${s.title}`}>
+          <div className={`${s.img}`}>
+            <img src={logo} alt="logo" />
+          </div>
+          <div className={`${s.name}`}>
+            <div>{saleTitle || 'Name'}</div>
+          </div>
+        </div>
+      ) : (
+        <>
+          <div className={`${s.row_cell} ${s.img}`}>
+            <img src={logo} alt="logo" />
+          </div>
+          <div className={`${s.row_cell} ${s.name}`}>
+            <div>{saleTitle || 'Name'}</div>
+          </div>
+        </>
+      )}
+      <div className={`${s.row_cell} ${s.price}`}>
+        {isMobile && <div className={s.row_header}>Price (ETH)</div>}
+        {listingPrice || '0.000'}
       </div>
-      <div className={`${s.row_cell} ${s.name}`}>{saleTitle}</div>
-      <div className={`${s.row_cell} ${s.price}`}>{listingPrice}</div>
       <div className={s.row_cell}>
+        {isMobile && <div className={s.row_header}>Soft cap</div>}
         {softCap} {currency}
       </div>
       <div className={s.row_cell}>
+        {isMobile && <div className={s.row_header}>Hard cap</div>}
         {hardCap} {currency}
       </div>
-      <div className={s.row_cell}>
+      <div className={`${s.row_cell} ${s.opensIn}`}>
+        {isMobile && <div className={s.row_header}>Opens in</div>}
         {daysBeforeOpen} {daysBeforeOpen && daysBeforeOpen > 1 ? 'days' : 'day'}
       </div>
       <div className={`${s.row_cell} ${s.likes}`}>
+        {isMobile && <div className={s.row_header}>Voting</div>}
         <div className={s.likes}>
-          <div
-            className={s.likes_img}
-            role="button"
-            tabIndex={0}
-            onKeyDown={() => {}}
-            onClick={() => vote(true)}
-          >
-            <img src={thumbUpGreen} alt="thumbUpGreen" />
+          <div className={s.like}>
+            <div
+              className={s.likes_img}
+              role="button"
+              tabIndex={0}
+              onKeyDown={() => {}}
+              onClick={() => vote(true)}
+            >
+              <img src={thumbUpGreen} alt="thumbUpGreen" />
+            </div>
+            <div className={s.likes_data}>
+              {likesPercent && (likesPercent < 10 ? +`0${likesPercent}` : likesPercent).toFixed(2)}%
+            </div>
           </div>
-          <div className={s.likes_data}>
-            {likesPercent && (likesPercent < 10 ? +`0${likesPercent}` : likesPercent).toFixed(2)}%
-          </div>
-        </div>
-        <div className={s.likes}>
-          <div
-            className={s.likes_img}
-            role="button"
-            tabIndex={0}
-            onKeyDown={() => {}}
-            onClick={() => vote(false)}
-          >
-            <img src={thumbUpRed} alt="thumbUpRed" />
-          </div>
-          <div className={s.likes_data}>
-            {likesPercent &&
-              dislikesPercent &&
-              (likesPercent < 10 ? +`0${likesPercent}` : dislikesPercent).toFixed(2)}
-            %
+          <div className={s.like}>
+            <div
+              className={s.likes_img}
+              role="button"
+              tabIndex={0}
+              onKeyDown={() => {}}
+              onClick={() => vote(false)}
+            >
+              <img src={thumbUpRed} alt="thumbUpRed" />
+            </div>
+            <div className={s.likes_data}>
+              {likesPercent &&
+                dislikesPercent &&
+                (likesPercent < 10 ? +`0${likesPercent}` : dislikesPercent).toFixed(2)}
+              %
+            </div>
           </div>
         </div>
       </div>
@@ -169,6 +196,8 @@ const Table: React.FC<ITableProps> = ({ data }) => {
   let countOfPages = +(data.length / itemsOnPage).toFixed();
   const moduloOfPages = data.length % itemsOnPage;
   if (moduloOfPages > 0) countOfPages += 1;
+
+  const isMobile = useMedia({ maxWidth: 768 });
 
   const isEthereum = chainType === 'Ethereum';
   const isBinanceSmartChain = chainType === 'Binance-Smart-Chain';
@@ -200,15 +229,17 @@ const Table: React.FC<ITableProps> = ({ data }) => {
   return (
     <div className={s.table}>
       <div className={s.inner}>
-        <div className={s.table_header}>
-          <div className={s.cell} />
-          <div className={`${s.name} ${s.cell}`}>Name</div>
-          <div className={s.cell}>Price ({currency})</div>
-          <div className={s.cell}>Softcap</div>
-          <div className={s.cell}>Hardcap</div>
-          <div className={s.cell}>Opens in</div>
-          <div className={`${s.voting} ${s.cell}`}>Voting</div>
-        </div>
+        {!isMobile && (
+          <div className={s.table_header}>
+            <div className={s.cell} />
+            <div className={`${s.name} ${s.cell}`}>Name</div>
+            <div className={s.cell}>Price ({currency})</div>
+            <div className={s.cell}>Softcap</div>
+            <div className={s.cell}>Hardcap</div>
+            <div className={s.cell}>Opens in</div>
+            <div className={`${s.voting} ${s.cell}`}>Voting</div>
+          </div>
+        )}
         <div className={s.table_body}>
           {dataFiltered.map((address, index) => {
             return (

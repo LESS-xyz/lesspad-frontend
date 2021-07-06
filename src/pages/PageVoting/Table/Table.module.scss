@@ -1,5 +1,7 @@
 @import '../../../styles/mixins/gradient-text.scss';
 @import '../../../styles/mixins/flex.scss';
+@import '../../../styles/mixins/grid';
+@import '../../../styles/mixins/media';
 
 .table {
   margin-bottom: 25px;
@@ -7,6 +9,10 @@
 .inner {
   background: var(--table-background);
   padding-top: 20px;
+
+  @include b('mobile') {
+    padding-top: 0;
+  }
 }
 
 .table_header {
@@ -25,12 +31,15 @@
   text-align: center;
 }
 
-// row
 .row {
-  display: grid;
-  grid-template-columns: 0.65fr 1fr 1fr 1fr 1fr 1fr 2fr;
-  grid-column-gap: 25px;
+  @include grid(0.65fr 1fr 1fr 1fr 1fr 1fr 2fr, 1fr, 25px);
   border-radius: 10px;
+
+  @include b('mobile') {
+    @include grid(1fr 1fr, 68px 61px 61px 106px, 0);
+    margin: 5px 0;
+  }
+
   &.filled {
     background-color: var(--table-row-filled-background);
   }
@@ -40,8 +49,24 @@
   font-size: 16px;
   font-weight: 400;
   padding: 17px 0;
-  display: flex;
-  align-items: center;
+  @include flex(row, center);
+
+  > * {
+    justify-self: center;
+  }
+
+  @include b('mobile') {
+    @include flex(column, normal, center, nowrap);
+    padding: 10px 17px;
+  }
+
+  &.title {
+    @include b('mobile') {
+      @include flex(row, center);
+      grid-column: 1 / 3;
+      grid-row: 1;
+    }
+  }
 
   &.img {
     padding-left: 20px;
@@ -52,21 +77,66 @@
       border-radius: 50%;
     }
   }
+
   &.price {
     font-weight: 700;
     @include gradient-text;
   }
+
+  &.opensIn {
+    @include b('mobile') {
+      grid-column: 2;
+      grid-row: 2;
+    }
+  }
+
   &.likes {
     @include flex(row, center, space-around);
+
+    @include b('mobile') {
+      @include flex(column, center, center, nowrap);
+      background-color: var(--table-row-filled-section);
+      border-radius: 10px;
+      grid-column: 1 / 3;
+      grid-row: 4;
+      margin: 10px;
+    }
   }
 }
 
+.name {
+  @include b('mobile') {
+    margin: 0 0 0 25px;
+  }
+}
+
+.row_header {
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 25px;
+  color: var(--blue);
+}
+
 .likes {
+  @include flex(row, center);
+  margin: 10px;
+  @include b('mobile') {
+    margin: 0;
+  }
+}
+
+.like {
   @include flex(row, center);
   &_img {
     height: 24px;
     margin-right: 10px;
     cursor: pointer;
+  }
+
+  @include b('mobile') {
+    background-color: var(--table-row-filled-section);
+    border-radius: 10px;
+    margin: 10px;
   }
 }
 

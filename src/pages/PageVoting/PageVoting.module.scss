@@ -1,17 +1,19 @@
 @import '../../styles/mixins/flex.scss';
 @import '../../styles/mixins/container.scss';
+@import '../../styles/mixins/media';
 
 .page {
   padding-top: 160px;
   min-height: 100vh;
   background: var(--gradient-background);
+
+  @include b('mobile') {
+    padding-top: 120px;
+  }
 }
 
 .container {
   @include container;
-}
-
-.inner {
 }
 
 .title {
@@ -20,6 +22,12 @@
   text-align: center;
   color: var(--grey);
   margin-bottom: 60px;
+
+  @include b('mobile') {
+    font-size: 26px;
+    line-height: 33px;
+    margin-bottom: 40px;
+  }
 }
 
 .input {

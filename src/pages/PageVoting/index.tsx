@@ -7,7 +7,7 @@ import Search from '../../components/Search/index';
 
 import Table from './Table/index';
 
-import s from './PagePresale.module.scss';
+import s from './PageVoting.module.scss';
 
 // const tableDataExample = [
 //   {
