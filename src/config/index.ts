@@ -26,6 +26,7 @@ export default {
     policy: '',
   },
   apis: {
+    'backend': 'https://lesspad.rocknblock.io/api/v1',
     '0x': IS_PRODUCTION
       ? 'https://api.0x.org'
       : IS_TESTING_ON_ROPSTEN

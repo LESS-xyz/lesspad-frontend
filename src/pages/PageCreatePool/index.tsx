@@ -93,6 +93,15 @@ const CreatePoolPage: React.FC = () => {
     return undefined;
   };
 
+  const signMessage = async () => {
+    try {
+      // const result = await web3.signMessage({ userAddress, message: 'Hello' });
+      // console.log('PageCreatePool signMessage result:', result);
+    } catch (e) {
+      console.error('PageCreatePool signMessage result:', e);
+    }
+  };
+
   const validateForm = () => {
     if (!saleTitle) return false;
     if (!tokenAddress) return false;
@@ -299,6 +308,12 @@ const CreatePoolPage: React.FC = () => {
       console.error(e);
     }
   };
+
+  useEffect(() => {
+    if (!userAddress) return;
+    signMessage();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userAddress]);
 
   useEffect(() => {
     if (!ContractLessToken) return;

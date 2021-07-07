@@ -22,6 +22,11 @@ type TypeApprove = {
   contractAbi: any;
 };
 
+type TypeSignMessageProps = {
+  userAddress: string;
+  message: string;
+};
+
 export default class Web3Service {
   public provider: any;
 
@@ -173,6 +178,43 @@ export default class Web3Service {
       await this.web3Provider.eth.clearSubscriptions();
     } catch (e) {
       console.error('Web3ProviderService clearSubscriptions:', e);
+    }
+  };
+
+  // public signMessage = async ({ userAddress, message }: TypeSignMessageProps) => {
+  //   try {
+  //     await this.web3Provider.eth.sign(message, userAddress);
+  //   } catch (e) {
+  //     console.error('Web3ProviderService sign:', e);
+  //   }
+  // };
+
+  public signMessage = async ({ userAddress, message }: TypeSignMessageProps) => {
+    try {
+      const msgParams = [
+        {
+          type: 'string', // Any valid solidity type
+          name: 'Message', // Any string label you want
+          value: message, // The value to sign
+        },
+      ];
+      return new Promise((resolve: any, reject: any) => {
+        this.web3Provider.currentProvider.send(
+          {
+            method: 'eth_signTypedData',
+            params: [msgParams, userAddress],
+            from: userAddress,
+          },
+          (err: Error | null, result: any) => {
+            if (err) reject(err);
+            if (result.error) reject(result.error.message);
+            resolve(result.result);
+          },
+        );
+      });
+    } catch (e) {
+      console.error('Web3ProviderService sign:', e);
+      return null;
     }
   };
 }

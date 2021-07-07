@@ -126,6 +126,7 @@ module.exports = {
     'no-nested-ternary': 'off',
     'no-continue': 'warn',
     'no-await-in-loop': 'warn',
+    'camelcase': 'warn',
     'spaced-comment': 'off',
   },
   settings: {
