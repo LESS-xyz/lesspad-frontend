@@ -190,7 +190,7 @@ const Pool: React.FC = () => {
         <div className="description">
           <img className="icon-logo" src={Logo} alt="Logo" />
           <div className="description-info">
-            <div className="description-info-header">XOLO Finance</div>
+            <div className="description-info-header">{name}</div>
             <div className="description-info-text">
               Autonomous interest rate protocol for on-chain lending and borrowing
             </div>

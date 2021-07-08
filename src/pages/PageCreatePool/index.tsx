@@ -11,15 +11,17 @@ import config from '../../config';
 import { useContractsContext } from '../../contexts/ContractsContext';
 import { useWeb3ConnectorContext } from '../../contexts/Web3Connector';
 import { modalActions } from '../../redux/actions';
+import { BackendService } from '../../services/backend';
 
 import s from './CreatePool.module.scss';
 
+const Backend = new BackendService();
 const { BN }: any = Web3.utils;
 
 const CreatePoolPage: React.FC = () => {
   const { web3 } = useWeb3ConnectorContext();
   const {
-    ContractPresaleFactory,
+    // ContractPresaleFactory,
     ContractLessToken,
     ContractStaking,
     ContractLessLibrary,
@@ -235,15 +237,15 @@ const CreatePoolPage: React.FC = () => {
     }
   };
 
-  const subscribeEvent = async (type: string) => {
-    try {
-      await web3.subscribe(type, console.log);
-      return true;
-    } catch (e) {
-      console.error('CreatePool subscribeEvent:', e);
-      return false;
-    }
-  };
+  // const subscribeEvent = async (type: string) => {
+  //   try {
+  //     await web3.subscribe(type, console.log);
+  //     return true;
+  //   } catch (e) {
+  //     console.error('CreatePool subscribeEvent:', e);
+  //     return false;
+  //   }
+  // };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     try {
@@ -295,17 +297,32 @@ const CreatePoolPage: React.FC = () => {
       setIsFormSubmitted(true);
       const resultApprove = await approve();
       if (!resultApprove) return;
-      const resultCreatePresalePublic = await ContractPresaleFactory.createPresalePublic({
-        userAddress,
-        presaleInfo,
-        presalePancakeSwapInfo,
-        presaleStringInfo,
-      });
-      console.log('CreatePool handleSubmit', resultCreatePresalePublic);
-      if (resultCreatePresalePublic) await subscribeEvent('PublicPresaleCreated');
+      // const resultCreatePresalePublic = await ContractPresaleFactory.createPresalePublic({
+      //   userAddress,
+      //   presaleInfo,
+      //   presalePancakeSwapInfo,
+      //   presaleStringInfo,
+      // });
+      // console.log('CreatePool handleSubmit', resultCreatePresalePublic);
+      // if (resultCreatePresalePublic) await subscribeEvent('PublicPresaleCreated');
+      // login to backend
+      const resultGetMetamaskMessage = await Backend.getMetamaskMessage();
+      console.log('PageCreatePool resultGetMetamaskMessage:', resultGetMetamaskMessage);
+      if (resultGetMetamaskMessage.data) {
+        const msg = resultGetMetamaskMessage.data;
+        const signedMsg = await web3.signMessage({ userAddress, message: msg });
+        console.log('PageCreatePool signedMsg:', signedMsg);
+        if (signedMsg) {
+          const resultMetamaskLogin = await Backend.metamaskLogin({
+            address: userAddress,
+            msg,
+            signedMsg,
+          });
+          console.log('PageCreatePool resultMetamaskLogin:', resultMetamaskLogin);
+        }
+      }
     } catch (e) {
-      console.error('CreatePool handleSubmit:', e);
-      console.error(e);
+      console.error('PageCreatePool handleSubmit:', e);
     }
   };
 
