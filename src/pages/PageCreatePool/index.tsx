@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useDispatch, useSelector } from 'react-redux';
+import dayjs from 'dayjs';
 import Web3 from 'web3';
 
 import calendarImg from '../../assets/img/icons/calendar.svg';
@@ -396,10 +397,10 @@ const CreatePoolPage: React.FC = () => {
               </div>
               {/* date pickers */}
               <div className={s.datePicker}>
-                <div className={s.datePicker_title}>Open voting date</div>
+                <div className={s.datePicker_title}>Open voting Time</div>
                 <div className={s.datePicker_inner}>
                   <div className={s.datePicker_value}>
-                    {new Date(openVotingTime)?.toLocaleDateString()}
+                    {dayjs(openVotingTime).format('DD MMM YYYY HH:mm')}
                   </div>
                   <div
                     className={s.datePicker_img}
@@ -415,10 +416,10 @@ const CreatePoolPage: React.FC = () => {
               </div>
               <div className={s.small_inputs}>
                 <div className={s.datePicker}>
-                  <div className={s.datePicker_title}>Open date</div>
+                  <div className={s.datePicker_title}>Open Time</div>
                   <div className={s.datePicker_inner}>
                     <div className={s.datePicker_value}>
-                      {new Date(openTime)?.toLocaleDateString()}
+                      {dayjs(openTime).format('DD MMM YYYY HH:mm')}
                     </div>
                     <div
                       className={s.datePicker_img}
@@ -433,16 +434,16 @@ const CreatePoolPage: React.FC = () => {
                   <div className={s.datePicker_subtitle}>In Your Timezone</div>
                 </div>
                 <div className={s.datePicker}>
-                  <div className={s.datePicker_title}>Close date</div>
+                  <div className={s.datePicker_title}>Close Time</div>
                   <div className={s.datePicker_inner}>
                     <div className={s.datePicker_value}>
-                      {new Date(closeTime)?.toLocaleDateString()}
+                      {dayjs(closeTime).format('DD MMM YYYY HH:mm')}
                     </div>
                     <div
                       className={s.datePicker_img}
                       role="button"
-                      tabIndex={-1}
-                      onClick={() => setIsCalendarLiquidityAllocationTime(true)}
+                      tabIndex={0}
+                      onClick={() => setIsCalendar2(true)}
                       onKeyDown={() => {}}
                     >
                       <img src={calendarImg} alt="calendarImg" />
@@ -493,7 +494,7 @@ const CreatePoolPage: React.FC = () => {
                     <div className={s.datePicker_title}>Liquidity Allocation Time</div>
                     <div className={s.datePicker_inner}>
                       <div className={s.datePicker_value}>
-                        {new Date(liquidityAllocationTime)?.toLocaleDateString()}
+                        {dayjs(liquidityAllocationTime).format('DD MMM YYYY HH:mm')}
                       </div>
                       <div
                         className={s.datePicker_img}
@@ -567,6 +568,7 @@ const CreatePoolPage: React.FC = () => {
           {isCalendarVoting && (
             <div className={s.calender}>
               <Calendar
+                defaultTimestamp={openVotingTime}
                 onChange={(date: number) => setOpenVotingTime(date)}
                 closeCalendar={() => setIsCalendarVoting(false)}
               />
@@ -575,6 +577,7 @@ const CreatePoolPage: React.FC = () => {
           {isCalendar1 && (
             <div className={s.calender}>
               <Calendar
+                defaultTimestamp={openTime}
                 onChange={(date: number) => setOpenTime(date)}
                 closeCalendar={() => setIsCalendar1(false)}
               />
@@ -583,6 +586,7 @@ const CreatePoolPage: React.FC = () => {
           {isCalendar2 && (
             <div className={s.calender}>
               <Calendar
+                defaultTimestamp={closeTime}
                 onChange={(date: number) => setCloseTime(date)}
                 closeCalendar={() => setIsCalendar2(false)}
               />
@@ -591,6 +595,7 @@ const CreatePoolPage: React.FC = () => {
           {isCalendarLiquidityAllocationTime && (
             <div className={s.calender}>
               <Calendar
+                defaultTimestamp={liquidityAllocationTime}
                 onChange={(date: number) => setLiquidityAllocationTime(date)}
                 closeCalendar={() => setIsCalendarLiquidityAllocationTime(false)}
               />
