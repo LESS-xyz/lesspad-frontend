@@ -65,6 +65,12 @@
   }
 }
 
+.active {
+  cursor: pointer;
+  background: var(--gradient);
+  font-weight: 700;
+}
+
 .time {
   @include flex(row, center);
   padding: 20px 0 10px 0;

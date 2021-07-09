@@ -163,18 +163,23 @@ const Calendar: React.FC<ICalendarProps> = (props) => {
         <div className={s.calendar_weekDays__day}>Su</div>
       </div>
       <div className={s.calendar_body} ref={refBody}>
-        {dataForCalendar.map((dayItem) => (
-          <div
-            key={dayItem?.toString() || Math.random()}
-            role="button"
-            tabIndex={0}
-            onClick={() => dayItem !== null && handleDayPick(dayItem)}
-            onKeyDown={() => dayItem !== null && handleDayPick(dayItem)}
-            className={`${s.calendar_body__cell} ${dayItem === null ? s.nullish : ''}`}
-          >
-            {dayItem ? dayItem.getDate() : ''}
-          </div>
-        ))}
+        {dataForCalendar.map((dayItem) => {
+          const isActive = dayjs(dayItem).valueOf() === day;
+          return (
+            <div
+              key={dayItem?.toString() || Math.random()}
+              role="button"
+              tabIndex={0}
+              onClick={() => dayItem !== null && handleDayPick(dayItem)}
+              onKeyDown={() => dayItem !== null && handleDayPick(dayItem)}
+              className={`${s.calendar_body__cell} ${dayItem === null ? s.nullish : ''} ${
+                isActive && s.active
+              }`}
+            >
+              {dayItem ? dayItem.getDate() : ''}
+            </div>
+          );
+        })}
       </div>
       <div className={s.time}>
         <div className={s.hours}>
