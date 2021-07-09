@@ -41,9 +41,7 @@ const Calendar: React.FC<ICalendarProps> = (props) => {
     defaultHours = +dayjs(defaultTimestamp).format('H');
     defaultMinutes = +dayjs(defaultTimestamp).format('m');
   }
-  // defaultHours = +defaultHours * 60 * 60 * 1000;
-  // defaultMinutes = +defaultMinutes * 60 * 1000;
-  console.log('Calendar:', { defaultDay, defaultHours, defaultMinutes });
+  // console.log('Calendar:', { defaultDay, defaultHours, defaultMinutes });
 
   const [currentMonth, setCurrentMonth] = useState(currentDate.getMonth());
   const [currentYear, setCurrentYear] = useState(currentDate.getFullYear());
@@ -92,7 +90,7 @@ const Calendar: React.FC<ICalendarProps> = (props) => {
   };
 
   const handleDayPick = (newDay: Date) => {
-    console.log('handleDayPick:', newDay.getTime(), new Date(newDay).toLocaleString());
+    // console.log('handleDayPick:', newDay.getTime(), new Date(newDay).toLocaleString());
     setDay(newDay.getTime());
   };
 
@@ -102,7 +100,7 @@ const Calendar: React.FC<ICalendarProps> = (props) => {
 
   const handleClickOutside = (e: any) => {
     if (!refCalendar?.current?.contains(e.target) && !refBody?.current?.contains(e.target)) {
-      console.log('handleClickOutside:');
+      // console.log('handleClickOutside:');
       handleClose();
     }
   };
