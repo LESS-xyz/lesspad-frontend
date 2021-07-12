@@ -10,7 +10,9 @@ import Subscribe from '../../../assets/img/icons/subscribe.svg';
 import Subtract from '../../../assets/img/icons/subtract-icon.svg';
 import Telegram from '../../../assets/img/icons/tg-icon.svg';
 import Twitter from '../../../assets/img/icons/twitter-icon.svg';
+import YourTier from '../../../components/YourTier/index';
 import config from '../../../config';
+import ParticipantsTable from '../ParticipantsTable';
 
 import './index.scss';
 
@@ -272,6 +274,7 @@ const Pool: React.FC = () => {
           ))}
         </div>
       </div>
+      <YourTier tier="king" className="tier-block" />
       <div className="container-header">Your Investment</div>
       <div className="box">
         <div className="row last">
@@ -292,6 +295,7 @@ const Pool: React.FC = () => {
           ))}
         </div>
       </div>
+      <ParticipantsTable />
       <div className="container-header">Important Links</div>
       <div className="box">
         <div className="box-links">
@@ -322,7 +326,7 @@ const Pool: React.FC = () => {
       <div className="box">
         <div className="box-text">Not audited yet.</div>
       </div>
-      <div className="container-header">Disclaimer</div>
+      {/* <div className="container-header">Disclaimer</div>
       <div className="box">
         <div className="box-disclaimer">
           <p>
@@ -343,7 +347,7 @@ const Pool: React.FC = () => {
             United Nations, or other applicable sanctions or embargoes.
           </p>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

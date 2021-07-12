@@ -1,0 +1,88 @@
+@import '../../../styles/mixins/grid.scss';
+@import '../../../styles/mixins/flex.scss';
+@import '../../../styles/mixins/gradient-text.scss';
+
+.block {
+  padding-top: 80px;
+}
+
+.title {
+  text-align: center;
+  color: var(--grey);
+  font-size: 40px;
+  margin-bottom: 36px;
+}
+
+// table
+
+.table {
+  &_header {
+    @include grid(repeat(5, 1fr), 1fr, 2px);
+    margin-bottom: 2px;
+
+    &__button {
+      height: 64px;
+      @include flex(row, flex-end, center);
+
+      &_inner {
+        cursor: pointer;
+        border-radius: 2px;
+        background-color: rgba(156, 138, 255, 0.2);
+        @include flex(row, center, center);
+        width: 100%;
+        height: 85%;
+        color: #9c8aff;
+        font-weight: 500;
+
+        &.active {
+          height: 100%;
+          background: var(--gradient);
+          color: #fff;
+        }
+      }
+    }
+  }
+
+  &_body {
+    min-height: 600px;
+    background-color: rgba(103, 77, 246, 0.2);
+    padding: 28px 28px 40px;
+    @include flex(column, center, center);
+
+    &_adresses {
+      flex-grow: 1;
+      width: 100%;
+      @include grid;
+      justify-content: center;
+
+      &__title {
+        font-size: 20px;
+        color: var(--grey);
+        font-weight: 700;
+        margin-bottom: 25px;
+        &.winner {
+          display: inline-block;
+          font-weight: 500;
+          @include gradient-text;
+        }
+      }
+
+      &__left,
+      &__right {
+        padding-left: 100px;
+      }
+    }
+  }
+}
+
+.participant {
+  font-size: 16px;
+  margin-bottom: 20px;
+
+  &.winner {
+    span {
+      font-weight: 500;
+      @include gradient-text;
+    }
+  }
+}

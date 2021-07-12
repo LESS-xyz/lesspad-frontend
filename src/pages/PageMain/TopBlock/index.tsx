@@ -14,13 +14,10 @@ const TopBlock: React.FC = () => {
         <div className={s.container}>
           <div className={s.inner}>
             <div className={s.block}>
-              <div className={s.title}>
-                Multi-Chain Decentralized <br /> Fundraising Capital
-              </div>
+              <div className={s.title}>Lesspad</div>
               <div className={s.subtitle}>
-                Filter through the messy landscape where rugs overshadow the great potential of a
-                growing ecosystem. Join the first community-oriented network for raising capital on
-                BSC
+                A decentralized, community owned IDO launchpad bringing opportunity to early stage,
+                innovative projects across all major protocols
               </div>
               <div className={s.buttons}>
                 <Button big fullWidth={isMobile} to="/pools">

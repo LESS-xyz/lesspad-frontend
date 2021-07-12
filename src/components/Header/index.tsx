@@ -101,14 +101,6 @@ const Header: React.FC = () => {
             </div>
             <div className={s.inner_container_menu_mobile}>
               <NavLink
-                to="/about"
-                activeClassName={s.active_menu_mobile_item}
-                className={s.menu_mobile_item}
-                data-text="About"
-              >
-                <div>About</div>
-              </NavLink>
-              <NavLink
                 to="/pools"
                 activeClassName={s.active_menu_mobile_item}
                 className={s.menu_mobile_item}
@@ -204,14 +196,6 @@ const Header: React.FC = () => {
             )}
             {isDesktop && (
               <nav className={s.navigation}>
-                <NavLink
-                  to="/about"
-                  activeClassName={s.active}
-                  className={s.nav_link}
-                  data-text="About"
-                >
-                  About
-                </NavLink>
                 <NavLink
                   to="/pools"
                   activeClassName={s.active}

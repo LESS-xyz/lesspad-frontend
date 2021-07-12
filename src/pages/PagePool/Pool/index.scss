@@ -1,15 +1,11 @@
+@import '../../../styles/mixins/container.scss';
+
 @mixin gradient-text {
   width: fit-content;
 
   background: linear-gradient(to right, #6f45ff, #ff6365);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-}
-
-@mixin gradient-box {
-  width: 98%;
-
-  background: linear-gradient(to right, #040404, #1c0e40);
 }
 
 .icon {
@@ -40,11 +36,9 @@
 }
 
 .container {
-  margin: 160px auto 23px auto;
+  @include container;
+  padding-top: 160px;
   padding-bottom: 100px;
-
-  box-sizing: border-box;
-  width: 80%;
 
   .preview {
     margin-bottom: 64px;
@@ -187,8 +181,13 @@
     color: #c2c2c2;
   }
 
+  .tier-block {
+    padding-top: 80px;
+  }
+
   .box {
-    @include gradient-box();
+    background: linear-gradient(to right, #040404, #1c0e40);
+
     padding: 0 10px 0 14px;
 
     .row {
@@ -255,11 +254,7 @@
         .button-border {
           margin: 24px 0 30px;
           padding: 2px;
-
-          text-align: end;
-
           width: fit-content;
-          height: 56px;
 
           background: linear-gradient(to right, #6f45ff, #ff6365);
 
@@ -290,23 +285,18 @@
     }
 
     &-links {
-      padding: 30px 20px 25px 16px;
-
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-
-      justify-content: space-between;
-      gap: 20px;
+      padding: 30px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-gap: 30px;
 
       &-link {
-        padding: 20px 20px 24px;
+        padding: 20px;
 
         display: flex;
         flex-direction: row;
         justify-content: space-between;
-
-        width: 45%;
+        align-items: center;
 
         background-color: rgba(103, 77, 246, 0.2);
 
@@ -320,10 +310,6 @@
             @include gradient-text();
             font-family: 'Celias Bold', sans-serif;
           }
-        }
-
-        &-button {
-          margin: 20px 9px;
         }
       }
 
