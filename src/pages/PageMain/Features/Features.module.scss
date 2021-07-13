@@ -1,6 +1,7 @@
 @import '../../../styles/mixins/container.scss';
 @import '../../../styles/mixins/grid.scss';
 @import '../../../styles/mixins/flex.scss';
+@import '../../../styles/mixins/media.scss';
 
 .container {
   @include container;
@@ -12,6 +13,9 @@
   &_inner {
     @include grid(repeat(3, 1fr));
     align-items: center;
+    @include b(tablet) {
+      @include grid(repeat(1, 1fr));
+    }
   }
 }
 

@@ -21,12 +21,31 @@
   line-height: 51px;
   text-align: center;
   color: var(--grey);
-  margin-bottom: 60px;
+  margin-bottom: 20px;
 
   @include b('mobile') {
     font-size: 26px;
     line-height: 33px;
     margin-bottom: 40px;
+  }
+}
+
+.subtitle {
+  text-align: center;
+  margin-bottom: 40px;
+  span {
+    background-color: var(--blue);
+    padding: 8px 17px;
+    border-radius: 30px;
+    display: inline-flex;
+    align-items: center;
+    &::before {
+      content: '';
+      height: 20px;
+      width: 20px;
+      margin-right: 5px;
+      background: url('../../assets/img/icons/info.svg') no-repeat;
+    }
   }
 }
 

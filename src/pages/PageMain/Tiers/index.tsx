@@ -40,16 +40,18 @@ interface ITierProps {
 }
 
 const Tier: React.FC<ITierProps> = ({ tierCount, title, text }) => (
-  <div className={s.tier}>
-    <div className={s.tier_img}>
-      <img src={tiersImgs[tierCount - 1]} alt="tier-img" />
-    </div>
-    <div className={s.tier_count}>Tier {tierCount}</div>
-    <div className={s.tier_title}>{title}</div>
-    <div className={s.tier_text}>
-      {text.map((p) => (
-        <p>{p}</p>
-      ))}
+  <div className={s.tier_wrap}>
+    <div className={s.tier}>
+      <div className={s.tier_img}>
+        <img src={tiersImgs[tierCount - 1]} alt="tier-img" />
+      </div>
+      <div className={s.tier_count}>Tier {tierCount}</div>
+      <div className={s.tier_title}>{title}</div>
+      <div className={s.tier_text}>
+        {text.map((p) => (
+          <p>{p}</p>
+        ))}
+      </div>
     </div>
   </div>
 );

@@ -1,6 +1,8 @@
 @import '../../../styles/mixins/container.scss';
 @import '../../../styles/mixins/grid.scss';
+@import '../../../styles/mixins/flex.scss';
 @import '../../../styles/mixins/gradient-text.scss';
+@import '../../../styles/mixins/media.scss';
 
 .container {
   @include container;
@@ -29,17 +31,32 @@
     @include grid(repeat(5, 1fr));
     align-items: flex-end;
     margin-bottom: 55px;
+
+    @include b(tablet) {
+      @include grid(repeat(3, 1fr));
+    }
+
+    @include b(mobile) {
+      @include grid(repeat(2, 1fr));
+    }
   }
 
   &_subtext {
     text-align: center;
     font-size: 18px;
-    line-height: 1.2; 
+    line-height: 1.2;
     color: #515050;
   }
 }
 
 .tier {
+  &_wrap {
+    @include b(tablet) {
+      @include flex(row, center, center);
+      margin-bottom: 15px;
+    }
+  }
+
   color: var(--color-text-primary);
 
   &_img {
