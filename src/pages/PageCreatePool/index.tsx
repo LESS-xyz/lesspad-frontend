@@ -71,7 +71,7 @@ const CreatePoolPage: React.FC = () => {
     setIsCalendarLiquidityAllocationTime,
   ] = useState<boolean>(false);
   // чекбоксы
-  const [isPublic, setIsPublic] = useState<boolean>(true);
+  const [isPublic, setIsPublic] = useState<boolean>(false);
   const [isLiquidity, setIsLiquidity] = useState<boolean>(false);
   const [isAutomatically, setIsAutomatically] = useState<boolean>(false);
   const [isVesting, setIsVesting] = useState<boolean>(false);
@@ -355,10 +355,10 @@ const CreatePoolPage: React.FC = () => {
           <div className={s.title}>Create Pool</div>
           <Checkbox
             checkboxTitle="presale type"
-            optionOne="Public"
-            optionTwo="Certified"
+            optionOne="Certified"
+            optionTwo="Public"
             onChange={setIsPublic}
-            defaultValue={isPublic}
+            defaultValue={!isPublic}
           />
           <div className={s.page_body}>
             <form action="" onSubmit={(e) => handleSubmit(e)}>

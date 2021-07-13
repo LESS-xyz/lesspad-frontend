@@ -6,7 +6,6 @@
 .block {
   padding-top: 90px;
   padding-bottom: 110px;
-  background-color: var(--pools-in-voting-background);
 
   @include b('mobile') {
     padding-top: 40px;

@@ -4,55 +4,35 @@ import { useSelector } from 'react-redux';
 import useMedia from 'use-media';
 import { v4 as uuid } from 'uuid';
 
+import bnbLogo from '../../assets/img/icons/bnb-logo.svg';
 import logo1 from '../../assets/img/sections/token-card/logo-1.png';
 import Pagination from '../../components/Pagination/index';
 import Search from '../../components/Search/index';
 import Selector from '../../components/Selector/index';
+import TokenCardNew, { ITokenCardProps } from '../../components/TokenCard-new/index';
 import TokenCard from '../../components/TokenCard/index';
 import { CardConditions, cryptos } from '../../types/index';
 
 import s from './AllPools.module.scss';
 
-// const cardsExample = [
-//   {
-//     type: CardConditions.inVoting,
-//     cryptoType: cryptos.BNB,
-//     logo: logo1,
-//     name: 'XOLO Financies',
-//     cost: '0.0000345',
-//     totalAmount: 3454,
-//     currentAmount: 2343,
-//     minPercent: 45,
-//     liquidityPercent: 56,
-//     daysBeforeOpening: 4,
-//     yesCounter: 12321,
-//     noCounter: 4455,
-//   },
-//   {
-//     type: CardConditions.closed,
-//     cryptoType: cryptos.ETH,
-//     logo: logo1,
-//     name: 'XOLO Financies',
-//     cost: '0.0000345',
-//     totalAmount: 3454,
-//     currentAmount: 2343,
-//     minPercent: 45,
-//     liquidityPercent: 56,
-//     daysBeforeOpening: 4,
-//   },
-//   {
-//     type: CardConditions.notOpened,
-//     cryptoType: cryptos.BNB,
-//     logo: logo1,
-//     name: 'XOLO Financies',
-//     cost: '0.0000345',
-//     totalAmount: 3454,
-//     currentAmount: 2343,
-//     minPercent: 45,
-//     liquidityPercent: 56,
-//     daysBeforeOpening: 4,
-//   },
-// ];
+// добавил новый дизайн карточки
+// пример даты для новых карточек
+const newCardData: Array<ITokenCardProps> = [
+  {
+    logo: logo1,
+    daysTillOpen: 3,
+    name: 'XOLO Finance',
+    subtitle: 'Participant',
+    website: 'https://github.com/',
+    telegram: 'https://t.me/durov',
+    whitePaper: 'https://bitcoin.org/ru/bitcoin-paper',
+    blockchainLogo: bnbLogo,
+    chain: 'BNB',
+    type: 'public',
+    fundingToken: 'BNB',
+    status: 'not opened',
+  },
+];
 
 const AllPoolsPage: React.FC = () => {
   const [search, setSearch] = useState<string>('');
@@ -132,6 +112,10 @@ Fundraising Capital"
               // eslint-disable-next-line react/no-array-index-key
               return <TokenCard key={uuid()} address={address} {...props} />;
             })}
+            {/* новая карточка */}
+            {newCardData.map((data) => (
+              <TokenCardNew {...data} />
+            ))}
           </div>
           <div className={s.pagination}>
             <Pagination countOfPages={countOfPages} onChange={handleChangePage} />
