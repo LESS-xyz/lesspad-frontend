@@ -1,0 +1,66 @@
+@import '../../styles/mixins/container.scss';
+@import '../../styles/mixins/grid.scss';
+
+.container {
+  @include container;
+}
+
+.tier {
+  position: relative;
+  
+  &_title {
+    text-align: center;
+    font-size: 40px;
+    color: var(--grey);
+    margin-bottom: 34px;
+  }
+
+  &_body {
+    @include grid(repeat(5, 1fr), 1fr, 0px);
+  }
+
+  &_item {
+    text-align: center;
+    opacity: 0.5;
+    &.active {
+      opacity: 1;
+    }
+
+    &.pawn {
+      .tier_item_bg {
+        background-color: var(--blue);
+      }
+    }
+    &.bishop {
+      .tier_item_bg {
+        background-color: #934dd9;
+      }
+    }
+    &.rook {
+      .tier_item_bg {
+        background-color: #b354b7;
+      }
+    }
+    &.queen {
+      .tier_item_bg {
+        background-color: #dd5c8b;
+      }
+    }
+    &.king {
+      .tier_item_bg {
+        background-color: #fd6369;
+      }
+    }
+
+    &_bg {
+      height: 29px;
+      margin-bottom: 19px;
+    }
+
+    &_title {
+      font-weight: bold;
+      font-size: 20px;
+      color: var(--grey);
+    }
+  }
+}

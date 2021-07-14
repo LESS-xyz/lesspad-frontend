@@ -27,7 +27,7 @@ Fundraising Capital"
       </Helmet>
 
       <TopBlock />
-      <PoweredBy />
+      <PoweredBy withTitle />
       <Features />
       <FiveTiers />
       <Partners logos={partnersLogos} title="Our partners" />

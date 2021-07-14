@@ -85,6 +85,9 @@ const PageVoting: React.FC = () => {
       <div className={s.container}>
         <div className={s.inner}>
           <div className={s.title}>Presale Voting</div>
+          <div className={s.subtitle}>
+            <span>Info</span>
+          </div>
           <div className={s.input}>
             <Search
               big

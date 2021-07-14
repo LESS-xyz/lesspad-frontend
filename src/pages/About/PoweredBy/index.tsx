@@ -6,13 +6,18 @@ import polygonLogo from '../../../assets/img/sections/about-page/polygon-logo.sv
 
 import s from './PoweredBy.module.scss';
 
-const PoweredBy: React.FC = () => {
+interface IPoweredByProps {
+  className?: string;
+  withTitle?: boolean;
+}
+
+const PoweredBy: React.FC<IPoweredByProps> = ({ className, withTitle }) => {
   const logos = [binanceLogo, ethereumLogo, polygonLogo];
   return (
-    <div className={s.block}>
+    <div className={`${s.block} ${className}`}>
       <div className={s.container}>
         <div className={s.inner}>
-          <div className={s.title}>Powered By</div>
+          {withTitle && <div className={s.title}>Powered By</div>}
           <div className={s.logos}>
             {logos.map((logo) => (
               <div className={s.logo}>

@@ -1,0 +1,44 @@
+@import '../../../styles/mixins/container.scss';
+@import '../../../styles/mixins/grid.scss';
+@import '../../../styles/mixins/flex.scss';
+@import '../../../styles/mixins/media.scss';
+
+.container {
+  @include container;
+}
+
+.features {
+  background: linear-gradient(90deg, #190f31 0%, #000000 100%);
+
+  &_inner {
+    @include grid(repeat(3, 1fr));
+    align-items: center;
+    @include b(tablet) {
+      @include grid(repeat(1, 1fr));
+    }
+  }
+}
+
+.feature {
+  @include flex(row, center, center);
+  position: relative;
+
+  &_img {
+    img {
+      max-width: 100%;
+    }
+  }
+
+  &_text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    text-align: center;
+    font-weight: 500;
+    font-size: 36px;
+    color: var(--blue);
+    line-height: 1.2;
+  }
+}

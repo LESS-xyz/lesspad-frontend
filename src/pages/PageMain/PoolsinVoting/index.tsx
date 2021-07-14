@@ -9,44 +9,6 @@ import { CardConditions, cryptos } from '../../../types/index';
 import s from './PoolsInVoting.module.scss';
 
 // const cardsExample = [
-//   {
-//     type: CardConditions.inVoting,
-//     cryptoType: cryptos.BNB,
-//     logo: logo1,
-//     name: 'XOLO Financies',
-//     cost: '0.0000345',
-//     totalAmount: 3454,
-//     currentAmount: 2343,
-//     minPercent: 45,
-//     liquidityPercent: 56,
-//     daysBeforeOpening: 4,
-//     yesCounter: 12321,
-//     noCounter: 4455,
-//   },
-//   {
-//     type: CardConditions.closed,
-//     cryptoType: cryptos.ETH,
-//     logo: logo1,
-//     name: 'XOLO Financies',
-//     cost: '0.0000345',
-//     totalAmount: 3454,
-//     currentAmount: 2343,
-//     minPercent: 45,
-//     liquidityPercent: 56,
-//     daysBeforeOpening: 4,
-//   },
-//   {
-//     type: CardConditions.notOpened,
-//     cryptoType: cryptos.BNB,
-//     logo: logo1,
-//     name: 'XOLO Financies',
-//     cost: '0.0000345',
-//     totalAmount: 3454,
-//     currentAmount: 2343,
-//     minPercent: 45,
-//     liquidityPercent: 56,
-//     daysBeforeOpening: 4,
-//   },
 // ];
 
 const PoolsiInVoting: React.FC = () => {

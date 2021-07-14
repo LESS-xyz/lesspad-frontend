@@ -6,12 +6,13 @@
 
 .page {
   padding-top: 170px;
+  padding-bottom: 60px;
   background: var(--gradient-background);
   min-height: 100vh;
 }
 
 .container {
-  @include container(1000px);
+  @include container;
 }
 
 .title {
@@ -40,17 +41,22 @@
       @include gradient-text;
     }
     font-size: 24px;
-    margin-bottom: 8px;
+    margin-bottom: 16px;
   }
 
   &_bnb {
     font-weight: 500;
     font-size: 16px;
-    margin-bottom: 5px;
+    margin-bottom: 60px;
+
+    span {
+      font-size: 36px;
+    }
   }
 
-  &_usd {
-    color: var(--grey);
+  &_subtitle {
+    font-weight: 500;
+    font-size: 16px;
     margin-bottom: 20px;
   }
 
@@ -109,10 +115,59 @@
 
 .small_balances {
   margin-top: 20px;
-  @include grid(repeat(2, 1fr), 1fr, 20px);
+  @include grid(repeat(2, 1fr), 1fr, 90px);
 
   @include b('mobile') {
     @include grid(repeat(1, 1fr), 1fr 1fr, 20px);
     padding: 0 0 100px 0;
   }
+
+  &.wide {
+    grid-column-gap: 200px;
+    grid-row-gap: 50px;
+  }
+}
+
+.your_tier {
+  padding-top: 50px;
+  margin-bottom: 30px;
+}
+
+.bottom_table {
+  background: linear-gradient(90deg, #040404 0%, #1c0e40 100%);
+  padding: 26px 43px;
+  margin-bottom: 66px;
+
+  &__title {
+    font-weight: bold;
+    font-size: 24px;
+    text-align: center;
+    text-transform: uppercase;
+    span {
+      @include gradient-text;
+    }
+  }
+}
+
+.small_balance {
+  text-align: center;
+
+  &_title {
+    font-size: 24px;
+    margin-bottom: 15px;
+    span {
+      @include gradient-text;
+    }
+  }
+
+  &_subtitle {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 13px;
+  }
+}
+
+.button_center {
+  display: flex;
+  justify-content: center;
 }
