@@ -109,7 +109,7 @@ export default class Web3Service {
     allowanceTarget,
     contractAddress,
     contractAbi,
-  }: TypeAllowance) => {
+  }: TypeAllowance): Promise<any> => {
     try {
       console.log('Web3ProviderService allowance', {
         userAddress,
@@ -129,14 +129,13 @@ export default class Web3Service {
   public approve = async ({
     // amount,
     userAddress,
-    allowanceTarget,
     contractAbi,
     contractAddress,
-  }: TypeApprove) => {
+  }: TypeApprove): Promise<any> => {
     try {
       const totalSupply = await this.totalSupply({ contractAddress, contractAbi });
       const contract = new this.web3Provider.eth.Contract(contractAbi, contractAddress);
-      return contract.methods.approve(allowanceTarget, totalSupply).send({ from: userAddress });
+      return contract.methods.approve(userAddress, totalSupply);
     } catch (e) {
       console.error('Web3ProviderService approve:', e);
       return null;

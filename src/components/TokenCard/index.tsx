@@ -16,7 +16,7 @@ import telegramActive from '../../assets/img/icons/telegram-active.svg';
 import telegramDisabled from '../../assets/img/icons/telegram-disabled.svg';
 import thumbup from '../../assets/img/sections/token-card/thumb-up.svg';
 import { useContractsContext } from '../../contexts/ContractsContext';
-import { CardConditions, cryptos } from '../../types/index';
+import { CardConditions, cryptos } from '../../types';
 import Icon from '../Icon/index';
 import ProgressBar from '../ProgressBar/index';
 
@@ -82,7 +82,7 @@ const TokenCard: React.FC<ITokenCardProps> = (props) => {
     try {
       const newInfo = await ContractPresalePublic.getInfo({ contractAddress: address });
       if (newInfo) setInfo(newInfo);
-      // console.log('TokenCard getInfo:', newInfo);
+      console.log('TokenCard getInfo:', newInfo);
     } catch (e) {
       console.error(e);
     }

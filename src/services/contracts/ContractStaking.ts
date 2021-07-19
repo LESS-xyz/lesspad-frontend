@@ -13,7 +13,17 @@ type TypeGetStakedBalanceProps = {
 
 type TypeStakeProps = {
   userAddress: string;
-  amount: string;
+  lpAmount: number;
+  lessAmount: number;
+};
+
+type TypeUnstakeProps = {
+  userAddress: string;
+  lpAmount: number;
+  lessAmount: number;
+  lpRewards: number;
+  lessRewards: number;
+  stakeId: number;
 };
 
 export default class ContractStakingService {
@@ -36,36 +46,57 @@ export default class ContractStakingService {
     this.contractAbi = abisOfNetType[chainType][this.contractName];
   }
 
-  public getStakedBalance = async ({ userAddress }: TypeGetStakedBalanceProps) => {
+  // get balance of staked Less
+  public getLessBalance = async ({ userAddress }: TypeGetStakedBalanceProps): Promise<any> => {
     try {
-      // console.log('ContractPresalePublicService getInfo:', this.contractAbi, this.contractAddress)
       const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
-      const result = await contract.methods.accountInfos(userAddress).call();
-      return result.balance;
+      return await contract.methods.getLessBalanceByAddress(userAddress).call();
     } catch (e) {
-      console.error('ContractStakingService getStakingBalance:', e);
+      console.error('ContractStakingService getLessBalance:', e);
       return null;
     }
   };
 
-  public stake = async ({ amount, userAddress }: TypeStakeProps) => {
+  // get balance of staked Less LP
+  public getLPBalance = async ({ userAddress }: TypeGetStakedBalanceProps): Promise<any> => {
     try {
-      // console.log('ContractPresalePublicService getInfo:', this.contractAbi, this.contractAddress)
       const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
-      const result = await contract.methods.stake(amount).send({ from: userAddress });
-      return result;
+      return await contract.methods.getLpBalanceByAddress(userAddress).call();
+    } catch (e) {
+      console.error('ContractStakingService getLPBalance:', e);
+      return null;
+    }
+  };
+
+  // public getTotalLessRewards = async ({ userAddress })
+
+  public stakeTokens = async ({
+    userAddress,
+    lpAmount,
+    lessAmount,
+  }: TypeStakeProps): Promise<any> => {
+    try {
+      const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
+      return await contract.methods.stake(lpAmount, lessAmount).send({ from: userAddress });
     } catch (e) {
       console.error('ContractStakingService stake:', e);
       return null;
     }
   };
 
-  public unstake = async ({ amount, userAddress }: TypeStakeProps) => {
+  public unstakeTokens = async ({
+    userAddress,
+    lpAmount,
+    lessAmount,
+    lpRewards,
+    lessRewards,
+    stakeId,
+  }: TypeUnstakeProps): Promise<any> => {
     try {
-      // console.log('ContractPresalePublicService getInfo:', this.contractAbi, this.contractAddress)
       const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
-      const result = await contract.methods.unstake(amount).send({ from: userAddress });
-      return result;
+      return await contract.methods
+        .unstake(lpAmount, lessAmount, lpRewards, lessRewards, stakeId)
+        .send({ from: userAddress });
     } catch (e) {
       console.error('ContractStakingService stake:', e);
       return null;

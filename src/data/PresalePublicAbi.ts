@@ -1,384 +1,8 @@
-// export default [
-//   {
-//     inputs: [
-//       { internalType: 'address', name: '_factory', type: 'address' },
-//       { internalType: 'address', name: '_library', type: 'address' },
-//       { internalType: 'address', name: '_platformOwner', type: 'address' },
-//       { internalType: 'address', name: '_devAddress', type: 'address' },
-//     ],
-//     stateMutability: 'nonpayable',
-//     type: 'constructor',
-//   },
-//   {
-//     inputs: [],
-//     name: 'addLiquidity',
-//     outputs: [],
-//     stateMutability: 'nonpayable',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [],
-//     name: 'cancelPresale',
-//     outputs: [],
-//     stateMutability: 'nonpayable',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [{ internalType: 'uint256', name: '_newCloseTime', type: 'uint256' }],
-//     name: 'changeCloseTimeVoting',
-//     outputs: [],
-//     stateMutability: 'nonpayable',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [
-//       { internalType: 'uint256', name: '_newOpenTime', type: 'uint256' },
-//       { internalType: 'uint256', name: '_newCloseTime', type: 'uint256' },
-//     ],
-//     name: 'changePresaleTime',
-//     outputs: [],
-//     stateMutability: 'nonpayable',
-//     type: 'function',
-//   },
-//   { inputs: [], name: 'claimTokens', outputs: [], stateMutability: 'nonpayable', type: 'function' },
-//   {
-//     inputs: [{ internalType: 'address', name: '', type: 'address' }],
-//     name: 'claimed',
-//     outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
-//     stateMutability: 'view',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [],
-//     name: 'closeTimePresale',
-//     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-//     stateMutability: 'view',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [],
-//     name: 'closeTimeVoting',
-//     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-//     stateMutability: 'view',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [],
-//     name: 'collectFundsRaised',
-//     outputs: [],
-//     stateMutability: 'nonpayable',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [],
-//     name: 'description',
-//     outputs: [{ internalType: 'string', name: '', type: 'string' }],
-//     stateMutability: 'view',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [],
-//     name: 'getPresaleId',
-//     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-//     stateMutability: 'view',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [],
-//     name: 'getUnsoldTokens',
-//     outputs: [],
-//     stateMutability: 'nonpayable',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [],
-//     name: 'hardCap',
-//     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-//     stateMutability: 'view',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [
-//       { internalType: 'address[2]', name: '_creatorToken', type: 'address[2]' },
-//       {
-//         internalType: 'uint256[5]',
-//         name: '_priceTokensForSaleLiquiditySoftHard',
-//         type: 'uint256[5]',
-//       },
-//       { internalType: 'uint8', name: '_liquidityAlloc', type: 'uint8' },
-//       {
-//         internalType: 'uint256[5]',
-//         name: '_liqPriceDurationAllocTimeOpenClose',
-//         type: 'uint256[5]',
-//       },
-//     ],
-//     name: 'init',
-//     outputs: [],
-//     stateMutability: 'nonpayable',
-//     type: 'function',
-//   },
-//   { inputs: [], name: 'invest', outputs: [], stateMutability: 'payable', type: 'function' },
-//   {
-//     inputs: [{ internalType: 'address', name: '', type: 'address' }],
-//     name: 'investments',
-//     outputs: [
-//       { internalType: 'uint256', name: 'amountEth', type: 'uint256' },
-//       { internalType: 'uint256', name: 'amountTokens', type: 'uint256' },
-//     ],
-//     stateMutability: 'view',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [],
-//     name: 'lessLib',
-//     outputs: [{ internalType: 'contract LessLibrary', name: '', type: 'address' }],
-//     stateMutability: 'view',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [],
-//     name: 'linkGithub',
-//     outputs: [{ internalType: 'bytes32', name: '', type: 'bytes32' }],
-//     stateMutability: 'view',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [],
-//     name: 'linkLogo',
-//     outputs: [{ internalType: 'string', name: '', type: 'string' }],
-//     stateMutability: 'view',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [],
-//     name: 'linkTelegram',
-//     outputs: [{ internalType: 'bytes32', name: '', type: 'bytes32' }],
-//     stateMutability: 'view',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [],
-//     name: 'linkTwitter',
-//     outputs: [{ internalType: 'bytes32', name: '', type: 'bytes32' }],
-//     stateMutability: 'view',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [],
-//     name: 'linkWebsite',
-//     outputs: [{ internalType: 'bytes32', name: '', type: 'bytes32' }],
-//     stateMutability: 'view',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [],
-//     name: 'liquidityAllocation',
-//     outputs: [{ internalType: 'uint8', name: '', type: 'uint8' }],
-//     stateMutability: 'view',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [],
-//     name: 'liquidityAllocationTime',
-//     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-//     stateMutability: 'view',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [],
-//     name: 'liquidityLockDuration',
-//     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-//     stateMutability: 'view',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [],
-//     name: 'listingPrice',
-//     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-//     stateMutability: 'view',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [],
-//     name: 'maxInvestInWei',
-//     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-//     stateMutability: 'view',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [],
-//     name: 'minInvestInWei',
-//     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-//     stateMutability: 'view',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [],
-//     name: 'noVotes',
-//     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-//     stateMutability: 'view',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [],
-//     name: 'openTimePresale',
-//     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-//     stateMutability: 'view',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [],
-//     name: 'participants',
-//     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-//     stateMutability: 'view',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [],
-//     name: 'pricePerToken',
-//     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-//     stateMutability: 'view',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [],
-//     name: 'raisedAmount',
-//     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-//     stateMutability: 'view',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [],
-//     name: 'refundLpTokens',
-//     outputs: [],
-//     stateMutability: 'nonpayable',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [],
-//     name: 'saleTitle',
-//     outputs: [{ internalType: 'bytes32', name: '', type: 'bytes32' }],
-//     stateMutability: 'view',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [{ internalType: 'uint256', name: '_id', type: 'uint256' }],
-//     name: 'setPresaleId',
-//     outputs: [],
-//     stateMutability: 'nonpayable',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [
-//       { internalType: 'bytes32', name: '_saleTitle', type: 'bytes32' },
-//       { internalType: 'bytes32', name: '_linkTelegram', type: 'bytes32' },
-//       { internalType: 'bytes32', name: '_linkGithub', type: 'bytes32' },
-//       { internalType: 'bytes32', name: '_linkTwitter', type: 'bytes32' },
-//       { internalType: 'bytes32', name: '_linkWebsite', type: 'bytes32' },
-//       { internalType: 'string', name: '_linkLogo', type: 'string' },
-//       { internalType: 'string', name: '_description', type: 'string' },
-//       { internalType: 'string', name: '_whitepaper', type: 'string' },
-//     ],
-//     name: 'setStringInfo',
-//     outputs: [],
-//     stateMutability: 'nonpayable',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [],
-//     name: 'softCap',
-//     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-//     stateMutability: 'view',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [],
-//     name: 'token',
-//     outputs: [{ internalType: 'contract IERC20', name: '', type: 'address' }],
-//     stateMutability: 'view',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [],
-//     name: 'tokenDecimals',
-//     outputs: [{ internalType: 'uint8', name: '', type: 'uint8' }],
-//     stateMutability: 'view',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [],
-//     name: 'tokenMagnitude',
-//     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-//     stateMutability: 'view',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [],
-//     name: 'tokensForLiquidity',
-//     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-//     stateMutability: 'view',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [],
-//     name: 'tokensLeft',
-//     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-//     stateMutability: 'view',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [],
-//     name: 'unlockEthTime',
-//     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-//     stateMutability: 'view',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [{ internalType: 'bool', name: 'yes', type: 'bool' }],
-//     name: 'vote',
-//     outputs: [],
-//     stateMutability: 'nonpayable',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [{ internalType: 'address', name: '', type: 'address' }],
-//     name: 'voters',
-//     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-//     stateMutability: 'view',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [],
-//     name: 'whitepaper',
-//     outputs: [{ internalType: 'string', name: '', type: 'string' }],
-//     stateMutability: 'view',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [
-//       { internalType: 'address payable', name: 'to', type: 'address' },
-//       { internalType: 'uint256', name: 'amount', type: 'uint256' },
-//     ],
-//     name: 'withdrawInvestment',
-//     outputs: [],
-//     stateMutability: 'nonpayable',
-//     type: 'function',
-//   },
-//   {
-//     inputs: [],
-//     name: 'yesVotes',
-//     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-//     stateMutability: 'view',
-//     type: 'function',
-//   },
-//   { stateMutability: 'payable', type: 'receive' },
-// ];
-
 export default [
   {
     inputs: [
       {
-        internalType: 'address',
+        internalType: 'address payable',
         name: '_factory',
         type: 'address',
       },
@@ -397,6 +21,16 @@ export default [
         name: '_devAddress',
         type: 'address',
       },
+      {
+        internalType: 'address',
+        name: '_tokenAddress',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: '_WETHAddress',
+        type: 'address',
+      },
     ],
     stateMutability: 'nonpayable',
     type: 'constructor',
@@ -404,12 +38,17 @@ export default [
   {
     inputs: [
       {
-        internalType: 'address',
-        name: '',
-        type: 'address',
+        internalType: 'uint256',
+        name: '_tokenAmount',
+        type: 'uint256',
+      },
+      {
+        internalType: 'bytes',
+        name: '_signature',
+        type: 'bytes',
       },
     ],
-    name: 'claimed',
+    name: '_isLotteryWinner',
     outputs: [
       {
         internalType: 'bool',
@@ -422,10 +61,95 @@ export default [
   },
   {
     inputs: [],
+    name: 'addLiquidity',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'cancelPresale',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '_newCloseTime',
+        type: 'uint256',
+      },
+    ],
+    name: 'changeCloseTimeVoting',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '_newOpenTime',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: '_newCloseTime',
+        type: 'uint256',
+      },
+    ],
+    name: 'changePresaleTime',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'claimTokens',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    name: 'claimed',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'collectFee',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'collectFundsRaised',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
     name: 'factoryAddress',
     outputs: [
       {
-        internalType: 'address',
+        internalType: 'address payable',
         name: '',
         type: 'address',
       },
@@ -503,6 +227,74 @@ export default [
   },
   {
     inputs: [],
+    name: 'getGenInfo',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'getMyVote',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'getPresaleId',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '_tier',
+        type: 'uint256',
+      },
+    ],
+    name: 'getWhitelistLength',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
     name: 'id',
     outputs: [
       {
@@ -512,6 +304,24 @@ export default [
       },
     ],
     stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address[2]',
+        name: '_creatorToken',
+        type: 'address[2]',
+      },
+      {
+        internalType: 'uint256[9]',
+        name: '_priceTokensForSaleLiquiditySoftHardOpenOpenCloseFee',
+        type: 'uint256[9]',
+      },
+    ],
+    name: 'init',
+    outputs: [],
+    stateMutability: 'nonpayable',
     type: 'function',
   },
   {
@@ -560,6 +370,44 @@ export default [
   {
     inputs: [
       {
+        internalType: 'uint256',
+        name: '_tokenAmount',
+        type: 'uint256',
+      },
+      {
+        internalType: 'bytes',
+        name: '_signature',
+        type: 'bytes',
+      },
+      {
+        internalType: 'uint256',
+        name: '_stakedAmount',
+        type: 'uint256',
+      },
+      {
+        internalType: 'bool',
+        name: '_isTierOneTwo',
+        type: 'bool',
+      },
+      {
+        internalType: 'uint256[4]',
+        name: 'poolPercentages',
+        type: 'uint256[4]',
+      },
+      {
+        internalType: 'uint256[4]',
+        name: 'stakingTiers',
+        type: 'uint256[4]',
+      },
+    ],
+    name: 'invest',
+    outputs: [],
+    stateMutability: 'payable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
         internalType: 'address',
         name: '',
         type: 'address',
@@ -576,6 +424,19 @@ export default [
         internalType: 'uint256',
         name: 'amountTokens',
         type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'isWhitelisting',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
       },
     ],
     stateMutability: 'view',
@@ -609,141 +470,7 @@ export default [
   },
   {
     inputs: [],
-    name: 'stringInfo',
-    outputs: [
-      {
-        internalType: 'bytes32',
-        name: 'saleTitle',
-        type: 'bytes32',
-      },
-      {
-        internalType: 'bytes32',
-        name: 'linkTelegram',
-        type: 'bytes32',
-      },
-      {
-        internalType: 'bytes32',
-        name: 'linkGithub',
-        type: 'bytes32',
-      },
-      {
-        internalType: 'bytes32',
-        name: 'linkTwitter',
-        type: 'bytes32',
-      },
-      {
-        internalType: 'bytes32',
-        name: 'linkWebsite',
-        type: 'bytes32',
-      },
-      {
-        internalType: 'string',
-        name: 'linkLogo',
-        type: 'string',
-      },
-      {
-        internalType: 'string',
-        name: 'description',
-        type: 'string',
-      },
-      {
-        internalType: 'string',
-        name: 'whitepaper',
-        type: 'string',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'uniswapInfo',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: 'listingPriceInWei',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: 'lpTokensLockDurationInDays',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint8',
-        name: 'liquidityPercentageAllocation',
-        type: 'uint8',
-      },
-      {
-        internalType: 'uint256',
-        name: 'liquidityAllocationTime',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: 'unlockTime',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    name: 'voters',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    name: 'whitelist',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    stateMutability: 'payable',
-    type: 'receive',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'address[2]',
-        name: '_creatorToken',
-        type: 'address[2]',
-      },
-      {
-        internalType: 'uint256[9]',
-        name: '_priceTokensForSaleLiquiditySoftHardOpenOpenCloseFee',
-        type: 'uint256[9]',
-      },
-    ],
-    name: 'init',
+    name: 'refundLpTokens',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
@@ -752,26 +479,57 @@ export default [
     inputs: [
       {
         internalType: 'uint256',
-        name: 'price',
+        name: '_tokenAmount',
         type: 'uint256',
       },
       {
         internalType: 'uint256',
-        name: 'duration',
+        name: '_tier',
         type: 'uint256',
       },
       {
-        internalType: 'uint8',
-        name: 'percent',
-        type: 'uint8',
+        internalType: 'bytes',
+        name: '_signature',
+        type: 'bytes',
+      },
+    ],
+    name: 'register',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '_tokenAmount',
+        type: 'uint256',
       },
       {
         internalType: 'uint256',
-        name: 'allocationTime',
+        name: '_tier',
+        type: 'uint256',
+      },
+      {
+        internalType: 'bytes',
+        name: '_signature',
+        type: 'bytes',
+      },
+    ],
+    name: 'registerTierOneTwo',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '_id',
         type: 'uint256',
       },
     ],
-    name: 'setUniswapInfo',
+    name: 'setPresaleId',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
@@ -825,18 +583,173 @@ export default [
     type: 'function',
   },
   {
-    inputs: [],
-    name: 'register',
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'price',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'duration',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint8',
+        name: 'percent',
+        type: 'uint8',
+      },
+      {
+        internalType: 'uint256',
+        name: 'allocationTime',
+        type: 'uint256',
+      },
+    ],
+    name: 'setUniswapInfo',
     outputs: [],
     stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'stringInfo',
+    outputs: [
+      {
+        internalType: 'bytes32',
+        name: 'saleTitle',
+        type: 'bytes32',
+      },
+      {
+        internalType: 'bytes32',
+        name: 'linkTelegram',
+        type: 'bytes32',
+      },
+      {
+        internalType: 'bytes32',
+        name: 'linkGithub',
+        type: 'bytes32',
+      },
+      {
+        internalType: 'bytes32',
+        name: 'linkTwitter',
+        type: 'bytes32',
+      },
+      {
+        internalType: 'bytes32',
+        name: 'linkWebsite',
+        type: 'bytes32',
+      },
+      {
+        internalType: 'string',
+        name: 'linkLogo',
+        type: 'string',
+      },
+      {
+        internalType: 'string',
+        name: 'description',
+        type: 'string',
+      },
+      {
+        internalType: 'string',
+        name: 'whitepaper',
+        type: 'string',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    name: 'tickets',
+    outputs: [
+      {
+        internalType: 'address',
+        name: 'user',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'ticketAmount',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'uniswapInfo',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: 'listingPriceInWei',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'lpTokensLockDurationInDays',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint8',
+        name: 'liquidityPercentageAllocation',
+        type: 'uint8',
+      },
+      {
+        internalType: 'uint256',
+        name: 'liquidityAllocationTime',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'unlockTime',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'bytes32',
+        name: '',
+        type: 'bytes32',
+      },
+    ],
+    name: 'usedSignature',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
     type: 'function',
   },
   {
     inputs: [
       {
         internalType: 'bool',
-        name: 'yes',
+        name: '_yes',
         type: 'bool',
+      },
+      {
+        internalType: 'uint256',
+        name: '_stakingAmount',
+        type: 'uint256',
+      },
+      {
+        internalType: 'bytes',
+        name: '_signature',
+        type: 'bytes',
       },
     ],
     name: 'vote',
@@ -845,10 +758,46 @@ export default [
     type: 'function',
   },
   {
-    inputs: [],
-    name: 'invest',
-    outputs: [],
-    stateMutability: 'payable',
+    inputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    name: 'voters',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    name: 'whitelist',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
     type: 'function',
   },
   {
@@ -867,148 +816,6 @@ export default [
     name: 'withdrawInvestment',
     outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'claimTokens',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'addLiquidity',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'collectFundsRaised',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'refundLpTokens',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'getUnsoldTokens',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'collectFee',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'uint256',
-        name: '_newCloseTime',
-        type: 'uint256',
-      },
-    ],
-    name: 'changeCloseTimeVoting',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'uint256',
-        name: '_newOpenTime',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: '_newCloseTime',
-        type: 'uint256',
-      },
-    ],
-    name: 'changePresaleTime',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'cancelPresale',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'getPresaleId',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'uint256',
-        name: '_id',
-        type: 'uint256',
-      },
-    ],
-    name: 'setPresaleId',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'getMyVote',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'getGenInfo',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
     type: 'function',
   },
 ];

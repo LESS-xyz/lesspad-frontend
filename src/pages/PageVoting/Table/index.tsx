@@ -47,9 +47,10 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
   const { chainType } = useSelector(({ wallet }: any) => wallet);
 
   const dispatch = useDispatch();
-  const toggleModal = React.useCallback((params) => dispatch(modalActions.toggleModal(params)), [
-    dispatch,
-  ]);
+  const toggleModal = React.useCallback(
+    (params) => dispatch(modalActions.toggleModal(params)),
+    [dispatch],
+  );
 
   const isMobile = useMedia({ maxWidth: 768 });
 

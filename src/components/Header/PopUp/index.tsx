@@ -13,6 +13,31 @@ interface IPopUpProps {
   style?: any;
 }
 
+const chains: any = {
+  bnbt: {
+    chainId: '0x61',
+    chainName: 'Binance Smart Chain Testnet',
+    nativeCurrency: {
+      name: 'tBNB',
+      symbol: 'tBNB',
+      decimals: 18,
+    },
+    rpcUrls: ['https://data-seed-prebsc-1-s1.binance.org:8545'],
+    blockExplorerUrls: ['https://testnet.bscscan.com'],
+  },
+  tmatic: {
+    chainId: '0x13881',
+    chainName: 'Matic Testnet Mumbai',
+    nativeCurrency: {
+      name: 'tMATIC',
+      symbol: 'tMATIC',
+      decimals: 18,
+    },
+    rpcUrls: ['https://rpc-mumbai.matic.today'],
+    blockExplorerUrls: ['https://matic.network/'],
+  },
+};
+
 const PopUp: React.FC<IPopUpProps> = (props) => {
   const { setCurrentCrypto = () => {}, setIsPopUpOpen, refButton, style = {} } = props;
 
@@ -30,8 +55,30 @@ const PopUp: React.FC<IPopUpProps> = (props) => {
     { key: 'Matic', title: 'Polygon (Matic)', logo: maticLogo },
   ];
 
+  const switchChain = async (chainName: string) => {
+    try {
+      await (window as any).ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: chains[chainName].chainId }],
+      });
+    } catch (switchError) {
+      // This error code indicates that the chain has not been added to MetaMask.
+      if (switchError.code === 4902) {
+        try {
+          await (window as any).ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [chains[chainName]],
+          });
+        } catch (e) {
+          console.log('SwitchError error:', e);
+        }
+      }
+    }
+  };
+
   const handleClick = (key: string) => {
     // setCurrentCrypto(title.length > 8 ? `${title.slice(0, 7)}...` : title);
+    switchChain(key);
     setCurrentCrypto(key);
     setIsPopUpOpen(false);
   };

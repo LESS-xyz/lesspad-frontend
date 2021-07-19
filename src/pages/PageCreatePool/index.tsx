@@ -66,10 +66,8 @@ const CreatePoolPage: React.FC = () => {
   const [isCalendarVoting, setIsCalendarVoting] = useState<boolean>(false);
   const [isCalendar1, setIsCalendar1] = useState<boolean>(false);
   const [isCalendar2, setIsCalendar2] = useState<boolean>(false);
-  const [
-    isCalendarLiquidityAllocationTime,
-    setIsCalendarLiquidityAllocationTime,
-  ] = useState<boolean>(false);
+  const [isCalendarLiquidityAllocationTime, setIsCalendarLiquidityAllocationTime] =
+    useState<boolean>(false);
   // чекбоксы
   const [isPublic, setIsPublic] = useState<boolean>(false);
   const [isLiquidity, setIsLiquidity] = useState<boolean>(false);
@@ -82,9 +80,10 @@ const CreatePoolPage: React.FC = () => {
   const { address: userAddress } = useSelector(({ user }: any) => user);
 
   const dispatch = useDispatch();
-  const toggleModal = React.useCallback((params) => dispatch(modalActions.toggleModal(params)), [
-    dispatch,
-  ]);
+  const toggleModal = React.useCallback(
+    (params) => dispatch(modalActions.toggleModal(params)),
+    [dispatch],
+  );
 
   const minInvestInWei = new BN(10).pow(new BN(10)).toString(10); // todo
   const maxInvestInWei = new BN(10).pow(new BN(20)).toString(10); // todo

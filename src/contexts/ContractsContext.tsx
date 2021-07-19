@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 
 import ContractLessLibraryService from '../services/contracts/ContractLessLibrary';
 import ContractLessTokenService from '../services/contracts/ContractLessToken';
+import ContractLPTokenService from '../services/contracts/ContractLPToken';
 import ContractPresaleFactoryService from '../services/contracts/ContractPresaleFactory';
 import ContractPresalePublicService from '../services/contracts/ContractPresalePublic';
 import ContractStakingService from '../services/contracts/ContractStaking';
@@ -15,6 +16,7 @@ const contractsContext = createContext<any>({
   ContractPresaleFactory: {},
   ContractStaking: {},
   ContractLessToken: {},
+  ContractLPToken: {},
 });
 
 const ContractsContext: React.FC = ({ children }) => {
@@ -46,7 +48,10 @@ const ContractsContext: React.FC = ({ children }) => {
         web3Provider: web3.provider,
         chainType,
       });
-      // console.log('ContractsContext init:', { web3Provider: web3.provider, chainType, NewContractLessLibrary });
+      const ContractLPToken = new ContractLPTokenService({
+        web3Provider: web3.provider,
+        chainType,
+      });
       if (!ContractLessLibrary) return;
       const newValue = {
         ContractLessLibrary,
@@ -54,6 +59,7 @@ const ContractsContext: React.FC = ({ children }) => {
         ContractPresaleFactory,
         ContractStaking,
         ContractLessToken,
+        ContractLPToken,
       };
       setValue(newValue);
     } catch (e) {
@@ -73,6 +79,6 @@ const ContractsContext: React.FC = ({ children }) => {
 
 export default ContractsContext;
 
-export function useContractsContext() {
+export function useContractsContext(): any {
   return useContext(contractsContext);
 }

@@ -10,9 +10,10 @@ type TypeConstructorProps = {
 type TypeStakeProps = {
   userAddress: string;
   spender: string;
+  amount: number;
 };
 
-export default class ContractLessToken {
+export default class ContractLPToken {
   public web3: any;
 
   public contractAddress: string;
@@ -27,61 +28,58 @@ export default class ContractLessToken {
     const addressesOfNetType = addresses[isMainnetOrTestnet];
     const abisOfNetType = abis[isMainnetOrTestnet];
     this.web3 = new Web3(web3Provider);
-    this.contractName = 'LessToken';
+    this.contractName = 'LPToken';
     this.contractAddress = addressesOfNetType[chainType][this.contractName];
     this.contractAbi = abisOfNetType[chainType][this.contractName];
   }
 
-  public decimals = async (): Promise<number | null> => {
+  public decimals = async (): Promise<any> => {
     try {
       const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
       return await contract.methods.decimals().call();
     } catch (e) {
-      console.error('ContractLessToken decimals:', e);
+      console.error('ContractLPToken decimals:', e);
       return null;
     }
   };
 
   public totalSupply = async (): Promise<any> => {
     try {
-      // console.log('ContractPresalePublicService getInfo:', this.contractAbi, this.contractAddress)
       const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
       return await contract.methods.totalSupply().call();
     } catch (e) {
-      console.error('ContractLessToken totalSupply:', e);
+      console.error('ContractLPToken totalSupply:', e);
       return null;
     }
   };
 
   public balanceOf = async ({ userAddress }: TypeStakeProps): Promise<any> => {
     try {
-      // console.log('ContractPresalePublicService getInfo:', this.contractAbi, this.contractAddress)
       const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
       return await contract.methods.balanceOf(userAddress).call();
     } catch (e) {
-      console.error('ContractLessToken balanceOf:', e);
+      console.error('ContractLPToken balanceOf:', e);
       return null;
     }
   };
 
   public allowance = async ({ userAddress, spender }: TypeStakeProps): Promise<any> => {
     try {
-      // console.log('ContractPresalePublicService getInfo:', this.contractAbi, this.contractAddress)
       const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
       return await contract.methods.allowance(userAddress, spender).call();
     } catch (e) {
-      console.error('ContractLessToken allowance:', e);
+      console.error('ContractLPToken allowance:', e);
       return null;
     }
   };
 
-  public approve = async ({ userAddress, spender, amount }: any): Promise<any> => {
+  public approve = async ({ userAddress, spender, amount }: TypeStakeProps): Promise<any> => {
     try {
       // console.log('ContractPresalePublicService getInfo:', this.contractAbi, this.contractAddress)
       const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
       return await contract.methods.approve(spender, amount).send({ from: userAddress });
     } catch (e) {
-      console.error('ContractLessToken approve:', e);
+      console.error('ContractLPToken approve:', e);
       return null;
     }
   };
