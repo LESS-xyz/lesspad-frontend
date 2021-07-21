@@ -29,15 +29,12 @@ const StakingPage: React.FC = () => {
   const { chainType } = useSelector(({ wallet }: any) => wallet);
   const { address: userAddress } = useSelector(({ user }: any) => user);
 
-  const decimals = async () => {
-    return ContractLessToken.decimals();
-  };
-
   const getLessTokenBalance = async () => {
     try {
       const result = await ContractLessToken.balanceOf({ userAddress });
       const ten = web3.utils.toBN(10);
-      const decimalsBN = web3.utils.toBN(await decimals());
+      const decimalsLess = await ContractLessToken.decimals();
+      const decimalsBN = web3.utils.toBN(decimalsLess);
       const balance = new BN(result).div(ten.pow(decimalsBN)).toString(10);
       setBalanceLessToken(balance);
       console.log('Staking lessTokenBalanceOf:', balance);
@@ -50,7 +47,8 @@ const StakingPage: React.FC = () => {
     try {
       const result = await ContractLPToken.balanceOf({ userAddress });
       const ten = web3.utils.toBN(10);
-      const decimalsBN = web3.utils.toBN(await decimals());
+      const decimalsLP = await ContractLPToken.decimals();
+      const decimalsBN = web3.utils.toBN(decimalsLP);
       const balance = new BN(result).div(ten.pow(decimalsBN)).toString(10);
       setBalanceLPToken(balance);
       console.log('Staking lpTokenBalanceOf:', balance);
@@ -90,23 +88,41 @@ const StakingPage: React.FC = () => {
   const stake = async () => {
     try {
       const ten = web3.utils.toBN(10);
-      const decimalsBN = web3.utils.toBN(await decimals());
-      const stakeLessValueBN = new BN(stakeLessValue).mul(ten.pow(decimalsBN)).toString(10);
-      const stakeLPValueBN = new BN(stakeLPValue).mul(ten.pow(decimalsBN)).toString(10);
+      // approve Less
+      const decimalsLess = await ContractLessToken.decimals();
+      const decimalsLessBN = web3.utils.toBN(decimalsLess);
+      const stakeLessValueBN = new BN(stakeLessValue || 0)
+        .mul(ten.pow(decimalsLessBN))
+        .toString(10);
       console.log('Staking stake stakeLessValueBN:', stakeLessValueBN);
-      console.log('Staking stake stakeLPValueBN:', stakeLPValueBN);
       const { addresses }: any = config;
       const spender = addresses[config.isMainnetOrTestnet][chainType].Staking;
-      const allowance = await ContractLessToken.allowance({ userAddress, spender });
-      console.log('Staking stake allowance:', allowance);
-      if (allowance <= stakeLessValueBN && allowance <= stakeLPValueBN) {
+      const allowanceLess = await ContractLessToken.allowance({ userAddress, spender });
+      console.log('Staking stake allowanceLess:', allowanceLess);
+      if (allowanceLess <= stakeLessValueBN) {
         const resultApprove = await ContractLessToken.approve({
           userAddress,
           spender,
-          amount: stakeLessValueBN + stakeLPValueBN,
+          amount: stakeLessValueBN,
         });
         console.log('Staking stake resultApprove:', resultApprove);
       }
+      // approve LP
+      const decimalsLP = await ContractLPToken.decimals();
+      const decimalsLPBN = web3.utils.toBN(decimalsLP);
+      const stakeLPValueBN = new BN(stakeLPValue || 0).mul(ten.pow(decimalsLPBN)).toString(10);
+      console.log('Staking stake stakeLPValueBN:', stakeLPValueBN);
+      const allowanceLP = await ContractLPToken.allowance({ userAddress, spender });
+      console.log('Staking stake allowanceLP:', allowanceLP);
+      if (allowanceLP <= stakeLPValueBN) {
+        const resultApprove = await ContractLPToken.approve({
+          userAddress,
+          spender,
+          amount: stakeLPValueBN,
+        });
+        console.log('Staking stake resultApprove:', resultApprove);
+      }
+      // stake
       const result = await ContractStaking.stakeTokens({
         userAddress,
         lpAmount: stakeLPValueBN,
@@ -122,10 +138,12 @@ const StakingPage: React.FC = () => {
     }
   };
 
+  // todo unstake less/LP, rewards
   const unstake = async () => {
     try {
       const ten = web3.utils.toBN(10);
-      const decimalsBN = web3.utils.toBN(await decimals());
+      const decimalsLess = await ContractLessToken.decimals();
+      const decimalsBN = web3.utils.toBN(decimalsLess);
       const unstakeLessValueBN = new BN(stakeLessValue).mul(ten.pow(decimalsBN)).toString(10);
       const unstakeLPValueBN = new BN(stakeLessValue).mul(ten.pow(decimalsBN)).toString(10);
       console.log('Staking unstake unstakeLessValueBN:', unstakeLessValueBN);
@@ -148,8 +166,14 @@ const StakingPage: React.FC = () => {
   useEffect(() => {
     if (!userAddress) return;
     if (!ContractStaking) return;
+    const interval = setInterval(() => {
+      getLPTokenBalance();
+      getLessTokenBalance();
+    }, 20000);
     getLPTokenBalance();
     getLessTokenBalance();
+    // eslint-disable-next-line consistent-return
+    return () => clearInterval(interval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ContractStaking, userAddress]);
 
@@ -197,7 +221,7 @@ const StakingPage: React.FC = () => {
                 <div className={s.balance_bnb}>
                   <span>{Number(balanceLPToken).toFixed(3)}</span> ETH-$Less LP
                 </div>
-                <div className={s.balance_subtitle}>Avaliable to unstake:</div>
+                <div className={s.balance_subtitle}>Available to stake:</div>
                 <div className={s.balance_amount}>
                   <div className={s.balance_amount__inner}>
                     <div className={s.balance_amount__money}>

@@ -103,10 +103,10 @@ export default {
     },
     testnet: {
       'Ethereum': {
-        LessToken: '0x6d478B336D39707B57b4747d7cfca3386516B859',
-        LPToken: '0x66bF43B9fbD7780a5BdcCaE0adEE692588aE4944',
+        LessToken: '0x87feef975fd65f32A0836f910Fd13d9Cf4553690',
+        LPToken: '0x4fe142c6CBD294ef96DbBa8a837CdE3035850A97',
         LessLibrary: '0xA0BDCb13fD00D7cEF0eb872C4537fbf3F379E5Bb',
-        Staking: '0xFB2CdaCEa060A299DC165B809686D99f29517349',
+        Staking: '0x4Ae81086f0AC4E0bF454E7705719c59A9cf16F7d',
         PresaleFactory: '0x451d4bC560404b0aF65f967B125c864EbD69559d',
         PresalePublic: '0xCaC38897188e2FD8A3655f183cf86521040108fE',
       },
