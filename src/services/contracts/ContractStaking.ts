@@ -25,7 +25,6 @@ type TypeUnstakeProps = {
   lessAmount: number;
   lpRewards: number;
   lessRewards: number;
-  stakeId: number;
 };
 
 export default class ContractStakingService {
@@ -134,10 +133,11 @@ export default class ContractStakingService {
     lessAmount,
     lpRewards,
     lessRewards,
-    stakeId,
   }: TypeUnstakeProps): Promise<any> => {
     try {
       const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
+      // todo: get user stakes and their amounts, loop
+      const stakeId = 0;
       return await contract.methods
         .unstake(lpAmount, lessAmount, lpRewards, lessRewards, stakeId)
         .send({ from: userAddress });
