@@ -18,13 +18,17 @@ const StakingPage: React.FC = () => {
 
   const [balanceLessToken, setBalanceLessToken] = useState('0');
   const [balanceLPToken, setBalanceLPToken] = useState('0');
+  const [stakedLess, setStakedLess] = useState('0.000');
+  const [stakedLP, setStakedLP] = useState('0.000');
+
   const [stakeLessValue, setStakeLessValue] = useState('');
   const [stakeLPValue, setStakeLPValue] = useState('');
 
-  const [alreadyStakedLess, setAlreadyStakedLess] = useState('');
-  const [alreadyStakedEthLess, setAlreadyStakedEthLess] = useState('');
-  const [lessRewards, setLessRewards] = useState('');
-  const [ethLessRewards, setEthLessRewards] = useState('');
+  const [unstakeLessValue, setUnstakeLessValue] = useState('');
+  const [unstakeLPValue, setUnstakeLPValue] = useState('');
+
+  const [rewardLessValue, setRewardLessValue] = useState('');
+  const [rewardLPValue, setRewardLPValue] = useState('');
 
   const { chainType } = useSelector(({ wallet }: any) => wallet);
   const { address: userAddress } = useSelector(({ user }: any) => user);
@@ -37,7 +41,7 @@ const StakingPage: React.FC = () => {
       const decimalsBN = web3.utils.toBN(decimalsLess);
       const balance = new BN(result).div(ten.pow(decimalsBN)).toString(10);
       setBalanceLessToken(balance);
-      console.log('Staking lessTokenBalanceOf:', balance);
+      console.log('Staking getLessTokenBalance:', balance);
     } catch (e) {
       console.error(e);
     }
@@ -51,39 +55,39 @@ const StakingPage: React.FC = () => {
       const decimalsBN = web3.utils.toBN(decimalsLP);
       const balance = new BN(result).div(ten.pow(decimalsBN)).toString(10);
       setBalanceLPToken(balance);
-      console.log('Staking lpTokenBalanceOf:', balance);
+      console.log('Staking getLPTokenBalance:', balance);
     } catch (e) {
       console.error(e);
     }
   };
 
-  // const getLessStakedBalance = async () => {
-  //   try {
-  //     const decimals = await ContractLessToken.decimals();
-  //     const result = await ContractStaking.getLessBalance({ userAddress });
-  //     const ten = web3.utils.toBN(10);
-  //     const decimalsBN = web3.utils.toBN(decimals);
-  //     const balance = new BN(result).div(ten.pow(decimalsBN)).toString(10);
-  //     setStakeLessValue(balance);
-  //     console.log('Staking getStakedBalance:', balance);
-  //   } catch (e) {
-  //     console.error(e);
-  //   }
-  // };
+  const getStakedLess = async () => {
+    try {
+      const decimals = await ContractLessToken.decimals();
+      const result = await ContractStaking.getLessBalanceByAddress({ userAddress });
+      const ten = web3.utils.toBN(10);
+      const decimalsBN = web3.utils.toBN(decimals);
+      const balance = new BN(result).div(ten.pow(decimalsBN)).toString(10);
+      setStakedLess(balance);
+      console.log('Staking getStakedLess:', balance);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
-  // const getLPStakedBalance = async () => {
-  //   try {
-  //     const decimals = await ContractLPToken.decimals();
-  //     const result = await ContractStaking.getStakedBalance({ userAddress });
-  //     const ten = web3.utils.toBN(10);
-  //     const decimalsBN = web3.utils.toBN(decimals);
-  //     const balance = new BN(result).div(ten.pow(decimalsBN)).toString(10);
-  //     setStakeBalance(balance);
-  //     console.log('Staking getStakedBalance:', balance);
-  //   } catch (e) {
-  //     console.error(e);
-  //   }
-  // };
+  const getStakedLP = async () => {
+    try {
+      const decimals = await ContractLPToken.decimals();
+      const result = await ContractStaking.getLpBalanceByAddress({ userAddress });
+      const ten = web3.utils.toBN(10);
+      const decimalsBN = web3.utils.toBN(decimals);
+      const balance = new BN(result).div(ten.pow(decimalsBN)).toString(10);
+      setStakedLP(balance);
+      console.log('Staking getStakedLP:', balance);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   const stake = async () => {
     try {
@@ -99,7 +103,7 @@ const StakingPage: React.FC = () => {
       const spender = addresses[config.isMainnetOrTestnet][chainType].Staking;
       const allowanceLess = await ContractLessToken.allowance({ userAddress, spender });
       console.log('Staking stake allowanceLess:', allowanceLess);
-      if (allowanceLess <= stakeLessValueBN) {
+      if (stakeLessValueBN > 0 && allowanceLess <= stakeLessValueBN) {
         const resultApprove = await ContractLessToken.approve({
           userAddress,
           spender,
@@ -114,7 +118,7 @@ const StakingPage: React.FC = () => {
       console.log('Staking stake stakeLPValueBN:', stakeLPValueBN);
       const allowanceLP = await ContractLPToken.allowance({ userAddress, spender });
       console.log('Staking stake allowanceLP:', allowanceLP);
-      if (allowanceLP <= stakeLPValueBN) {
+      if (stakeLPValueBN > 0 && allowanceLP <= stakeLPValueBN) {
         const resultApprove = await ContractLPToken.approve({
           userAddress,
           spender,
@@ -163,15 +167,43 @@ const StakingPage: React.FC = () => {
     }
   };
 
+  const handleSetMaxLessStake = () => {
+    setStakeLessValue(balanceLessToken);
+  };
+
+  const handleSetMaxLPStake = () => {
+    setStakeLPValue(balanceLPToken);
+  };
+
+  const handleSetMaxLessUnstake = () => {
+    setUnstakeLessValue(stakedLess);
+  };
+
+  const handleSetMaxLPUnstake = () => {
+    setUnstakeLPValue(stakedLP);
+  };
+
+  const handleSetMaxLessReward = () => {
+    // setRewardLessValue(balanceLessToken); // todo
+  };
+
+  const handleSetMaxLPReward = () => {
+    // setRewardLPValue(balanceLessToken); // todo
+  };
+
   useEffect(() => {
     if (!userAddress) return;
     if (!ContractStaking) return;
     const interval = setInterval(() => {
       getLPTokenBalance();
       getLessTokenBalance();
+      getStakedLess();
+      getStakedLP();
     }, 20000);
     getLPTokenBalance();
     getLessTokenBalance();
+    getStakedLess();
+    getStakedLP();
     // eslint-disable-next-line consistent-return
     return () => clearInterval(interval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -208,7 +240,13 @@ const StakingPage: React.FC = () => {
                         onChange={(e) => setStakeLessValue(e.target.value.replace(/[^\d.,]/g, ''))}
                       />
                     </div>
-                    <div className={s.balance_amount__img}>
+                    <div
+                      className={s.balance_amount__img}
+                      role="button"
+                      tabIndex={0}
+                      onClick={handleSetMaxLessStake}
+                      onKeyDown={() => {}}
+                    >
                       <img src={maxImg} alt="maxImg" />
                     </div>
                   </div>
@@ -232,7 +270,13 @@ const StakingPage: React.FC = () => {
                         onChange={(e) => setStakeLPValue(e.target.value.replace(/[^\d.,]/g, ''))}
                       />
                     </div>
-                    <div className={s.balance_amount__img}>
+                    <div
+                      className={s.balance_amount__img}
+                      role="button"
+                      tabIndex={0}
+                      onClick={handleSetMaxLPStake}
+                      onKeyDown={() => {}}
+                    >
                       <img src={maxImg} alt="maxImg" />
                     </div>
                   </div>
@@ -256,7 +300,7 @@ const StakingPage: React.FC = () => {
                 <span>Already staked $Less</span>
               </div>
               <div className={s.small_balance_subtitle}>
-                <span>0.000 Less</span>
+                <span>{stakedLess} Less</span>
               </div>
               <div className={s.balance_amount}>
                 <div className={s.balance_amount__inner}>
@@ -264,11 +308,17 @@ const StakingPage: React.FC = () => {
                     <input
                       type="text"
                       placeholder="0.0"
-                      value={alreadyStakedLess}
-                      onChange={(e) => setAlreadyStakedLess(e.target.value.replace(/[^\d.,]/g, ''))}
+                      value={unstakeLessValue}
+                      onChange={(e) => setUnstakeLessValue(e.target.value.replace(/[^\d.,]/g, ''))}
                     />
                   </div>
-                  <div className={s.balance_amount__img}>
+                  <div
+                    className={s.balance_amount__img}
+                    role="button"
+                    tabIndex={0}
+                    onClick={handleSetMaxLessUnstake}
+                    onKeyDown={() => {}}
+                  >
                     <img src={maxImg} alt="maxImg" />
                   </div>
                 </div>
@@ -279,7 +329,7 @@ const StakingPage: React.FC = () => {
                 <span>Already staked ETH-$Less LP</span>
               </div>
               <div className={s.small_balance_subtitle}>
-                <span>0.000 ETH-$Less LP</span>
+                <span>{stakedLP} ETH-$Less LP</span>
               </div>
               <div className={s.balance_amount}>
                 <div className={s.balance_amount__inner}>
@@ -287,13 +337,17 @@ const StakingPage: React.FC = () => {
                     <input
                       type="text"
                       placeholder="0.0"
-                      value={alreadyStakedEthLess}
-                      onChange={(e) =>
-                        setAlreadyStakedEthLess(e.target.value.replace(/[^\d.,]/g, ''))
-                      }
+                      value={unstakeLPValue}
+                      onChange={(e) => setUnstakeLPValue(e.target.value.replace(/[^\d.,]/g, ''))}
                     />
                   </div>
-                  <div className={s.balance_amount__img}>
+                  <div
+                    className={s.balance_amount__img}
+                    role="button"
+                    tabIndex={0}
+                    onClick={handleSetMaxLPUnstake}
+                    onKeyDown={() => {}}
+                  >
                     <img src={maxImg} alt="maxImg" />
                   </div>
                 </div>
@@ -312,11 +366,17 @@ const StakingPage: React.FC = () => {
                     <input
                       type="text"
                       placeholder="0.0"
-                      value={lessRewards}
-                      onChange={(e) => setLessRewards(e.target.value.replace(/[^\d.,]/g, ''))}
+                      value={rewardLessValue}
+                      onChange={(e) => setRewardLessValue(e.target.value.replace(/[^\d.,]/g, ''))}
                     />
                   </div>
-                  <div className={s.balance_amount__img}>
+                  <div
+                    className={s.balance_amount__img}
+                    role="button"
+                    tabIndex={0}
+                    onClick={handleSetMaxLessReward}
+                    onKeyDown={() => {}}
+                  >
                     <img src={maxImg} alt="maxImg" />
                   </div>
                 </div>
@@ -335,11 +395,17 @@ const StakingPage: React.FC = () => {
                     <input
                       type="text"
                       placeholder="0.0"
-                      value={ethLessRewards}
-                      onChange={(e) => setEthLessRewards(e.target.value.replace(/[^\d.,]/g, ''))}
+                      value={rewardLPValue}
+                      onChange={(e) => setRewardLPValue(e.target.value.replace(/[^\d.,]/g, ''))}
                     />
                   </div>
-                  <div className={s.balance_amount__img}>
+                  <div
+                    className={s.balance_amount__img}
+                    role="button"
+                    tabIndex={0}
+                    onClick={handleSetMaxLPReward}
+                    onKeyDown={() => {}}
+                  >
                     <img src={maxImg} alt="maxImg" />
                   </div>
                 </div>

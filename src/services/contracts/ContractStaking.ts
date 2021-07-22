@@ -47,8 +47,9 @@ export default class ContractStakingService {
   }
 
   // get balance of staked Less
-  public getLessBalance = async ({ userAddress }: TypeGetStakedBalanceProps): Promise<any> => {
+  public getLessBalanceByAddress = async (props: TypeGetStakedBalanceProps): Promise<any> => {
     try {
+      const { userAddress } = props;
       const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
       return await contract.methods.getLessBalanceByAddress(userAddress).call();
     } catch (e) {
@@ -58,8 +59,9 @@ export default class ContractStakingService {
   };
 
   // get balance of staked Less LP
-  public getLPBalance = async ({ userAddress }: TypeGetStakedBalanceProps): Promise<any> => {
+  public getLpBalanceByAddress = async (props: TypeGetStakedBalanceProps): Promise<any> => {
     try {
+      const { userAddress } = props;
       const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
       return await contract.methods.getLpBalanceByAddress(userAddress).call();
     } catch (e) {
