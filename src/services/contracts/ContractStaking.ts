@@ -13,6 +13,11 @@ type TypeGetStakedBalanceProps = {
   userAddress: string;
 };
 
+type TypeGetStakeListProps = {
+  userAddress: string;
+  index: number;
+};
+
 type TypeStakeProps = {
   userAddress: string;
   lpAmount: number;
@@ -83,6 +88,18 @@ export default class ContractStakingService {
     }
   };
 
+  // get stake of user by address and index
+  public getStakeList = async (props: TypeGetStakeListProps): Promise<any> => {
+    try {
+      const { userAddress, index } = props;
+      const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
+      return await contract.methods.stakeList(userAddress, index).call();
+    } catch (e) {
+      console.error('ContractStakingService getStakeList:', e);
+      return null;
+    }
+  };
+
   public getLessRewards = async (props: TypeGetStakedBalanceProps): Promise<any> => {
     try {
       const { userAddress } = props;
@@ -136,11 +153,38 @@ export default class ContractStakingService {
   }: TypeUnstakeProps): Promise<any> => {
     try {
       const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
-      // todo: get user stakes and their amounts, loop
-      const stakeId = 0;
-      return await contract.methods
-        .unstake(lpAmount, lessAmount, lpRewards, lessRewards, stakeId)
-        .send({ from: userAddress });
+      let lpAmountCounter = lpAmount;
+      let lessAmountCounter = lessAmount;
+      let lpRewardsCounter = lpRewards;
+      let lessRewardsCounter = lessRewards;
+      const amountOfUsersStakes = await this.getAmountOfUsersStakes({ userAddress });
+      for (let i = 0; i < amountOfUsersStakes; i += 1) {
+        const stakeId = i;
+        const stake = await this.getStakeList({ userAddress, index: stakeId });
+        let { stakedLess, stakedLp, lpEarned, lessEarned } = stake;
+        console.log('ContractStakingService unstake', { i, stakedLess, stakedLp });
+        // next iterate, if this stake was unstaked
+        if (stakedLp + stakedLess + lpEarned + lessEarned === 0) continue;
+        // amounts shouldnt be less than 0
+        if (lpAmountCounter <= 0) stakedLp = 0;
+        if (lessAmountCounter <= 0) stakedLess = 0;
+        if (lpRewardsCounter <= 0) lpEarned = 0;
+        if (lessRewardsCounter <= 0) lessEarned = 0;
+        if (stakedLp + stakedLess + lpEarned + lessEarned === 0) return null;
+        try {
+          const result = await contract.methods
+            .unstake(stakedLp, stakedLess, lpRewards, lessRewards, stakeId)
+            .send({ from: userAddress });
+          console.log('ContractStakingService unstake', result);
+          lpAmountCounter -= stakedLp;
+          lessAmountCounter -= stakedLess;
+          lpRewardsCounter -= lpEarned;
+          lessRewardsCounter -= lessEarned;
+        } catch (e) {
+          console.error(e);
+        }
+      }
+      return null;
     } catch (e) {
       console.error('ContractStakingService stake:', e);
       return null;
