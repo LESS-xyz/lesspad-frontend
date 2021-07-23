@@ -125,19 +125,19 @@ const ParticipantsTable: React.FC = () => {
               ))}
             </div>
             {/* для первых двух тиров показываем список победителей */}
-            <div className={s.table_body_adresses__right}>
-              {(activeTier === 'pawns' || activeTier === 'bishops') && (
+            {(activeTier === 'pawns' || activeTier === 'bishops') && (
+              <div className={s.table_body_adresses__right}>
                 <div className={`${s.table_body_adresses__title} ${s.winner}`}>
                   <span>Lottery winners</span>
                 </div>
-              )}
-              {(activeTier === 'pawns' || activeTier === 'bishops') &&
-                winnersExample.map((winner) => (
+
+                {winnersExample.map((winner) => (
                   <div className={`${s.participant} ${s.winner}`}>
                     <span>{winner}</span>
                   </div>
                 ))}
-            </div>
+              </div>
+            )}
           </div>
           <div className={s.table_body_pagination}>
             <Pagination countOfPages={4} onChange={() => {}} />

@@ -1,5 +1,6 @@
 @import '../../../styles/mixins/grid.scss';
 @import '../../../styles/mixins/flex.scss';
+@import '../../../styles/mixins/media.scss';
 @import '../../../styles/mixins/gradient-text.scss';
 
 .block {
@@ -11,6 +12,9 @@
   color: var(--grey);
   font-size: 40px;
   margin-bottom: 36px;
+  @include b(tablet) {
+    font-size: 23px;
+  }
 }
 
 // table
@@ -34,6 +38,10 @@
         color: #9c8aff;
         font-weight: 500;
 
+        @include b(extramobile) {
+          font-size: 14px;
+        }
+
         &.active {
           height: 100%;
           background: var(--gradient);
@@ -48,12 +56,22 @@
     background-color: rgba(103, 77, 246, 0.2);
     padding: 28px 28px 40px;
     @include flex(column, center, center);
+    @include b(tablet) {
+      background-color: transparent;
+      padding: 28px 0 40px;
+      min-height: 0;
+    }
 
     &_adresses {
       flex-grow: 1;
       width: 100%;
       @include grid;
+      grid-auto-rows: auto;
       justify-content: center;
+      @include b(mobile) {
+        grid-template-columns: 1fr;
+        margin-bottom: 20px;
+      }
 
       &__title {
         font-size: 20px;
@@ -70,6 +88,9 @@
       &__left,
       &__right {
         padding-left: 100px;
+        @include b(tablet) {
+          padding-left: 0;
+        }
       }
     }
   }

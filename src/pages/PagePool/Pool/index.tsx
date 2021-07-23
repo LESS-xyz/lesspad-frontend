@@ -190,9 +190,13 @@ const Pool: React.FC = () => {
 
       <div className="preview">
         <div className="description">
-          <img className="icon-logo" src={Logo} alt="Logo" />
+          <div className="logo-center">
+            <img className="icon-logo" src={Logo} alt="Logo" />
+          </div>
           <div className="description-info">
-            <div className="description-info-header">{name}</div>
+            <div className="description-info-header">
+              <span>{name}</span>
+            </div>
             <div className="description-info-text">
               Autonomous interest rate protocol for on-chain lending and borrowing
             </div>
@@ -227,10 +231,11 @@ const Pool: React.FC = () => {
           <div className="grow-max">0.000 / 1164.000 {currency}</div>
         </div>
       </div>
+
       <div className="box">
-        <div className="row">
-          {row1.map((item) => (
-            <div className={item.last ? 'item last' : 'item'}>
+        <div className="row row-items">
+          {row1.map((item, i) => (
+            <div className={`${item.last ? 'item last' : 'item'} ${i % 2 !== 0 && 'cell'}`}>
               {item.header}
               {item.gradient ? (
                 <div className="gradient-text">{item.value}</div>
@@ -243,9 +248,9 @@ const Pool: React.FC = () => {
             </div>
           ))}
         </div>
-        <div className="row">
-          {row2.map((item) => (
-            <div className={item.last ? 'item last' : 'item'}>
+        <div className="row row-items">
+          {row2.map((item, i) => (
+            <div className={`${item.last ? 'item last' : 'item'} ${i % 2 !== 0 && 'cell'}`}>
               {item.header}
               {item.gradient ? (
                 <div className="gradient-text">{item.value}</div>
@@ -258,9 +263,9 @@ const Pool: React.FC = () => {
             </div>
           ))}
         </div>
-        <div className="row last">
-          {row3.map((item) => (
-            <div className={item.last ? 'item last' : 'item'}>
+        <div className="row row-items last">
+          {row3.map((item, i) => (
+            <div className={`${item.last ? 'item last' : 'item'} ${i % 2 !== 0 && 'cell'}`}>
               {item.header}
               {item.gradient ? (
                 <div className="gradient-text">{item.value}</div>
@@ -274,9 +279,10 @@ const Pool: React.FC = () => {
           ))}
         </div>
       </div>
+
       <YourTier tier="king" className="tier-block" />
       <div className="container-header">Your Investment</div>
-      <div className="box">
+      <div className="box box-bg">
         <div className="row last">
           {invest.map((item) => (
             <div className={item.last ? 'item last' : 'item'}>
@@ -303,7 +309,7 @@ const Pool: React.FC = () => {
             <div className="box-links-link">
               <div className="box-links-link-content">
                 <div className="box-links-link-content-header">{item.header}</div>
-                {item.value}
+                <div>{item.value}</div>
               </div>
               <div className="box-links-link-button">
                 <img src={Subscribe} alt="Subscribe icon" />
@@ -323,31 +329,9 @@ const Pool: React.FC = () => {
         </div>
       </div>
       <div className="container-header">Audit</div>
-      <div className="box">
+      <div className="box box-bg">
         <div className="box-text">Not audited yet.</div>
       </div>
-      {/* <div className="container-header">Disclaimer</div>
-      <div className="box">
-        <div className="box-disclaimer">
-          <p>
-            The BSCstarter team does not endorse, support or otherwise perform any due diligence on
-            the projects listed on its platform. As always, please DO YOUR OWN RESEARCH before
-            investing any of your hard-earned {currency} into these projects and never invest more
-            than you are willing to lose.
-          </p>
-          <p>
-            <b>PLEASE NOTE THAT WE CANNOT ACCEPT INVESTMENT FROM THE FOLLOWING COUNTRIES:</b>
-            <br />
-            Afghanistan, Albania, Bahamas, Barbados, Botswana, Cambodia, Canada, Cuba, Ghana, Iran
-            (Islamic Republic of), Iraq, Jamaica, Korea (the Democratic People’s Republic of),
-            Libya, Mauritius, Myanmar, Nicaragua, Panama, Pakistan, South Sudan, Sudan (North),
-            Syrian Arab Republic, The Crimea, Trinidad and Tobago, Uganda, United States of America,
-            Vanuatu, Yemen, Zimbabwe; Jurisdictions in which participation or ownership of tokens is
-            prohibited by any applicable Law; Jurisdictions which are subject to United States,
-            United Nations, or other applicable sanctions or embargoes.
-          </p>
-        </div>
-      </div> */}
     </div>
   );
 };
