@@ -134,11 +134,11 @@
           font-weight: 400;
         }
       }
-
-      &-date {
-        opacity: 60% !important;
-      }
     }
+  }
+
+  .preview-info-date__text-opacity {
+    opacity: 60% !important;
   }
 
   .grow {
@@ -151,8 +151,6 @@
       margin-bottom: 14px;
 
       font-size: 16px;
-
-      opacity: 60% !important;
     }
 
     &-progress {

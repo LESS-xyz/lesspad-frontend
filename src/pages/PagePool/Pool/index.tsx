@@ -212,11 +212,15 @@ const Pool: React.FC = () => {
           <div className="preview-info-days">
             <div className="preview-info-days-text">opens in 3 days</div>
           </div>
-          <div className="preview-info-date">Listing: June 07, 2021 18:00 PM GMT</div>
+          <div className="preview-info-date preview-info-date__text-opacity">
+            Listing: June 07, 2021 18:00 PM GMT
+          </div>
         </div>
       </div>
       <div className="grow">
-        <div className="grow-text">0.0001454 {currency} per Token</div>
+        <div className="grow-text preview-info-date__text-opacity">
+          0.0001454 {currency} per Token
+        </div>
         <div className="grow-progress">
           <div>0.000 {currency} Raised</div>
           <div>0 Participants</div>
