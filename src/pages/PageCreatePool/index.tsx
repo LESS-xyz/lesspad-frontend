@@ -22,7 +22,7 @@ const { BN }: any = Web3.utils;
 const CreatePoolPage: React.FC = () => {
   const { web3 } = useWeb3ConnectorContext();
   const {
-    // ContractPresaleFactory,
+    ContractPresaleFactory,
     ContractLessToken,
     ContractStaking,
     ContractLessLibrary,
@@ -257,56 +257,12 @@ const CreatePoolPage: React.FC = () => {
         // return; // todo
       }
       if (!checkTime) return;
-      // порядок полей менять нельзя!
-      const presaleInfo = [
-        tokenAddress,
-        tokenPriceInWei,
-        hardCapInWei,
-        softCapInWei,
-        // maxInvestInWei,
-        // minInvestInWei, // 5
-        openVotingTime,
-        openTime,
-        closeTime,
-        // presaleType,
-        // isLiquidity,
-        // isAutomatically, // 10
-        // isWhiteListed,
-        // whitelistArray,
-        // isVesting,
-      ];
-      // порядок полей менять нельзя!
-      const presalePancakeSwapInfo = [
-        listingPriceInWei,
-        lpTokensLockDurationInDays,
-        liquidityPercentageAllocation,
-        liquidityAllocationTime,
-      ];
-      // порядок полей менять нельзя!
-      const presaleStringInfo = [
-        saleTitle,
-        linkTelegram,
-        linkGithub,
-        linkTwitter,
-        linkWebsite,
-        linkLogo,
-        description,
-        whitepaper,
-      ];
-
-      console.log({ isPublic, presaleInfo, presalePancakeSwapInfo, presaleStringInfo });
       setIsFormSubmitted(true);
       const resultApprove = await approve();
       if (!resultApprove) return;
-      // const resultCreatePresalePublic = await ContractPresaleFactory.createPresalePublic({
-      //   userAddress,
-      //   presaleInfo,
-      //   presalePancakeSwapInfo,
-      //   presaleStringInfo,
-      // });
-      // console.log('CreatePool handleSubmit', resultCreatePresalePublic);
-      // if (resultCreatePresalePublic) await subscribeEvent('PublicPresaleCreated');
       // login to backend
+      let timestamp;
+      let signature;
       const resultGetMetamaskMessage = await Backend.getMetamaskMessage();
       console.log('PageCreatePool resultGetMetamaskMessage:', resultGetMetamaskMessage);
       if (resultGetMetamaskMessage.data) {
@@ -320,8 +276,58 @@ const CreatePoolPage: React.FC = () => {
             signedMsg,
           });
           console.log('PageCreatePool resultMetamaskLogin:', resultMetamaskLogin);
+          if (resultMetamaskLogin.data) {
+            const { key } = resultMetamaskLogin.data;
+            const resultGetPoolSignature = await Backend.getPoolSignature({
+              token: key,
+            });
+            console.log('PageCreatePool resultGetPoolSignature:', resultGetPoolSignature);
+            if (resultGetPoolSignature.data) {
+              timestamp = resultGetPoolSignature.data.date;
+              signature = resultGetPoolSignature.data.signature;
+            }
+          }
         }
       }
+
+      const tokenAmount = new BN(500).mul(new BN(10).pow(new BN(18))).toString(10); // todo
+      const presaleInfo = [
+        tokenAddress,
+        tokenPriceInWei,
+        hardCapInWei,
+        softCapInWei,
+        openVotingTime,
+        openTime,
+        closeTime,
+        tokenAmount,
+        signature,
+        timestamp,
+      ];
+      const presalePancakeSwapInfo = [
+        listingPriceInWei,
+        lpTokensLockDurationInDays,
+        liquidityPercentageAllocation,
+        liquidityAllocationTime,
+      ];
+      const presaleStringInfo = [
+        saleTitle,
+        linkTelegram,
+        linkGithub,
+        linkTwitter,
+        linkWebsite,
+        linkLogo,
+        description,
+        whitepaper,
+      ];
+      console.log({ isPublic, presaleInfo, presalePancakeSwapInfo, presaleStringInfo });
+      const resultCreatePresalePublic = await ContractPresaleFactory.createPresalePublic({
+        userAddress,
+        presaleInfo,
+        presalePancakeSwapInfo,
+        presaleStringInfo,
+      });
+      console.log('CreatePool handleSubmit', resultCreatePresalePublic);
+      // if (resultCreatePresalePublic) await subscribeEvent('PublicPresaleCreated');
     } catch (e) {
       console.error('PageCreatePool handleSubmit:', e);
     }

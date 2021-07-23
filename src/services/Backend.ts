@@ -10,6 +10,20 @@ type TypeMetamaskLoginProps = {
   signedMsg: string;
 };
 
+type TypeGetPoolSignatureProps = {
+  token: string;
+};
+
+type TypeGetVotingSignatureProps = {
+  token: string;
+  pool: string;
+};
+
+type TypeGetTierSignatureProps = {
+  token: string;
+  presale: string;
+};
+
 // type TypeAddPoolProps = {
 //   type_presale?: string;
 //   name: string;
@@ -36,11 +50,6 @@ type TypeMetamaskLoginProps = {
 //   vote_to_remove: number;
 //   user: number;
 // };
-
-// todo
-type TypeGetVotingSignatureProps = {
-  data: string;
-};
 
 export class BackendService {
   private axios: any;
@@ -81,10 +90,10 @@ export class BackendService {
     }
   };
 
-  getAllPools = async () => {
+  getPoolSignature = async (props: TypeGetPoolSignatureProps) => {
     try {
       const url = `/pool/`;
-      const result = await this.axios.get(url);
+      const result = await this.axios.post(url, props);
       // console.log('BackendService getAllPools:', result);
       return { data: result.data };
     } catch (e) {
@@ -93,55 +102,50 @@ export class BackendService {
     }
   };
 
-  getPool = async (address: string) => {
-    try {
-      const url = `/pool/${address}`;
-      const result = await this.axios.get(url);
-      // console.log('BackendService getAllPools:', result);
-      return { data: result.data };
-    } catch (e) {
-      // console.error('BackendService getAllPools:', e);
-      return { data: null, error: e.response.data };
-    }
-  };
-
-  addPool = async (props: any) => {
-    try {
-      const url = `/pool/`;
-      const options = {};
-      const result = await this.axios.post(url, props, options);
-      // console.log('BackendService addPool:', result);
-      return { data: result.data };
-    } catch (e) {
-      // console.error('BackendService addPool:', e);
-      return { data: null, error: e.response.data };
-    }
-  };
-
-  getVoting = async () => {
-    try {
-      const url = `/voting/`;
-      const result = await this.axios.get(url);
-      // console.log('BackendService getVoting:', result);
-      return { data: result.data };
-    } catch (e) {
-      // console.error('BackendService getVoting:', e);
-      return { data: null, error: e.response.data };
-    }
-  };
-
-  // todo
   getVotingSignature = async (props: TypeGetVotingSignatureProps) => {
     try {
       const url = `/voting/`;
-      const options = {
-        // headers: { Authorization: 'token' },
-      };
-      const result = await this.axios.post(url, props, options);
-      // console.log('BackendService getVoting:', result);
+      const result = await this.axios.post(url, props);
+      // console.log('BackendService getAllPools:', result);
       return { data: result.data };
     } catch (e) {
-      // console.error('BackendService getVoting:', e);
+      // console.error('BackendService getAllPools:', e);
+      return { data: null, error: e.response.data };
+    }
+  };
+
+  getWhitelistSignature = async (props: TypeGetVotingSignatureProps) => {
+    try {
+      const url = `/whitelist/`;
+      const result = await this.axios.post(url, props);
+      // console.log('BackendService getAllPools:', result);
+      return { data: result.data };
+    } catch (e) {
+      // console.error('BackendService getAllPools:', e);
+      return { data: null, error: e.response.data };
+    }
+  };
+
+  getInvestSignature = async (props: TypeGetVotingSignatureProps) => {
+    try {
+      const url = `/invest/`;
+      const result = await this.axios.post(url, props);
+      // console.log('BackendService getAllPools:', result);
+      return { data: result.data };
+    } catch (e) {
+      // console.error('BackendService getAllPools:', e);
+      return { data: null, error: e.response.data };
+    }
+  };
+
+  getTierSignature = async (props: TypeGetTierSignatureProps) => {
+    try {
+      const url = `/tier/`;
+      const result = await this.axios.post(url, props);
+      // console.log('BackendService getAllPools:', result);
+      return { data: result.data };
+    } catch (e) {
+      // console.error('BackendService getAllPools:', e);
       return { data: null, error: e.response.data };
     }
   };
