@@ -1,4 +1,6 @@
 @import '../../styles/mixins/container.scss';
+@import '../../styles/mixins/media.scss';
+
 .container {
   @include container;
 }
@@ -34,6 +36,8 @@
   cursor: pointer;
   font-size: 16px;
   margin-right: 24px;
+  text-decoration: none;
+  color: #fff;
   &:last-child {
     margin-right: 0;
   }
@@ -46,21 +50,33 @@
   background: var(--footer-line-background);
   opacity: 0.2;
   margin-bottom: 25px;
+  @include b(tablet) {
+    margin-bottom: 40px;
+  }
 }
 
 // info-bottom
 .info {
   display: flex;
   justify-content: space-between;
+  @include b(tablet) {
+    flex-wrap: wrap;
+    flex-direction: column-reverse;
+    align-items: center;
+  }
 }
 
 .info_text {
   font-size: 14px;
   color: var(--grey);
+  line-height: 2;
 }
 
 .social_links {
   display: flex;
+  @include b(tablet) {
+    margin-bottom: 40px;
+  }
 }
 .social_link {
   cursor: pointer;
@@ -74,5 +90,14 @@
   margin-right: 16px;
   &:last-child {
     margin-right: 0;
+  }
+
+  @include b(tablet) {
+    width: 48px;
+    height: 48px;
+    img {
+      width: 16px;
+      height: 16px;
+    }
   }
 }

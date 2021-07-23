@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 import github from '../../assets/img/icons/github.svg';
 import logo from '../../assets/img/icons/logo-small.svg';
@@ -20,11 +21,17 @@ const Footer: React.FC = () => {
             <div className={s.logo_text}>less</div>
           </div>
           <div className={s.links}>
-            <div className={s.link}>Pools</div>
-            <div className={s.link}>Voting</div>
-            <div className={s.link}>Liquidity Mining</div>
-            <div className={s.link}>Stats</div>
-            <div className={s.link}>Staking</div>
+            <Link to="/pools" className={s.link}>
+              Pools
+            </Link>
+            <Link to="/voting" className={s.link}>
+              Voting
+            </Link>
+            {/* <div className={s.link}>Liquidity Mining</div> */}
+            {/* <div className={s.link}>Stats</div> */}
+            <Link to="/staking" className={s.link}>
+              Staking
+            </Link>
           </div>
           <div className={s.line} />
           <div className={s.info}>

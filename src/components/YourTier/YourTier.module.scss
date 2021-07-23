@@ -1,5 +1,7 @@
 @import '../../styles/mixins/container.scss';
 @import '../../styles/mixins/grid.scss';
+@import '../../styles/mixins/flex.scss';
+@import '../../styles/mixins/media.scss';
 
 .container {
   @include container;
@@ -7,21 +9,40 @@
 
 .tier {
   position: relative;
-  
+
   &_title {
     text-align: center;
     font-size: 40px;
     color: var(--grey);
     margin-bottom: 34px;
+    @include b(tablet) {
+      font-size: 23px;
+    }
   }
 
   &_body {
     @include grid(repeat(5, 1fr), 1fr, 0px);
+    @include b(mobile) {
+      grid-template-columns: 1fr;
+    }
   }
 
   &_item {
     text-align: center;
     opacity: 0.5;
+    @include b(mobile) {
+      display: grid;
+      grid-template-columns: 5fr 1fr;
+      gap: 20px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    @include b(extramobile) {
+      display: grid;
+      grid-template-columns: 3fr 1fr;
+      gap: 20px;
+    }
+
     &.active {
       opacity: 1;
     }
@@ -55,12 +76,18 @@
     &_bg {
       height: 29px;
       margin-bottom: 19px;
+      @include b(mobile) {
+        margin-bottom: 0;
+      }
     }
 
     &_title {
       font-weight: bold;
       font-size: 20px;
       color: var(--grey);
+      @include b(mobile) {
+        text-align: left;
+      }
     }
   }
 }
