@@ -263,10 +263,10 @@ const StakingPage: React.FC = () => {
             <div className={s.small_balances}>
               <div className={s.balance_inner}>
                 <div className={s.balance_title}>
-                  Your <span>$Less</span> Balance
+                  Your <span>$LESS</span> Balance
                 </div>
                 <div className={s.balance_bnb}>
-                  <span>{Number(balanceLessToken).toFixed(3)}</span> $Less
+                  <span>{Number(balanceLessToken).toFixed(3)}</span> $LESS
                 </div>
                 <div className={s.balance_subtitle}>Available to stake:</div>
                 <div className={s.balance_amount}>
@@ -293,10 +293,10 @@ const StakingPage: React.FC = () => {
               </div>
               <div className={s.balance_inner}>
                 <div className={s.balance_title}>
-                  Your <span>ETH-$Less LP</span> Balance
+                  Your <span>ETH-$LESS LP</span> Balance
                 </div>
                 <div className={s.balance_bnb}>
-                  <span>{Number(balanceLPToken).toFixed(3)}</span> ETH-$Less LP
+                  <span>{Number(balanceLPToken).toFixed(3)}</span> ETH-$LESS LP
                 </div>
                 <div className={s.balance_subtitle}>Available to stake:</div>
                 <div className={s.balance_amount}>
@@ -336,10 +336,10 @@ const StakingPage: React.FC = () => {
           <div className={`${s.small_balances} ${s.wide}`}>
             <div className={s.small_balance}>
               <div className={s.small_balance_title}>
-                <span>Already staked $Less</span>
+                <span>Already staked $LESS</span>
               </div>
               <div className={s.small_balance_subtitle}>
-                <span>{stakedLess} $Less</span>
+                <span>{stakedLess} $LESS</span>
               </div>
               <div className={s.balance_amount}>
                 <div className={s.balance_amount__inner}>
@@ -365,10 +365,10 @@ const StakingPage: React.FC = () => {
             </div>
             <div className={s.small_balance}>
               <div className={s.small_balance_title}>
-                <span>Already staked ETH-$Less LP</span>
+                <span>Already staked ETH-$LESS LP</span>
               </div>
               <div className={s.small_balance_subtitle}>
-                <span>{stakedLP} ETH-$Less LP</span>
+                <span>{stakedLP} ETH-$LESS LP</span>
               </div>
               <div className={s.balance_amount}>
                 <div className={s.balance_amount__inner}>
@@ -394,10 +394,10 @@ const StakingPage: React.FC = () => {
             </div>
             <div className={s.small_balance}>
               <div className={s.small_balance_title}>
-                <span>$Less Rewards</span>
+                <span>$LESS Rewards</span>
               </div>
               <div className={s.small_balance_subtitle}>
-                <span>{lessRewards} $Less</span>
+                <span>{lessRewards} $LESS</span>
               </div>
               <div className={s.balance_amount}>
                 <div className={s.balance_amount__inner}>
@@ -423,10 +423,10 @@ const StakingPage: React.FC = () => {
             </div>
             <div className={s.small_balance}>
               <div className={s.small_balance_title}>
-                <span>ETH-$Less LP Rewards</span>
+                <span>ETH-$LESS LP Rewards</span>
               </div>
               <div className={s.small_balance_subtitle}>
-                <span>{lpRewards} ETH-$Less LP</span>
+                <span>{lpRewards} ETH-$LESS LP</span>
               </div>
               <div className={s.balance_amount}>
                 <div className={s.balance_amount__inner}>
