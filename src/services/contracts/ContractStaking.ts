@@ -88,6 +88,21 @@ export default class ContractStakingService {
     }
   };
 
+  // get stake balance of user by address, also time of last stake and lat unstake
+  public getStakedInfo = async (props: TypeGetStakeListProps): Promise<any> => {
+    try {
+      const { userAddress } = props;
+      const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
+      const result = await contract.methods.getStakedInfo(userAddress).call();
+      console.log('ContractStakingService getStakedInfo:', result);
+      const { 0: stakedBalance, 1: lastStakeTime, 2: lastUnstakeTime } = result;
+      return { stakedBalance, lastStakeTime, lastUnstakeTime };
+    } catch (e) {
+      console.error('ContractStakingService getStakedInfo:', e);
+      return null;
+    }
+  };
+
   // get stake of user by address and index
   public getStakeList = async (props: TypeGetStakeListProps): Promise<any> => {
     try {
@@ -159,9 +174,9 @@ export default class ContractStakingService {
       let lessRewardsCounter = lessRewards;
       const amountOfUsersStakes = await this.getAmountOfUsersStakes({ userAddress });
       for (let i = 0; i < amountOfUsersStakes; i += 1) {
-        const stakeId = i;
-        const stake = await this.getStakeList({ userAddress, index: stakeId });
+        const stake = await this.getStakeList({ userAddress, index: i });
         let { stakedLess, stakedLp, lpEarned, lessEarned } = stake;
+        const { stakeId } = stake;
         console.log('ContractStakingService unstake', { i, stakedLess, stakedLp });
         // next iterate, if this stake was unstaked
         if (stakedLp + stakedLess + lpEarned + lessEarned === 0) continue;
@@ -171,6 +186,11 @@ export default class ContractStakingService {
         if (lpRewardsCounter <= 0) lpEarned = 0;
         if (lessRewardsCounter <= 0) lessEarned = 0;
         if (stakedLp + stakedLess + lpEarned + lessEarned === 0) return null;
+        // if amount is less or equal to stake
+        if (lpAmountCounter <= stakedLp) stakedLp = lpAmountCounter;
+        if (lessAmountCounter <= stakedLess) stakedLess = lessAmountCounter;
+        if (lpRewardsCounter <= lpEarned) lpEarned = lpRewardsCounter;
+        if (lessRewardsCounter <= lessEarned) lessEarned = lessRewardsCounter;
         try {
           const result = await contract.methods
             .unstake(stakedLp, stakedLess, lpRewards, lessRewards, stakeId)

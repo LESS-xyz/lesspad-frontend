@@ -13,23 +13,23 @@ const tiersImgs = [tierPawn, tierBishop, tierRook, tierQueen, tierKing];
 const tiersData = [
   {
     title: 'Pawns',
-    text: ['Stake 1,000 $Less', 'Pool Size = 15%', 'Lottery Based'],
+    text: ['Stake 1,000 $LESS', 'Pool Size = 15%', 'Lottery Based'],
   },
   {
     title: 'Bishops',
-    text: ['Stake 5,000 $Less', 'Pool Size = 20%', 'Lottery Based'],
+    text: ['Stake 5,000 $LESS', 'Pool Size = 20%', 'Lottery Based'],
   },
   {
     title: 'Rooks',
-    text: ['Stake 20,000 $Less', 'Pool Size = 15%', 'Guaranteed Allocation'],
+    text: ['Stake 20,000 $LESS', 'Pool Size = 15%', 'Guaranteed Allocation'],
   },
   {
     title: 'Queens',
-    text: ['Stake 50,000 $Less', 'Pool Size = 20%', 'Guaranteed Allocation'],
+    text: ['Stake 50,000 $LESS', 'Pool Size = 20%', 'Guaranteed Allocation'],
   },
   {
     title: 'Kings',
-    text: ['Stake 200,000 $Less', 'Pool Size = 30%', 'Guaranteed Allocation'],
+    text: ['Stake 200,000 $LESS', 'Pool Size = 30%', 'Guaranteed Allocation'],
   },
 ];
 
