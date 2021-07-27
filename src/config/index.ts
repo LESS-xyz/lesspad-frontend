@@ -109,6 +109,7 @@ export default {
         Staking: '0xfd99C422A81032a6E332533Afa64D6556Adaad6a',
         PresaleFactory: '0x451d4bC560404b0aF65f967B125c864EbD69559d',
         PresalePublic: '0xCaC38897188e2FD8A3655f183cf86521040108fE',
+        WETH: '0xf3a6679b266899042276804930b3bfbaf807f15b',
       },
       'Binance-Smart-Chain': {
         // todo

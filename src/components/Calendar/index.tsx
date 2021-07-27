@@ -60,7 +60,7 @@ const Calendar: React.FC<ICalendarProps> = (props) => {
   // понед = 0; воск = 6 ☝🏽
 
   // массив с объектами дат для каждого дня в месяце
-  const dataForCalendar = [];
+  const dataForCalendar: any[] = [];
 
   // заполняем массив null до первого дня в месяце
   for (let i = 0; i < firstDayInMonth; i += 1) {

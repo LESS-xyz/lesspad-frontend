@@ -86,6 +86,8 @@ const CreatePoolPage: React.FC = () => {
     dispatch,
   ]);
 
+  const WETHAddress = config.addresses[config.isMainnetOrTestnet][chainType].WETH;
+
   const minInvestInWei = new BN(10).pow(new BN(10)).toString(10); // todo
   const maxInvestInWei = new BN(10).pow(new BN(20)).toString(10); // todo
   // const presaleType = isPublic ? 1 : 0;
@@ -261,6 +263,7 @@ const CreatePoolPage: React.FC = () => {
       const resultApprove = await approve();
       if (!resultApprove) return;
       // login to backend
+      let tokenAmount;
       let timestamp;
       let signature;
       const resultGetMetamaskMessage = await Backend.getMetamaskMessage();
@@ -285,23 +288,26 @@ const CreatePoolPage: React.FC = () => {
             if (resultGetPoolSignature.data) {
               timestamp = resultGetPoolSignature.data.date;
               signature = resultGetPoolSignature.data.signature;
+              tokenAmount = resultGetPoolSignature.data.user_balance;
             }
           }
         }
       }
 
-      const tokenAmount = new BN(500).mul(new BN(10).pow(new BN(18))).toString(10); // todo
+      // const tokenAmount = new BN(500).mul(new BN(10).pow(new BN(18))).toString(10);
       const presaleInfo = [
         tokenAddress,
         tokenPriceInWei,
         hardCapInWei,
         softCapInWei,
-        openVotingTime,
-        openTime,
-        closeTime,
-        tokenAmount,
+        (openVotingTime / 1000).toFixed(),
+        (openTime / 1000).toFixed(),
+        (closeTime / 1000).toFixed(),
+        tokenAmount.toString(),
+        // hexToBytes(signature),
         signature,
-        timestamp,
+        timestamp.toString(),
+        WETHAddress,
       ];
       const presalePancakeSwapInfo = [
         listingPriceInWei,
