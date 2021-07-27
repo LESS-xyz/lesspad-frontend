@@ -159,9 +159,9 @@ export default class ContractStakingService {
       let lessRewardsCounter = lessRewards;
       const amountOfUsersStakes = await this.getAmountOfUsersStakes({ userAddress });
       for (let i = 0; i < amountOfUsersStakes; i += 1) {
-        const stakeId = i;
-        const stake = await this.getStakeList({ userAddress, index: stakeId });
+        const stake = await this.getStakeList({ userAddress, index: i });
         let { stakedLess, stakedLp, lpEarned, lessEarned } = stake;
+        const { stakeId } = stake;
         console.log('ContractStakingService unstake', { i, stakedLess, stakedLp });
         // next iterate, if this stake was unstaked
         if (stakedLp + stakedLess + lpEarned + lessEarned === 0) continue;
@@ -171,6 +171,11 @@ export default class ContractStakingService {
         if (lpRewardsCounter <= 0) lpEarned = 0;
         if (lessRewardsCounter <= 0) lessEarned = 0;
         if (stakedLp + stakedLess + lpEarned + lessEarned === 0) return null;
+        // if amount is less or equal to stake
+        if (lpAmountCounter <= stakedLp) stakedLp = lpAmountCounter;
+        if (lessAmountCounter <= stakedLess) stakedLess = lessAmountCounter;
+        if (lpRewardsCounter <= lpEarned) lpEarned = lpRewardsCounter;
+        if (lessRewardsCounter <= lessEarned) lessEarned = lessRewardsCounter;
         try {
           const result = await contract.methods
             .unstake(stakedLp, stakedLess, lpRewards, lessRewards, stakeId)
