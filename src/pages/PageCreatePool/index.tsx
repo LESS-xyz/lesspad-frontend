@@ -24,6 +24,7 @@ const CreatePoolPage: React.FC = () => {
   const {
     ContractPresaleFactory,
     ContractLessToken,
+    ContractLPToken,
     ContractStaking,
     ContractLessLibrary,
   } = useContractsContext();
@@ -32,6 +33,9 @@ const CreatePoolPage: React.FC = () => {
   const defaultOpenTime = defaultOpenVotingTime + 1000 * 60 * 60 * 24 + 1000 * 60 * 10;
   const defaultCloseTime = defaultOpenTime + 1000 * 60 * 60 * 24;
   const defaultLiquidityAllocationTime = defaultCloseTime + 1000 * 60 * 60 * 24;
+
+  const [lessDecimals, setLessDecimals] = useState();
+  const [lpDecimals, setLpDecimals] = useState();
 
   const [saleTitle, setSaleTitle] = useState<string>('Rnb');
   const [description, setDescription] = useState<string>('');
@@ -92,6 +96,17 @@ const CreatePoolPage: React.FC = () => {
   const maxInvestInWei = new BN(10).pow(new BN(20)).toString(10); // todo
   // const presaleType = isPublic ? 1 : 0;
   // const whitelistArray = whitelist ? whitelist.split(',') : [];
+
+  const getDecimals = async () => {
+    try {
+      const resultLessDecimals = await ContractLessToken.decimals();
+      setLessDecimals(resultLessDecimals);
+      const resultLpDecimals = await ContractLPToken.decimals();
+      setLpDecimals(resultLpDecimals);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   const handleError = (value: any, message?: string) => {
     if (isFormSubmitted && !value) return message || 'Enter value';
@@ -193,10 +208,16 @@ const CreatePoolPage: React.FC = () => {
       const minCreatorStakedBalanceInEther = new BN(minCreatorStakedBalance)
         .div(new BN(10).pow(new BN(decimals)))
         .toString(10);
-      const balance = await ContractStaking.getStakedBalance({ userAddress });
-      const balanceInEther = new BN(balance).div(new BN(10).pow(new BN(decimals))).toString(10);
-      // console.log('CreatePool checkStakingBalance:', { minCreatorStakedBalanceInEther, balanceInEther });
-      if (balance < minCreatorStakedBalance)
+      const stakedInfo = await ContractStaking.getStakedInfo({ userAddress });
+      const { stakedBalance } = stakedInfo;
+      const balanceStakedSumInEther = new BN(stakedBalance)
+        .div(new BN(10).pow(new BN(lessDecimals)))
+        .toString(10);
+      console.log('CreatePool checkStakingBalance:', {
+        minCreatorStakedBalanceInEther,
+        balanceStakedSumInEther,
+      });
+      if (balanceStakedSumInEther < minCreatorStakedBalance)
         toggleModal({
           open: true,
           text: (
@@ -204,7 +225,7 @@ const CreatePoolPage: React.FC = () => {
               <p>
                 To be able to create new pool, please stake {minCreatorStakedBalanceInEther} LESS
               </p>
-              <p>Your staking balance is: {balanceInEther} LESS</p>
+              <p>Your staking balance is: {balanceStakedSumInEther} ($LESS + $LP)</p>
             </div>
           ),
         });
@@ -341,6 +362,15 @@ const CreatePoolPage: React.FC = () => {
 
   useEffect(() => {
     if (!userAddress) return;
+    if (!ContractLessToken) return;
+    if (!ContractLessLibrary) return;
+    if (!ContractStaking) return;
+    getDecimals();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ContractStaking, userAddress]);
+
+  useEffect(() => {
+    if (!userAddress) return;
     signMessage();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userAddress]);
@@ -350,9 +380,18 @@ const CreatePoolPage: React.FC = () => {
     if (!ContractLessLibrary) return;
     if (!ContractStaking) return;
     if (!userAddress) return;
+    if (!lpDecimals) return;
+    if (!lessDecimals) return;
     checkStakingBalance();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ContractLessToken, ContractLessLibrary, ContractStaking, userAddress]);
+  }, [
+    ContractLessToken,
+    ContractLessLibrary,
+    ContractStaking,
+    userAddress,
+    lpDecimals,
+    lessDecimals,
+  ]);
 
   return (
     <section className={s.page}>

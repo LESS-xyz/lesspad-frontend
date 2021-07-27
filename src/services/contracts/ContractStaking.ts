@@ -88,6 +88,21 @@ export default class ContractStakingService {
     }
   };
 
+  // get stake balance of user by address, also time of last stake and lat unstake
+  public getStakedInfo = async (props: TypeGetStakeListProps): Promise<any> => {
+    try {
+      const { userAddress } = props;
+      const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
+      const result = await contract.methods.getStakedInfo(userAddress).call();
+      console.log('ContractStakingService getStakedInfo:', result);
+      const { 0: stakedBalance, 1: lastStakeTime, 2: lastUnstakeTime } = result;
+      return { stakedBalance, lastStakeTime, lastUnstakeTime };
+    } catch (e) {
+      console.error('ContractStakingService getStakedInfo:', e);
+      return null;
+    }
+  };
+
   // get stake of user by address and index
   public getStakeList = async (props: TypeGetStakeListProps): Promise<any> => {
     try {
