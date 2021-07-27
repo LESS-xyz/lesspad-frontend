@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import ContractLessLibraryService from '../services/contracts/ContractLessLibrary';
 import ContractLessTokenService from '../services/contracts/ContractLessToken';
 import ContractLPTokenService from '../services/contracts/ContractLPToken';
+import ContractPresaleCertifiedService from '../services/contracts/ContractPresaleCertified';
 import ContractPresaleFactoryService from '../services/contracts/ContractPresaleFactory';
 import ContractPresalePublicService from '../services/contracts/ContractPresalePublic';
 import ContractStakingService from '../services/contracts/ContractStaking';
@@ -14,6 +15,7 @@ const contractsContext = createContext<any>({
   ContractLessLibrary: {},
   ContractPresalePublic: {},
   ContractPresaleFactory: {},
+  ContractPresaleCertified: {},
   ContractStaking: {},
   ContractLessToken: {},
   ContractLPToken: {},
@@ -33,6 +35,10 @@ const ContractsContext: React.FC = ({ children }) => {
         chainType,
       });
       const ContractPresalePublic = new ContractPresalePublicService({
+        web3Provider: web3.provider,
+        chainType,
+      });
+      const ContractPresaleCertified = new ContractPresaleCertifiedService({
         web3Provider: web3.provider,
         chainType,
       });
@@ -56,6 +62,7 @@ const ContractsContext: React.FC = ({ children }) => {
       const newValue = {
         ContractLessLibrary,
         ContractPresalePublic,
+        ContractPresaleCertified,
         ContractPresaleFactory,
         ContractStaking,
         ContractLessToken,

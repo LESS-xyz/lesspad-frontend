@@ -1,90 +1,60 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 
-import BNBgradient from '../../assets/img/icons/BNB-gradient.svg';
-import BNBwhite from '../../assets/img/icons/BNB-white.svg';
-import chainActive from '../../assets/img/icons/chain-active.svg';
-import chainDisabled from '../../assets/img/icons/chain-disabled.svg';
-import ETHgradient from '../../assets/img/icons/ETH-gradient.svg';
-import ETHwhite from '../../assets/img/icons/ETH-white.svg';
-import POLKADOTgradient from '../../assets/img/icons/polkadot-gradient.svg';
-import POLKADOTwhite from '../../assets/img/icons/polkadot-white.svg';
-import shareGradient from '../../assets/img/icons/share-gradient.svg';
-import shareGrey from '../../assets/img/icons/share-grey.svg';
-import shareWhite from '../../assets/img/icons/share-white.svg';
-import telegramActive from '../../assets/img/icons/telegram-active.svg';
-import telegramDisabled from '../../assets/img/icons/telegram-disabled.svg';
-import thumbup from '../../assets/img/sections/token-card/thumb-up.svg';
 import { useContractsContext } from '../../contexts/ContractsContext';
-import { CardConditions, cryptos } from '../../types';
-import Icon from '../Icon/index';
-import ProgressBar from '../ProgressBar/index';
+import { addHttps } from '../../utils/prettifiers';
 
 import s from './TokenCard.module.scss';
 
-interface ITokenCardProps {
-  address?: string;
-  type: CardConditions;
-  cryptoType: cryptos;
+export interface ITokenCardProps {
+  address: string;
   logo: string;
+  daysTillOpen: number;
   name: string;
-  cost: string;
-  totalAmount: number;
-  currentAmount: number;
-  minPercent: number;
-  liquidityPercent: number;
-  daysBeforeOpening: number;
-  telegramLink?: string;
-  chainLink?: string;
-  yesCounter?: number;
-  noCounter?: number;
+  subtitle: string;
+  website: string;
+  telegram: string;
+  whitePaper: string;
+  blockchainLogo: string;
+  chain: string;
+  type: 'public' | 'certified';
+  fundingToken: string;
+  status: 'ended' | 'in voting' | 'not opened';
 }
 
-const iconsHeader = {
-  BNB: BNBgradient,
-  ETH: ETHgradient,
-  POLKADOT: POLKADOTgradient,
-};
-const iconsHeaderWhite = {
-  BNB: BNBwhite,
-  ETH: ETHwhite,
-  POLKADOT: POLKADOTwhite,
-};
-
-const iconsHeader2 = {
-  notOpened: shareGrey,
-  closed: shareWhite,
-  inVoting: shareGradient,
-};
-
-const TokenCard: React.FC<ITokenCardProps> = (props) => {
+const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
   const {
     address,
-    type,
     logo,
-    // name,
-    cost,
-    totalAmount,
-    currentAmount,
-    minPercent,
-    yesCounter,
-    noCounter,
-    liquidityPercent,
-    chainLink,
-    daysBeforeOpening,
-    cryptoType,
+    daysTillOpen,
+    name,
+    subtitle,
+    website,
+    // telegram,
+    whitePaper,
+    blockchainLogo,
+    chain,
+    type,
+    fundingToken,
+    status,
   } = props;
-  const { ContractPresalePublic } = useContractsContext();
+  const { ContractPresalePublic, ContractPresaleCertified } = useContractsContext();
 
   const [info, setInfo] = useState<any>();
 
   const getInfo = async () => {
     try {
-      const newInfo = await ContractPresalePublic.getInfo({ contractAddress: address });
-      if (newInfo) setInfo(newInfo);
-      console.log('TokenCard getInfo:', newInfo);
+      try {
+        const newInfo = await ContractPresalePublic.getInfo({ contractAddress: address });
+        if (newInfo) setInfo(newInfo);
+        console.log('TokenCard getInfo public:', newInfo);
+      } catch (e) {
+        console.log('TokenCard getInfo public error:', e);
+        const newInfo = await ContractPresaleCertified.getInfo({ contractAddress: address });
+        if (newInfo) setInfo(newInfo);
+        console.log('TokenCard getInfo certified:', newInfo);
+      }
     } catch (e) {
-      console.error(e);
+      console.error('TokenCard getInfo:', e);
     }
   };
 
@@ -94,121 +64,79 @@ const TokenCard: React.FC<ITokenCardProps> = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ContractPresalePublic]);
 
-  if (!address) return null; // todo
-  if (!info) return null; // todo
+  if (!address) return null; // todo: show loader
+  if (!info) return null; // todo: show loader
 
-  const { linkTwitter, hardCap = 0, softCap = 0, saleTitle = 'Title' } = info;
+  const { linkTwitter } = info;
 
   return (
     <div className={s.card}>
-      <div className={s.inner}>
-        <div className={`${s.header} ${s[type]}`}>
-          <div className={s.header_icon}>
-            {type === CardConditions.closed ? (
-              <img src={iconsHeaderWhite[cryptoType]} alt="crypto-icon" />
-            ) : (
-              <img src={iconsHeader[cryptoType]} alt="crypto-icon" />
-            )}
+      <div className={s.card_header}>
+        <div className={s.card_header__logo}>
+          <img src={logo} alt="token-logo" />
+        </div>
+        <div className={s.card_header__info}>
+          <div className={s.card_header__info_days}>
+            opens in {daysTillOpen} {daysTillOpen > 1 ? 'days' : 'day'}
           </div>
-          <div className={s.header_title}>
-            opens in {daysBeforeOpening} {daysBeforeOpening > 1 ? 'days' : 'day'}
+          <div className={s.card_header__info_name}>{name}</div>
+          <div className={s.card_header__info_subtitle}>{subtitle}</div>
+        </div>
+      </div>
+      <div className={s.card_links}>
+        <a href={addHttps(website)} target="_blank" rel="noreferrer" className={s.card_links__link}>
+          <span>Website</span>
+        </a>
+        <a
+          href={addHttps(linkTwitter)}
+          target="_blank"
+          rel="noreferrer"
+          className={s.card_links__link}
+        >
+          <span>Twitter</span>
+        </a>
+        <a
+          href={addHttps(whitePaper)}
+          target="_blank"
+          rel="noreferrer"
+          className={s.card_links__link}
+        >
+          <span>White Paper</span>
+        </a>
+      </div>
+      <div className={s.card_body}>
+        <div className={s.card_body__logo}>
+          <img src={blockchainLogo} alt="blockchainLogo" />
+        </div>
+        <div className={s.card_body__info}>
+          <div className={s.card_body__info_item}>
+            <div className={s.card_body__info_item__title}>Chain</div>
+            <div className={s.card_body__info_item__value}>{chain} Network</div>
           </div>
-          <div className={s.header_icon}>
-            <img src={iconsHeader2[type]} alt="" />
+          <div className={s.card_body__info_item}>
+            <div className={s.card_body__info_item__title}>Type</div>
+            <div className={s.card_body__info_item__value}>{type}</div>
+          </div>
+          <div className={s.card_body__info_item}>
+            <div className={s.card_body__info_item__title}>Funding token</div>
+            <div className={s.card_body__info_item__value}>{fundingToken}</div>
+          </div>
+          <div className={s.card_body__info_item}>
+            <div className={s.card_body__info_item__title}>Status</div>
+            <div className={s.card_body__info_item__value}>{status}</div>
           </div>
         </div>
-        <div className={s.card_container}>
-          <Link to={`/pool/${address}`} className={s.token_info}>
-            <div className={s.token_logo}>
-              <img src={logo} alt="token-logo" />
+      </div>
+      <div className={s.card_footer__wrap}>
+        <div className={s.card_footer}>
+          <div className={s.card_footer__top}>
+            <div className={s.card_footer__top_liquidity}>Liquidity Allocation</div>
+            <div className={s.card_footer_gradient}>
+              <span>60 %</span>
             </div>
-            <div className={s.token_name}>{saleTitle}</div>
-          </Link>
-
-          <div className={s.token_cost}>
-            <div className={s.token_price}>{cost} BNB per Token</div>
-            {type === CardConditions.closed && (
-              <div className={s.token_fees}>{currentAmount} BNB</div>
-            )}
           </div>
-
-          <div className={s.body}>
-            <div className={s.progress_bar}>
-              <ProgressBar totalAmount={totalAmount} currentAmount={currentAmount} type={type} />
-              {type === CardConditions.inVoting && (
-                <div className={s.progress_bar__extra}>
-                  {Math.round((currentAmount / totalAmount) * 100)}%
-                  <div className={s.thumbup_img}>
-                    <img src={thumbup} alt="thumbup" />
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {type === CardConditions.closed && (
-              <>
-                <div className={s.progress_bar__info}>
-                  <div className={s.progress_bar__info_left}>
-                    {((currentAmount / totalAmount) * 100).toFixed(2)}%
-                  </div>
-                  <div className={s.progress_bar__info_right}>
-                    {softCap.toFixed(2)} / {hardCap.toFixed(2)}
-                  </div>
-                </div>
-                <div className={s.progress_bar__subinfo}>
-                  <div className={s.progress_bar__subinfo_left}>Min {minPercent.toFixed(2)}%</div>
-                  <div className={s.progress_bar__subinfo_right}>BNB</div>
-                </div>
-              </>
-            )}
-
-            {type === CardConditions.notOpened && (
-              <>
-                <div className={s.progress_bar__info}>
-                  <div className={s.progress_bar__info_left}>Min {minPercent}%</div>
-                  <div className={s.progress_bar__info_right}>
-                    {currentAmount.toFixed(2)} / {totalAmount.toFixed(2)}
-                  </div>
-                </div>
-                <div className={s.progress_bar__subinfo}>
-                  Yes - No Votes {'>'} 15% of max supply
-                </div>
-              </>
-            )}
-
-            {type === CardConditions.inVoting && (
-              <>
-                <div className={s.progress_bar__info} style={{ width: '70%' }}>
-                  <div className={s.progress_bar__info_left}>Yes: {yesCounter}</div>
-                  <div className={s.progress_bar__info_right}>No: {noCounter}</div>
-                </div>
-                <div className={s.progress_bar__subinfo}>
-                  Yes - No Votes {'>'} 15% of max supply
-                </div>
-              </>
-            )}
-          </div>
-
-          <div className={s.footer}>
-            <div className={s.first_line}>
-              <div className={s.footer_title}>Liquidity Allocation</div>
-              <div className={s.footer_title}>Connect</div>
-            </div>
-            <div className={s.second_line}>
-              <div className={s.liquidity_percent}>{liquidityPercent}%</div>
-              <div className={s.footer_links}>
-                <div className={s.footer_link}>
-                  <a href={linkTwitter}>
-                    <Icon onHover={telegramActive} defaultIcon={telegramDisabled} />
-                  </a>
-                </div>
-                <div className={s.footer_link}>
-                  <a href={chainLink}>
-                    <Icon onHover={chainActive} defaultIcon={chainDisabled} />
-                  </a>
-                </div>
-              </div>
-            </div>
+          <div className={s.card_footer_gradient}>
+            <span>1 BNB = 0,00001 XCO</span>
           </div>
         </div>
       </div>

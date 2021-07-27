@@ -20,7 +20,7 @@ type TypeVoteProps = {
   yes: boolean;
 };
 
-export default class ContractPresalePublicService {
+export default class ContractPresaleCertifiedService {
   public web3: any;
 
   public contractAddress: any;
@@ -36,22 +36,30 @@ export default class ContractPresalePublicService {
     const abisOfNetType = abis[isMainnetOrTestnet];
     this.web3 = new Web3(web3Provider);
     // this.web3.eth.handleRevert = true;
-    this.contractName = 'PresalePublic';
+    this.contractName = 'PresaleCertified';
     this.contractAddress = addressesOfNetType[chainType][this.contractName];
     this.contractAbi = abisOfNetType[chainType][this.contractName];
   }
 
   public getInfo = async ({ contractAddress }: TypeGetInfoProps): Promise<any> => {
     try {
-      // console.log('ContractPresalePublicService getInfo:', this.contractAbi, this.contractAddress)
       const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
+      console.log(
+        'ContractPresaleCertifiedService getInfo:',
+        this.contractAbi,
+        this.contractAddress,
+      );
       // get token decimals
       // const generalInfo = await contract.methods.generalInfo().call();
+      // console.log('ContractPresaleCertifiedService getInfo:', {
+      //   generalInfo,
+      // });
       const uniswapInfo = await contract.methods.uniswapInfo().call();
-      const stringInfo = await contract.methods.stringInfo().call();
-      console.log('ContractPresalePublicService getInfo:', {
-        // generalInfo,
+      console.log('ContractPresaleCertifiedService getInfo:', {
         uniswapInfo,
+      });
+      const stringInfo = await contract.methods.stringInfo().call();
+      console.log('ContractPresaleCertifiedService getInfo:', {
         stringInfo,
       });
       // const tokenAddress = generalInfo.token;
@@ -59,7 +67,7 @@ export default class ContractPresalePublicService {
       // const decimals = await contractToken.methods.decimals().call();
       // const { saleTitle } = stringInfo;
       // const { softCapInWei, hardCapInWei } = generalInfo;
-      // format
+      // // format
       // const softCapFormatted = +new BN(softCapInWei).div(new BN(10).pow(decimals));
       // const hardCapFormatted = +new BN(hardCapInWei).div(new BN(10).pow(decimals));
       // result
@@ -71,7 +79,7 @@ export default class ContractPresalePublicService {
         linkTwitter: this.web3.utils.hexToString(linkTwitter),
       };
     } catch (e) {
-      console.error('ContractPresalePublicService getInfo:', e);
+      console.error('ContractPresaleCertifiedService getInfo:', e);
       return null;
     }
   };
@@ -82,7 +90,7 @@ export default class ContractPresalePublicService {
       const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
       return await contract.methods.vote(yes).send({ from: userAddress });
     } catch (e) {
-      console.error('ContractLessLibraryService vote:', e);
+      console.error('ContractPresaleCertifiedService vote:', e);
       return null;
     }
   };

@@ -2,14 +2,11 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { v4 as uuid } from 'uuid';
 
+import bnbLogo from '../../../assets/img/icons/bnb-logo.svg';
 import logo1 from '../../../assets/img/sections/token-card/logo-1.png';
-import TokenCard from '../../../components/TokenCard/index';
-import { CardConditions, cryptos } from '../../../types/index';
+import TokenCard, { ITokenCardProps } from '../../../components/TokenCard';
 
 import s from './PoolsInVoting.module.scss';
-
-// const cardsExample = [
-// ];
 
 const PoolsiInVoting: React.FC = () => {
   const { pools } = useSelector(({ pool }: any) => pool);
@@ -22,19 +19,22 @@ const PoolsiInVoting: React.FC = () => {
           <div className={s.cards}>
             {pools.slice(0, 3).map((item: any) => {
               const { address = '', title = '' } = item;
-              const props = {
-                name: title || 'Pool',
-                type: CardConditions.closed,
-                cryptoType: cryptos.ETH,
+              const props: ITokenCardProps = {
+                address,
                 logo: logo1,
-                cost: '0.0000345',
-                totalAmount: 3454,
-                currentAmount: 2343,
-                minPercent: 45,
-                liquidityPercent: 56,
-                daysBeforeOpening: 4,
+                daysTillOpen: 3,
+                name: title,
+                subtitle: 'Participant',
+                website: 'https://github.com/',
+                telegram: 'https://t.me/durov',
+                whitePaper: 'https://bitcoin.org/ru/bitcoin-paper',
+                blockchainLogo: bnbLogo,
+                chain: 'BNB',
+                type: 'public',
+                fundingToken: 'BNB',
+                status: 'not opened',
               };
-              return <TokenCard key={uuid()} address={address} {...props} />;
+              return <TokenCard key={uuid()} {...props} />;
             })}
           </div>
         </div>
