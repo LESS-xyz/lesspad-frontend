@@ -3,7 +3,7 @@ import React from 'react';
 import s from './YourTier.module.scss';
 
 interface IYourTierProps {
-  tier: 'pawn' | 'bishop' | 'rook' | 'queen' | 'king';
+  tier: string;
   className?: string;
 }
 
