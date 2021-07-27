@@ -22,8 +22,9 @@ const { BN }: any = Web3.utils;
 const CreatePoolPage: React.FC = () => {
   const { web3 } = useWeb3ConnectorContext();
   const {
-    // ContractPresaleFactory,
+    ContractPresaleFactory,
     ContractLessToken,
+    ContractLPToken,
     ContractStaking,
     ContractLessLibrary,
   } = useContractsContext();
@@ -32,6 +33,9 @@ const CreatePoolPage: React.FC = () => {
   const defaultOpenTime = defaultOpenVotingTime + 1000 * 60 * 60 * 24 + 1000 * 60 * 10;
   const defaultCloseTime = defaultOpenTime + 1000 * 60 * 60 * 24;
   const defaultLiquidityAllocationTime = defaultCloseTime + 1000 * 60 * 60 * 24;
+
+  const [lessDecimals, setLessDecimals] = useState();
+  const [lpDecimals, setLpDecimals] = useState();
 
   const [saleTitle, setSaleTitle] = useState<string>('Rnb');
   const [description, setDescription] = useState<string>('');
@@ -86,10 +90,23 @@ const CreatePoolPage: React.FC = () => {
     dispatch,
   ]);
 
+  const WETHAddress = config.addresses[config.isMainnetOrTestnet][chainType].WETH;
+
   const minInvestInWei = new BN(10).pow(new BN(10)).toString(10); // todo
   const maxInvestInWei = new BN(10).pow(new BN(20)).toString(10); // todo
   // const presaleType = isPublic ? 1 : 0;
   // const whitelistArray = whitelist ? whitelist.split(',') : [];
+
+  const getDecimals = async () => {
+    try {
+      const resultLessDecimals = await ContractLessToken.decimals();
+      setLessDecimals(resultLessDecimals);
+      const resultLpDecimals = await ContractLPToken.decimals();
+      setLpDecimals(resultLpDecimals);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   const handleError = (value: any, message?: string) => {
     if (isFormSubmitted && !value) return message || 'Enter value';
@@ -191,10 +208,16 @@ const CreatePoolPage: React.FC = () => {
       const minCreatorStakedBalanceInEther = new BN(minCreatorStakedBalance)
         .div(new BN(10).pow(new BN(decimals)))
         .toString(10);
-      const balance = await ContractStaking.getStakedBalance({ userAddress });
-      const balanceInEther = new BN(balance).div(new BN(10).pow(new BN(decimals))).toString(10);
-      // console.log('CreatePool checkStakingBalance:', { minCreatorStakedBalanceInEther, balanceInEther });
-      if (balance < minCreatorStakedBalance)
+      const stakedInfo = await ContractStaking.getStakedInfo({ userAddress });
+      const { stakedBalance } = stakedInfo;
+      const balanceStakedSumInEther = new BN(stakedBalance)
+        .div(new BN(10).pow(new BN(lessDecimals)))
+        .toString(10);
+      console.log('CreatePool checkStakingBalance:', {
+        minCreatorStakedBalanceInEther,
+        balanceStakedSumInEther,
+      });
+      if (balanceStakedSumInEther < minCreatorStakedBalance)
         toggleModal({
           open: true,
           text: (
@@ -202,7 +225,7 @@ const CreatePoolPage: React.FC = () => {
               <p>
                 To be able to create new pool, please stake {minCreatorStakedBalanceInEther} LESS
               </p>
-              <p>Your staking balance is: {balanceInEther} LESS</p>
+              <p>Your staking balance is: {balanceStakedSumInEther} ($LESS + $LP)</p>
             </div>
           ),
         });
@@ -257,56 +280,13 @@ const CreatePoolPage: React.FC = () => {
         // return; // todo
       }
       if (!checkTime) return;
-      // порядок полей менять нельзя!
-      const presaleInfo = [
-        tokenAddress,
-        tokenPriceInWei,
-        hardCapInWei,
-        softCapInWei,
-        // maxInvestInWei,
-        // minInvestInWei, // 5
-        openVotingTime,
-        openTime,
-        closeTime,
-        // presaleType,
-        // isLiquidity,
-        // isAutomatically, // 10
-        // isWhiteListed,
-        // whitelistArray,
-        // isVesting,
-      ];
-      // порядок полей менять нельзя!
-      const presalePancakeSwapInfo = [
-        listingPriceInWei,
-        lpTokensLockDurationInDays,
-        liquidityPercentageAllocation,
-        liquidityAllocationTime,
-      ];
-      // порядок полей менять нельзя!
-      const presaleStringInfo = [
-        saleTitle,
-        linkTelegram,
-        linkGithub,
-        linkTwitter,
-        linkWebsite,
-        linkLogo,
-        description,
-        whitepaper,
-      ];
-
-      console.log({ isPublic, presaleInfo, presalePancakeSwapInfo, presaleStringInfo });
       setIsFormSubmitted(true);
       const resultApprove = await approve();
       if (!resultApprove) return;
-      // const resultCreatePresalePublic = await ContractPresaleFactory.createPresalePublic({
-      //   userAddress,
-      //   presaleInfo,
-      //   presalePancakeSwapInfo,
-      //   presaleStringInfo,
-      // });
-      // console.log('CreatePool handleSubmit', resultCreatePresalePublic);
-      // if (resultCreatePresalePublic) await subscribeEvent('PublicPresaleCreated');
       // login to backend
+      let tokenAmount;
+      let timestamp;
+      let signature;
       const resultGetMetamaskMessage = await Backend.getMetamaskMessage();
       console.log('PageCreatePool resultGetMetamaskMessage:', resultGetMetamaskMessage);
       if (resultGetMetamaskMessage.data) {
@@ -320,12 +300,74 @@ const CreatePoolPage: React.FC = () => {
             signedMsg,
           });
           console.log('PageCreatePool resultMetamaskLogin:', resultMetamaskLogin);
+          if (resultMetamaskLogin.data) {
+            const { key } = resultMetamaskLogin.data;
+            const resultGetPoolSignature = await Backend.getPoolSignature({
+              token: key,
+            });
+            console.log('PageCreatePool resultGetPoolSignature:', resultGetPoolSignature);
+            if (resultGetPoolSignature.data) {
+              timestamp = resultGetPoolSignature.data.date;
+              signature = resultGetPoolSignature.data.signature;
+              tokenAmount = resultGetPoolSignature.data.user_balance;
+            }
+          }
         }
       }
+
+      // const tokenAmount = new BN(500).mul(new BN(10).pow(new BN(18))).toString(10);
+      const presaleInfo = [
+        tokenAddress,
+        tokenPriceInWei,
+        hardCapInWei,
+        softCapInWei,
+        (openVotingTime / 1000).toFixed(),
+        (openTime / 1000).toFixed(),
+        (closeTime / 1000).toFixed(),
+        tokenAmount.toString(),
+        // hexToBytes(signature),
+        signature,
+        timestamp.toString(),
+        WETHAddress,
+      ];
+      const presalePancakeSwapInfo = [
+        listingPriceInWei,
+        lpTokensLockDurationInDays,
+        liquidityPercentageAllocation,
+        liquidityAllocationTime,
+      ];
+      const presaleStringInfo = [
+        saleTitle,
+        linkTelegram,
+        linkGithub,
+        linkTwitter,
+        linkWebsite,
+        linkLogo,
+        description,
+        whitepaper,
+      ];
+      console.log({ isPublic, presaleInfo, presalePancakeSwapInfo, presaleStringInfo });
+      const resultCreatePresalePublic = await ContractPresaleFactory.createPresalePublic({
+        userAddress,
+        presaleInfo,
+        presalePancakeSwapInfo,
+        presaleStringInfo,
+      });
+      console.log('CreatePool handleSubmit', resultCreatePresalePublic);
+      // if (resultCreatePresalePublic) await subscribeEvent('PublicPresaleCreated');
     } catch (e) {
       console.error('PageCreatePool handleSubmit:', e);
     }
   };
+
+  useEffect(() => {
+    if (!userAddress) return;
+    if (!ContractLessToken) return;
+    if (!ContractLessLibrary) return;
+    if (!ContractStaking) return;
+    getDecimals();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ContractStaking, userAddress]);
 
   useEffect(() => {
     if (!userAddress) return;
@@ -338,9 +380,18 @@ const CreatePoolPage: React.FC = () => {
     if (!ContractLessLibrary) return;
     if (!ContractStaking) return;
     if (!userAddress) return;
+    if (!lpDecimals) return;
+    if (!lessDecimals) return;
     checkStakingBalance();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ContractLessToken, ContractLessLibrary, ContractStaking, userAddress]);
+  }, [
+    ContractLessToken,
+    ContractLessLibrary,
+    ContractStaking,
+    userAddress,
+    lpDecimals,
+    lessDecimals,
+  ]);
 
   return (
     <section className={s.page}>

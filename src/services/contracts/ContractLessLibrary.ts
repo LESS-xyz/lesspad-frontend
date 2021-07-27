@@ -44,7 +44,7 @@ export default class ContractLessLibraryService {
       // console.log('ContractLessLibraryService getPresalesAddresses:', this.contractAbi, this.contractAddress)
       const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
       const count = await contract.methods.getPresalesCount().call();
-      const addresses = [];
+      const addresses: string[] = [];
       if (count) {
         for (let i = 0; i < count; i += 1) {
           const address = await contract.methods.getPresaleAddress(i).call();
@@ -54,6 +54,17 @@ export default class ContractLessLibraryService {
       return addresses;
     } catch (e) {
       console.error('ContractLessLibraryService getPresalesAddresses:', e);
+      return null;
+    }
+  };
+
+  public getMinUnstakeTime = async () => {
+    try {
+      const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
+      const result = await contract.methods.getMinUnstakeTime().call();
+      return result;
+    } catch (e) {
+      console.error('ContractLessLibraryService getMinUnstakeTime:', e);
       return null;
     }
   };
