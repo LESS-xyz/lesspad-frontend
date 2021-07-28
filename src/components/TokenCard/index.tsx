@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
@@ -146,12 +147,13 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
     if (closeTimeVoting < now) presaleStatus = 'Voting ended';
     if (closeTimePresale < now) presaleStatus = 'Ended';
   }
+  const isOpened = openTimePresale < now;
 
   if (statusChoosenInFilter !== 'All' && statusChoosenInFilter !== presaleStatus) return null;
 
   return (
     <div className={s.card}>
-      <div className={s.card_header}>
+      <Link to={`/pool/${address}`} className={s.card_header}>
         <div className={s.card_header__logo}>
           <img src={addHttps(linkLogo)} alt="token-logo" />
         </div>
@@ -159,11 +161,13 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
           {/*<div className={s.card_header__info_days}>*/}
           {/*  opens in {daysTillOpen} {daysTillOpen > 1 ? 'days' : 'day'}*/}
           {/*</div>*/}
-          <div className={s.card_header__info_days}>opens {dayjs(openTimePresale).fromNow()}</div>
+          <div className={s.card_header__info_days}>
+            {isOpened ? 'opened' : 'opens'} {dayjs(openTimePresale).fromNow()}
+          </div>
           <div className={s.card_header__info_name}>{saleTitle}</div>
           {/*<div className={s.card_header__info_subtitle}>{subtitle}</div>*/}
         </div>
-      </div>
+      </Link>
       <div className={s.card_links}>
         <a
           href={addHttps(linkWebsite)}
@@ -223,7 +227,7 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
           </div>
           <div className={s.card_footer_gradient}>
             <span>
-              1 {chainInfo.symbol} = {listingPrice} {tokenSymbol}
+              1 {tokenSymbol} = {listingPrice} {chainInfo.symbol}
             </span>
           </div>
         </div>
