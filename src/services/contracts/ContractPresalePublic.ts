@@ -43,9 +43,7 @@ export default class ContractPresalePublicService {
 
   public getInfo = async ({ contractAddress }: TypeGetInfoProps): Promise<any> => {
     try {
-      // console.log('ContractPresalePublicService getInfo:', this.contractAbi, this.contractAddress)
       const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
-      // get token decimals
       const generalInfo = await contract.methods.generalInfo().call();
       const uniswapInfo = await contract.methods.uniswapInfo().call();
       const stringInfo = await contract.methods.stringInfo().call();
@@ -57,18 +55,61 @@ export default class ContractPresalePublicService {
       const tokenAddress = generalInfo.token;
       const contractToken = new this.web3.eth.Contract(ERC20Abi, tokenAddress);
       const decimals = await contractToken.methods.decimals().call();
-      const { saleTitle } = stringInfo;
-      const { softCapInWei, hardCapInWei } = generalInfo;
+      const {
+        creator,
+        token,
+        tokenPriceInWei,
+        softCapInWei,
+        hardCapInWei,
+        tokensForSaleLeft,
+        tokensForLiquidityLeft,
+        openTimePresale,
+        closeTimePresale,
+        openTimeVoting,
+        closeTimeVoting,
+        collectedFee,
+      } = generalInfo;
+      const {
+        saleTitle,
+        linkTelegram,
+        linkGithub,
+        linkTwitter,
+        linkWebsite,
+        linkLogo,
+        description,
+        whitepaper,
+      } = stringInfo;
       // format
-      const softCapFormatted = +new BN(softCapInWei).div(new BN(10).pow(new BN(decimals)));
-      const hardCapFormatted = +new BN(hardCapInWei).div(new BN(10).pow(new BN(decimals)));
+      const pow = new BN(10).pow(new BN(decimals));
+      const tokenPrice = +new BN(tokenPriceInWei).div(pow);
+      const softCapFormatted = +new BN(softCapInWei).div(pow);
+      const hardCapFormatted = +new BN(hardCapInWei).div(pow);
+      const tokensForSaleLeftInEth = +new BN(tokensForSaleLeft).div(pow);
+      const tokensForLiquidityLeftInEth = +new BN(tokensForLiquidityLeft).div(pow);
       // result
-      const { linkTwitter } = stringInfo;
       return {
-        saleTitle: this.web3.utils.hexToString(saleTitle),
+        // general
+        creator,
+        token,
+        tokenPrice,
         softCap: softCapFormatted,
         hardCap: hardCapFormatted,
+        tokensForSaleLeft: tokensForSaleLeftInEth,
+        tokensForLiquidityLeft: tokensForLiquidityLeftInEth,
+        openTimePresale: openTimePresale * 1000,
+        closeTimePresale: closeTimePresale * 1000,
+        openTimeVoting: openTimeVoting * 1000,
+        closeTimeVoting: closeTimeVoting * 1000,
+        collectedFee,
+        // string
+        saleTitle: this.web3.utils.hexToString(saleTitle),
+        linkTelegram: this.web3.utils.hexToString(linkTelegram),
+        linkGithub: this.web3.utils.hexToString(linkGithub),
         linkTwitter: this.web3.utils.hexToString(linkTwitter),
+        linkWebsite: this.web3.utils.hexToString(linkWebsite),
+        linkLogo,
+        description,
+        whitepaper,
       };
     } catch (e) {
       console.error('ContractPresalePublicService getInfo:', e);
@@ -82,7 +123,7 @@ export default class ContractPresalePublicService {
       const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
       return await contract.methods.vote(yes).send({ from: userAddress });
     } catch (e) {
-      console.error('ContractLessLibraryService vote:', e);
+      console.error('ContractPresalePublicService vote:', e);
       return null;
     }
   };

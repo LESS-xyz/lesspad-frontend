@@ -60,7 +60,7 @@ Fundraising Capital"
               <Selector
                 fn={setCurrentOption}
                 defaultOption="All"
-                othersOptions={['Ended', 'In Voting', 'Not Opened']}
+                othersOptions={['Ended', 'In voting', 'Not opened']}
               />
             </div>
           </div>
@@ -94,7 +94,7 @@ Fundraising Capital"
                 isCertified,
               };
               // eslint-disable-next-line react/no-array-index-key
-              return <TokenCard key={uuid()} {...props} />;
+              return <TokenCard key={uuid()} {...props} statusChoosenInFilter={currentOption} />;
             })}
           </div>
           <div className={s.pagination}>
