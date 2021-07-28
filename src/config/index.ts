@@ -13,6 +13,7 @@ import UniswapRouterAbi from '../data/abi/UniswapRouterAbi';
 const IS_PRODUCTION = false;
 const IS_TESTING_ON_ROPSTEN = false;
 const SHOW_CONSOLE_LOGS = true;
+const INFURA_KEY = 'df6686bd56e047219d5fdfbb594c2e47';
 
 export default {
   IS_PRODUCTION,
@@ -40,7 +41,14 @@ export default {
       : 'https://kovan.api.0x.org/',
   },
   keys: {
-    infura: '',
+    infura: INFURA_KEY,
+  },
+  rpc: {
+    'Ethereum': IS_PRODUCTION
+      ? `https://mainnet.infura.io/v3/${INFURA_KEY}`
+      : `https://kovan.infura.io/v3/${INFURA_KEY}`,
+    'Binance-Smart-Chain': `https://bsc-dataseed.binance.org`,
+    'Matic': `https://polygon-mainnet.infura.io/v3/${INFURA_KEY}`,
   },
   chainSymbols: {
     'Ethereum': 'ETH',

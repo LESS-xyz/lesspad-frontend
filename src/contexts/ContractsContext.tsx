@@ -1,6 +1,8 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import Web3 from 'web3';
 
+import config from '../config';
 import ContractLessLibraryService from '../services/contracts/ContractLessLibrary';
 import ContractLessTokenService from '../services/contracts/ContractLessToken';
 import ContractLPTokenService from '../services/contracts/ContractLPToken';
@@ -34,16 +36,17 @@ const ContractsContext: React.FC = ({ children }) => {
 
   const init: any = useCallback(async () => {
     try {
+      const rpcProvider = new Web3(new Web3.providers.HttpProvider(config.rpc[chainType]));
       const ContractLessLibrary = new ContractLessLibraryService({
         web3Provider: web3.provider,
         chainType,
       });
       const ContractPresalePublic = new ContractPresalePublicService({
-        web3Provider: web3.provider,
+        web3Provider: rpcProvider,
         chainType,
       });
       const ContractPresaleCertified = new ContractPresaleCertifiedService({
-        web3Provider: web3.provider,
+        web3Provider: rpcProvider,
         chainType,
       });
       const ContractPresaleFactory = new ContractPresaleFactoryService({
