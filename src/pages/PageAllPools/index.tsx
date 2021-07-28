@@ -9,30 +9,9 @@ import logo1 from '../../assets/img/sections/token-card/logo-1.png';
 import Pagination from '../../components/Pagination/index';
 import Search from '../../components/Search/index';
 import Selector from '../../components/Selector/index';
-import TokenCardNew, { ITokenCardProps } from '../../components/TokenCard-new/index';
-import TokenCard from '../../components/TokenCard/index';
-import { CardConditions, cryptos } from '../../types/index';
+import TokenCard, { ITokenCardProps } from '../../components/TokenCard/index';
 
 import s from './AllPools.module.scss';
-
-// добавил новый дизайн карточки
-// пример даты для новых карточек
-const newCardData: Array<ITokenCardProps> = [
-  {
-    logo: logo1,
-    daysTillOpen: 3,
-    name: 'XOLO Finance',
-    subtitle: 'Participant',
-    website: 'https://github.com/',
-    telegram: 'https://t.me/durov',
-    whitePaper: 'https://bitcoin.org/ru/bitcoin-paper',
-    blockchainLogo: bnbLogo,
-    chain: 'BNB',
-    type: 'public',
-    fundingToken: 'BNB',
-    status: 'not opened',
-  },
-];
 
 const AllPoolsPage: React.FC = () => {
   const [search, setSearch] = useState<string>('');
@@ -40,6 +19,7 @@ const AllPoolsPage: React.FC = () => {
   const [page, setPage] = useState<number>(0);
 
   const { pools } = useSelector(({ pool }: any) => pool);
+  console.log('AllPoolsPage pools:', pools);
 
   const isMobile = useMedia({ maxWidth: 768 });
 
@@ -86,7 +66,7 @@ Fundraising Capital"
           </div>
           <div className={s.cards}>
             {pools.map((item: any, ii: number) => {
-              const { address = '', title = '', description = '' } = item;
+              const { address = '', title = '', description = '', isCertified } = item;
               // todo: fix pagination
               if (ii < page * itemsOnPage || ii >= (page + 1) * itemsOnPage) return null;
               if (search) {
@@ -97,25 +77,25 @@ Fundraising Capital"
                   .includes(search.toLowerCase());
                 if (!isAddressInSearch && !isTitleInSearch && !isDescriptionInSearch) return null;
               }
-              const props = {
-                name: 'Pool',
-                type: CardConditions.closed,
-                cryptoType: cryptos.ETH,
+              const props: ITokenCardProps = {
+                address,
                 logo: logo1,
-                cost: '0.0000345',
-                totalAmount: 3454,
-                currentAmount: 2343,
-                minPercent: 45,
-                liquidityPercent: 56,
-                daysBeforeOpening: 4,
+                daysTillOpen: 3,
+                name: 'XOLO Finance',
+                subtitle: 'Participant',
+                website: 'https://github.com/',
+                telegram: 'https://t.me/durov',
+                whitePaper: 'https://bitcoin.org/ru/bitcoin-paper',
+                blockchainLogo: bnbLogo,
+                chain: 'BNB',
+                type: 'public',
+                fundingToken: 'BNB',
+                status: 'not opened',
+                isCertified,
               };
               // eslint-disable-next-line react/no-array-index-key
-              return <TokenCard key={uuid()} address={address} {...props} />;
+              return <TokenCard key={uuid()} {...props} />;
             })}
-            {/* новая карточка */}
-            {newCardData.map((data) => (
-              <TokenCardNew {...data} />
-            ))}
           </div>
           <div className={s.pagination}>
             <Pagination countOfPages={countOfPages} onChange={handleChangePage} />

@@ -1,9 +1,14 @@
-import ERC20Abi from '../data/ERC20Abi';
-import LessLibraryAbi from '../data/LessLibraryAbi';
-import LPTokenAbi from '../data/LPTokenAbi';
-import PresaleFactoryAbi from '../data/PresaleFactoryAbi';
-import PresalePublicAbi from '../data/PresalePublicAbi';
-import StakingAbi from '../data/StakingAbi';
+import ERC20Abi from '../data/abi/ERC20Abi';
+import LessLibraryAbi from '../data/abi/LessLibraryAbi';
+import LPTokenAbi from '../data/abi/LPTokenAbi';
+import PresaleCertifiedAbi from '../data/abi/PresaleCertifiedAbi';
+import PresaleFactoryAbi from '../data/abi/PresaleFactoryAbi';
+/*eslint-disable*/
+import PresaleFactoryCertifiedAbi from '../data/abi/PresaleFactoryCertifiedAbi';
+/*eslint-enable*/
+import PresalePublicAbi from '../data/abi/PresalePublicAbi';
+import StakingAbi from '../data/abi/StakingAbi';
+import UniswapRouterAbi from '../data/abi/UniswapRouterAbi';
 
 const IS_PRODUCTION = false;
 const IS_TESTING_ON_ROPSTEN = false;
@@ -105,7 +110,7 @@ export default {
       'Ethereum': {
         LessToken: '0x87feef975fd65f32A0836f910Fd13d9Cf4553690',
         LPToken: '0x4fe142c6CBD294ef96DbBa8a837CdE3035850A97',
-        LessLibrary: '0xA0BDCb13fD00D7cEF0eb872C4537fbf3F379E5Bb',
+        LessLibrary: '0x8A60F3FA37f9e3BA08909ace4edfea0c7D183587',
         Staking: '0xfd99C422A81032a6E332533Afa64D6556Adaad6a',
         PresaleFactory: '0x451d4bC560404b0aF65f967B125c864EbD69559d',
         PresalePublic: '0xCaC38897188e2FD8A3655f183cf86521040108fE',
@@ -130,7 +135,10 @@ export default {
         LessLibrary: LessLibraryAbi,
         Staking: StakingAbi,
         PresaleFactory: PresaleFactoryAbi,
+        PresaleFactoryCertified: PresaleFactoryCertifiedAbi,
         PresalePublic: PresalePublicAbi,
+        PresaleCertified: PresaleCertifiedAbi,
+        UniswapRouter: UniswapRouterAbi,
       },
     },
   },

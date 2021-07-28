@@ -27,6 +27,7 @@ const CreatePoolPage: React.FC = () => {
     ContractLPToken,
     ContractStaking,
     ContractLessLibrary,
+    ContractUniswapRouter,
   } = useContractsContext();
 
   const defaultOpenVotingTime = new Date().getTime() + 1000 * 60 * 60 * 24;
@@ -89,8 +90,6 @@ const CreatePoolPage: React.FC = () => {
   const toggleModal = React.useCallback((params) => dispatch(modalActions.toggleModal(params)), [
     dispatch,
   ]);
-
-  const WETHAddress = config.addresses[config.isMainnetOrTestnet][chainType].WETH;
 
   const minInvestInWei = new BN(10).pow(new BN(10)).toString(10); // todo
   const maxInvestInWei = new BN(10).pow(new BN(20)).toString(10); // todo
@@ -274,7 +273,7 @@ const CreatePoolPage: React.FC = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     try {
       event.preventDefault();
-      console.log('handleSubmit:', { vestingPercent });
+      console.log('PageCreatePool handleSubmit:', { vestingPercent });
       if (!validateForm()) {
         setIsFormSubmitted(true);
         // return; // todo
@@ -315,7 +314,8 @@ const CreatePoolPage: React.FC = () => {
         }
       }
 
-      // const tokenAmount = new BN(500).mul(new BN(10).pow(new BN(18))).toString(10);
+      const WETHAddress = await ContractUniswapRouter.getWETHAddress();
+      console.log('PageCreatePool handleSubmit WETHAddress:', WETHAddress);
       const presaleInfo = [
         tokenAddress,
         tokenPriceInWei,
