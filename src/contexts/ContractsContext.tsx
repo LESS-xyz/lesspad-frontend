@@ -34,11 +34,11 @@ const ContractsContext: React.FC = ({ children }) => {
 
   const [value, setValue] = useState<any>({});
 
-  const init: any = useCallback(async () => {
+  const initRpc: any = useCallback(async () => {
     try {
       const rpcProvider = new Web3(new Web3.providers.HttpProvider(config.rpc[chainType]));
       const ContractLessLibrary = new ContractLessLibraryService({
-        web3Provider: web3.provider,
+        web3Provider: rpcProvider,
         chainType,
       });
       const ContractPresalePublic = new ContractPresalePublicService({
@@ -49,6 +49,27 @@ const ContractsContext: React.FC = ({ children }) => {
         web3Provider: rpcProvider,
         chainType,
       });
+      if (!ContractLessLibrary) return;
+      const uniswapRouterAddress = await ContractLessLibrary.getUniswapRouter();
+      const ContractUniswapRouter = new ContractUniswapRouterService({
+        web3Provider: rpcProvider,
+        chainType,
+        contractAddress: uniswapRouterAddress,
+      });
+      const newValue = {
+        ContractPresalePublic,
+        ContractPresaleCertified,
+        ContractLessLibrary,
+        ContractUniswapRouter,
+      };
+      setValue({ ...value, ...newValue });
+    } catch (e) {
+      console.error('ContractsContext init:', e);
+    }
+  }, [chainType, value]);
+
+  const initMetamask: any = useCallback(async () => {
+    try {
       const ContractPresaleFactory = new ContractPresaleFactoryService({
         web3Provider: web3.provider,
         chainType,
@@ -69,36 +90,36 @@ const ContractsContext: React.FC = ({ children }) => {
         web3Provider: web3.provider,
         chainType,
       });
-      if (!ContractLessLibrary) return;
-      const uniswapRouterAddress = await ContractLessLibrary.getUniswapRouter();
-      const ContractUniswapRouter = new ContractUniswapRouterService({
-        web3Provider: web3.provider,
-        chainType,
-        contractAddress: uniswapRouterAddress,
-      });
       const newValue = {
-        ContractLessLibrary,
-        ContractPresalePublic,
-        ContractPresaleCertified,
         ContractPresaleFactory,
         ContractPresaleFactoryCertified,
         ContractStaking,
         ContractLessToken,
         ContractLPToken,
-        ContractUniswapRouter,
       };
-      setValue(newValue);
+      setValue({ ...value, ...newValue });
     } catch (e) {
       console.error('ContractsContext init:', e);
     }
-  }, [web3, chainType]);
+  }, [web3, chainType, value]);
 
   useEffect(() => {
-    if (!web3) return;
     if (!chainType) return;
-    init();
+    initRpc();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chainType]);
+
+  useEffect(() => {
+    if (!chainType) return;
+    if (!web3) return;
+    initMetamask();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [web3]);
+
+  useEffect(() => {
+    console.log('value:', value);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
 
   return <contractsContext.Provider value={value}>{children}</contractsContext.Provider>;
 };

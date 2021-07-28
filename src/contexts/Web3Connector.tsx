@@ -85,7 +85,7 @@ const Web3Connector: React.FC = ({ children }) => {
       //   web3 = new Web3Provider({ chainType });
       // }
       console.log('Web3Connector init:', web3);
-      if (!web3) return;
+      if (!web3.provider) return;
 
       if (walletType !== 'walletConnect') {
         web3.provider.on('accountsChanged', (accounts: string[]) => {
