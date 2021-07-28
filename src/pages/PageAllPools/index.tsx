@@ -9,7 +9,7 @@ import logo1 from '../../assets/img/sections/token-card/logo-1.png';
 import Pagination from '../../components/Pagination/index';
 import Search from '../../components/Search/index';
 import Selector from '../../components/Selector/index';
-import TokenCardNew, { ITokenCardProps } from '../../components/TokenCard/index';
+import TokenCard, { ITokenCardProps } from '../../components/TokenCard/index';
 
 import s from './AllPools.module.scss';
 
@@ -66,7 +66,7 @@ Fundraising Capital"
           </div>
           <div className={s.cards}>
             {pools.map((item: any, ii: number) => {
-              const { address = '', title = '', description = '' } = item;
+              const { address = '', title = '', description = '', isCertified } = item;
               // todo: fix pagination
               if (ii < page * itemsOnPage || ii >= (page + 1) * itemsOnPage) return null;
               if (search) {
@@ -91,9 +91,10 @@ Fundraising Capital"
                 type: 'public',
                 fundingToken: 'BNB',
                 status: 'not opened',
+                isCertified,
               };
               // eslint-disable-next-line react/no-array-index-key
-              return <TokenCardNew key={uuid()} {...props} />;
+              return <TokenCard key={uuid()} {...props} />;
             })}
           </div>
           <div className={s.pagination}>

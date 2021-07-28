@@ -5,7 +5,7 @@ import { v4 as uuid } from 'uuid';
 
 import bnbLogo from '../../../assets/img/icons/bnb-logo.svg';
 import logo1 from '../../../assets/img/sections/token-card/logo-1.png';
-import TokenCardNew, { ITokenCardProps } from '../../../components/TokenCard/index';
+import TokenCard, { ITokenCardProps } from '../../../components/TokenCard';
 
 import s from './FeaturedProjects.module.scss';
 
@@ -23,7 +23,7 @@ const FeaturedProject: React.FC = () => {
           <div className={s.title}>Upcoming Projects</div>
           <div className={s.cards}>
             {pools.slice(0, 5).map((item: any) => {
-              const { address = '', title = '' } = item;
+              const { address = '', title = '', isCertified } = item;
               const props: ITokenCardProps = {
                 address,
                 logo: logo1,
@@ -38,8 +38,9 @@ const FeaturedProject: React.FC = () => {
                 type: 'public',
                 fundingToken: 'BNB',
                 status: 'not opened',
+                isCertified,
               };
-              return <TokenCardNew key={uuid()} {...props} />;
+              return <TokenCard key={uuid()} {...props} />;
             })}
             {/*{emptyCards.map((element) => (*/}
             {/*  <Link to="/create-pool" key={element} className={s.emptyCard} />*/}

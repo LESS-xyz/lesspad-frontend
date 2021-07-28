@@ -18,7 +18,7 @@ const PoolsiInVoting: React.FC = () => {
           <div className={s.title}>Pools in Voting</div>
           <div className={s.cards}>
             {pools.slice(0, 3).map((item: any) => {
-              const { address = '', title = '' } = item;
+              const { address = '', title = '', isCertified } = item;
               const props: ITokenCardProps = {
                 address,
                 logo: logo1,
@@ -33,6 +33,7 @@ const PoolsiInVoting: React.FC = () => {
                 type: 'public',
                 fundingToken: 'BNB',
                 status: 'not opened',
+                isCertified,
               };
               return <TokenCard key={uuid()} {...props} />;
             })}

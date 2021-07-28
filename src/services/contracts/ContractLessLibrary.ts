@@ -113,4 +113,15 @@ export default class ContractLessLibraryService {
       return null;
     }
   };
+
+  public getUniswapRouter = async () => {
+    try {
+      const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
+      const result = await contract.methods.getUniswapRouter().call();
+      return result;
+    } catch (e) {
+      console.error('ContractLessLibraryService getUniswapRouter:', e);
+      return null;
+    }
+  };
 }

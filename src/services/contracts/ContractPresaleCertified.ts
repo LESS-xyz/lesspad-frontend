@@ -1,9 +1,9 @@
 import Web3 from 'web3';
 
 import config from '../../config';
-// import ERC20Abi from '../../data/abi/ERC20Abi';
+import ERC20Abi from '../../data/abi/ERC20Abi';
 
-// const { BN }: any = Web3.utils;
+const { BN }: any = Web3.utils;
 
 type TypeConstructorProps = {
   web3Provider: any;
@@ -44,38 +44,34 @@ export default class ContractPresaleCertifiedService {
   public getInfo = async ({ contractAddress }: TypeGetInfoProps): Promise<any> => {
     try {
       const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
-      console.log(
-        'ContractPresaleCertifiedService getInfo:',
-        this.contractAbi,
-        this.contractAddress,
-      );
+      // console.log(
+      //   'ContractPresaleCertifiedService getInfo:',
+      //   this.contractAbi,
+      //   this.contractAddress,
+      // );
       // get token decimals
-      // const generalInfo = await contract.methods.generalInfo().call();
-      // console.log('ContractPresaleCertifiedService getInfo:', {
-      //   generalInfo,
-      // });
+      const generalInfo = await contract.methods.generalInfo().call();
       const uniswapInfo = await contract.methods.uniswapInfo().call();
-      console.log('ContractPresaleCertifiedService getInfo:', {
-        uniswapInfo,
-      });
       const stringInfo = await contract.methods.stringInfo().call();
       console.log('ContractPresaleCertifiedService getInfo:', {
+        generalInfo,
+        uniswapInfo,
         stringInfo,
       });
-      // const tokenAddress = generalInfo.token;
-      // const contractToken = new this.web3.eth.Contract(ERC20Abi, tokenAddress);
-      // const decimals = await contractToken.methods.decimals().call();
-      // const { saleTitle } = stringInfo;
-      // const { softCapInWei, hardCapInWei } = generalInfo;
-      // // format
-      // const softCapFormatted = +new BN(softCapInWei).div(new BN(10).pow(decimals));
-      // const hardCapFormatted = +new BN(hardCapInWei).div(new BN(10).pow(decimals));
+      const tokenAddress = generalInfo.token;
+      const contractToken = new this.web3.eth.Contract(ERC20Abi, tokenAddress);
+      const decimals = await contractToken.methods.decimals().call();
+      const { saleTitle } = stringInfo;
+      const { softCapInWei, hardCapInWei } = generalInfo;
+      // format
+      const softCapFormatted = +new BN(softCapInWei).div(new BN(10).pow(new BN(decimals)));
+      const hardCapFormatted = +new BN(hardCapInWei).div(new BN(10).pow(new BN(decimals)));
       // result
       const { linkTwitter } = stringInfo;
       return {
-        // saleTitle: this.web3.utils.hexToString(saleTitle),
-        // softCap: softCapFormatted,
-        // hardCap: hardCapFormatted,
+        saleTitle: this.web3.utils.hexToString(saleTitle),
+        softCap: softCapFormatted,
+        hardCap: hardCapFormatted,
         linkTwitter: this.web3.utils.hexToString(linkTwitter),
       };
     } catch (e) {

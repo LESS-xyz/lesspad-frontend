@@ -3,8 +3,12 @@ import LessLibraryAbi from '../data/abi/LessLibraryAbi';
 import LPTokenAbi from '../data/abi/LPTokenAbi';
 import PresaleCertifiedAbi from '../data/abi/PresaleCertifiedAbi';
 import PresaleFactoryAbi from '../data/abi/PresaleFactoryAbi';
+/*eslint-disable*/
+import PresaleFactoryCertifiedAbi from '../data/abi/PresaleFactoryCertifiedAbi';
+/*eslint-enable*/
 import PresalePublicAbi from '../data/abi/PresalePublicAbi';
 import StakingAbi from '../data/abi/StakingAbi';
+import UniswapRouterAbi from '../data/abi/UniswapRouterAbi';
 
 const IS_PRODUCTION = false;
 const IS_TESTING_ON_ROPSTEN = false;
@@ -131,8 +135,10 @@ export default {
         LessLibrary: LessLibraryAbi,
         Staking: StakingAbi,
         PresaleFactory: PresaleFactoryAbi,
+        PresaleFactoryCertified: PresaleFactoryCertifiedAbi,
         PresalePublic: PresalePublicAbi,
         PresaleCertified: PresaleCertifiedAbi,
+        UniswapRouter: UniswapRouterAbi,
       },
     },
   },

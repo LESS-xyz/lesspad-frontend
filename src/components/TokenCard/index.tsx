@@ -19,6 +19,7 @@ export interface ITokenCardProps {
   type: 'public' | 'certified';
   fundingToken: string;
   status: 'ended' | 'in voting' | 'not opened';
+  isCertified: boolean;
 }
 
 const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
@@ -36,6 +37,7 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
     type,
     fundingToken,
     status,
+    isCertified,
   } = props;
   const { ContractPresalePublic, ContractPresaleCertified } = useContractsContext();
 
@@ -43,16 +45,15 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
 
   const getInfo = async () => {
     try {
-      try {
-        const newInfo = await ContractPresalePublic.getInfo({ contractAddress: address });
-        if (newInfo) setInfo(newInfo);
-        console.log('TokenCard getInfo public:', newInfo);
-      } catch (e) {
-        console.log('TokenCard getInfo public error:', e);
-        const newInfo = await ContractPresaleCertified.getInfo({ contractAddress: address });
-        if (newInfo) setInfo(newInfo);
+      let newInfo;
+      if (isCertified) {
+        newInfo = await ContractPresaleCertified.getInfo({ contractAddress: address });
         console.log('TokenCard getInfo certified:', newInfo);
+      } else {
+        newInfo = await ContractPresalePublic.getInfo({ contractAddress: address });
+        console.log('TokenCard getInfo public:', newInfo);
       }
+      if (newInfo) setInfo(newInfo);
     } catch (e) {
       console.error('TokenCard getInfo:', e);
     }

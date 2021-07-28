@@ -6,8 +6,10 @@ import ContractLessTokenService from '../services/contracts/ContractLessToken';
 import ContractLPTokenService from '../services/contracts/ContractLPToken';
 import ContractPresaleCertifiedService from '../services/contracts/ContractPresaleCertified';
 import ContractPresaleFactoryService from '../services/contracts/ContractPresaleFactory';
+import ContractPresaleFactoryCertifiedService from '../services/contracts/ContractPresaleFactoryCertified';
 import ContractPresalePublicService from '../services/contracts/ContractPresalePublic';
 import ContractStakingService from '../services/contracts/ContractStaking';
+import ContractUniswapRouterService from '../services/contracts/ContractUniswapRouter';
 
 import { useWeb3ConnectorContext } from './Web3Connector';
 
@@ -15,10 +17,12 @@ const contractsContext = createContext<any>({
   ContractLessLibrary: {},
   ContractPresalePublic: {},
   ContractPresaleFactory: {},
+  ContractPresaleFactoryCertified: {},
   ContractPresaleCertified: {},
   ContractStaking: {},
   ContractLessToken: {},
   ContractLPToken: {},
+  ContractUniswapRouter: {},
 });
 
 const ContractsContext: React.FC = ({ children }) => {
@@ -28,7 +32,7 @@ const ContractsContext: React.FC = ({ children }) => {
 
   const [value, setValue] = useState<any>({});
 
-  const init: any = useCallback(() => {
+  const init: any = useCallback(async () => {
     try {
       const ContractLessLibrary = new ContractLessLibraryService({
         web3Provider: web3.provider,
@@ -46,6 +50,10 @@ const ContractsContext: React.FC = ({ children }) => {
         web3Provider: web3.provider,
         chainType,
       });
+      const ContractPresaleFactoryCertified = new ContractPresaleFactoryCertifiedService({
+        web3Provider: web3.provider,
+        chainType,
+      });
       const ContractStaking = new ContractStakingService({
         web3Provider: web3.provider,
         chainType,
@@ -59,14 +67,22 @@ const ContractsContext: React.FC = ({ children }) => {
         chainType,
       });
       if (!ContractLessLibrary) return;
+      const uniswapRouterAddress = await ContractLessLibrary.getUniswapRouter();
+      const ContractUniswapRouter = new ContractUniswapRouterService({
+        web3Provider: web3.provider,
+        chainType,
+        contractAddress: uniswapRouterAddress,
+      });
       const newValue = {
         ContractLessLibrary,
         ContractPresalePublic,
         ContractPresaleCertified,
         ContractPresaleFactory,
+        ContractPresaleFactoryCertified,
         ContractStaking,
         ContractLessToken,
         ContractLPToken,
+        ContractUniswapRouter,
       };
       setValue(newValue);
     } catch (e) {
