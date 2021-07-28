@@ -60,6 +60,7 @@ const CreatePoolPage: React.FC = () => {
   );
   // инпут для Certified type
   const [whitelist, setWhitelist] = useState<string>('');
+  const [nativeToken, setNativeToken] = useState<string>('WETH');
   // links
   const [linkLogo, setLinkLogo] = useState<string>('');
   const [linkWebsite, setLinkWebsite] = useState<string>('');
@@ -76,12 +77,18 @@ const CreatePoolPage: React.FC = () => {
     setIsCalendarLiquidityAllocationTime,
   ] = useState<boolean>(false);
   // чекбоксы
-  const [isPublic, setIsPublic] = useState<boolean>(false);
-  const [isLiquidity, setIsLiquidity] = useState<boolean>(false);
-  const [isAutomatically, setIsAutomatically] = useState<boolean>(false);
-  const [isVesting, setIsVesting] = useState<boolean>(false);
-  const [isWhiteListed, setIsWhiteListed] = useState<boolean>(false);
+  const [presaleType, setPresaleType] = useState<string>('Public');
+  const [liquidity, setLiquidity] = useState<string>('Liquidity');
+  const [automatically, setAutomatically] = useState<string>('Automatically');
+  const [vesting, setVesting] = useState<string>('Vesting');
+  const [whiteListed, setWhiteListed] = useState<string>('Whitelist');
   const [isFormSubmitted, setIsFormSubmitted] = useState<boolean>(false);
+
+  const isPublic = presaleType === 'Public';
+  const isLiquidity = liquidity === 'Liquidity';
+  const isAutomatically = automatically === 'Automatically';
+  const isVesting = vesting === 'Vesting';
+  const isWhiteListed = whiteListed === 'Whitelisted';
 
   const { chainType } = useSelector(({ wallet }: any) => wallet);
   const { address: userAddress } = useSelector(({ user }: any) => user);
@@ -95,6 +102,17 @@ const CreatePoolPage: React.FC = () => {
   const maxInvestInWei = new BN(10).pow(new BN(20)).toString(10); // todo
   // const presaleType = isPublic ? 1 : 0;
   // const whitelistArray = whitelist ? whitelist.split(',') : [];
+
+  const splitWhitelist = (data: string) => {
+    try {
+      const whitelistArray = data.split(',');
+      const newWhitelistArray = whitelistArray.map((item: string) => item.trim());
+      return newWhitelistArray;
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
+  };
 
   const getDecimals = async () => {
     try {
@@ -147,7 +165,7 @@ const CreatePoolPage: React.FC = () => {
     // openTime < closeTime &&
     // closeTime < _cakeInfo.liquidityAllocationTime,
     // todo block timestamp
-    const isOpenTimeMoreThanBlockTimestamp = openTime > new Date().getTime();
+    const isOpenTimeMoreThanBlockTimestamp = openTime > Date.now();
     // todo getVotingTime, check ms/s
     const isOpenVotingTimePlus24LessThanOpenTime =
       openVotingTime + 600 * 1000 + 86400 * 1000 <= openTime;
@@ -303,6 +321,7 @@ const CreatePoolPage: React.FC = () => {
             const { key } = resultMetamaskLogin.data;
             const resultGetPoolSignature = await Backend.getPoolSignature({
               token: key,
+              token_address: tokenAddress,
             });
             console.log('PageCreatePool resultGetPoolSignature:', resultGetPoolSignature);
             if (resultGetPoolSignature.data) {
@@ -313,6 +332,9 @@ const CreatePoolPage: React.FC = () => {
           }
         }
       }
+      const tokenAmountInEth = new BN(`${tokenAmount}`)
+        .div(new BN(10).pow(new BN(lessDecimals)))
+        .toString(10);
 
       const WETHAddress = await ContractUniswapRouter.getWETHAddress();
       console.log('PageCreatePool handleSubmit WETHAddress:', WETHAddress);
@@ -324,7 +346,7 @@ const CreatePoolPage: React.FC = () => {
         (openVotingTime / 1000).toFixed(),
         (openTime / 1000).toFixed(),
         (closeTime / 1000).toFixed(),
-        tokenAmount.toString(),
+        tokenAmountInEth,
         // hexToBytes(signature),
         signature,
         timestamp.toString(),
@@ -336,6 +358,7 @@ const CreatePoolPage: React.FC = () => {
         liquidityPercentageAllocation,
         liquidityAllocationTime,
       ];
+      // todo: add CertifiedAddition for certified presale, where nativeToken is
       const presaleStringInfo = [
         saleTitle,
         linkTelegram,
@@ -346,15 +369,44 @@ const CreatePoolPage: React.FC = () => {
         description,
         whitepaper,
       ];
-      console.log({ isPublic, presaleInfo, presalePancakeSwapInfo, presaleStringInfo });
-      const resultCreatePresalePublic = await ContractPresaleFactory.createPresalePublic({
-        userAddress,
-        presaleInfo,
-        presalePancakeSwapInfo,
-        presaleStringInfo,
-      });
-      console.log('CreatePool handleSubmit', resultCreatePresalePublic);
-      // if (resultCreatePresalePublic) await subscribeEvent('PublicPresaleCreated');
+      if (isPublic) {
+        console.log({ isPublic, presaleInfo, presalePancakeSwapInfo, presaleStringInfo });
+        const resultCreatePresalePublic = await ContractPresaleFactory.createPresalePublic({
+          userAddress,
+          presaleInfo,
+          presalePancakeSwapInfo,
+          presaleStringInfo,
+        });
+        console.log('CreatePool handleSubmit', resultCreatePresalePublic);
+      } else {
+        // bool liquidity; - с ликвидностью / без
+        // bool automatically; - если с ликвидностью, то через бэк, либо ручками
+        // uint8 vesting; - процент вестинга
+        // address[] whitelist; - список адресов для приватного пресейла (если список пустой, то проводится регистрация как на публичном)
+        // address nativeToken; - в какой валюте продавать токены (котируются WETH, USDT, USDC)
+        const whiteListArray = splitWhitelist(whitelist);
+        const certifiedAddition = [
+          isLiquidity,
+          isAutomatically,
+          isVesting,
+          whiteListArray,
+          nativeToken,
+        ];
+        console.log('CreatePool handleSubmit:', {
+          isPublic,
+          presaleInfo,
+          presalePancakeSwapInfo,
+          presaleStringInfo,
+          certifiedAddition,
+        });
+        const resultCreatePresalePublic = await ContractPresaleFactory.createPresalePublic({
+          userAddress,
+          presaleInfo,
+          presalePancakeSwapInfo,
+          presaleStringInfo,
+        });
+        console.log('CreatePool handleSubmit', resultCreatePresalePublic);
+      }
     } catch (e) {
       console.error('PageCreatePool handleSubmit:', e);
     }
@@ -405,11 +457,13 @@ const CreatePoolPage: React.FC = () => {
         <div className={s.inner}>
           <div className={s.title}>Create Pool</div>
           <Checkbox
-            checkboxTitle="presale type"
-            optionOne="Certified"
-            optionTwo="Public"
-            onChange={setIsPublic}
-            defaultValue={!isPublic}
+            name="presale type"
+            value={presaleType}
+            onChange={setPresaleType}
+            options={[
+              { key: 'Public', text: 'Public' },
+              { key: 'Certified', text: 'Certified' },
+            ]}
           />
           <div className={s.page_body}>
             <form action="" onSubmit={(e) => handleSubmit(e)}>
@@ -506,11 +560,13 @@ const CreatePoolPage: React.FC = () => {
               {/* date pickers end */}
               {!isPublic && (
                 <Checkbox
-                  defaultValue={isLiquidity}
-                  onChange={setIsLiquidity}
-                  checkboxTitle="liquidity / without liquidity"
-                  optionOne="Liquidity"
-                  optionTwo="Without liquidity"
+                  name="liquidity / without liquidity"
+                  value={liquidity}
+                  onChange={setLiquidity}
+                  options={[
+                    { key: 'Liquidity', text: 'Liquidity' },
+                    { key: 'Without liquidity', text: 'Without liquidity' },
+                  ]}
                 />
               )}
 
@@ -561,34 +617,45 @@ const CreatePoolPage: React.FC = () => {
                   </div>
                   {!isPublic && (
                     <Checkbox
-                      defaultValue={isAutomatically}
-                      onChange={setIsAutomatically}
-                      checkboxTitle="Automatically / Not Automatically"
-                      optionOne="Automatically"
-                      optionTwo="Not Automatically"
+                      name="Automatically / Not Automatically"
+                      value={automatically}
+                      onChange={setAutomatically}
+                      options={[
+                        { key: 'Automatically', text: 'Automatically' },
+                        { key: 'Not Automatically', text: 'Not Automatically' },
+                      ]}
                     />
                   )}
-                  {/* Liquidity inputs end */}
                 </>
               )}
+              {/* Liquidity inputs end */}
+
               {!isPublic && (
                 <>
                   <Checkbox
-                    defaultValue={isWhiteListed}
-                    onChange={setIsWhiteListed}
-                    checkboxTitle="Whitelist / without whitelist"
-                    optionOne="Whitelist"
-                    optionTwo="Without whitelist"
+                    name="Whitelist / without whitelist"
+                    value={whiteListed}
+                    onChange={setWhiteListed}
+                    options={[
+                      { key: 'Whitelist', text: 'Whitelist' },
+                      { key: 'Without whitelist', text: 'Without whitelist' },
+                    ]}
                   />
                   {isWhiteListed && (
-                    <Input title="Adresses" value={whitelist} onChange={setWhitelist} />
+                    <Input
+                      title="Adresses, comma separated"
+                      value={whitelist}
+                      onChange={setWhitelist}
+                    />
                   )}
                   <Checkbox
-                    defaultValue={isVesting}
-                    onChange={setIsVesting}
-                    checkboxTitle="vesting / without vesting"
-                    optionOne="Vesting"
-                    optionTwo="Without vesting"
+                    name="vesting / without vesting"
+                    value={vesting}
+                    onChange={setVesting}
+                    options={[
+                      { key: 'Vesting', text: 'Vesting' },
+                      { key: 'Without vesting', text: 'Without vesting' },
+                    ]}
                   />
                   {isVesting && (
                     <>
@@ -600,6 +667,19 @@ const CreatePoolPage: React.FC = () => {
                     </>
                   )}
                 </>
+              )}
+
+              {!isPublic && (
+                <Checkbox
+                  name="Native token"
+                  value={nativeToken}
+                  onChange={setNativeToken}
+                  options={[
+                    { key: 'WETH', text: 'WETH' },
+                    { key: 'USDT', text: 'USDT' },
+                    { key: 'USDC', text: 'USDC' },
+                  ]}
+                />
               )}
 
               <Input value={linkLogo} onChange={setLinkLogo} title="Link to logo" />

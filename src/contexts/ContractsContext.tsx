@@ -32,7 +32,8 @@ const ContractsContext: React.FC = ({ children }) => {
 
   const { chainType } = useSelector(({ wallet }: any) => wallet);
 
-  const [value, setValue] = useState<any>({});
+  const [contractsOnRpc, setContractsOnRpc] = useState<any>({});
+  const [contractsOnMetamask, setContractsOnMetamask] = useState<any>({});
 
   const initRpc: any = useCallback(async () => {
     try {
@@ -62,11 +63,11 @@ const ContractsContext: React.FC = ({ children }) => {
         ContractLessLibrary,
         ContractUniswapRouter,
       };
-      setValue({ ...value, ...newValue });
+      setContractsOnRpc(newValue);
     } catch (e) {
       console.error('ContractsContext init:', e);
     }
-  }, [chainType, value]);
+  }, [chainType]);
 
   const initMetamask: any = useCallback(async () => {
     try {
@@ -97,11 +98,11 @@ const ContractsContext: React.FC = ({ children }) => {
         ContractLessToken,
         ContractLPToken,
       };
-      setValue({ ...value, ...newValue });
+      setContractsOnMetamask(newValue);
     } catch (e) {
       console.error('ContractsContext init:', e);
     }
-  }, [web3, chainType, value]);
+  }, [web3, chainType]);
 
   useEffect(() => {
     if (!chainType) return;
@@ -117,11 +118,15 @@ const ContractsContext: React.FC = ({ children }) => {
   }, [web3]);
 
   useEffect(() => {
-    console.log('value:', value);
+    console.log('value:', { ...contractsOnRpc, ...contractsOnMetamask });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value]);
+  }, [contractsOnRpc, contractsOnMetamask]);
 
-  return <contractsContext.Provider value={value}>{children}</contractsContext.Provider>;
+  return (
+    <contractsContext.Provider value={{ ...contractsOnRpc, ...contractsOnMetamask }}>
+      {children}
+    </contractsContext.Provider>
+  );
 };
 
 export default ContractsContext;

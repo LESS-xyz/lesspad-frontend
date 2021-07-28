@@ -13,7 +13,7 @@ import UniswapRouterAbi from '../data/abi/UniswapRouterAbi';
 const IS_PRODUCTION = false;
 const IS_TESTING_ON_ROPSTEN = false;
 const SHOW_CONSOLE_LOGS = true;
-const INFURA_KEY = 'df6686bd56e047219d5fdfbb594c2e47';
+const INFURA_KEY = 'bf1db577e6bb42bf93893e1ea5dd1630';
 
 export default {
   IS_PRODUCTION,

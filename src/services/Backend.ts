@@ -12,6 +12,7 @@ type TypeMetamaskLoginProps = {
 
 type TypeGetPoolSignatureProps = {
   token: string;
+  token_address: string;
 };
 
 type TypeGetVotingSignatureProps = {
