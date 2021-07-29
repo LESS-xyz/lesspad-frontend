@@ -9,7 +9,6 @@ import ethLogo from '../../../assets/img/icons/eth-logo.svg';
 import Github from '../../../assets/img/icons/gh-icon.svg';
 import Link from '../../../assets/img/icons/link-icon.svg';
 import maticLogo from '../../../assets/img/icons/matic-logo.svg';
-import Logo from '../../../assets/img/icons/project-logo.svg';
 import Subscribe from '../../../assets/img/icons/subscribe.svg';
 import Telegram from '../../../assets/img/icons/tg-icon.svg';
 import Twitter from '../../../assets/img/icons/twitter-icon.svg';
@@ -104,7 +103,7 @@ const Pool: React.FC = () => {
     tokenPrice,
     softCap,
     hardCap,
-    // tokensForSaleLeft,
+    tokensForSaleLeft,
     // tokensForLiquidityLeft,
     openTimePresale,
     closeTimePresale,
@@ -117,7 +116,7 @@ const Pool: React.FC = () => {
     linkGithub,
     linkTwitter,
     linkWebsite,
-    // linkLogo,
+    linkLogo,
     description,
     // whitepaper,
     // #uniswap info
@@ -128,7 +127,7 @@ const Pool: React.FC = () => {
     // unlockTime,
     // todo: native token
     approved,
-    // beginingAmount,
+    beginingAmount,
     // cancelled,
     // liquidityAdded,
     participants,
@@ -156,6 +155,11 @@ const Pool: React.FC = () => {
   // const isMatic = chainType === 'Matic';
 
   const exchange = isEthereum ? 'Uniswap' : isBinanceSmartChain ? 'PancakeSwap' : 'SushiSwap';
+
+  const tokensSoldInNativeCurrency = (beginingAmount - tokensForSaleLeft) * tokenPrice;
+  const hardCapInNativeCurrency = hardCap * tokenPrice;
+  const percentOfTokensSold = ((beginingAmount - tokensForSaleLeft) / beginingAmount) * 100;
+  const percentOfSoftCap = (softCap / hardCap) * 100;
 
   ////////////////////////////////////
 
@@ -299,7 +303,7 @@ const Pool: React.FC = () => {
       <div className="preview">
         <div className="description">
           <div className="logo-center">
-            <img className="icon-logo" src={Logo} alt="Logo" />
+            <img src={addHttps(linkLogo)} alt="token-logo" />
           </div>
           <div className="description-info">
             <div className="description-info-header">
@@ -340,12 +344,19 @@ const Pool: React.FC = () => {
         </div>
         <div className="grow-scale">
           <div className="grow-scale-progress">
-            <div className="grow-scale-progress-value" />
+            <div
+              className="grow-scale-progress-value"
+              style={{ width: `${percentOfTokensSold}%` }}
+            />
           </div>
         </div>
         <div className="grow-info">
-          <div className="grow-min">0.000% (Min 44.931%)</div>
-          <div className="grow-max">0.000 / 1164.000 {currency}</div>
+          <div className="grow-min">
+            {percentOfTokensSold}% (Min {percentOfSoftCap}%)
+          </div>
+          <div className="grow-max">
+            {tokensSoldInNativeCurrency} / {hardCapInNativeCurrency} {currency}
+          </div>
         </div>
       </div>
 
