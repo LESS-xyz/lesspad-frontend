@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
+import dayjs from 'dayjs';
 
+import bnbLogo from '../../../assets/img/icons/bnb-logo.svg';
+import ethLogo from '../../../assets/img/icons/eth-logo.svg';
 import Github from '../../../assets/img/icons/gh-icon.svg';
 import Link from '../../../assets/img/icons/link-icon.svg';
+import maticLogo from '../../../assets/img/icons/matic-logo.svg';
 import Logo from '../../../assets/img/icons/project-logo.svg';
 import Subscribe from '../../../assets/img/icons/subscribe.svg';
 import Subtract from '../../../assets/img/icons/subtract-icon.svg';
@@ -12,46 +16,177 @@ import Telegram from '../../../assets/img/icons/tg-icon.svg';
 import Twitter from '../../../assets/img/icons/twitter-icon.svg';
 import YourTier from '../../../components/YourTier/index';
 import config from '../../../config';
+import { useContractsContext } from '../../../contexts/ContractsContext';
 import ParticipantsTable from '../ParticipantsTable';
 
 import './index.scss';
 
 const { chainSymbols, explorers }: any = config;
 
+const chainsInfo: any = [
+  { key: 'Ethereum', title: 'Ethereum', symbol: 'ETH', logo: ethLogo },
+  { key: 'Binance-Smart-Chain', title: 'Binance Smart Chain', symbol: 'BNB', logo: bnbLogo },
+  { key: 'Matic', title: 'Polygon (Matic)', symbol: 'MATIC', logo: maticLogo },
+];
+
 const Pool: React.FC = () => {
   const { address }: any = useParams();
 
+  const { ContractPresalePublic, ContractPresaleCertified } = useContractsContext();
+
+  const [info, setInfo] = useState<any>();
+  const [isCertified, setIsCertified] = useState<boolean>();
+  const [chainInfo, setChainInfo] = useState<any>();
+
+  const { pools } = useSelector(({ pool }: any) => pool);
   const { chainType } = useSelector(({ wallet }: any) => wallet);
+
+  const getIsCertified = (presaleAddress: string) => {
+    try {
+      const isCertifiedNew = pools?.filter((item: any) => item.address === presaleAddress)[0]
+        .isCertified;
+      setIsCertified(isCertifiedNew);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const getChainInfo = () => {
+    const chainInfoNew = chainsInfo.filter((item: any) => item.key === chainType);
+    setChainInfo(chainInfoNew[0]);
+  };
+
+  const getInfo = async () => {
+    try {
+      let newInfo;
+      if (isCertified) {
+        newInfo = await ContractPresaleCertified.getInfo({ contractAddress: address });
+        console.log('TokenCard getInfo certified:', newInfo);
+      } else {
+        newInfo = await ContractPresalePublic.getInfo({ contractAddress: address });
+        console.log('TokenCard getInfo public:', newInfo);
+      }
+      if (newInfo) setInfo(newInfo);
+    } catch (e) {
+      console.error('TokenCard getInfo:', e);
+    }
+  };
+
+  useEffect(() => {
+    if (!chainType) return;
+    getChainInfo();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chainType]);
+
+  useEffect(() => {
+    if (!pools || !pools.length) return;
+    getIsCertified(address);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pools]);
+
+  useEffect(() => {
+    if (!ContractPresalePublic) return;
+    if (!ContractPresaleCertified) return;
+    if (isCertified === undefined) return;
+    getInfo();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ContractPresalePublic, ContractPresaleCertified, isCertified]);
+
+  if (!address) return null; // todo: show loader
+  if (!info) return null; // todo: show loader
+
+  const {
+    // #additional info
+    tokenSymbol,
+    // #general info
+    // creator,
+    // token,
+    tokenPrice,
+    softCap,
+    hardCap,
+    // tokensForSaleLeft,
+    // tokensForLiquidityLeft,
+    openTimePresale,
+    closeTimePresale,
+    // openTimeVoting,
+    // closeTimeVoting,
+    // collectedFee,
+    // #string info
+    saleTitle,
+    // linkTelegram,
+    // linkGithub,
+    // linkTwitter,
+    // linkWebsite,
+    // linkLogo,
+    description,
+    // whitepaper,
+    // #uniswap info
+    listingPrice,
+    lpTokensLockDurationInDays,
+    liquidityPercentageAllocation,
+    liquidityAllocationTime,
+    // unlockTime,
+    // todo: native token
+    // approved,
+    // beginingAmount,
+    // cancelled,
+    // liquidityAdded,
+    participants,
+    raisedAmount,
+  } = info;
+  console.log('Pool info:', info);
+
+  const now = Date.now();
+  // let presaleStatus = '';
+  // if (isCertified) {
+  //   if (openTimePresale > now) presaleStatus = 'Not opened';
+  //   if (openTimePresale < now) presaleStatus = 'Opened';
+  //   if (closeTimePresale < now) presaleStatus = 'Closed';
+  // } else {
+  //   if (openTimePresale > now) presaleStatus = 'Not opened';
+  //   if (openTimePresale < now) presaleStatus = 'Opened';
+  //   if (openTimeVoting < now) presaleStatus = 'In voting';
+  //   if (closeTimeVoting < now) presaleStatus = 'Voting ended';
+  //   if (closeTimePresale < now) presaleStatus = 'Ended';
+  // }
+  const isOpened = openTimePresale < now;
+
+  const isEthereum = chainType === 'Ethereum';
+  const isBinanceSmartChain = chainType === 'Binance-Smart-Chain';
+  // const isMatic = chainType === 'Matic';
+
+  const exchange = isEthereum ? 'Uniswap' : isBinanceSmartChain ? 'PancakeSwap' : 'SushiSwap';
+
+  ////////////////////////////////////
 
   const currency = chainSymbols[chainType];
   const explorer = explorers[chainType];
-  const name = 'Pool';
 
   const row1 = [
     {
       header: 'Softcap',
-      value: `638.094 ${currency}`,
+      value: `${softCap} ${currency}`,
       gradient: true,
       less: false,
       last: false,
     },
     {
       header: 'Presale Rate',
-      value: `0.0001454 ${currency}`,
+      value: `${tokenPrice} ${currency}`,
       gradient: false,
       less: false,
       last: false,
     },
     {
       header: 'Liquidity Allocation',
-      value: '60%',
+      value: `${liquidityPercentageAllocation}%`,
       gradient: false,
       less: false,
       last: false,
     },
     {
       header: 'Open Time',
-      value: 'June 05, 2021 17:00 PM GMT',
+      value: dayjs(openTimePresale).format('MMMM DD, YYYY HH:mm A GMT'),
       gradient: false,
       less: false,
       last: true,
@@ -61,28 +196,28 @@ const Pool: React.FC = () => {
   const row2 = [
     {
       header: 'Hardcap',
-      value: `1164 ${currency}`,
+      value: `${hardCap} ${currency}`,
       gradient: true,
       less: false,
       last: false,
     },
     {
-      header: 'PancakeSwap Listing Rate',
-      value: `0.0001740 ${currency}`,
+      header: `${exchange} Listing Rate`,
+      value: `${listingPrice} ${currency}`,
       gradient: false,
       less: false,
       last: false,
     },
     {
       header: 'Liquidity Lock Duration',
-      value: '240 days',
+      value: `${lpTokensLockDurationInDays} days`,
       gradient: true,
       less: false,
       last: false,
     },
     {
-      header: 'Open Time',
-      value: 'June 05, 2021 17:00 PM GMT',
+      header: 'Close Time',
+      value: dayjs(closeTimePresale).format('MMMM DD, YYYY HH:mm A GMT'),
       gradient: false,
       less: false,
       last: true,
@@ -92,30 +227,30 @@ const Pool: React.FC = () => {
   const row3 = [
     {
       header: 'Presale Type',
-      value: 'Public Presale',
+      value: `${isCertified ? 'Certified' : 'Public'} Presale`,
       gradient: false,
       less: false,
       last: false,
     },
     {
-      header: 'Headstart',
-      value: '30 mins',
+      header: isCertified ? '' : 'Yes Votes',
+      value: isCertified ? '' : '125556',
       gradient: false,
       less: false,
       last: false,
     },
     {
-      header: 'Yes Votes',
-      value: '125556',
+      header: isCertified ? '' : 'No Votes',
+      value: isCertified ? '' : '0',
       gradient: false,
-      less: true,
+      less: false,
       last: false,
     },
     {
-      header: 'No Votes',
-      value: '0',
+      header: '',
+      value: '',
       gradient: false,
-      less: true,
+      less: false,
       last: true,
     },
   ];
@@ -184,8 +319,8 @@ const Pool: React.FC = () => {
     <div className="container">
       <Helmet>
         <meta charSet="utf-8" />
-        <title>{name} | Lesspad</title>
-        <meta name="description" content={`Pool. ${name}.`} />
+        <title>{saleTitle} | Lesspad</title>
+        <meta name="description" content={`Presale Pool. ${saleTitle}. ${description}`} />
       </Helmet>
 
       <div className="preview">
@@ -195,11 +330,9 @@ const Pool: React.FC = () => {
           </div>
           <div className="description-info">
             <div className="description-info-header">
-              <span>{name}</span>
+              <span>{saleTitle}</span>
             </div>
-            <div className="description-info-text">
-              Autonomous interest rate protocol for on-chain lending and borrowing
-            </div>
+            <div className="description-info-text">{description}</div>
             <div className="subscription">
               <a href={`${explorer}/token/${address}`} className="subscription-text">
                 {address}
@@ -210,20 +343,27 @@ const Pool: React.FC = () => {
         </div>
         <div className="preview-info">
           <div className="preview-info-days">
-            <div className="preview-info-days-text">opens in 3 days</div>
+            <div className="preview-info-days-text">
+              {isOpened ? 'opened' : 'opens'} {dayjs(openTimePresale).fromNow()}
+            </div>
           </div>
           <div className="preview-info-date preview-info-date__text-opacity">
-            Listing: June 07, 2021 18:00 PM GMT
+            Listing:{' '}
+            {liquidityAllocationTime
+              ? dayjs(liquidityAllocationTime).format('MMMM DD, YYYY HH:mm A GMT')
+              : 'soon'}
           </div>
         </div>
       </div>
       <div className="grow">
         <div className="grow-text preview-info-date__text-opacity">
-          0.0001454 {currency} per Token
+          {tokenPrice} {currency} per {tokenSymbol}
         </div>
         <div className="grow-progress">
-          <div>0.000 {currency} Raised</div>
-          <div>0 Participants</div>
+          <div>
+            {raisedAmount} {chainInfo.symbol} Raised
+          </div>
+          <div>{participants} Participants</div>
         </div>
         <div className="grow-scale">
           <div className="grow-scale-progress">
@@ -285,6 +425,7 @@ const Pool: React.FC = () => {
       </div>
 
       <YourTier tier="king" className="tier-block" />
+
       <div className="container-header">Your Investment</div>
       <div className="box box-bg">
         <div className="row last">

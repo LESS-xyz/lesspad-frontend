@@ -47,14 +47,17 @@ export default class ContractPresalePublicService {
       const generalInfo = await contract.methods.generalInfo().call();
       const uniswapInfo = await contract.methods.uniswapInfo().call();
       const stringInfo = await contract.methods.stringInfo().call();
+      const intermediate = await contract.methods.intermediate().call();
       console.log('ContractPresalePublicService getInfo:', {
         generalInfo,
         uniswapInfo,
         stringInfo,
+        intermediate,
       });
       const tokenAddress = generalInfo.token;
       const contractToken = new this.web3.eth.Contract(ERC20Abi, tokenAddress);
       const decimals = await contractToken.methods.decimals().call();
+      const tokenSymbol = await contractToken.methods.symbol().call();
       const {
         creator,
         token,
@@ -79,6 +82,21 @@ export default class ContractPresalePublicService {
         description,
         whitepaper,
       } = stringInfo;
+      const {
+        listingPriceInWei,
+        lpTokensLockDurationInDays,
+        liquidityPercentageAllocation,
+        liquidityAllocationTime,
+        unlockTime,
+      } = uniswapInfo;
+      const {
+        approved,
+        beginingAmount,
+        cancelled,
+        liquidityAdded,
+        participants,
+        raisedAmount,
+      } = intermediate;
       // format
       const pow = new BN(10).pow(new BN(decimals));
       const tokenPrice = +new BN(tokenPriceInWei).div(pow);
@@ -86,11 +104,15 @@ export default class ContractPresalePublicService {
       const hardCapFormatted = +new BN(hardCapInWei).div(pow);
       const tokensForSaleLeftInEth = +new BN(tokensForSaleLeft).div(pow);
       const tokensForLiquidityLeftInEth = +new BN(tokensForLiquidityLeft).div(pow);
+      const listingPriceInEth = +new BN(listingPriceInWei).div(pow);
+      const beginingAmountInEth = +new BN(beginingAmount).div(pow);
+      const raisedAmountInEth = +new BN(raisedAmount).div(pow); // todo: decimals of native token
       // result
       return {
         // general
         creator,
         token,
+        tokenSymbol,
         tokenPrice,
         softCap: softCapFormatted,
         hardCap: hardCapFormatted,
@@ -110,6 +132,19 @@ export default class ContractPresalePublicService {
         linkLogo,
         description,
         whitepaper,
+        // uniswap
+        listingPrice: listingPriceInEth,
+        lpTokensLockDurationInDays,
+        liquidityPercentageAllocation, // todo: in percent or in 0.01?
+        liquidityAllocationTime: liquidityAllocationTime * 1000,
+        unlockTime,
+        // intermediate
+        approved,
+        beginingAmount: beginingAmountInEth,
+        cancelled,
+        liquidityAdded,
+        participants,
+        raisedAmount: raisedAmountInEth,
       };
     } catch (e) {
       console.error('ContractPresalePublicService getInfo:', e);

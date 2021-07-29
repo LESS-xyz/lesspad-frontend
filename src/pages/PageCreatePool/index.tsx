@@ -641,7 +641,7 @@ const CreatePoolPage: React.FC = () => {
                       { key: 'Without whitelist', text: 'Without whitelist' },
                     ]}
                   />
-                  {isWhiteListed && (
+                  {isWhiteListed && ( // todo: matrix
                     <Input
                       title="Adresses, comma separated"
                       value={whitelist}
