@@ -11,12 +11,12 @@ import Link from '../../../assets/img/icons/link-icon.svg';
 import maticLogo from '../../../assets/img/icons/matic-logo.svg';
 import Logo from '../../../assets/img/icons/project-logo.svg';
 import Subscribe from '../../../assets/img/icons/subscribe.svg';
-import Subtract from '../../../assets/img/icons/subtract-icon.svg';
 import Telegram from '../../../assets/img/icons/tg-icon.svg';
 import Twitter from '../../../assets/img/icons/twitter-icon.svg';
 import YourTier from '../../../components/YourTier/index';
 import config from '../../../config';
 import { useContractsContext } from '../../../contexts/ContractsContext';
+import { addHttps } from '../../../utils/prettifiers';
 import ParticipantsTable from '../ParticipantsTable';
 
 import './index.scss';
@@ -100,7 +100,7 @@ const Pool: React.FC = () => {
     tokenSymbol,
     // #general info
     // creator,
-    // token,
+    token,
     tokenPrice,
     softCap,
     hardCap,
@@ -113,10 +113,10 @@ const Pool: React.FC = () => {
     // collectedFee,
     // #string info
     saleTitle,
-    // linkTelegram,
-    // linkGithub,
-    // linkTwitter,
-    // linkWebsite,
+    linkTelegram,
+    linkGithub,
+    linkTwitter,
+    linkWebsite,
     // linkLogo,
     description,
     // whitepaper,
@@ -127,7 +127,7 @@ const Pool: React.FC = () => {
     liquidityAllocationTime,
     // unlockTime,
     // todo: native token
-    // approved,
+    approved,
     // beginingAmount,
     // cancelled,
     // liquidityAdded,
@@ -255,65 +255,38 @@ const Pool: React.FC = () => {
     },
   ];
 
-  const invest = [
-    {
-      header: 'VOTE',
-      value: '0.000',
-      count: '$0.0 USD',
-      buttonText: 'Vote',
-      less: true,
-      last: false,
-    },
-    {
-      header: 'Your Tokens',
-      value: '1,000,000',
-      count: '$13,780,000 USD',
-      buttonText: 'Claim Token',
-      less: true,
-      last: false,
-    },
-    {
-      header: 'Your BNB Investment',
-      value: '0.0 BNB',
-      count: '$0.0 USD',
-      buttonText: 'Get Refund',
-      less: false,
-      last: false,
-    },
-    {
-      header: 'Buy Tokens',
-      value: '1 Token = 0.000145 BNB',
-      count: '',
-      buttonText: 'Get Refund',
-      less: false,
-      last: true,
-    },
-  ];
-
   const links = [
     {
       header: 'Token Contract Address',
-      value: 'x19314Dfa75CfC1E5154f95daFaB217646bdb79AC',
+      value: token,
+      link: `${explorers[chainType]}/token/${token}`,
     },
-    {
-      header: 'PancakeSwap Address',
-      value: '0x19314Dfa75CfC1E5154f95daFaB217646bdb79AC',
-    },
-    {
-      header: 'Locked Liquidity Address',
-      value: '0x0e7b582003de0E541548cF02a1F00725Df6E6E6f',
-    },
-    {
-      header: 'PooCoin Address',
-      value: '0x19314Dfa75CfC1E5154f95daFaB217646bdb79AC',
-    },
+    // {
+    //   header: 'PancakeSwap Address',
+    //   value: '0x19314Dfa75CfC1E5154f95daFaB217646bdb79AC',
+    // },
+    // {
+    //   header: 'Locked Liquidity Address',
+    //   value: '0x0e7b582003de0E541548cF02a1F00725Df6E6E6f',
+    //   link: `${explorers[chainType]}/token/${token}`,
+    // },
+    // {
+    //   header: 'PooCoin Address',
+    //   value: '0x19314Dfa75CfC1E5154f95daFaB217646bdb79AC',
+    // },
     {
       header: 'Presale Contract Address',
-      value: '0x685C3083A8EeF94e4eBa075cfD04bf35202C09C5',
+      value: address,
+      link: `${explorers[chainType]}/address/${address}`,
     },
   ];
 
-  const linksIcons = [Telegram, Twitter, Link, Github, Subtract];
+  const linksIcons = [
+    { image: Telegram, link: linkTelegram },
+    { image: Twitter, link: linkTwitter },
+    { image: Link, link: linkWebsite },
+    { image: Github, link: linkGithub },
+  ];
 
   return (
     <div className="container">
@@ -424,34 +397,76 @@ const Pool: React.FC = () => {
         </div>
       </div>
 
+      {/*Your Tier*/}
       <YourTier tier="king" className="tier-block" />
 
+      {/*Your Investment*/}
       <div className="container-header">Your Investment</div>
       <div className="box box-bg">
         <div className="row last">
-          {invest.map((item) => (
-            <div className={item.last ? 'item last' : 'item'}>
-              {item.header}
-              <div className="item-text">
-                <div className="item-text-bold">{item.value}</div>
-                {item.less ? <div className="item-text-gradient">LESS</div> : null}
-              </div>
-              <div className="item-count">{item.count}</div>
-              <div className="button-border">
-                <div className="button">
-                  <div className="gradient-button-text">{item.buttonText}</div>
-                </div>
+          <div className="item">
+            VOTE
+            <div className="item-text">
+              <div className="item-text-bold">0.000</div>
+              <div className="item-text-gradient">LESS</div>
+            </div>
+            <div className="item-count">$0.0 USD</div>
+            <div className="button-border">
+              <div className="button">
+                <div className="gradient-button-text">Vote</div>
               </div>
             </div>
-          ))}
+          </div>
+          <div className="item">
+            Your Tokens
+            <div className="item-text">
+              <div className="item-text-bold">1,000,000</div>
+              <div className="item-text-gradient">LESS</div>
+            </div>
+            <div className="item-count">$13,780,000 USD</div>
+            <div className="button-border">
+              <div className="button">
+                <div className="gradient-button-text">Claim Token</div>
+              </div>
+            </div>
+          </div>
+          <div className="item">
+            Your BNB Investment
+            <div className="item-text">
+              <div className="item-text-bold">0.0 BNB</div>
+            </div>
+            <div className="item-count">$0.0 USD</div>
+            <div className="button-border">
+              <div className="button">
+                <div className="gradient-button-text">Get Refund</div>
+              </div>
+            </div>
+          </div>
+          <div className="item last">
+            Buy Tokens
+            <div className="item-text">
+              <div className="item-text-bold">
+                1 {tokenSymbol} = {tokenPrice} {currency}
+              </div>
+            </div>
+            <div className="button-border">
+              <div className="button">
+                <div className="gradient-button-text">Get Refund</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+
+      {/*Participants*/}
       <ParticipantsTable />
+
+      {/*Important Links*/}
       <div className="container-header">Important Links</div>
       <div className="box">
         <div className="box-links">
           {links.map((item) => (
-            <div className="box-links-link">
+            <a href={item.link} className="box-links-link">
               <div className="box-links-link-content">
                 <div className="box-links-link-content-header">{item.header}</div>
                 <div>{item.value}</div>
@@ -459,23 +474,24 @@ const Pool: React.FC = () => {
               <div className="box-links-link-button">
                 <img src={Subscribe} alt="Subscribe icon" />
               </div>
-            </div>
+            </a>
           ))}
           <div className="box-links-list">
             <div className="box-links-list-header">Connect</div>
             <div className="box-links-list-links">
-              {linksIcons.map((link) => (
-                <div className="box-links-list-links-item">
-                  <img src={link} alt={`${link} icon`} />
-                </div>
+              {linksIcons.map((item) => (
+                <a href={addHttps(item.link)} className="box-links-list-links-item">
+                  <img src={item.image} alt={`${item.image} icon`} />
+                </a>
               ))}
             </div>
           </div>
         </div>
       </div>
+
       <div className="container-header">Audit</div>
       <div className="box box-bg">
-        <div className="box-text">Not audited yet.</div>
+        <div className="box-text">{approved ? 'Audited' : 'Not audited yet.'}</div>
       </div>
     </div>
   );
