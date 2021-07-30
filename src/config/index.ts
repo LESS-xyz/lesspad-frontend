@@ -134,9 +134,23 @@ export default {
     },
   },
   abis: {
-    mainnet: {},
+    mainnet: {
+      Ethereum: {
+        ERC20: ERC20Abi,
+        LessToken: ERC20Abi,
+        LPToken: LPTokenAbi,
+        LessLibrary: LessLibraryAbi,
+        Staking: StakingAbi,
+        PresaleFactory: PresaleFactoryAbi,
+        PresaleFactoryCertified: PresaleFactoryCertifiedAbi,
+        PresalePublic: PresalePublicAbi,
+        PresaleCertified: PresaleCertifiedAbi,
+        UniswapRouter: UniswapRouterAbi,
+      },
+    },
     testnet: {
       Ethereum: {
+        ERC20: ERC20Abi,
         LessToken: ERC20Abi,
         LPToken: LPTokenAbi,
         LessLibrary: LessLibraryAbi,

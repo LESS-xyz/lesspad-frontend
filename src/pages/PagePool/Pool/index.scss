@@ -500,3 +500,32 @@
     object-fit: contain;
   }
 }
+
+.messageContainer {
+  @include flex(column, normal, center);
+  height: 100%;
+}
+
+.button-border {
+  margin: 24px 0 30px;
+  padding: 2px;
+  width: fit-content;
+
+  background: linear-gradient(to right, #6f45ff, #ff6365);
+
+  border-radius: 28px;
+
+  .button {
+    padding: 16px 30px;
+    cursor: pointer;
+
+    background: #040404;
+
+    border-radius: 28px;
+
+    .gradient-button-text {
+      @include gradient-text();
+      font-family: 'Poppins Bold', sans-serif;
+    }
+  }
+}

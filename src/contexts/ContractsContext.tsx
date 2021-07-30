@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import Web3 from 'web3';
 
 import config from '../config';
+import ContractERC20Service from '../services/contracts/ContractERC20';
 import ContractLessLibraryService from '../services/contracts/ContractLessLibrary';
 import ContractLessTokenService from '../services/contracts/ContractLessToken';
 import ContractLPTokenService from '../services/contracts/ContractLPToken';
@@ -16,6 +17,7 @@ import ContractUniswapRouterService from '../services/contracts/ContractUniswapR
 import { useWeb3ConnectorContext } from './Web3Connector';
 
 const contractsContext = createContext<any>({
+  ContractERC20: {},
   ContractPresalePublicWithMetamask: {},
   ContractLessLibrary: {},
   ContractPresalePublic: {},
@@ -72,6 +74,10 @@ const ContractsContext: React.FC = ({ children }) => {
 
   const initMetamask: any = useCallback(async () => {
     try {
+      const ContractERC20 = new ContractERC20Service({
+        web3Provider: web3.provider,
+        chainType,
+      });
       const ContractPresalePublicWithMetamask = new ContractPresalePublicService({
         web3Provider: web3.provider,
         chainType,
@@ -97,6 +103,7 @@ const ContractsContext: React.FC = ({ children }) => {
         chainType,
       });
       const newValue = {
+        ContractERC20,
         ContractPresalePublicWithMetamask,
         ContractPresaleFactory,
         ContractPresaleFactoryCertified,

@@ -22,6 +22,17 @@ type TypeVoteProps = {
   yes: boolean;
 };
 
+type TypeInvestProps = {
+  userAddress: string;
+  contractAddress: string;
+  tokenAmount: string;
+  signature: string;
+  stakedAmount: string;
+  timestamp: number;
+  poolPercentages: number[];
+  stakingTiers: number[];
+};
+
 export default class ContractPresalePublicService {
   public web3: any;
 
@@ -161,6 +172,29 @@ export default class ContractPresalePublicService {
       const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
       // todo: add timestamp in new contract
       return await contract.methods.vote(yes, stakingAmount, signature).send({ from: userAddress });
+    } catch (e) {
+      console.error('ContractPresalePublicService vote:', e);
+      return null;
+    }
+  };
+
+  public invest = async (props: TypeInvestProps): Promise<any> => {
+    try {
+      const {
+        userAddress,
+        contractAddress,
+        tokenAmount,
+        signature,
+        stakedAmount,
+        timestamp,
+        poolPercentages,
+        stakingTiers,
+      } = props;
+      console.log('ContractPresalePublicService vote props:', props);
+      const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
+      return await contract.methods
+        .invest(tokenAmount, signature, stakedAmount, timestamp, poolPercentages, stakingTiers)
+        .send({ from: userAddress });
     } catch (e) {
       console.error('ContractPresalePublicService vote:', e);
       return null;

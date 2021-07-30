@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
 import Web3 from 'web3';
@@ -13,10 +13,12 @@ import maticLogo from '../../../assets/img/icons/matic-logo.svg';
 import Subscribe from '../../../assets/img/icons/subscribe.svg';
 import Telegram from '../../../assets/img/icons/tg-icon.svg';
 import Twitter from '../../../assets/img/icons/twitter-icon.svg';
+import Input from '../../../components/Input';
 import YourTier from '../../../components/YourTier/index';
 import config from '../../../config';
 import { useContractsContext } from '../../../contexts/ContractsContext';
 import { useWeb3ConnectorContext } from '../../../contexts/Web3Connector';
+import { modalActions } from '../../../redux/actions';
 import { BackendService } from '../../../services/Backend';
 import { addHttps } from '../../../utils/prettifiers';
 import ParticipantsTable from '../ParticipantsTable';
@@ -38,6 +40,7 @@ const Pool: React.FC = () => {
 
   const { web3 } = useWeb3ConnectorContext();
   const {
+    ContractERC20,
     ContractPresalePublicWithMetamask,
     ContractPresalePublic,
     ContractPresaleCertified,
@@ -48,19 +51,37 @@ const Pool: React.FC = () => {
   const [isCertified, setIsCertified] = useState<boolean>();
   const [chainInfo, setChainInfo] = useState<any>();
 
-  const [lessDecimals, setLessDecimals] = useState<number>();
+  // const [lessDecimals, setLessDecimals] = useState<number>();
   // const [lpDecimals, setLpDecimals] = useState<number>();
+  const [tokenDecimals, setTokenDecimals] = useState<number>();
+
+  const [amountToInvest, setAmountToInvest] = useState<string>('');
 
   const { pools } = useSelector(({ pool }: any) => pool);
   const { chainType } = useSelector(({ wallet }: any) => wallet);
   const { address: userAddress } = useSelector(({ user }: any) => user);
 
-  const getDecimals = async () => {
+  const dispatch = useDispatch();
+  const toggleModal = React.useCallback((params) => dispatch(modalActions.toggleModal(params)), [
+    dispatch,
+  ]);
+
+  // const getDecimals = async () => {
+  //   try {
+  //     // const resultLessDecimals = await ContractLessToken.decimals();
+  //     // setLessDecimals(resultLessDecimals);
+  //     // const resultLpDecimals = await ContractLPToken.decimals();
+  //     // setLpDecimals(resultLpDecimals);
+  //   } catch (e) {
+  //     console.error(e);
+  //   }
+  // };
+
+  const getTokenDecimals = async () => {
     try {
-      const resultLessDecimals = await ContractLessToken.decimals();
-      setLessDecimals(resultLessDecimals);
-      // const resultLpDecimals = await ContractLPToken.decimals();
-      // setLpDecimals(resultLpDecimals);
+      const { token } = info;
+      const resultTokenDecimals = await ContractERC20.decimals({ contractAddress: token });
+      setTokenDecimals(resultTokenDecimals);
     } catch (e) {
       console.error(e);
     }
@@ -99,39 +120,22 @@ const Pool: React.FC = () => {
 
   const loginToBackend = async () => {
     try {
-      // login to backend
-      let timestamp;
-      let signature;
-      let user_balance;
       const resultGetMetamaskMessage = await Backend.getMetamaskMessage();
-      console.log('PagePool vote resultGetMetamaskMessage:', resultGetMetamaskMessage);
-      if (resultGetMetamaskMessage.data) {
-        const msg = resultGetMetamaskMessage.data;
-        const signedMsg = await web3.signMessage({ userAddress, message: msg });
-        console.log('PagePool vote signedMsg:', signedMsg);
-        if (signedMsg) {
-          const resultMetamaskLogin = await Backend.metamaskLogin({
-            address: userAddress,
-            msg,
-            signedMsg,
-          });
-          console.log('PagePool vote resultMetamaskLogin:', resultMetamaskLogin);
-          if (resultMetamaskLogin.data) {
-            const { key } = resultMetamaskLogin.data;
-            const resultGetPoolSignature = await Backend.getVotingSignature({
-              token: key,
-              pool: address,
-            });
-            console.log('PageCreatePool vote resultGetPoolSignature:', resultGetPoolSignature);
-            if (resultGetPoolSignature.data) {
-              timestamp = resultGetPoolSignature.data.date;
-              signature = resultGetPoolSignature.data.signature;
-              user_balance = resultGetPoolSignature.data.user_balance;
-            }
-          }
-        }
-      }
-      return { success: true, data: { timestamp, signature, user_balance } };
+      console.log('PagePool loginToBackend resultGetMetamaskMessage:', resultGetMetamaskMessage);
+      if (!resultGetMetamaskMessage.data) throw new Error('getMetamaskMessage unsuccesful');
+      const msg = resultGetMetamaskMessage.data;
+      const signedMsg = await web3.signMessage({ userAddress, message: msg });
+      console.log('PagePool loginToBackend signedMsg:', signedMsg);
+      if (!signedMsg) throw new Error('signMessage unsuccesful');
+      const resultMetamaskLogin = await Backend.metamaskLogin({
+        address: userAddress,
+        msg,
+        signedMsg,
+      });
+      console.log('PagePool loginToBackend resultMetamaskLogin:', resultMetamaskLogin);
+      if (!resultMetamaskLogin.data) throw new Error('metamaskLogin unsuccesful');
+      const { key } = resultMetamaskLogin.data;
+      return { success: true, data: { key } };
     } catch (e) {
       console.error('PagePool vote:', e);
       return { success: false, data: null };
@@ -142,11 +146,15 @@ const Pool: React.FC = () => {
     try {
       const resultLoginToBackend = await loginToBackend();
       if (!resultLoginToBackend.success) throw new Error('Not logged to backend');
-      const { data }: any = resultLoginToBackend;
-      const { timestamp, signature, user_balance } = data;
-      const stakingAmountInEth = new BN(`${user_balance}`)
-        .div(new BN(10).pow(new BN(lessDecimals)))
-        .toString(10);
+      const { key }: any = resultLoginToBackend.data;
+      const resultGetPoolSignature = await Backend.getVotingSignature({
+        token: key,
+        pool: address,
+      });
+      console.log('PagePool vote resultGetPoolSignature:', resultGetPoolSignature);
+      if (!resultGetPoolSignature.data) throw new Error('Cannot get pool signature');
+      const { timestamp, signature, user_balance } = resultGetPoolSignature.data;
+      const stakingAmountInEth = new BN(`${user_balance}`).toString(10);
       const resultVote = await ContractPresalePublicWithMetamask.vote({
         contractAddress: address,
         stakingAmount: stakingAmountInEth,
@@ -154,6 +162,42 @@ const Pool: React.FC = () => {
         timestamp,
         signature,
         yes,
+      });
+      console.log('PagePool vote:', resultVote);
+    } catch (e) {
+      console.error('PagePool vote:', e);
+    }
+  };
+
+  const invest = async (amount: string) => {
+    try {
+      const resultLoginToBackend = await loginToBackend();
+      if (!resultLoginToBackend.success) throw new Error('Not logged to backend');
+      const { key }: any = resultLoginToBackend.data;
+      const resultGetPoolSignature = await Backend.getInvestSignature({
+        token: key,
+        pool: address,
+      });
+      console.log('PagePool vote resultGetPoolSignature:', resultGetPoolSignature);
+      if (!resultGetPoolSignature.data) throw new Error('Cannot get invest signature');
+      const {
+        timestamp,
+        signature,
+        totalStakedAmount,
+        poolPercentages,
+        stakingTiers,
+      } = resultGetPoolSignature.data;
+      const tokenAmount = new BN(amount).mul(new BN(10).pow(new BN(tokenDecimals))).toString(10);
+      const stakedAmount = new BN(`${totalStakedAmount}`).toString(10);
+      const resultVote = await ContractPresalePublicWithMetamask.invest({
+        userAddress,
+        contractAddress: address,
+        tokenAmount,
+        signature,
+        stakedAmount,
+        timestamp,
+        poolPercentages,
+        stakingTiers,
       });
       console.log('PagePool vote:', resultVote);
     } catch (e) {
@@ -169,12 +213,42 @@ const Pool: React.FC = () => {
     }
   };
 
+  const handleInvest = async () => {
+    try {
+      toggleModal({
+        open: true,
+        text: (
+          <div className="messageContainer">
+            <p>Please, enter amount to invest (in ether)</p>
+            <Input title="" value={amountToInvest} onChange={setAmountToInvest} />
+            <div className="button-border" style={{ margin: '5px 0' }}>
+              <div
+                className="button"
+                role="button"
+                tabIndex={0}
+                onClick={() => invest(amountToInvest)}
+                onKeyDown={() => {}}
+              >
+                <div className="gradient-button-text">Submit</div>
+              </div>
+            </div>
+          </div>
+        ),
+      });
+    } catch (e) {
+      console.error('PagePool handleInvest:', e);
+    }
+  };
+
   useEffect(() => {
+    if (!info) return;
     if (!userAddress) return;
     if (!ContractLessToken) return;
-    getDecimals();
+    if (!ContractERC20) return;
+    // getDecimals();
+    getTokenDecimals();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ContractLessToken, userAddress]);
+  }, [ContractLessToken, userAddress, info]);
 
   useEffect(() => {
     if (!chainType) return;
@@ -241,23 +315,10 @@ const Pool: React.FC = () => {
   console.log('Pool info:', info);
 
   const now = Date.now();
-  // let presaleStatus = '';
-  // if (isCertified) {
-  //   if (openTimePresale > now) presaleStatus = 'Not opened';
-  //   if (openTimePresale < now) presaleStatus = 'Opened';
-  //   if (closeTimePresale < now) presaleStatus = 'Closed';
-  // } else {
-  //   if (openTimePresale > now) presaleStatus = 'Not opened';
-  //   if (openTimePresale < now) presaleStatus = 'Opened';
-  //   if (openTimeVoting < now) presaleStatus = 'In voting';
-  //   if (closeTimeVoting < now) presaleStatus = 'Voting ended';
-  //   if (closeTimePresale < now) presaleStatus = 'Ended';
-  // }
   const isOpened = openTimePresale < now;
 
   const isEthereum = chainType === 'Ethereum';
   const isBinanceSmartChain = chainType === 'Binance-Smart-Chain';
-  // const isMatic = chainType === 'Matic';
 
   const exchange = isEthereum ? 'Uniswap' : isBinanceSmartChain ? 'PancakeSwap' : 'SushiSwap';
 
@@ -265,8 +326,6 @@ const Pool: React.FC = () => {
   const hardCapInNativeCurrency = hardCap * tokenPrice;
   const percentOfTokensSold = ((beginingAmount - tokensForSaleLeft) / beginingAmount) * 100;
   const percentOfSoftCap = (softCap / hardCap) * 100;
-
-  ////////////////////////////////////
 
   const currency = chainSymbols[chainType];
   const explorer = explorers[chainType];
@@ -561,7 +620,13 @@ const Pool: React.FC = () => {
             </div>
             <div className="item-count">$13,780,000 USD</div>
             <div className="button-border">
-              <div className="button">
+              <div
+                className="button"
+                role="button"
+                tabIndex={0}
+                onClick={() => {}}
+                onKeyDown={() => {}}
+              >
                 <div className="gradient-button-text">Claim Token</div>
               </div>
             </div>
@@ -573,7 +638,13 @@ const Pool: React.FC = () => {
             </div>
             <div className="item-count">$0.0 USD</div>
             <div className="button-border">
-              <div className="button">
+              <div
+                className="button"
+                role="button"
+                tabIndex={0}
+                onClick={() => {}}
+                onKeyDown={() => {}}
+              >
                 <div className="gradient-button-text">Get Refund</div>
               </div>
             </div>
@@ -586,8 +657,14 @@ const Pool: React.FC = () => {
               </div>
             </div>
             <div className="button-border">
-              <div className="button">
-                <div className="gradient-button-text">Get Refund</div>
+              <div
+                className="button"
+                role="button"
+                tabIndex={0}
+                onClick={handleInvest}
+                onKeyDown={() => {}}
+              >
+                <div className="gradient-button-text">Invest</div>
               </div>
             </div>
           </div>
