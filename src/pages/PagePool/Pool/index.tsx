@@ -55,6 +55,7 @@ const Pool: React.FC = () => {
   // const [lpDecimals, setLpDecimals] = useState<number>();
   const [tokenDecimals, setTokenDecimals] = useState<number>();
 
+  const [investments, setInvestments] = useState<any>({ amountEth: 0, amountTokens: 0 });
   const [amountToInvest, setAmountToInvest] = useState<string>('');
 
   const { pools } = useSelector(({ pool }: any) => pool);
@@ -65,6 +66,8 @@ const Pool: React.FC = () => {
   const toggleModal = React.useCallback((params) => dispatch(modalActions.toggleModal(params)), [
     dispatch,
   ]);
+
+  const { amountEth, amountTokens } = investments;
 
   // const getDecimals = async () => {
   //   try {
@@ -115,6 +118,20 @@ const Pool: React.FC = () => {
       if (newInfo) setInfo(newInfo);
     } catch (e) {
       console.error('PagePool getInfo:', e);
+    }
+  };
+
+  const getInvestments = async () => {
+    try {
+      const resultInvestments = await ContractPresaleCertified.investments({
+        contractAddress: address,
+        userAddress,
+        tokenDecimals,
+      });
+      console.log('PagePool getRefund certified:', resultInvestments);
+      if (resultInvestments) setInvestments(resultInvestments);
+    } catch (e) {
+      console.error('PagePool getRefund:', e);
     }
   };
 
@@ -169,6 +186,7 @@ const Pool: React.FC = () => {
     }
   };
 
+  // todo: сделать для сертифицированного
   const invest = async (amount: string) => {
     try {
       const resultLoginToBackend = await loginToBackend();
@@ -202,6 +220,28 @@ const Pool: React.FC = () => {
       console.log('PagePool vote:', resultVote);
     } catch (e) {
       console.error('PagePool vote:', e);
+    }
+  };
+
+  const getRefund = async () => {
+    try {
+      let newInfo;
+      if (isCertified) {
+        newInfo = await ContractPresaleCertified.collectFundsRaised({
+          contractAddress: address,
+          userAddress,
+        });
+        console.log('PagePool getRefund certified:', newInfo);
+      } else {
+        newInfo = await ContractPresalePublic.collectFundsRaised({
+          contractAddress: address,
+          userAddress,
+        });
+        console.log('PagePool getRefund public:', newInfo);
+      }
+      if (newInfo) setInfo(newInfo);
+    } catch (e) {
+      console.error('PagePool getRefund:', e);
     }
   };
 
@@ -267,6 +307,7 @@ const Pool: React.FC = () => {
     if (!ContractPresaleCertified) return;
     if (isCertified === undefined) return;
     getInfo();
+    getInvestments();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ContractPresalePublic, ContractPresaleCertified, isCertified]);
 
@@ -580,14 +621,14 @@ const Pool: React.FC = () => {
       <div className="container-header">Your Investment</div>
       <div className="box box-bg">
         <div className="row last">
-          {isCertified && (
+          {!isCertified && (
             <div className="item">
               VOTE
               <div className="item-text">
                 <div className="item-text-bold">0.000</div>
                 <div className="item-text-gradient">LESS</div>
               </div>
-              <div className="item-count">$0.0 USD</div>
+              {/*<div className="item-count">$0.0 USD</div>*/}
               <div className="button-border" style={{ marginBottom: 5 }}>
                 <div
                   className="button"
@@ -615,10 +656,10 @@ const Pool: React.FC = () => {
           <div className="item">
             Your Tokens
             <div className="item-text">
-              <div className="item-text-bold">1,000,000</div>
-              <div className="item-text-gradient">LESS</div>
+              <div className="item-text-bold">{amountTokens}</div>
+              <div className="item-text-gradient">{tokenSymbol}</div>
             </div>
-            <div className="item-count">$13,780,000 USD</div>
+            {/*<div className="item-count">$13,780,000 USD</div>*/}
             <div className="button-border">
               <div
                 className="button"
@@ -632,17 +673,19 @@ const Pool: React.FC = () => {
             </div>
           </div>
           <div className="item">
-            Your BNB Investment
+            Your {currency} Investment
             <div className="item-text">
-              <div className="item-text-bold">0.0 BNB</div>
+              <div className="item-text-bold">
+                {amountEth} {currency}
+              </div>
             </div>
-            <div className="item-count">$0.0 USD</div>
+            {/*<div className="item-count">$0.0 USD</div>*/}
             <div className="button-border">
               <div
                 className="button"
                 role="button"
                 tabIndex={0}
-                onClick={() => {}}
+                onClick={getRefund}
                 onKeyDown={() => {}}
               >
                 <div className="gradient-button-text">Get Refund</div>
