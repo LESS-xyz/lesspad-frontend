@@ -17,6 +17,8 @@ type TypeGetInfoProps = {
 type TypeVoteProps = {
   userAddress: string;
   contractAddress: string;
+  stakingAmount: string;
+  signature: string;
   yes: boolean;
 };
 
@@ -135,7 +137,7 @@ export default class ContractPresalePublicService {
         // uniswap
         listingPrice: listingPriceInEth,
         lpTokensLockDurationInDays,
-        liquidityPercentageAllocation, // todo: in percent or in 0.01?
+        liquidityPercentageAllocation,
         liquidityAllocationTime: liquidityAllocationTime * 1000,
         unlockTime,
         // intermediate
@@ -154,9 +156,11 @@ export default class ContractPresalePublicService {
 
   public vote = async (props: TypeVoteProps): Promise<any> => {
     try {
-      const { userAddress, contractAddress, yes } = props;
+      const { userAddress, contractAddress, yes, stakingAmount, signature } = props;
+      console.log('ContractPresalePublicService vote:', props);
       const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
-      return await contract.methods.vote(yes).send({ from: userAddress });
+      // todo: add timestamp in new contract
+      return await contract.methods.vote(yes, stakingAmount, signature).send({ from: userAddress });
     } catch (e) {
       console.error('ContractPresalePublicService vote:', e);
       return null;

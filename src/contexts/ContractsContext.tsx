@@ -16,6 +16,7 @@ import ContractUniswapRouterService from '../services/contracts/ContractUniswapR
 import { useWeb3ConnectorContext } from './Web3Connector';
 
 const contractsContext = createContext<any>({
+  ContractPresalePublicWithMetamask: {},
   ContractLessLibrary: {},
   ContractPresalePublic: {},
   ContractPresaleFactory: {},
@@ -71,6 +72,10 @@ const ContractsContext: React.FC = ({ children }) => {
 
   const initMetamask: any = useCallback(async () => {
     try {
+      const ContractPresalePublicWithMetamask = new ContractPresalePublicService({
+        web3Provider: web3.provider,
+        chainType,
+      });
       const ContractPresaleFactory = new ContractPresaleFactoryService({
         web3Provider: web3.provider,
         chainType,
@@ -92,6 +97,7 @@ const ContractsContext: React.FC = ({ children }) => {
         chainType,
       });
       const newValue = {
+        ContractPresalePublicWithMetamask,
         ContractPresaleFactory,
         ContractPresaleFactoryCertified,
         ContractStaking,

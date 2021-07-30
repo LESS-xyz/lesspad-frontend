@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
+import Web3 from 'web3';
 
 import bnbLogo from '../../../assets/img/icons/bnb-logo.svg';
 import ethLogo from '../../../assets/img/icons/eth-logo.svg';
@@ -15,12 +16,16 @@ import Twitter from '../../../assets/img/icons/twitter-icon.svg';
 import YourTier from '../../../components/YourTier/index';
 import config from '../../../config';
 import { useContractsContext } from '../../../contexts/ContractsContext';
+import { useWeb3ConnectorContext } from '../../../contexts/Web3Connector';
+import { BackendService } from '../../../services/Backend';
 import { addHttps } from '../../../utils/prettifiers';
 import ParticipantsTable from '../ParticipantsTable';
 
 import './index.scss';
 
 const { chainSymbols, explorers }: any = config;
+const Backend = new BackendService();
+const { BN }: any = Web3.utils;
 
 const chainsInfo: any = [
   { key: 'Ethereum', title: 'Ethereum', symbol: 'ETH', logo: ethLogo },
@@ -31,14 +36,35 @@ const chainsInfo: any = [
 const Pool: React.FC = () => {
   const { address }: any = useParams();
 
-  const { ContractPresalePublic, ContractPresaleCertified } = useContractsContext();
+  const { web3 } = useWeb3ConnectorContext();
+  const {
+    ContractPresalePublicWithMetamask,
+    ContractPresalePublic,
+    ContractPresaleCertified,
+    ContractLessToken,
+  } = useContractsContext();
 
   const [info, setInfo] = useState<any>();
   const [isCertified, setIsCertified] = useState<boolean>();
   const [chainInfo, setChainInfo] = useState<any>();
 
+  const [lessDecimals, setLessDecimals] = useState<number>();
+  // const [lpDecimals, setLpDecimals] = useState<number>();
+
   const { pools } = useSelector(({ pool }: any) => pool);
   const { chainType } = useSelector(({ wallet }: any) => wallet);
+  const { address: userAddress } = useSelector(({ user }: any) => user);
+
+  const getDecimals = async () => {
+    try {
+      const resultLessDecimals = await ContractLessToken.decimals();
+      setLessDecimals(resultLessDecimals);
+      // const resultLpDecimals = await ContractLPToken.decimals();
+      // setLpDecimals(resultLpDecimals);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   const getIsCertified = (presaleAddress: string) => {
     try {
@@ -60,16 +86,95 @@ const Pool: React.FC = () => {
       let newInfo;
       if (isCertified) {
         newInfo = await ContractPresaleCertified.getInfo({ contractAddress: address });
-        console.log('TokenCard getInfo certified:', newInfo);
+        console.log('PagePool getInfo certified:', newInfo);
       } else {
         newInfo = await ContractPresalePublic.getInfo({ contractAddress: address });
-        console.log('TokenCard getInfo public:', newInfo);
+        console.log('PagePool getInfo public:', newInfo);
       }
       if (newInfo) setInfo(newInfo);
     } catch (e) {
-      console.error('TokenCard getInfo:', e);
+      console.error('PagePool getInfo:', e);
     }
   };
+
+  const loginToBackend = async () => {
+    try {
+      // login to backend
+      let timestamp;
+      let signature;
+      let user_balance;
+      const resultGetMetamaskMessage = await Backend.getMetamaskMessage();
+      console.log('PagePool vote resultGetMetamaskMessage:', resultGetMetamaskMessage);
+      if (resultGetMetamaskMessage.data) {
+        const msg = resultGetMetamaskMessage.data;
+        const signedMsg = await web3.signMessage({ userAddress, message: msg });
+        console.log('PagePool vote signedMsg:', signedMsg);
+        if (signedMsg) {
+          const resultMetamaskLogin = await Backend.metamaskLogin({
+            address: userAddress,
+            msg,
+            signedMsg,
+          });
+          console.log('PagePool vote resultMetamaskLogin:', resultMetamaskLogin);
+          if (resultMetamaskLogin.data) {
+            const { key } = resultMetamaskLogin.data;
+            const resultGetPoolSignature = await Backend.getVotingSignature({
+              token: key,
+              pool: address,
+            });
+            console.log('PageCreatePool vote resultGetPoolSignature:', resultGetPoolSignature);
+            if (resultGetPoolSignature.data) {
+              timestamp = resultGetPoolSignature.data.date;
+              signature = resultGetPoolSignature.data.signature;
+              user_balance = resultGetPoolSignature.data.user_balance;
+            }
+          }
+        }
+      }
+      return { success: true, data: { timestamp, signature, user_balance } };
+    } catch (e) {
+      console.error('PagePool vote:', e);
+      return { success: false, data: null };
+    }
+  };
+
+  const vote = async (yes: boolean) => {
+    try {
+      const resultLoginToBackend = await loginToBackend();
+      if (!resultLoginToBackend.success) throw new Error('Not logged to backend');
+      const { data }: any = resultLoginToBackend;
+      const { timestamp, signature, user_balance } = data;
+      const stakingAmountInEth = new BN(`${user_balance}`)
+        .div(new BN(10).pow(new BN(lessDecimals)))
+        .toString(10);
+      const resultVote = await ContractPresalePublicWithMetamask.vote({
+        contractAddress: address,
+        stakingAmount: stakingAmountInEth,
+        userAddress,
+        timestamp,
+        signature,
+        yes,
+      });
+      console.log('PagePool vote:', resultVote);
+    } catch (e) {
+      console.error('PagePool vote:', e);
+    }
+  };
+
+  const handleVote = async (yes: boolean) => {
+    try {
+      await vote(yes);
+    } catch (e) {
+      console.error('PagePool handleVote:', e);
+    }
+  };
+
+  useEffect(() => {
+    if (!userAddress) return;
+    if (!ContractLessToken) return;
+    getDecimals();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ContractLessToken, userAddress]);
 
   useEffect(() => {
     if (!chainType) return;
@@ -350,6 +455,7 @@ const Pool: React.FC = () => {
             />
           </div>
         </div>
+
         <div className="grow-info">
           <div className="grow-min">
             {percentOfTokensSold}% (Min {percentOfSoftCap}%)
@@ -415,19 +521,38 @@ const Pool: React.FC = () => {
       <div className="container-header">Your Investment</div>
       <div className="box box-bg">
         <div className="row last">
-          <div className="item">
-            VOTE
-            <div className="item-text">
-              <div className="item-text-bold">0.000</div>
-              <div className="item-text-gradient">LESS</div>
-            </div>
-            <div className="item-count">$0.0 USD</div>
-            <div className="button-border">
-              <div className="button">
-                <div className="gradient-button-text">Vote</div>
+          {isCertified && (
+            <div className="item">
+              VOTE
+              <div className="item-text">
+                <div className="item-text-bold">0.000</div>
+                <div className="item-text-gradient">LESS</div>
+              </div>
+              <div className="item-count">$0.0 USD</div>
+              <div className="button-border" style={{ marginBottom: 5 }}>
+                <div
+                  className="button"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => handleVote(true)}
+                  onKeyDown={() => {}}
+                >
+                  <div className="gradient-button-text">Vote Yes</div>
+                </div>
+              </div>
+              <div className="button-border" style={{ marginTop: 5 }}>
+                <div
+                  className="button"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => handleVote(false)}
+                  onKeyDown={() => {}}
+                >
+                  <div className="gradient-button-text">Vote No</div>
+                </div>
               </div>
             </div>
-          </div>
+          )}
           <div className="item">
             Your Tokens
             <div className="item-text">
