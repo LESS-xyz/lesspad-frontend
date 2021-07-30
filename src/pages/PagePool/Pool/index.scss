@@ -1,5 +1,6 @@
 @import '../../../styles/mixins/container.scss';
 @import '../../../styles/mixins/media.scss';
+@import '../../../styles/mixins/flex';
 
 @mixin gradient-text {
   background: linear-gradient(to right, #6f45ff, #ff6365);
@@ -117,7 +118,8 @@
         justify-content: center;
         align-items: center;
 
-        width: 163px;
+        //width: 163px;
+        padding: 0 16px 0 16px;
         height: 43px;
         @include b(mobile) {
           width: 100%;
@@ -285,8 +287,7 @@
         margin: 30px 0;
         padding: 10px 30px 10px;
 
-        display: flex;
-        flex-direction: column;
+        @include flex(column, normal, space-between);
 
         width: 25%;
 
@@ -358,6 +359,7 @@
 
           .button {
             padding: 16px 30px;
+            cursor: pointer;
 
             background: #040404;
 
@@ -401,6 +403,9 @@
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
+        text-decoration: none;
+
+        color: #fff;
 
         background-color: rgba(103, 77, 246, 0.2);
         word-break: break-all;
@@ -484,6 +489,43 @@
         margin: 0;
         padding: 30px 0;
       }
+    }
+  }
+}
+
+.logo-center {
+  img {
+    width: 128px;
+    height: 128px;
+    object-fit: contain;
+  }
+}
+
+.messageContainer {
+  @include flex(column, normal, center);
+  height: 100%;
+}
+
+.button-border {
+  margin: 24px 0 30px;
+  padding: 2px;
+  width: fit-content;
+
+  background: linear-gradient(to right, #6f45ff, #ff6365);
+
+  border-radius: 28px;
+
+  .button {
+    padding: 16px 30px;
+    cursor: pointer;
+
+    background: #040404;
+
+    border-radius: 28px;
+
+    .gradient-button-text {
+      @include gradient-text();
+      font-family: 'Poppins Bold', sans-serif;
     }
   }
 }

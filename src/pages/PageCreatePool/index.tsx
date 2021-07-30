@@ -336,7 +336,7 @@ const CreatePoolPage: React.FC = () => {
         .div(new BN(10).pow(new BN(lessDecimals)))
         .toString(10);
 
-      const WETHAddress = await ContractUniswapRouter.getWETHAddress();
+      const WETHAddress = await ContractUniswapRouter.getWETHAddress(); // todo: убрать в новом контракте
       console.log('PageCreatePool handleSubmit WETHAddress:', WETHAddress);
       const presaleInfo = [
         tokenAddress,
@@ -641,7 +641,7 @@ const CreatePoolPage: React.FC = () => {
                       { key: 'Without whitelist', text: 'Without whitelist' },
                     ]}
                   />
-                  {isWhiteListed && (
+                  {isWhiteListed && ( // todo: matrix
                     <Input
                       title="Adresses, comma separated"
                       value={whitelist}

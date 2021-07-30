@@ -17,7 +17,26 @@ type TypeGetInfoProps = {
 type TypeVoteProps = {
   userAddress: string;
   contractAddress: string;
+  stakingAmount: string;
+  signature: string;
   yes: boolean;
+};
+
+type TypeInvestProps = {
+  userAddress: string;
+  contractAddress: string;
+  tokenAmount: string;
+  signature: string;
+  stakedAmount: string;
+  timestamp: number;
+  poolPercentages: number[];
+  stakingTiers: number[];
+};
+
+type TypeInvestmentsProps = {
+  userAddress: string;
+  contractAddress: string;
+  tokenDecimals: number;
 };
 
 export default class ContractPresalePublicService {
@@ -47,14 +66,17 @@ export default class ContractPresalePublicService {
       const generalInfo = await contract.methods.generalInfo().call();
       const uniswapInfo = await contract.methods.uniswapInfo().call();
       const stringInfo = await contract.methods.stringInfo().call();
+      const intermediate = await contract.methods.intermediate().call();
       console.log('ContractPresalePublicService getInfo:', {
         generalInfo,
         uniswapInfo,
         stringInfo,
+        intermediate,
       });
       const tokenAddress = generalInfo.token;
       const contractToken = new this.web3.eth.Contract(ERC20Abi, tokenAddress);
       const decimals = await contractToken.methods.decimals().call();
+      const tokenSymbol = await contractToken.methods.symbol().call();
       const {
         creator,
         token,
@@ -79,6 +101,21 @@ export default class ContractPresalePublicService {
         description,
         whitepaper,
       } = stringInfo;
+      const {
+        listingPriceInWei,
+        lpTokensLockDurationInDays,
+        liquidityPercentageAllocation,
+        liquidityAllocationTime,
+        unlockTime,
+      } = uniswapInfo;
+      const {
+        approved,
+        beginingAmount,
+        cancelled,
+        liquidityAdded,
+        participants,
+        raisedAmount,
+      } = intermediate;
       // format
       const pow = new BN(10).pow(new BN(decimals));
       const tokenPrice = +new BN(tokenPriceInWei).div(pow);
@@ -86,11 +123,15 @@ export default class ContractPresalePublicService {
       const hardCapFormatted = +new BN(hardCapInWei).div(pow);
       const tokensForSaleLeftInEth = +new BN(tokensForSaleLeft).div(pow);
       const tokensForLiquidityLeftInEth = +new BN(tokensForLiquidityLeft).div(pow);
+      const listingPriceInEth = +new BN(listingPriceInWei).div(pow);
+      const beginingAmountInEth = +new BN(beginingAmount).div(pow);
+      const raisedAmountInEth = +new BN(raisedAmount).div(pow); // todo: decimals of native token
       // result
       return {
         // general
         creator,
         token,
+        tokenSymbol,
         tokenPrice,
         softCap: softCapFormatted,
         hardCap: hardCapFormatted,
@@ -110,6 +151,19 @@ export default class ContractPresalePublicService {
         linkLogo,
         description,
         whitepaper,
+        // uniswap
+        listingPrice: listingPriceInEth,
+        lpTokensLockDurationInDays,
+        liquidityPercentageAllocation,
+        liquidityAllocationTime: liquidityAllocationTime * 1000,
+        unlockTime,
+        // intermediate
+        approved,
+        beginingAmount: beginingAmountInEth,
+        cancelled,
+        liquidityAdded,
+        participants,
+        raisedAmount: raisedAmountInEth,
       };
     } catch (e) {
       console.error('ContractPresalePublicService getInfo:', e);
@@ -119,11 +173,69 @@ export default class ContractPresalePublicService {
 
   public vote = async (props: TypeVoteProps): Promise<any> => {
     try {
-      const { userAddress, contractAddress, yes } = props;
+      const { userAddress, contractAddress, yes, stakingAmount, signature } = props;
+      // console.log('ContractPresalePublicService vote:', props);
       const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
-      return await contract.methods.vote(yes).send({ from: userAddress });
+      // todo: add timestamp in new contract
+      return await contract.methods.vote(yes, stakingAmount, signature).send({ from: userAddress });
     } catch (e) {
       console.error('ContractPresalePublicService vote:', e);
+      return null;
+    }
+  };
+
+  public invest = async (props: TypeInvestProps): Promise<any> => {
+    try {
+      const {
+        userAddress,
+        contractAddress,
+        tokenAmount,
+        signature,
+        stakedAmount,
+        timestamp,
+        poolPercentages,
+        stakingTiers,
+      } = props;
+      // console.log('ContractPresalePublicService vote props:', props);
+      const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
+      return await contract.methods
+        .invest(tokenAmount, signature, stakedAmount, timestamp, poolPercentages, stakingTiers)
+        .send({ from: userAddress });
+    } catch (e) {
+      console.error('ContractPresalePublicService vote:', e);
+      return null;
+    }
+  };
+
+  public collectFundsRaised = async (props: TypeInvestProps): Promise<any> => {
+    try {
+      const { userAddress, contractAddress } = props;
+      // console.log('ContractPresalePublicService collectFundsRaised props:', props);
+      const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
+      return await contract.methods.collectFundsRaised().send({ from: userAddress });
+    } catch (e) {
+      console.error('ContractPresalePublicService collectFundsRaised:', e);
+      return null;
+    }
+  };
+
+  public investments = async (props: TypeInvestmentsProps): Promise<any> => {
+    try {
+      const { userAddress, contractAddress, tokenDecimals } = props;
+      // console.log('ContractPresalePublicService investments props:', props);
+      const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
+      const result = await contract.methods.investments(userAddress).call();
+      const { amountEth, amountTokens } = result;
+      const pow = new BN(10).pow(new BN(18));
+      const amountEthInEth = +new BN(amountEth).div(pow);
+      const powToken = new BN(10).pow(new BN(tokenDecimals));
+      const amountTokensInEth = +new BN(amountTokens).div(powToken);
+      return {
+        amountEth: amountEthInEth,
+        amountTokens: amountTokensInEth,
+      };
+    } catch (e) {
+      console.error('ContractPresalePublicService investments:', e);
       return null;
     }
   };

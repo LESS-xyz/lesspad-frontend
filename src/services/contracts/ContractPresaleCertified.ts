@@ -52,13 +52,16 @@ export default class ContractPresaleCertifiedService {
       const generalInfo = await contract.methods.generalInfo().call();
       const uniswapInfo = await contract.methods.uniswapInfo().call();
       const stringInfo = await contract.methods.stringInfo().call();
+      const intermediate = await contract.methods.intermediate().call();
+      // const certifiedAddition = await contract.methods.certifiedAddition().call();
       console.log('ContractPresaleCertifiedService getInfo:', {
         generalInfo,
         uniswapInfo,
         stringInfo,
+        intermediate,
+        // certifiedAddition,
       });
-      const tokenAddress = generalInfo.token;
-      const contractToken = new this.web3.eth.Contract(ERC20Abi, tokenAddress);
+      const contractToken = new this.web3.eth.Contract(ERC20Abi, generalInfo.token);
       const decimals = await contractToken.methods.decimals().call();
       const tokenSymbol = await contractToken.methods.symbol().call();
       const {
@@ -83,11 +86,6 @@ export default class ContractPresaleCertifiedService {
         description,
         whitepaper,
       } = stringInfo;
-      // uint256 listingPriceInWei
-      // uint256 lpTokensLockDurationInDays
-      // uint8 liquidityPercentageAllocation
-      // uint256 liquidityAllocationTime
-      // uint256 unlockTime
       const {
         listingPriceInWei,
         lpTokensLockDurationInDays,
@@ -95,6 +93,14 @@ export default class ContractPresaleCertifiedService {
         liquidityAllocationTime,
         unlockTime,
       } = uniswapInfo;
+      const {
+        approved,
+        beginingAmount,
+        cancelled,
+        liquidityAdded,
+        participants,
+        raisedAmount,
+      } = intermediate;
       // format
       const pow = new BN(10).pow(new BN(decimals));
       const tokenPrice = +new BN(tokenPriceInWei).div(pow);
@@ -103,15 +109,9 @@ export default class ContractPresaleCertifiedService {
       const tokensForSaleLeftInEth = +new BN(tokensForSaleLeft).div(pow);
       const tokensForLiquidityLeftInEth = +new BN(tokensForLiquidityLeft).div(pow);
       const listingPriceInEth = +new BN(listingPriceInWei).div(pow);
-      // result
-      // saleTitle|bytes32 :  7269746100000000000000000000000000000000000000000000000000000000
-      // linkTelegram|bytes32 :  7269746100000000000000000000000000000000000000000000000000000000
-      // linkGithub|bytes32 :  7269746100000000000000000000000000000000000000000000000000000000
-      // linkTwitter|bytes32 :  7269746100000000000000000000000000000000000000000000000000000000
-      // linkWebsite|bytes32 :  7269746100000000000000000000000000000000000000000000000000000000
-      // linkLogo|string :  
-      // description|string :  �
-      // whitepaper|string :  �
+      const beginingAmountInEth = +new BN(beginingAmount).div(pow);
+      const raisedAmountInEth = +new BN(raisedAmount).div(pow); // todo: decimals of native token
+
       return {
         // general
         creator,
@@ -140,6 +140,13 @@ export default class ContractPresaleCertifiedService {
         liquidityPercentageAllocation, // todo: in percent or in 0.01?
         liquidityAllocationTime: liquidityAllocationTime * 1000,
         unlockTime,
+        // intermediate
+        approved,
+        beginingAmount: beginingAmountInEth,
+        cancelled,
+        liquidityAdded,
+        participants,
+        raisedAmount: raisedAmountInEth,
       };
     } catch (e) {
       console.error('ContractPresaleCertifiedService getInfo:', e);

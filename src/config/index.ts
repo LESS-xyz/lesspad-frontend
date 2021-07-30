@@ -56,7 +56,7 @@ export default {
     'Matic': 'MATIC',
   },
   explorers: {
-    'Ethereum': 'https://etherscan.io',
+    'Ethereum': IS_PRODUCTION ? 'https://etherscan.io' : 'https://kovan.etherscan.io',
     'Binance-Smart-Chain': 'https://bscscan.io',
     'Matic': 'https://polygonscan.com',
   },
@@ -120,8 +120,8 @@ export default {
         LPToken: '0x4fe142c6CBD294ef96DbBa8a837CdE3035850A97',
         LessLibrary: '0x8A60F3FA37f9e3BA08909ace4edfea0c7D183587',
         Staking: '0xfd99C422A81032a6E332533Afa64D6556Adaad6a',
-        PresaleFactory: '0x451d4bC560404b0aF65f967B125c864EbD69559d',
-        WETH: '0xf3a6679b266899042276804930b3bfbaf807f15b',
+        PresaleFactory: '0x73D55c3720De899814B28d2cfd8b14077665dEE6',
+        PresaleFactoryCertified: '0x73D55c3720De899814B28d2cfd8b14077665dEE6',
       },
       'Binance-Smart-Chain': {
         // todo
@@ -134,9 +134,23 @@ export default {
     },
   },
   abis: {
-    mainnet: {},
+    mainnet: {
+      Ethereum: {
+        ERC20: ERC20Abi,
+        LessToken: ERC20Abi,
+        LPToken: LPTokenAbi,
+        LessLibrary: LessLibraryAbi,
+        Staking: StakingAbi,
+        PresaleFactory: PresaleFactoryAbi,
+        PresaleFactoryCertified: PresaleFactoryCertifiedAbi,
+        PresalePublic: PresalePublicAbi,
+        PresaleCertified: PresaleCertifiedAbi,
+        UniswapRouter: UniswapRouterAbi,
+      },
+    },
     testnet: {
       Ethereum: {
+        ERC20: ERC20Abi,
         LessToken: ERC20Abi,
         LPToken: LPTokenAbi,
         LessLibrary: LessLibraryAbi,
