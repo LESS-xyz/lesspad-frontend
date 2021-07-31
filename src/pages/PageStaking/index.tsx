@@ -287,6 +287,7 @@ const StakingPage: React.FC = () => {
   }, [ContractStaking, userAddress]);
 
   useEffect(() => {
+    if (!userAddress) return;
     if (!lessDecimals) return;
     if (!lpDecimals) return;
     const interval = setInterval(() => {
@@ -296,7 +297,7 @@ const StakingPage: React.FC = () => {
     // eslint-disable-next-line consistent-return
     return () => clearInterval(interval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lessDecimals, lpDecimals]);
+  }, [lessDecimals, lpDecimals, userAddress]);
 
   return (
     <div className={s.page}>
