@@ -54,3 +54,9 @@
     margin-right: 11px;
   }
 }
+
+.disabled {
+  color: #BFBFBF;
+  cursor: default;
+  filter: grayscale(1);
+}

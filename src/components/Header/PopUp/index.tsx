@@ -2,6 +2,12 @@ import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 
 import bnbLogo from '../../../assets/img/icons/bnb-logo.svg';
 import ethLogo from '../../../assets/img/icons/eth-logo.svg';
+import avalancheLogo from '../../../assets/img/icons/header/Avalanche.svg';
+import huobiLogo from '../../../assets/img/icons/header/Huobi.svg';
+import KucoinLogo from '../../../assets/img/icons/header/Kucoin.svg';
+import PolkadotLogo from '../../../assets/img/icons/header/Polkadot.svg';
+import solanaLogo from '../../../assets/img/icons/header/Solana.svg';
+import TronLogo from '../../../assets/img/icons/header/Tron.svg';
 import maticLogo from '../../../assets/img/icons/matic-logo.svg';
 
 import s from './PopUp.module.scss';
@@ -50,9 +56,20 @@ const PopUp: React.FC<IPopUpProps> = (props) => {
   }, []);
 
   const options = [
-    { key: 'Ethereum', title: 'Ethereum', logo: ethLogo },
-    { key: 'Binance-Smart-Chain', title: 'Binance Smart Chain', logo: bnbLogo },
-    { key: 'Matic', title: 'Polygon (Matic)', logo: maticLogo },
+    { key: 'Ethereum', title: 'Ethereum', logo: ethLogo, disabled: false },
+    {
+      key: 'Binance-Smart-Chain',
+      title: 'Binance Smart Chain (coming soon)',
+      logo: bnbLogo,
+      disabled: true,
+    },
+    { key: 'Matic', title: 'Polygon (Matic) (coming soon)', logo: maticLogo, disabled: true },
+    { key: 'Solana', title: 'Solana (coming soon)', logo: solanaLogo, disabled: true },
+    { key: 'Polkadot', title: 'Polkadot (coming soon)', logo: PolkadotLogo, disabled: true },
+    { key: 'Tron', title: 'Tron (coming soon)', logo: TronLogo, disabled: true },
+    { key: 'Avalanche', title: 'Avalanche (coming soon)', logo: avalancheLogo, disabled: true },
+    { key: 'Kucoin', title: 'Kucoin Chain (coming soon)', logo: KucoinLogo, disabled: true },
+    { key: 'Huobi', title: 'Huobi (coming soon)', logo: huobiLogo, disabled: true },
   ];
 
   const switchChain = async (chainName: string) => {
@@ -103,11 +120,11 @@ const PopUp: React.FC<IPopUpProps> = (props) => {
         {options.map((option, index) => (
           <div
             key={option.key}
-            className={s.option}
+            className={`${s.option} ${option.disabled && s.disabled}`}
             tabIndex={index}
             role="button"
             onKeyDown={() => {}}
-            onClick={() => handleClick(option.key)}
+            onClick={option.disabled ? () => {} : () => handleClick(option.key)}
           >
             <div className={s.option_img}>
               <img src={option.logo} alt="ethLogo" />
