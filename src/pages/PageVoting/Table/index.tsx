@@ -39,7 +39,7 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
     likesPercent,
     dislikesPercent,
   } = props;
-  const { ContractPresalePublic } = useContractsContext();
+  const { ContractPresalePublic, ContractPresaleCertified } = useContractsContext();
 
   const [info, setInfo] = useState<any>();
 
@@ -59,11 +59,14 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
 
   const getInfo = async () => {
     try {
-      const newInfo = await ContractPresalePublic.getInfo({ contractAddress: address });
+      const newInfo = await ContractPresaleCertified.getInfo({ contractAddress: address });
+      console.log('TokenCard getInfo certified:', newInfo);
       if (newInfo) setInfo(newInfo);
-      // console.log('TableRow getInfo:', newInfo);
     } catch (e) {
       console.error('TableRow getInfo:', e);
+      const newInfo = await ContractPresalePublic.getInfo({ contractAddress: address });
+      console.log('TokenCard getInfo public:', newInfo);
+      if (newInfo) setInfo(newInfo);
     }
   };
 

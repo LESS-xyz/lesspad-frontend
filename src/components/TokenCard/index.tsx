@@ -149,7 +149,12 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
   }
   const isOpened = openTimePresale < now;
 
-  if (statusChoosenInFilter !== 'All' && statusChoosenInFilter !== presaleStatus) return null;
+  if (
+    statusChoosenInFilter &&
+    statusChoosenInFilter !== 'All' &&
+    statusChoosenInFilter !== presaleStatus
+  )
+    return null;
 
   return (
     <div className={s.card}>
