@@ -1,3 +1,40 @@
+@import '../../styles/mixins/gradient-text.scss';
+@import '../../styles/mixins/container.scss';
+
+
 .darkBg {
   background: linear-gradient(90deg, #190f31 0%, #000000 100%);
+}
+
+.container {
+  @include container;
+}
+
+.info {
+  margin: 76px 0 0 0;
+  padding: 40px 60px;
+  border: var(--about-fivetiers-info-border);
+  margin-bottom: 86px;
+
+  &_inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &_left {
+    font-weight: 500;
+    max-width: 378px;
+    font-size: 30px;
+    line-height: 1.2;
+    @include gradient-text;
+  }
+
+  &_right {
+    &__text {
+      font-size: 22px;
+      line-height: 1.2;
+      margin-bottom: 33px;
+    }
+  }
 }
