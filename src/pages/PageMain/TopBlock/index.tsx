@@ -24,7 +24,7 @@ const TopBlock: React.FC = () => {
                   View All Pools
                 </Button>
                 <Button
-                  href="https://exchange.pancakeswap.finance/#/swap?outputCurrency=0xb698ac9bc82c718d8eba9590564b9a5aa53d58e6"
+                  href="https://app.uniswap.org/#/swap?outputCurrency=0x62786eeacc9246b4018e0146cb7a3efeacd9459d&use=V2"
                   big
                   fullWidth={isMobile}
                 >

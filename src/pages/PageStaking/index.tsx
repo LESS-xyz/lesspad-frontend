@@ -10,6 +10,8 @@ import config from '../../config';
 import { useContractsContext } from '../../contexts/ContractsContext';
 import { convertFromWei, convertToWei } from '../../utils/ethereum';
 
+import Table from './Table';
+
 import s from './Staking.module.scss';
 
 const { BN }: any = Web3.utils;
@@ -47,6 +49,7 @@ const StakingPage: React.FC = () => {
   const [balanceLPToken, setBalanceLPToken] = useState<string>('0');
   const [stakedLess, setStakedLess] = useState<string>('0.000');
   const [stakedLP, setStakedLP] = useState<string>('0.000');
+  const [userStakeIds, setUserStakeIds] = useState<string[]>([]);
 
   const [stakeLessValue, setStakeLessValue] = useState<string>('');
   const [stakeLPValue, setStakeLPValue] = useState<string>('');
@@ -135,6 +138,16 @@ const StakingPage: React.FC = () => {
       const resultInEth = convertFromWei(result, lpDecimals);
       setStakedLP(resultInEth);
       console.log('StakingPage getStakedLP:', resultInEth);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const getUserStakeIds = async () => {
+    try {
+      const resultGetUserStakeIds = await ContractStaking.getUserStakeIds({ userAddress });
+      console.log('StakingPage getUserStakeIds:', resultGetUserStakeIds);
+      setUserStakeIds(resultGetUserStakeIds);
     } catch (e) {
       console.error(e);
     }
@@ -282,6 +295,7 @@ const StakingPage: React.FC = () => {
   useEffect(() => {
     if (!userAddress) return;
     if (!ContractStaking) return;
+    getUserStakeIds();
     getDecimals();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ContractStaking, userAddress]);
@@ -344,10 +358,10 @@ const StakingPage: React.FC = () => {
               </div>
               <div className={s.balance_inner}>
                 <div className={s.balance_title}>
-                  Your <span>ETH-$LESS LP</span> Balance
+                  Your <span>ETH-LESS LP</span> Balance
                 </div>
                 <div className={s.balance_bnb}>
-                  <span>{Number(balanceLPToken).toFixed(3)}</span> ETH-$LESS LP
+                  <span>{Number(balanceLPToken).toFixed(3)}</span> ETH-LESS LP
                 </div>
                 <div className={s.balance_subtitle}>Available to stake:</div>
                 <div className={s.balance_amount}>
@@ -477,10 +491,10 @@ const StakingPage: React.FC = () => {
             </div>
             <div className={s.small_balance}>
               <div className={s.small_balance_title}>
-                <span>ETH-$LESS LP Rewards</span>
+                <span>ETH-LESS LP Rewards</span>
               </div>
               <div className={s.small_balance_subtitle}>
-                <span>{lpRewards} ETH-$LESS LP</span>
+                <span>{lpRewards} ETH-LESS LP</span>
               </div>
               <div className={s.balance_amount}>
                 <div className={s.balance_amount__inner}>
@@ -506,6 +520,7 @@ const StakingPage: React.FC = () => {
             </div>
           </div>
         </div>
+        <Table data={userStakeIds} />
         <div className={s.button_center}>
           <div
             role="button"

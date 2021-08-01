@@ -63,8 +63,8 @@ const Tiers: React.FC = () => {
         <div className={s.tiers_title}>Lesspad Tiers</div>
         <div className={s.tiers_subtitle}>
           <p>
-            Copy A tier based system integrated with LessPad provides certain bonuses like
-            guaranteed allocation to each participants in a presale pool.{' '}
+            A tier based system integrated with LessPad provides certain bonuses like guaranteed
+            allocation to each participants in a presale pool.{' '}
           </p>
           <p>
             This feature is designed to provide a simple and fair process for all participants. The

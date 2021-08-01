@@ -1,6 +1,10 @@
 import Web3 from 'web3';
 
 import config from '../../config';
+import { convertFromWei } from '../../utils/ethereum';
+
+import ContractLessTokenService from './ContractLessToken';
+import ContractLpTokenService from './ContractLPToken';
 
 const { BN }: any = Web3.utils;
 
@@ -10,6 +14,14 @@ type TypeConstructorProps = {
 };
 
 type TypeGetStakedBalanceProps = {
+  userAddress: string;
+};
+
+type TypeStakesProps = {
+  stakeId: string;
+};
+
+type TypeGetUserStakeIdsProps = {
   userAddress: string;
 };
 
@@ -39,7 +51,13 @@ export default class ContractStakingService {
 
   public contractAbi: any;
 
+  public contract: any;
+
   public contractName: any;
+
+  public ContractLessToken: any;
+
+  public ContractLpToken: any;
 
   constructor(props: TypeConstructorProps) {
     const { web3Provider, chainType } = props;
@@ -50,6 +68,9 @@ export default class ContractStakingService {
     this.contractName = 'Staking';
     this.contractAddress = addressesOfNetType[chainType][this.contractName];
     this.contractAbi = abisOfNetType[chainType][this.contractName];
+    this.contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
+    this.ContractLessToken = new ContractLessTokenService({ web3Provider, chainType });
+    this.ContractLpToken = new ContractLpTokenService({ web3Provider, chainType });
   }
 
   // get balance of staked Less
@@ -99,6 +120,38 @@ export default class ContractStakingService {
       return { stakedBalance, lastStakeTime, lastUnstakeTime };
     } catch (e) {
       console.error('ContractStakingService getStakedInfo:', e);
+      return null;
+    }
+  };
+
+  // get ids of all user's stakes
+  public getUserStakeIds = async (props: TypeGetUserStakeIdsProps): Promise<any> => {
+    try {
+      const { userAddress } = props;
+      const result = await this.contract.methods.getUserStakeIds(userAddress).call();
+      return result;
+    } catch (e) {
+      console.error('ContractStakingService getUserStakeIds:', e);
+      return null;
+    }
+  };
+
+  // get stake info by it's id
+  public stakes = async (props: TypeStakesProps): Promise<any> => {
+    try {
+      const { stakeId } = props;
+      const stake = await this.contract.methods.stakes(stakeId).call();
+      const { stakedLess, stakedLp, startTime } = stake;
+      // format
+      const decimalsLess = await this.ContractLessToken.decimals();
+      const stakedLessInEth = convertFromWei(stakedLess, decimalsLess);
+      const decimalsLp = await this.ContractLpToken.decimals();
+      const stakedLpInEth = convertFromWei(stakedLp, decimalsLp);
+      const startTimeInMs = startTime * 1000;
+      // result
+      return { stakedLess: stakedLessInEth, stakedLp: stakedLpInEth, startTime: startTimeInMs };
+    } catch (e) {
+      console.error('ContractStakingService stakes:', e);
       return null;
     }
   };

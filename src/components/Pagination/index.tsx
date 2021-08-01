@@ -30,7 +30,7 @@ const Button: React.FC<IButtonProps> = ({ page, currentPage, onClick }) => {
 const Pagination: React.FC<TypePaginationProps> = (props) => {
   const { countOfPages = 0, onChange = () => {} } = props;
   const [currentPage, setCurrentPage] = useState<number>(0);
-  console.log('Pagination:', currentPage, countOfPages);
+  // console.log('Pagination:', currentPage, countOfPages);
 
   const arrayOfPages = new Array(countOfPages).fill(0);
 

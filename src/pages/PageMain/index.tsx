@@ -37,7 +37,7 @@ const PageMain: React.FC = () => {
               <div className={s.info_right__text}>
                 Funding? Exposure? <br /> LessPad has it all, click below!
               </div>
-              <Button>Start application</Button>
+              <Button to="/create-pool">Start application</Button>
             </div>
           </div>
         </div>

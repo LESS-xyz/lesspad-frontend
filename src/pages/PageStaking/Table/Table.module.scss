@@ -17,9 +17,9 @@
 
 .table_header {
   display: grid;
-  grid-template-columns: 0.65fr 1fr 1fr 1fr 1fr 1fr 2fr;
+  grid-template-columns: 0.65fr 1fr 1fr 1fr 1fr;
   grid-column-gap: 25px;
-  padding-bottom: 20px;
+  padding: 10px 20px 20px 20px;
 }
 
 .cell {
@@ -32,8 +32,9 @@
 }
 
 .row {
-  @include grid(0.65fr 1fr 1fr 1fr 1fr 1fr 2fr, 1fr, 25px);
+  @include grid(0.65fr 1fr 1fr 1fr 1fr, 1fr, 25px);
   border-radius: 10px;
+  padding: 10px 20px;
 
   @include b('mobile') {
     @include grid(1fr 1fr, 68px 61px 61px 106px, 0);

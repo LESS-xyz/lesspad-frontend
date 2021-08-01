@@ -38,7 +38,7 @@ const CreatePoolPage: React.FC = () => {
   const [lessDecimals, setLessDecimals] = useState();
   const [lpDecimals, setLpDecimals] = useState();
 
-  const [saleTitle, setSaleTitle] = useState<string>('Rnb');
+  const [saleTitle, setSaleTitle] = useState<string>('Title');
   const [description, setDescription] = useState<string>('');
   const [tokenAddress, setTokenAddress] = useState<string>(
     '0xa372d1d35041714092900B233934fB2D002755E2',
