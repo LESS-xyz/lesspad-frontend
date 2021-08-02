@@ -242,7 +242,7 @@ const CreatePoolPage: React.FC = () => {
               <p>
                 To be able to create new pool, please stake {minCreatorStakedBalanceInEther} LESS
               </p>
-              <p>Your staking balance is: {balanceStakedSumInEther} ($LESS + $LP)</p>
+              <p>Your staking balance is: {balanceStakedSumInEther} ($LESS + LESS LP)</p>
             </div>
           ),
         });

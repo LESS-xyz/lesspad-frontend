@@ -433,10 +433,10 @@ const StakingPage: React.FC = () => {
             </div>
             <div className={s.small_balance}>
               <div className={s.small_balance_title}>
-                <span>Already staked ETH-$LESS LP</span>
+                <span>Already staked ETH-LESS LP</span>
               </div>
               <div className={s.small_balance_subtitle}>
-                <span>{stakedLP} ETH-$LESS LP</span>
+                <span>{stakedLP} ETH-LESS LP</span>
               </div>
               <div className={s.balance_amount}>
                 <div className={s.balance_amount__inner}>
