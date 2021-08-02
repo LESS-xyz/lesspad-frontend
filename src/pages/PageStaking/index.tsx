@@ -344,10 +344,10 @@ const StakingPage: React.FC = () => {
               </div>
               <div className={s.balance_inner}>
                 <div className={s.balance_title}>
-                  Your <span>ETH-$LESS LP</span> Balance
+                  Your <span>ETH-LESS LP</span> Balance
                 </div>
                 <div className={s.balance_bnb}>
-                  <span>{Number(balanceLPToken).toFixed(3)}</span> ETH-$LESS LP
+                  <span>{Number(balanceLPToken).toFixed(3)}</span> ETH-LESS LP
                 </div>
                 <div className={s.balance_subtitle}>Available to stake:</div>
                 <div className={s.balance_amount}>
@@ -419,10 +419,10 @@ const StakingPage: React.FC = () => {
             </div>
             <div className={s.small_balance}>
               <div className={s.small_balance_title}>
-                <span>Already staked ETH-$LESS LP</span>
+                <span>Already staked ETH-LESS LP</span>
               </div>
               <div className={s.small_balance_subtitle}>
-                <span>{stakedLP} ETH-$LESS LP</span>
+                <span>{stakedLP} ETH-LESS LP</span>
               </div>
               <div className={s.balance_amount}>
                 <div className={s.balance_amount__inner}>
@@ -477,10 +477,10 @@ const StakingPage: React.FC = () => {
             </div>
             <div className={s.small_balance}>
               <div className={s.small_balance_title}>
-                <span>ETH-$LESS LP Rewards</span>
+                <span>ETH-LESS LP Rewards</span>
               </div>
               <div className={s.small_balance_subtitle}>
-                <span>{lpRewards} ETH-$LESS LP</span>
+                <span>{lpRewards} ETH-LESS LP</span>
               </div>
               <div className={s.balance_amount}>
                 <div className={s.balance_amount__inner}>
