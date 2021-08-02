@@ -54,13 +54,13 @@ const StakingPage: React.FC = () => {
   const [stakeLessValue, setStakeLessValue] = useState<string>('');
   const [stakeLPValue, setStakeLPValue] = useState<string>('');
 
-  const [unstakeLessValue, setUnstakeLessValue] = useState<string>('');
-  const [unstakeLPValue, setUnstakeLPValue] = useState<string>('');
+  // const [unstakeLessValue, setUnstakeLessValue] = useState<string>('');
+  // const [unstakeLPValue, setUnstakeLPValue] = useState<string>('');
 
   const [lessRewards, setLessRewards] = useState<string>('0.000');
   const [lpRewards, setLpRewards] = useState<string>('0.000');
-  const [rewardLessValue, setRewardLessValue] = useState<string>('');
-  const [rewardLPValue, setRewardLPValue] = useState<string>('');
+  // const [rewardLessValue, setRewardLessValue] = useState<string>('');
+  // const [rewardLPValue, setRewardLPValue] = useState<string>('');
 
   const [tier, setTier] = useState<string>('');
 
@@ -230,32 +230,32 @@ const StakingPage: React.FC = () => {
     }
   };
 
-  const unstake = async () => {
-    try {
-      const unstakeLessValueBN = convertToWei(unstakeLessValue, lessDecimals);
-      const rewardLessValueBN = convertToWei(rewardLessValue, lessDecimals);
-      console.log('StakingPage unstake unstakeLessValueBN:', unstakeLessValueBN);
-
-      const unstakeLpValueBN = convertToWei(unstakeLPValue, lpDecimals);
-      const rewardLPValueBN = convertToWei(rewardLPValue, lpDecimals);
-      console.log('StakingPage unstake unstakeLPValueBN:', unstakeLpValueBN);
-
-      const result = await ContractStaking.unstake({
-        userAddress,
-        lpAmount: unstakeLessValueBN,
-        lessAmount: unstakeLpValueBN,
-        lessRewards: rewardLessValueBN,
-        lpRewards: rewardLPValueBN,
-      });
-      if (result) {
-        getLessTokenBalance();
-        getLPTokenBalance();
-      }
-      console.log('StakingPage unstake:', result);
-    } catch (e) {
-      console.error('StakingPage unstake:', e);
-    }
-  };
+  // const unstake = async () => {
+  //   try {
+  //     const unstakeLessValueBN = convertToWei(unstakeLessValue, lessDecimals);
+  //     const rewardLessValueBN = convertToWei(rewardLessValue, lessDecimals);
+  //     console.log('StakingPage unstake unstakeLessValueBN:', unstakeLessValueBN);
+  //
+  //     const unstakeLpValueBN = convertToWei(unstakeLPValue, lpDecimals);
+  //     const rewardLPValueBN = convertToWei(rewardLPValue, lpDecimals);
+  //     console.log('StakingPage unstake unstakeLPValueBN:', unstakeLpValueBN);
+  //
+  //     const result = await ContractStaking.unstake({
+  //       userAddress,
+  //       lpAmount: unstakeLessValueBN,
+  //       lessAmount: unstakeLpValueBN,
+  //       lessRewards: rewardLessValueBN,
+  //       lpRewards: rewardLPValueBN,
+  //     });
+  //     if (result) {
+  //       getLessTokenBalance();
+  //       getLPTokenBalance();
+  //     }
+  //     console.log('StakingPage unstake:', result);
+  //   } catch (e) {
+  //     console.error('StakingPage unstake:', e);
+  //   }
+  // };
 
   const handleSetMaxLessStake = () => {
     setStakeLessValue(balanceLessToken);
@@ -265,21 +265,21 @@ const StakingPage: React.FC = () => {
     setStakeLPValue(balanceLPToken);
   };
 
-  const handleSetMaxLessUnstake = () => {
-    setUnstakeLessValue(stakedLess);
-  };
-
-  const handleSetMaxLPUnstake = () => {
-    setUnstakeLPValue(stakedLP);
-  };
-
-  const handleSetMaxLessReward = () => {
-    setRewardLessValue(lessRewards);
-  };
-
-  const handleSetMaxLPReward = () => {
-    setRewardLPValue(lpRewards);
-  };
+  // const handleSetMaxLessUnstake = () => {
+  //   setUnstakeLessValue(stakedLess);
+  // };
+  //
+  // const handleSetMaxLPUnstake = () => {
+  //   setUnstakeLPValue(stakedLP);
+  // };
+  //
+  // const handleSetMaxLessReward = () => {
+  //   setRewardLessValue(lessRewards);
+  // };
+  //
+  // const handleSetMaxLPReward = () => {
+  //   setRewardLPValue(lpRewards);
+  // };
 
   const getAllInfo = () => {
     getTier();
@@ -409,27 +409,27 @@ const StakingPage: React.FC = () => {
               <div className={s.small_balance_subtitle}>
                 <span>{stakedLess} $LESS</span>
               </div>
-              <div className={s.balance_amount}>
-                <div className={s.balance_amount__inner}>
-                  <div className={s.balance_amount__money}>
-                    <input
-                      type="text"
-                      placeholder="0.0"
-                      value={unstakeLessValue}
-                      onChange={(e) => setUnstakeLessValue(e.target.value.replace(/[^\d.,]/g, ''))}
-                    />
-                  </div>
-                  <div
-                    className={s.balance_amount__img}
-                    role="button"
-                    tabIndex={0}
-                    onClick={handleSetMaxLessUnstake}
-                    onKeyDown={() => {}}
-                  >
-                    <img src={maxImg} alt="maxImg" />
-                  </div>
-                </div>
-              </div>
+              {/*<div className={s.balance_amount}>*/}
+              {/*  <div className={s.balance_amount__inner}>*/}
+              {/*    <div className={s.balance_amount__money}>*/}
+              {/*      <input*/}
+              {/*        type="text"*/}
+              {/*        placeholder="0.0"*/}
+              {/*        value={unstakeLessValue}*/}
+              {/*        onChange={(e) => setUnstakeLessValue(e.target.value.replace(/[^\d.,]/g, ''))}*/}
+              {/*      />*/}
+              {/*    </div>*/}
+              {/*    <div*/}
+              {/*      className={s.balance_amount__img}*/}
+              {/*      role="button"*/}
+              {/*      tabIndex={0}*/}
+              {/*      onClick={handleSetMaxLessUnstake}*/}
+              {/*      onKeyDown={() => {}}*/}
+              {/*    >*/}
+              {/*      <img src={maxImg} alt="maxImg" />*/}
+              {/*    </div>*/}
+              {/*  </div>*/}
+              {/*</div>*/}
             </div>
             <div className={s.small_balance}>
               <div className={s.small_balance_title}>
@@ -438,27 +438,27 @@ const StakingPage: React.FC = () => {
               <div className={s.small_balance_subtitle}>
                 <span>{stakedLP} ETH-LESS LP</span>
               </div>
-              <div className={s.balance_amount}>
-                <div className={s.balance_amount__inner}>
-                  <div className={s.balance_amount__money}>
-                    <input
-                      type="text"
-                      placeholder="0.0"
-                      value={unstakeLPValue}
-                      onChange={(e) => setUnstakeLPValue(e.target.value.replace(/[^\d.,]/g, ''))}
-                    />
-                  </div>
-                  <div
-                    className={s.balance_amount__img}
-                    role="button"
-                    tabIndex={0}
-                    onClick={handleSetMaxLPUnstake}
-                    onKeyDown={() => {}}
-                  >
-                    <img src={maxImg} alt="maxImg" />
-                  </div>
-                </div>
-              </div>
+              {/*<div className={s.balance_amount}>*/}
+              {/*  <div className={s.balance_amount__inner}>*/}
+              {/*    <div className={s.balance_amount__money}>*/}
+              {/*      <input*/}
+              {/*        type="text"*/}
+              {/*        placeholder="0.0"*/}
+              {/*        value={unstakeLPValue}*/}
+              {/*        onChange={(e) => setUnstakeLPValue(e.target.value.replace(/[^\d.,]/g, ''))}*/}
+              {/*      />*/}
+              {/*    </div>*/}
+              {/*    <div*/}
+              {/*      className={s.balance_amount__img}*/}
+              {/*      role="button"*/}
+              {/*      tabIndex={0}*/}
+              {/*      onClick={handleSetMaxLPUnstake}*/}
+              {/*      onKeyDown={() => {}}*/}
+              {/*    >*/}
+              {/*      <img src={maxImg} alt="maxImg" />*/}
+              {/*    </div>*/}
+              {/*  </div>*/}
+              {/*</div>*/}
             </div>
             <div className={s.small_balance}>
               <div className={s.small_balance_title}>
@@ -467,27 +467,27 @@ const StakingPage: React.FC = () => {
               <div className={s.small_balance_subtitle}>
                 <span>{lessRewards} $LESS</span>
               </div>
-              <div className={s.balance_amount}>
-                <div className={s.balance_amount__inner}>
-                  <div className={s.balance_amount__money}>
-                    <input
-                      type="text"
-                      placeholder="0.0"
-                      value={rewardLessValue}
-                      onChange={(e) => setRewardLessValue(e.target.value.replace(/[^\d.,]/g, ''))}
-                    />
-                  </div>
-                  <div
-                    className={s.balance_amount__img}
-                    role="button"
-                    tabIndex={0}
-                    onClick={handleSetMaxLessReward}
-                    onKeyDown={() => {}}
-                  >
-                    <img src={maxImg} alt="maxImg" />
-                  </div>
-                </div>
-              </div>
+              {/*<div className={s.balance_amount}>*/}
+              {/*  <div className={s.balance_amount__inner}>*/}
+              {/*    <div className={s.balance_amount__money}>*/}
+              {/*      <input*/}
+              {/*        type="text"*/}
+              {/*        placeholder="0.0"*/}
+              {/*        value={rewardLessValue}*/}
+              {/*        onChange={(e) => setRewardLessValue(e.target.value.replace(/[^\d.,]/g, ''))}*/}
+              {/*      />*/}
+              {/*    </div>*/}
+              {/*    <div*/}
+              {/*      className={s.balance_amount__img}*/}
+              {/*      role="button"*/}
+              {/*      tabIndex={0}*/}
+              {/*      onClick={handleSetMaxLessReward}*/}
+              {/*      onKeyDown={() => {}}*/}
+              {/*    >*/}
+              {/*      <img src={maxImg} alt="maxImg" />*/}
+              {/*    </div>*/}
+              {/*  </div>*/}
+              {/*</div>*/}
             </div>
             <div className={s.small_balance}>
               <div className={s.small_balance_title}>
@@ -496,42 +496,42 @@ const StakingPage: React.FC = () => {
               <div className={s.small_balance_subtitle}>
                 <span>{lpRewards} ETH-LESS LP</span>
               </div>
-              <div className={s.balance_amount}>
-                <div className={s.balance_amount__inner}>
-                  <div className={s.balance_amount__money}>
-                    <input
-                      type="text"
-                      placeholder="0.0"
-                      value={rewardLPValue}
-                      onChange={(e) => setRewardLPValue(e.target.value.replace(/[^\d.,]/g, ''))}
-                    />
-                  </div>
-                  <div
-                    className={s.balance_amount__img}
-                    role="button"
-                    tabIndex={0}
-                    onClick={handleSetMaxLPReward}
-                    onKeyDown={() => {}}
-                  >
-                    <img src={maxImg} alt="maxImg" />
-                  </div>
-                </div>
-              </div>
+              {/*<div className={s.balance_amount}>*/}
+              {/*  <div className={s.balance_amount__inner}>*/}
+              {/*    <div className={s.balance_amount__money}>*/}
+              {/*      <input*/}
+              {/*        type="text"*/}
+              {/*        placeholder="0.0"*/}
+              {/*        value={rewardLPValue}*/}
+              {/*        onChange={(e) => setRewardLPValue(e.target.value.replace(/[^\d.,]/g, ''))}*/}
+              {/*      />*/}
+              {/*    </div>*/}
+              {/*    <div*/}
+              {/*      className={s.balance_amount__img}*/}
+              {/*      role="button"*/}
+              {/*      tabIndex={0}*/}
+              {/*      onClick={handleSetMaxLPReward}*/}
+              {/*      onKeyDown={() => {}}*/}
+              {/*    >*/}
+              {/*      <img src={maxImg} alt="maxImg" />*/}
+              {/*    </div>*/}
+              {/*  </div>*/}
+              {/*</div>*/}
             </div>
           </div>
         </div>
         <Table data={userStakeIds} />
-        <div className={s.button_center}>
-          <div
-            role="button"
-            tabIndex={0}
-            onKeyDown={() => {}}
-            onClick={unstake}
-            className={s.balance_button}
-          >
-            Claim Rewards and Unstake
-          </div>
-        </div>
+        {/*<div className={s.button_center}>*/}
+        {/*  <div*/}
+        {/*    role="button"*/}
+        {/*    tabIndex={0}*/}
+        {/*    onKeyDown={() => {}}*/}
+        {/*    onClick={unstake}*/}
+        {/*    className={s.balance_button}*/}
+        {/*  >*/}
+        {/*    Claim Rewards and Unstake*/}
+        {/*  </div>*/}
+        {/*</div>*/}
       </div>
     </div>
   );
