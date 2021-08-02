@@ -29,7 +29,7 @@ const Features: React.FC = () => {
             <div className={s.feature_img}>
               <img src={vector3} alt="vector-img-3" />
             </div>
-            <div className={s.feature_text}>Guaranteed Allications</div>
+            <div className={s.feature_text}>Guaranteed Allocations</div>
           </div>
         </div>
       </div>
