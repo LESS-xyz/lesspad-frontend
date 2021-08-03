@@ -155,3 +155,9 @@
   display: flex;
   justify-content: center;
 }
+
+.messageContainer {
+  @include flex(row, center);
+  height: 100%;
+}
+

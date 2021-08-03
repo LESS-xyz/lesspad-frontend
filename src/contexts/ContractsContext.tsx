@@ -137,7 +137,7 @@ const ContractsContext: React.FC = ({ children }) => {
   }, [chainType, web3, userAddress]);
 
   useEffect(() => {
-    console.log('value:', { ...contractsOnRpc, ...contractsOnMetamask });
+    // console.log('value:', { ...contractsOnRpc, ...contractsOnMetamask });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contractsOnRpc, contractsOnMetamask]);
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Web3 from 'web3';
 
 import maxImg from '../../assets/img/icons/max.svg';
@@ -8,6 +8,7 @@ import Button from '../../components/Button/index';
 import YourTier from '../../components/YourTier/index';
 import config from '../../config';
 import { useContractsContext } from '../../contexts/ContractsContext';
+import { modalActions } from '../../redux/actions';
 import { convertFromWei, convertToWei } from '../../utils/ethereum';
 
 import Table from './Table';
@@ -54,6 +55,9 @@ const StakingPage: React.FC = () => {
   const [stakeLessValue, setStakeLessValue] = useState<string>('');
   const [stakeLPValue, setStakeLPValue] = useState<string>('');
 
+  const [lessAllowance, setLessAllowance] = useState<number>(0);
+  const [lpAllowance, setLpAllowance] = useState<number>(0);
+
   // const [unstakeLessValue, setUnstakeLessValue] = useState<string>('');
   // const [unstakeLPValue, setUnstakeLPValue] = useState<string>('');
 
@@ -67,12 +71,44 @@ const StakingPage: React.FC = () => {
   const { chainType } = useSelector(({ wallet }: any) => wallet);
   const { address: userAddress } = useSelector(({ user }: any) => user);
 
+  const dispatch = useDispatch();
+  const toggleModal = React.useCallback((params) => dispatch(modalActions.toggleModal(params)), [
+    dispatch,
+  ]);
+
+  const isStakeLessValue = stakeLessValue !== '';
+  const isStakeLPValue = stakeLPValue !== '';
+  const isLessAllowed = lessAllowance >= +stakeLessValue;
+  const isLpAllowed = lpAllowance >= +stakeLPValue;
+
+  const stakingContractAddress = config.addresses[config.isMainnetOrTestnet][chainType].Staking;
+
   const getDecimals = async () => {
     try {
       const resultLessDecimals = await ContractLessToken.decimals();
       setLessDecimals(resultLessDecimals);
       const resultLpDecimals = await ContractLPToken.decimals();
       setLpDecimals(resultLpDecimals);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const getAllowances = async () => {
+    try {
+      console.log('StakingPage getAllowances:');
+      const resultLessAllowance = await ContractLessToken.allowance({
+        userAddress,
+        spender: stakingContractAddress,
+      });
+      setLessAllowance(resultLessAllowance);
+      console.log('StakingPage getAllowances:', resultLessAllowance);
+      const resultLpAllowance = await ContractLPToken.allowance({
+        userAddress,
+        spender: stakingContractAddress,
+      });
+      setLpAllowance(resultLpAllowance);
+      console.log('StakingPage getAllowances:', resultLpAllowance);
     } catch (e) {
       console.error(e);
     }
@@ -184,41 +220,97 @@ const StakingPage: React.FC = () => {
     }
   };
 
+  const approveLess = async () => {
+    try {
+      const stakeLessValueInWei = convertToWei(stakeLessValue || 0, lessDecimals);
+      const resultApprove = await ContractLessToken.approve({
+        userAddress,
+        spender: stakingContractAddress,
+        amount: stakeLessValueInWei,
+      });
+      console.log('StakingPage approveLess:', resultApprove);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const approveLp = async () => {
+    try {
+      const stakeLpValueInWei = convertToWei(stakeLPValue || 0, lpDecimals);
+      const resultApprove = await ContractLessToken.approve({
+        userAddress,
+        spender: stakingContractAddress,
+        amount: stakeLpValueInWei,
+      });
+      console.log('StakingPage approveLp:', resultApprove);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const checkAllowancesAndFields = () => {
+    try {
+      if (!isStakeLessValue && !isStakeLPValue) {
+        toggleModal({
+          open: true,
+          text: (
+            <div className={s.messageContainer}>
+              <p>Please, enter stake values</p>
+            </div>
+          ),
+        });
+        return false;
+      }
+      if (isStakeLessValue && isStakeLPValue && !isLessAllowed && !isLpAllowed) {
+        toggleModal({
+          open: true,
+          text: (
+            <div className={s.messageContainer}>
+              <p>Please, approve $LESS and ETH-LESS LP tokens to stake</p>
+            </div>
+          ),
+        });
+        return false;
+      }
+      if (isStakeLessValue && !isLessAllowed) {
+        toggleModal({
+          open: true,
+          text: (
+            <div className={s.messageContainer}>
+              <p>Please, approve $LESS tokens to stake</p>
+            </div>
+          ),
+        });
+        return false;
+      }
+      if (isStakeLPValue && !isLpAllowed) {
+        toggleModal({
+          open: true,
+          text: (
+            <div className={s.messageContainer}>
+              <p>Please, approve ETH-LESS LP tokens to stake</p>
+            </div>
+          ),
+        });
+        return false;
+      }
+      return true;
+    } catch (e) {
+      console.error('StakingPage stake:', e);
+      return false;
+    }
+  };
+
   const stake = async () => {
     try {
-      const { addresses }: any = config;
-      const spender = addresses[config.isMainnetOrTestnet][chainType].Staking;
-      // approve Less
-      const stakeLessValueBN = convertToWei(stakeLessValue || 0, lessDecimals);
-      console.log('StakingPage stake stakeLessValueBN:', stakeLessValueBN);
-      const allowanceLess = await ContractLessToken.allowance({ userAddress, spender });
-      console.log('StakingPage stake allowanceLess:', allowanceLess);
-      if (stakeLessValueBN > 0 && allowanceLess <= stakeLessValueBN) {
-        const resultApprove = await ContractLessToken.approve({
-          userAddress,
-          spender,
-          amount: stakeLessValueBN,
-        });
-        console.log('StakingPage stake resultApprove:', resultApprove);
-      }
-      // approve LP
-      const stakeLPValueBN = convertToWei(stakeLPValue || 0, lpDecimals);
-      console.log('StakingPage stake stakeLPValueBN:', stakeLPValueBN);
-      const allowanceLP = await ContractLPToken.allowance({ userAddress, spender });
-      console.log('StakingPage stake allowanceLP:', allowanceLP);
-      if (stakeLPValueBN > 0 && allowanceLP <= stakeLPValueBN) {
-        const resultApprove = await ContractLPToken.approve({
-          userAddress,
-          spender,
-          amount: stakeLPValueBN,
-        });
-        console.log('StakingPage stake resultApprove:', resultApprove);
-      }
-      // stake
+      const resultCheckAllowances = checkAllowancesAndFields();
+      if (!resultCheckAllowances) return;
+      const stakeLessValueInWei = convertToWei(stakeLessValue || 0, lessDecimals);
+      const stakeLpValueInWei = convertToWei(stakeLPValue || 0, lpDecimals);
       const result = await ContractStaking.stake({
         userAddress,
-        lpAmount: stakeLPValueBN,
-        lessAmount: stakeLessValueBN,
+        lessAmount: stakeLessValueInWei,
+        lpAmount: stakeLpValueInWei,
       });
       if (result) {
         getLessTokenBalance();
@@ -302,6 +394,14 @@ const StakingPage: React.FC = () => {
 
   useEffect(() => {
     if (!userAddress) return;
+    if (!ContractLessToken) return;
+    if (!ContractLPToken) return;
+    getAllowances();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ContractLessToken, ContractLPToken, userAddress, stakeLessValue, stakeLPValue]);
+
+  useEffect(() => {
+    if (!userAddress) return;
     if (!lessDecimals) return;
     if (!lpDecimals) return;
     const interval = setInterval(() => {
@@ -355,6 +455,11 @@ const StakingPage: React.FC = () => {
                     </div>
                   </div>
                 </div>
+                {stakeLessValue && !isLessAllowed && (
+                  <Button long onClick={approveLess}>
+                    Approve
+                  </Button>
+                )}
               </div>
               <div className={s.balance_inner}>
                 <div className={s.balance_title}>
@@ -385,6 +490,11 @@ const StakingPage: React.FC = () => {
                     </div>
                   </div>
                 </div>
+                {stakeLPValue && !isLpAllowed && (
+                  <Button long onClick={approveLp}>
+                    Approve
+                  </Button>
+                )}
               </div>
             </div>
             <Button long onClick={stake}>
