@@ -96,7 +96,6 @@ const StakingPage: React.FC = () => {
 
   const getAllowances = async () => {
     try {
-      console.log('StakingPage getAllowances:');
       const resultLessAllowance = await ContractLessToken.allowance({
         userAddress,
         spender: stakingContractAddress,
@@ -229,6 +228,7 @@ const StakingPage: React.FC = () => {
         amount: stakeLessValueInWei,
       });
       console.log('StakingPage approveLess:', resultApprove);
+      await getAllowances();
     } catch (e) {
       console.error(e);
     }
@@ -237,12 +237,13 @@ const StakingPage: React.FC = () => {
   const approveLp = async () => {
     try {
       const stakeLpValueInWei = convertToWei(stakeLPValue || 0, lpDecimals);
-      const resultApprove = await ContractLessToken.approve({
+      const resultApprove = await ContractLPToken.approve({
         userAddress,
         spender: stakingContractAddress,
         amount: stakeLpValueInWei,
       });
       console.log('StakingPage approveLp:', resultApprove);
+      await getAllowances();
     } catch (e) {
       console.error(e);
     }
@@ -299,6 +300,7 @@ const StakingPage: React.FC = () => {
       console.error('StakingPage stake:', e);
       return false;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   };
 
   const stake = async () => {
@@ -315,11 +317,14 @@ const StakingPage: React.FC = () => {
       if (result) {
         getLessTokenBalance();
         getLPTokenBalance();
+        getTier();
+        getUserStakeIds();
       }
       console.log('StakingPage stake:', result);
     } catch (e) {
       console.error('StakingPage stake:', e);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   };
 
   // const unstake = async () => {
