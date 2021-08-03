@@ -1,6 +1,7 @@
 import Web3 from 'web3';
 
 import config from '../../config';
+import { convertFromWei } from '../../utils/ethereum';
 
 type TypeConstructorProps = {
   web3Provider: any;
@@ -20,6 +21,8 @@ export default class ContractLPToken {
 
   public contractAbi: any;
 
+  public contract: any;
+
   public contractName: string;
 
   constructor(props: TypeConstructorProps) {
@@ -31,6 +34,7 @@ export default class ContractLPToken {
     this.contractName = 'LPToken';
     this.contractAddress = addressesOfNetType[chainType][this.contractName];
     this.contractAbi = abisOfNetType[chainType][this.contractName];
+    this.contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
   }
 
   public decimals = async (): Promise<any> => {
@@ -65,8 +69,11 @@ export default class ContractLPToken {
 
   public allowance = async ({ userAddress, spender }: TypeStakeProps): Promise<any> => {
     try {
-      const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
-      return await contract.methods.allowance(userAddress, spender).call();
+      // console.log('ContractPresalePublicService getInfo:', this.contractAbi, this.contractAddress)
+      const result = await this.contract.methods.allowance(userAddress, spender).call();
+      const decimals = await this.decimals();
+      const resultInEth = convertFromWei(result, decimals);
+      return resultInEth;
     } catch (e) {
       console.error('ContractLPToken allowance:', e);
       return null;
@@ -76,8 +83,7 @@ export default class ContractLPToken {
   public approve = async ({ userAddress, spender, amount }: TypeStakeProps): Promise<any> => {
     try {
       // console.log('ContractPresalePublicService getInfo:', this.contractAbi, this.contractAddress)
-      const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
-      return await contract.methods.approve(spender, amount).send({ from: userAddress });
+      return await this.contract.methods.approve(spender, amount).send({ from: userAddress });
     } catch (e) {
       console.error('ContractLPToken approve:', e);
       return null;

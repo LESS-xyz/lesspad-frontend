@@ -96,6 +96,7 @@ const ContractsContext: React.FC = ({ children }) => {
       const ContractStaking = new ContractStakingService({
         web3Provider: web3.provider,
         chainType,
+        userAddress,
       });
       const ContractLessToken = new ContractLessTokenService({
         web3Provider: web3.provider,
@@ -118,7 +119,7 @@ const ContractsContext: React.FC = ({ children }) => {
     } catch (e) {
       console.error('ContractsContext init:', e);
     }
-  }, [web3, chainType]);
+  }, [web3, chainType, userAddress]);
 
   useEffect(() => {
     if (!chainType) return;
@@ -136,7 +137,7 @@ const ContractsContext: React.FC = ({ children }) => {
   }, [chainType, web3, userAddress]);
 
   useEffect(() => {
-    console.log('value:', { ...contractsOnRpc, ...contractsOnMetamask });
+    // console.log('value:', { ...contractsOnRpc, ...contractsOnMetamask });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contractsOnRpc, contractsOnMetamask]);
 

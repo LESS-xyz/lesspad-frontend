@@ -1,6 +1,7 @@
 import Web3 from 'web3';
 
 import config from '../../config';
+import { convertFromWei } from '../../utils/ethereum';
 
 type TypeConstructorProps = {
   web3Provider: any;
@@ -19,6 +20,8 @@ export default class ContractLessToken {
 
   public contractAbi: any;
 
+  public contract: any;
+
   public contractName: string;
 
   constructor(props: TypeConstructorProps) {
@@ -30,9 +33,10 @@ export default class ContractLessToken {
     this.contractName = 'LessToken';
     this.contractAddress = addressesOfNetType[chainType][this.contractName];
     this.contractAbi = abisOfNetType[chainType][this.contractName];
+    this.contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
   }
 
-  public decimals = async (): Promise<number | null> => {
+  public decimals = async (): Promise<any> => {
     try {
       const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
       return await contract.methods.decimals().call();
@@ -67,8 +71,10 @@ export default class ContractLessToken {
   public allowance = async ({ userAddress, spender }: TypeStakeProps): Promise<any> => {
     try {
       // console.log('ContractPresalePublicService getInfo:', this.contractAbi, this.contractAddress)
-      const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
-      return await contract.methods.allowance(userAddress, spender).call();
+      const result = await this.contract.methods.allowance(userAddress, spender).call();
+      const decimals = await this.decimals();
+      const resultInEth = convertFromWei(result, decimals);
+      return resultInEth;
     } catch (e) {
       console.error('ContractLessToken allowance:', e);
       return null;

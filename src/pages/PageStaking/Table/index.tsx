@@ -41,17 +41,14 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
     }
   };
 
-  // const unstake = async () => {
-  //   try {
-  //     // const resultVote = await ContractPresalePublic.vote({
-  //     //   userAddress,
-  //     //   contractAddress: address,
-  //     //   yes,
-  //     // });
-  //   } catch (e) {
-  //     console.error('TableRow vote:', e);
-  //   }
-  // };
+  const unstake = async () => {
+    try {
+      const resultUnstake = await ContractStaking.unstake({ stakeId });
+      console.log('TableRow unstake:', resultUnstake);
+    } catch (e) {
+      console.error('TableRow vote:', e);
+    }
+  };
 
   useEffect(() => {
     if (!stakeId) return;
@@ -85,25 +82,11 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
         {isMobile && <div className={s.row_header}>Staked $LESS LP</div>}
         {stakedLp || '0.000'}
       </div>
-      {/*<div className={`${s.row_cell} ${s.opensIn}`}>*/}
-      {/*  {isMobile && <div className={s.row_header}>Opens in</div>}*/}
-      {/*</div>*/}
-      {/*<div className={`${s.row_cell} ${s.likes}`}>*/}
-      {/*  {isMobile && <div className={s.row_header}>Voting</div>}*/}
-      {/*  <div className={s.likes}>*/}
-      {/*    <div className={s.like}>*/}
-      {/*      <div*/}
-      {/*        className={s.likes_img}*/}
-      {/*        role="button"*/}
-      {/*        tabIndex={0}*/}
-      {/*        onKeyDown={() => {}}*/}
-      {/*        onClick={unstake}*/}
-      {/*      >*/}
-      {/*        <img src={thumbUpGreen} alt="thumbUpGreen" />*/}
-      {/*      </div>*/}
-      {/*    </div>*/}
-      {/*  </div>*/}
-      {/*</div>*/}
+      <div className={s.row_cell}>
+        <div role="button" tabIndex={0} onKeyDown={() => {}} onClick={unstake} className={s.button}>
+          Claim Rewards and Unstake
+        </div>
+      </div>
     </div>
   );
 };
@@ -156,7 +139,7 @@ const Table: React.FC<ITableProps> = (props) => {
             <div className={`${s.name} ${s.cell}`}>#</div>
             <div className={s.cell}>Staked</div>
             <div className={s.cell}>Staked $LESS</div>
-            <div className={s.cell}>Staked $LESS LP</div>
+            <div className={s.cell}>Staked ETH-LESS LP</div>
           </div>
         )}
         <div className={s.table_body}>
