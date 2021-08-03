@@ -219,8 +219,49 @@ const StakingPage: React.FC = () => {
     }
   };
 
+  const checkLessBalance = () => {
+    try {
+      if (isStakeLessValue && +stakeLessValue > +balanceLessToken) {
+        toggleModal({
+          open: true,
+          text: (
+            <div className={s.messageContainer}>
+              <p>Insufficient $LESS balance</p>
+            </div>
+          ),
+        });
+        return false;
+      }
+      return true;
+    } catch (e) {
+      console.error('StakingPage stake:', e);
+      return false;
+    }
+  };
+
+  const checkLpBalance = () => {
+    try {
+      if (isStakeLPValue && +stakeLPValue > +balanceLPToken) {
+        toggleModal({
+          open: true,
+          text: (
+            <div className={s.messageContainer}>
+              <p>Insufficient ETH-LESS LP balance</p>
+            </div>
+          ),
+        });
+        return false;
+      }
+      return true;
+    } catch (e) {
+      console.error('StakingPage stake:', e);
+      return false;
+    }
+  };
+
   const approveLess = async () => {
     try {
+      if (!checkLessBalance()) return;
       const stakeLessValueInWei = convertToWei(stakeLessValue || 0, lessDecimals);
       const resultApprove = await ContractLessToken.approve({
         userAddress,
@@ -236,6 +277,7 @@ const StakingPage: React.FC = () => {
 
   const approveLp = async () => {
     try {
+      if (!checkLpBalance()) return;
       const stakeLpValueInWei = convertToWei(stakeLPValue || 0, lpDecimals);
       const resultApprove = await ContractLPToken.approve({
         userAddress,
@@ -300,13 +342,13 @@ const StakingPage: React.FC = () => {
       console.error('StakingPage stake:', e);
       return false;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   };
 
   const stake = async () => {
     try {
-      const resultCheckAllowances = checkAllowancesAndFields();
-      if (!resultCheckAllowances) return;
+      if (isStakeLessValue && !checkLessBalance()) return;
+      if (isStakeLPValue && !checkLpBalance()) return;
+      if (!checkAllowancesAndFields()) return;
       const stakeLessValueInWei = convertToWei(stakeLessValue || 0, lessDecimals);
       const stakeLpValueInWei = convertToWei(stakeLPValue || 0, lpDecimals);
       const result = await ContractStaking.stake({
