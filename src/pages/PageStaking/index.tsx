@@ -8,6 +8,7 @@ import Button from '../../components/Button/index';
 import YourTier from '../../components/YourTier/index';
 import config from '../../config';
 import { useContractsContext } from '../../contexts/ContractsContext';
+import useDebounce from '../../hooks/useDebounce';
 import { modalActions } from '../../redux/actions';
 import { convertFromWei, convertToWei } from '../../utils/ethereum';
 
@@ -53,7 +54,9 @@ const StakingPage: React.FC = () => {
   const [userStakeIds, setUserStakeIds] = useState<string[]>([]);
 
   const [stakeLessValue, setStakeLessValue] = useState<string>('');
+  const debouncedStakeLessValue = useDebounce(stakeLessValue, 500);
   const [stakeLPValue, setStakeLPValue] = useState<string>('');
+  const debouncedStakeLpValue = useDebounce(stakeLPValue, 500);
 
   const [lessAllowance, setLessAllowance] = useState<number>(0);
   const [lpAllowance, setLpAllowance] = useState<number>(0);
@@ -76,10 +79,10 @@ const StakingPage: React.FC = () => {
     dispatch,
   ]);
 
-  const isStakeLessValue = stakeLessValue !== '';
-  const isStakeLPValue = stakeLPValue !== '';
-  const isLessAllowed = lessAllowance >= +stakeLessValue;
-  const isLpAllowed = lpAllowance >= +stakeLPValue;
+  const isStakeLessValue = debouncedStakeLessValue !== '';
+  const isStakeLPValue = debouncedStakeLpValue !== '';
+  const isLessAllowed = lessAllowance >= +debouncedStakeLessValue;
+  const isLpAllowed = lpAllowance >= +debouncedStakeLpValue;
 
   const stakingContractAddress = config.addresses[config.isMainnetOrTestnet][chainType].Staking;
 
@@ -221,7 +224,7 @@ const StakingPage: React.FC = () => {
 
   const checkLessBalance = () => {
     try {
-      if (isStakeLessValue && +stakeLessValue > +balanceLessToken) {
+      if (isStakeLessValue && +debouncedStakeLessValue > +balanceLessToken) {
         toggleModal({
           open: true,
           text: (
@@ -241,7 +244,7 @@ const StakingPage: React.FC = () => {
 
   const checkLpBalance = () => {
     try {
-      if (isStakeLPValue && +stakeLPValue > +balanceLPToken) {
+      if (isStakeLPValue && +debouncedStakeLpValue > +balanceLPToken) {
         toggleModal({
           open: true,
           text: (
@@ -262,7 +265,7 @@ const StakingPage: React.FC = () => {
   const approveLess = async () => {
     try {
       if (!checkLessBalance()) return;
-      const stakeLessValueInWei = convertToWei(stakeLessValue || 0, lessDecimals);
+      const stakeLessValueInWei = convertToWei(debouncedStakeLessValue || 0, lessDecimals);
       const resultApprove = await ContractLessToken.approve({
         userAddress,
         spender: stakingContractAddress,
@@ -278,7 +281,7 @@ const StakingPage: React.FC = () => {
   const approveLp = async () => {
     try {
       if (!checkLpBalance()) return;
-      const stakeLpValueInWei = convertToWei(stakeLPValue || 0, lpDecimals);
+      const stakeLpValueInWei = convertToWei(debouncedStakeLpValue || 0, lpDecimals);
       const resultApprove = await ContractLPToken.approve({
         userAddress,
         spender: stakingContractAddress,
@@ -349,8 +352,8 @@ const StakingPage: React.FC = () => {
       if (isStakeLessValue && !checkLessBalance()) return;
       if (isStakeLPValue && !checkLpBalance()) return;
       if (!checkAllowancesAndFields()) return;
-      const stakeLessValueInWei = convertToWei(stakeLessValue || 0, lessDecimals);
-      const stakeLpValueInWei = convertToWei(stakeLPValue || 0, lpDecimals);
+      const stakeLessValueInWei = convertToWei(debouncedStakeLessValue || 0, lessDecimals);
+      const stakeLpValueInWei = convertToWei(debouncedStakeLpValue || 0, lpDecimals);
       const result = await ContractStaking.stake({
         userAddress,
         lessAmount: stakeLessValueInWei,
@@ -445,7 +448,13 @@ const StakingPage: React.FC = () => {
     if (!ContractLPToken) return;
     getAllowances();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ContractLessToken, ContractLPToken, userAddress, stakeLessValue, stakeLPValue]);
+  }, [
+    ContractLessToken,
+    ContractLPToken,
+    userAddress,
+    debouncedStakeLessValue,
+    debouncedStakeLpValue,
+  ]);
 
   useEffect(() => {
     if (!userAddress) return;
@@ -502,7 +511,7 @@ const StakingPage: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                {stakeLessValue && !isLessAllowed && (
+                {debouncedStakeLessValue && !isLessAllowed && (
                   <Button long onClick={approveLess}>
                     Approve
                   </Button>
@@ -537,7 +546,7 @@ const StakingPage: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                {stakeLPValue && !isLpAllowed && (
+                {debouncedStakeLpValue && !isLpAllowed && (
                   <Button long onClick={approveLp}>
                     Approve
                   </Button>

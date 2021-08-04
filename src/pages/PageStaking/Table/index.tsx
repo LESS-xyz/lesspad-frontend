@@ -96,7 +96,8 @@ interface ITableProps {
 }
 
 const Table: React.FC<ITableProps> = (props) => {
-  const { data = [] } = props;
+  let { data = [] } = props;
+  if (!data) data = [];
 
   const [page, setPage] = useState<number>(0);
   const [dataFiltered, setDataFiltrered] = useState<any[]>(data);
@@ -130,7 +131,14 @@ const Table: React.FC<ITableProps> = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, data]);
 
-  if (!data) return null;
+  if (!data.length)
+    return (
+      <div className={s.table}>
+        <div className={s.table_body} style={{ textAlign: 'center' }}>
+          No stakes yet
+        </div>
+      </div>
+    );
   return (
     <div className={s.table}>
       <div className={s.inner}>
