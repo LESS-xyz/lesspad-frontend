@@ -78,7 +78,7 @@ export default class ContractStakingService {
 
   public getMinStakeTime = async (): Promise<any> => {
     try {
-      const result = await this.contract.methods.getMinStakeTime().call();
+      const result = await this.contract.methods.minStakeTime().call();
       return +result * 1000;
     } catch (e) {
       console.error('ContractStakingService getMinStakeTime:', e);

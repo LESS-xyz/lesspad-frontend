@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
 import useMedia from 'use-media';
 
 import Pagination from '../../../components/Pagination';
@@ -8,6 +9,8 @@ import { prettyNumber } from '../../../utils/prettifiers';
 
 // import { modalActions } from '../../../redux/actions';
 import s from './Table.module.scss';
+
+dayjs.extend(duration);
 
 interface ITableRow {
   stakeId?: string;
@@ -68,6 +71,7 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
 
   const { stakedLess, stakedLp, startTime, lessReward, lpReward } = info;
   const minStakeTimestamp = startTime + minStakeTime;
+  const isMinStakeTimePassed = minStakeTimestamp <= Date.now();
 
   return (
     <div className={`${s.row} ${index % 2 === 1 && s.filled}`}>
@@ -97,7 +101,7 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
       </div>
       <div className={s.row_cell}>
         {isMobile && <div className={s.row_header}>Min stake time</div>}
-        {dayjs(minStakeTimestamp).fromNow()}
+        {isMinStakeTimePassed ? 'Passed' : dayjs(minStakeTimestamp).fromNow()}
       </div>
       <div className={`${s.row_cell} ${isMobile && s.row_cell_allCells}`}>
         <div role="button" tabIndex={0} onKeyDown={() => {}} onClick={unstake} className={s.button}>
@@ -185,7 +189,10 @@ const Table: React.FC<ITableProps> = (props) => {
             <div className={s.cell}>Staked ETH-LESS LP</div>
             <div className={s.cell}>Reward $LESS</div>
             <div className={s.cell}>Reward ETH-LESS LP</div>
-            <div className={s.cell}>Min stake time</div>
+            <div className={s.cell}>
+              Min stake time ({dayjs.duration(minStakeTime).asDays().toFixed()}
+              days)
+            </div>
           </div>
         )}
         <div className={s.table_body}>
