@@ -63,8 +63,8 @@ const StakingPage: React.FC = () => {
   // const [unstakeLessValue, setUnstakeLessValue] = useState<string>('');
   // const [unstakeLPValue, setUnstakeLPValue] = useState<string>('');
 
-  const [lessRewards, setLessRewards] = useState<string | null>('0.000');
-  const [lpRewards, setLpRewards] = useState<string | null>('0.000');
+  const [lessRewards, setLessRewards] = useState<string>('0.000');
+  const [lpRewards, setLpRewards] = useState<string>('0.000');
   // const [rewardLessValue, setRewardLessValue] = useState<string>('');
   // const [rewardLPValue, setRewardLPValue] = useState<string>('');
 
@@ -200,9 +200,8 @@ const StakingPage: React.FC = () => {
   const getLessRewards = async () => {
     try {
       const result = await ContractStaking.getLessRewards({ userAddress });
-      const resultInEth = convertFromWei(result, lessDecimals);
-      setLessRewards(resultInEth);
-      console.log('StakingPage getLessRewards:', resultInEth);
+      setLessRewards(result);
+      console.log('StakingPage getLessRewards:', result);
     } catch (e) {
       console.error(e);
     }
@@ -211,9 +210,8 @@ const StakingPage: React.FC = () => {
   const getLpRewards = async () => {
     try {
       const result = await ContractStaking.getLpRewards({ userAddress });
-      const resultInEth = convertFromWei(result, lpDecimals);
-      setLpRewards(resultInEth);
-      console.log('StakingPage getLpRewards:', resultInEth);
+      setLpRewards(result);
+      console.log('StakingPage getLpRewards:', result);
     } catch (e) {
       console.error(e);
     }
@@ -630,7 +628,7 @@ const StakingPage: React.FC = () => {
                 <span>$LESS Rewards</span>
               </div>
               <div className={s.small_balance_subtitle}>
-                <span>{lessRewards} $LESS</span>
+                <span>{prettyNumber(lessRewards)} $LESS</span>
               </div>
               {/*<div className={s.balance_amount}>*/}
               {/*  <div className={s.balance_amount__inner}>*/}
@@ -659,7 +657,7 @@ const StakingPage: React.FC = () => {
                 <span>ETH-LESS LP Rewards</span>
               </div>
               <div className={s.small_balance_subtitle}>
-                <span>{lpRewards} ETH-LESS LP</span>
+                <span>{prettyNumber(lpRewards)} ETH-LESS LP</span>
               </div>
               {/*<div className={s.balance_amount}>*/}
               {/*  <div className={s.balance_amount__inner}>*/}

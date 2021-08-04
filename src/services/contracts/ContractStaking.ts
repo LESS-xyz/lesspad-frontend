@@ -159,6 +159,7 @@ export default class ContractStakingService {
     }
   };
 
+  // todo: remove
   // get stake of user by address and index
   public getStakeList = async (props: TypeGetStakeListProps): Promise<any> => {
     try {
@@ -174,17 +175,14 @@ export default class ContractStakingService {
   public getLessRewards = async (props: TypeGetStakedBalanceProps): Promise<any> => {
     try {
       const { userAddress } = props;
-      const stakedLess = await this.getLessBalanceByAddress({ userAddress });
-      const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
-      const totalLessRewards = await contract.methods.totalLessRewards().call();
-      const totalLessRewardsBN = new BN(totalLessRewards);
-      const allLess = await contract.methods.allLess().call();
-      const allLessBN = new BN(allLess);
-      const result = new BN(stakedLess)
-        .multipliedBy(totalLessRewardsBN)
-        .div(allLessBN)
-        .toString(10);
-      return result;
+      const userStakeIds = await this.getUserStakeIds({ userAddress });
+      let fullReward = new BN(0);
+      for (let i = 0; i < userStakeIds.length; i += 1) {
+        const stakeId = userStakeIds[i];
+        const reward = await this.getLessRewardOnStake({ stakeId });
+        fullReward = fullReward.plus(new BN(reward));
+      }
+      return fullReward.toString(10);
     } catch (e) {
       console.error('ContractStakingService getLessRewards:', e);
       return null;
@@ -194,14 +192,14 @@ export default class ContractStakingService {
   public getLpRewards = async (props: TypeGetStakedBalanceProps): Promise<any> => {
     try {
       const { userAddress } = props;
-      const stakedLp = await this.getLpBalanceByAddress({ userAddress });
-      const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
-      const totalLpRewards = await contract.methods.totalLpRewards().call();
-      const totalLpRewardsBN = new BN(totalLpRewards);
-      const allLp = await contract.methods.allLp().call();
-      const allLpBN = new BN(allLp);
-      const result = new BN(stakedLp).multipliedBy(totalLpRewardsBN).div(allLpBN).toString(10);
-      return result;
+      const userStakeIds = await this.getUserStakeIds({ userAddress });
+      let fullReward = new BN(0);
+      for (let i = 0; i < userStakeIds.length; i += 1) {
+        const stakeId = userStakeIds[i];
+        const reward = await this.getLpRewardOnStake({ stakeId });
+        fullReward = fullReward.plus(new BN(reward));
+      }
+      return fullReward.toString(10);
     } catch (e) {
       console.error('ContractStakingService getLpRewards:', e);
       return null;
