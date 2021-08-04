@@ -4,6 +4,7 @@ import useMedia from 'use-media';
 
 import Pagination from '../../../components/Pagination';
 import { useContractsContext } from '../../../contexts/ContractsContext';
+import { prettyNumber } from '../../../utils/prettifiers';
 
 // import { modalActions } from '../../../redux/actions';
 import s from './Table.module.scss';
@@ -33,8 +34,10 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
 
   const getInfo = async () => {
     try {
+      const lessReward = await ContractStaking.getLessRewardOnStake({ stakeId });
+      const lpReward = await ContractStaking.getLpRewardOnStake({ stakeId });
       const newInfo = await ContractStaking.stakes({ stakeId });
-      if (newInfo) setInfo(newInfo);
+      if (newInfo) setInfo({ ...newInfo, ...{ lessReward }, ...{ lpReward } });
       console.log('TableRow getInfo:', newInfo);
     } catch (e) {
       console.error('TableRow getInfo:', e);
@@ -62,13 +65,13 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
   if (!stakeId) return null; // todo
   if (!info) return null; // todo
 
-  const { stakedLess, stakedLp, startTime } = info;
+  const { stakedLess, stakedLp, startTime, lessReward, lpReward } = info;
 
   return (
     <div className={`${s.row} ${index % 2 === 1 && s.filled}`}>
       <div className={s.row_cell}>
         {isMobile && <div className={s.row_header}>#</div>}
-        {index || '0.000'}
+        {index || '0'}
       </div>
       <div className={s.row_cell}>
         {isMobile && <div className={s.row_header}>Staked</div>}
@@ -76,13 +79,21 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
       </div>
       <div className={s.row_cell}>
         {isMobile && <div className={s.row_header}>Staked $LESS</div>}
-        {stakedLess || '0.000'}
+        {prettyNumber(stakedLess) || '0'}
       </div>
       <div className={s.row_cell}>
-        {isMobile && <div className={s.row_header}>Staked $LESS LP</div>}
-        {stakedLp || '0.000'}
+        {isMobile && <div className={s.row_header}>Staked ETH-LESS LP</div>}
+        {prettyNumber(stakedLp) || '0'}
       </div>
       <div className={s.row_cell}>
+        {isMobile && <div className={s.row_header}>Reward $LESS</div>}
+        {prettyNumber(lessReward) || '0'}
+      </div>
+      <div className={s.row_cell}>
+        {isMobile && <div className={s.row_header}>Reward ETH-LESS LP</div>}
+        {prettyNumber(lpReward) || '0'}
+      </div>
+      <div className={`${s.row_cell} ${isMobile && s.row_cell_allCells}`}>
         <div role="button" tabIndex={0} onKeyDown={() => {}} onClick={unstake} className={s.button}>
           Claim Rewards and Unstake
         </div>
@@ -148,6 +159,8 @@ const Table: React.FC<ITableProps> = (props) => {
             <div className={s.cell}>Staked</div>
             <div className={s.cell}>Staked $LESS</div>
             <div className={s.cell}>Staked ETH-LESS LP</div>
+            <div className={s.cell}>Reward $LESS</div>
+            <div className={s.cell}>Reward ETH-LESS LP</div>
           </div>
         )}
         <div className={s.table_body}>

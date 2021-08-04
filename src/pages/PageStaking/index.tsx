@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useDispatch, useSelector } from 'react-redux';
-import Web3 from 'web3';
+import { BigNumber as BN } from 'bignumber.js/bignumber';
 
 import maxImg from '../../assets/img/icons/max.svg';
 import Button from '../../components/Button/index';
@@ -11,12 +11,11 @@ import { useContractsContext } from '../../contexts/ContractsContext';
 import useDebounce from '../../hooks/useDebounce';
 import { modalActions } from '../../redux/actions';
 import { convertFromWei, convertToWei } from '../../utils/ethereum';
+import { prettyNumber } from '../../utils/prettifiers';
 
 import Table from './Table';
 
 import s from './Staking.module.scss';
-
-const { BN }: any = Web3.utils;
 
 const tiers = [
   {
@@ -49,8 +48,8 @@ const StakingPage: React.FC = () => {
 
   const [balanceLessToken, setBalanceLessToken] = useState<string>('0');
   const [balanceLPToken, setBalanceLPToken] = useState<string>('0');
-  const [stakedLess, setStakedLess] = useState<string>('0.000');
-  const [stakedLP, setStakedLP] = useState<string>('0.000');
+  const [stakedLess, setStakedLess] = useState<string | null>('0.000');
+  const [stakedLP, setStakedLP] = useState<string | null>('0.000');
   const [userStakeIds, setUserStakeIds] = useState<string[]>([]);
 
   const [stakeLessValue, setStakeLessValue] = useState<string>('');
@@ -64,8 +63,8 @@ const StakingPage: React.FC = () => {
   // const [unstakeLessValue, setUnstakeLessValue] = useState<string>('');
   // const [unstakeLPValue, setUnstakeLPValue] = useState<string>('');
 
-  const [lessRewards, setLessRewards] = useState<string>('0.000');
-  const [lpRewards, setLpRewards] = useState<string>('0.000');
+  const [lessRewards, setLessRewards] = useState<string | null>('0.000');
+  const [lpRewards, setLpRewards] = useState<string | null>('0.000');
   // const [rewardLessValue, setRewardLessValue] = useState<string>('');
   // const [rewardLPValue, setRewardLPValue] = useState<string>('');
 
@@ -126,7 +125,7 @@ const StakingPage: React.FC = () => {
       let newTier = '';
       for (let i = 0; i < tiers.length; i += 1) {
         const item = tiers[i];
-        if (balanceInEther > item.minStake) {
+        if (+balanceInEther >= item.minStake) {
           newTier = item.tier;
         }
       }
@@ -140,9 +139,8 @@ const StakingPage: React.FC = () => {
   const getLessTokenBalance = async () => {
     try {
       const result = await ContractLessToken.balanceOf({ userAddress });
-      const resultInEth = convertFromWei(result, lessDecimals);
-      setBalanceLessToken(resultInEth);
-      console.log('StakingPage getLessTokenBalance:', resultInEth);
+      setBalanceLessToken(result);
+      console.log('StakingPage getLessTokenBalance:', result);
     } catch (e) {
       console.error(e);
     }
@@ -151,9 +149,8 @@ const StakingPage: React.FC = () => {
   const getLPTokenBalance = async () => {
     try {
       const result = await ContractLPToken.balanceOf({ userAddress });
-      const resultInEth = convertFromWei(result, lpDecimals);
-      setBalanceLPToken(resultInEth);
-      console.log('StakingPage getLPTokenBalance:', resultInEth);
+      setBalanceLPToken(result);
+      console.log('StakingPage getLPTokenBalance:', result);
     } catch (e) {
       console.error(e);
     }
@@ -360,6 +357,8 @@ const StakingPage: React.FC = () => {
         lpAmount: stakeLpValueInWei,
       });
       if (result) {
+        setStakeLessValue('');
+        setStakeLPValue('');
         getLessTokenBalance();
         getLPTokenBalance();
         getTier();
@@ -487,7 +486,7 @@ const StakingPage: React.FC = () => {
                   Your <span>$LESS</span> Balance
                 </div>
                 <div className={s.balance_bnb}>
-                  <span>{Number(balanceLessToken).toFixed(3)}</span> $LESS
+                  <span>{prettyNumber(balanceLessToken)}</span> $LESS
                 </div>
                 <div className={s.balance_subtitle}>Available to stake:</div>
                 <div className={s.balance_amount}>
@@ -522,7 +521,7 @@ const StakingPage: React.FC = () => {
                   Your <span>ETH-LESS LP</span> Balance
                 </div>
                 <div className={s.balance_bnb}>
-                  <span>{Number(balanceLPToken).toFixed(3)}</span> ETH-LESS LP
+                  <span>{prettyNumber(balanceLPToken)}</span> ETH-LESS LP
                 </div>
                 <div className={s.balance_subtitle}>Available to stake:</div>
                 <div className={s.balance_amount}>

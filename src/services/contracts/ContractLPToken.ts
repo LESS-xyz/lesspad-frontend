@@ -59,8 +59,10 @@ export default class ContractLPToken {
 
   public balanceOf = async ({ userAddress }: TypeStakeProps): Promise<any> => {
     try {
-      const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
-      return await contract.methods.balanceOf(userAddress).call();
+      const result = await this.contract.methods.balanceOf(userAddress).call();
+      const decimals = await this.decimals();
+      const resultInEth = convertFromWei(result, decimals);
+      return resultInEth;
     } catch (e) {
       console.error('ContractLPToken balanceOf:', e);
       return null;

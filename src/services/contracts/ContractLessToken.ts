@@ -60,8 +60,12 @@ export default class ContractLessToken {
   public balanceOf = async ({ userAddress }: TypeStakeProps): Promise<any> => {
     try {
       // console.log('ContractPresalePublicService getInfo:', this.contractAbi, this.contractAddress)
-      const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
-      return await contract.methods.balanceOf(userAddress).call();
+      const result = await this.contract.methods.balanceOf(userAddress).call();
+      const decimals = await this.decimals();
+      console.log('ContractLessToken balanceOf:', result);
+      const resultInEth = convertFromWei(result, decimals);
+      console.log('ContractLessToken balanceOf:', resultInEth);
+      return resultInEth;
     } catch (e) {
       console.error('ContractLessToken balanceOf:', e);
       return null;

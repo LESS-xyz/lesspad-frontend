@@ -17,7 +17,7 @@
 
 .table_header {
   display: grid;
-  grid-template-columns: 0.65fr 1fr 1fr 1fr 2fr;
+  grid-template-columns: 0.2fr 1.5fr 1fr 1fr 1fr 1fr 260px;
   grid-column-gap: 25px;
   padding: 10px 20px 20px 20px;
 }
@@ -32,7 +32,7 @@
 }
 
 .row {
-  @include grid(0.65fr 1fr 1fr 1fr 2fr, 1fr, 25px);
+  @include grid(0.2fr 1.5fr 1fr 1fr 1fr 1fr 260px, 1fr, 25px);
   border-radius: 10px;
   padding: 10px 20px;
 
@@ -44,6 +44,10 @@
   &.filled {
     background-color: var(--table-row-filled-background);
   }
+}
+
+.row_cell_allCells {
+  grid-column: 1/3;
 }
 
 .row_cell {
@@ -156,4 +160,5 @@
   display: inline-block;
   cursor: pointer;
   background: var(--gradient);
+  max-width: 270px;
 }

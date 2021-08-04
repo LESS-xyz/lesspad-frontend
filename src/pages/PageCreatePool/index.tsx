@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useDispatch, useSelector } from 'react-redux';
+import { BigNumber as BN } from 'bignumber.js/bignumber';
 import dayjs from 'dayjs';
-import Web3 from 'web3';
 
 import calendarImg from '../../assets/img/icons/calendar.svg';
 import Calendar from '../../components/Calendar/index';
@@ -17,7 +17,6 @@ import { BackendService } from '../../services/Backend';
 import s from './CreatePool.module.scss';
 
 const Backend = new BackendService();
-const { BN }: any = Web3.utils;
 
 const CreatePoolPage: React.FC = () => {
   const { web3 } = useWeb3ConnectorContext();
@@ -35,8 +34,8 @@ const CreatePoolPage: React.FC = () => {
   const defaultCloseTime = defaultOpenTime + 1000 * 60 * 60 * 24;
   const defaultLiquidityAllocationTime = defaultCloseTime + 1000 * 60 * 60 * 24;
 
-  const [lessDecimals, setLessDecimals] = useState();
-  const [lpDecimals, setLpDecimals] = useState();
+  const [lessDecimals, setLessDecimals] = useState<number>(0);
+  const [lpDecimals, setLpDecimals] = useState<number>(0);
 
   const [saleTitle, setSaleTitle] = useState<string>('Title');
   const [description, setDescription] = useState<string>('');

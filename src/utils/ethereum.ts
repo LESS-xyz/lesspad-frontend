@@ -1,12 +1,10 @@
-import web3 from 'web3';
-
-const { BN }: any = web3.utils;
+import { BigNumber as BN } from 'bignumber.js/bignumber';
 
 export const convertFromWei = (amount: string | number, decimals: string | number) => {
   try {
-    const tenBN = web3.utils.toBN(10);
-    const decimalsBN = web3.utils.toBN(decimals);
-    const result = new BN(amount).div(tenBN.pow(decimalsBN)).toString(10);
+    const tenBN = new BN(10);
+    const decimalsBN = new BN(decimals);
+    const result = new BN(amount).div(tenBN.pow(decimalsBN)).toFixed(3);
     return result;
   } catch (e) {
     console.error(e);
@@ -16,9 +14,9 @@ export const convertFromWei = (amount: string | number, decimals: string | numbe
 
 export const convertToWei = (amount: string | number, decimals: string | number) => {
   try {
-    const tenBN = web3.utils.toBN(10);
-    const decimalsBN = web3.utils.toBN(decimals);
-    const result = new BN(amount).mul(tenBN.pow(decimalsBN)).toString(10);
+    const tenBN = new BN(10);
+    const decimalsBN = new BN(decimals);
+    const result = new BN(amount).multipliedBy(tenBN.pow(decimalsBN)).toFixed(3);
     return result;
   } catch (e) {
     console.error(e);

@@ -1,9 +1,8 @@
+import { BigNumber as BN } from 'bignumber.js/bignumber';
 import Web3 from 'web3';
 
 import config from '../../config';
 import ERC20Abi from '../../data/abi/ERC20Abi';
-
-const { BN }: any = Web3.utils;
 
 type TypeConstructorProps = {
   web3Provider: any;

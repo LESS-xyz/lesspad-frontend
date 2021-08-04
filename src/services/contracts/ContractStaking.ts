@@ -1,3 +1,4 @@
+import { BigNumber as BN } from 'bignumber.js/bignumber';
 import Web3 from 'web3';
 
 import config from '../../config';
@@ -5,8 +6,6 @@ import { convertFromWei } from '../../utils/ethereum';
 
 import ContractLessTokenService from './ContractLessToken';
 import ContractLpTokenService from './ContractLPToken';
-
-const { BN }: any = Web3.utils;
 
 type TypeConstructorProps = {
   web3Provider: any;
@@ -19,6 +18,10 @@ type TypeGetStakedBalanceProps = {
 };
 
 type TypeStakesProps = {
+  stakeId: string;
+};
+
+type TypeGetLessRewardsOnStakeProps = {
   stakeId: string;
 };
 
@@ -177,7 +180,10 @@ export default class ContractStakingService {
       const totalLessRewardsBN = new BN(totalLessRewards);
       const allLess = await contract.methods.allLess().call();
       const allLessBN = new BN(allLess);
-      const result = new BN(stakedLess).mul(totalLessRewardsBN).div(allLessBN).toString(10);
+      const result = new BN(stakedLess)
+        .multipliedBy(totalLessRewardsBN)
+        .div(allLessBN)
+        .toString(10);
       return result;
     } catch (e) {
       console.error('ContractStakingService getLessRewards:', e);
@@ -194,10 +200,38 @@ export default class ContractStakingService {
       const totalLpRewardsBN = new BN(totalLpRewards);
       const allLp = await contract.methods.allLp().call();
       const allLpBN = new BN(allLp);
-      const result = new BN(stakedLp).mul(totalLpRewardsBN).div(allLpBN).toString(10);
+      const result = new BN(stakedLp).multipliedBy(totalLpRewardsBN).div(allLpBN).toString(10);
       return result;
     } catch (e) {
       console.error('ContractStakingService getLpRewards:', e);
+      return null;
+    }
+  };
+
+  public getLessRewardOnStake = async (props: TypeGetLessRewardsOnStakeProps): Promise<any> => {
+    try {
+      const { stakeId } = props;
+      const rewards = await this.contract.methods.getLessRewradsAmount(stakeId).call();
+      const decimals = await this.ContractLessToken.decimals();
+      const pow = new BN(10).pow(new BN(decimals));
+      const result = new BN(rewards).div(pow).toString(10);
+      return result;
+    } catch (e) {
+      console.error('ContractStakingService getLessRewardOnStake:', e);
+      return null;
+    }
+  };
+
+  public getLpRewardOnStake = async (props: TypeGetLessRewardsOnStakeProps): Promise<any> => {
+    try {
+      const { stakeId } = props;
+      const rewards = await this.contract.methods.getLpRewradsAmount(stakeId).call();
+      const decimals = await this.ContractLpToken.decimals();
+      const pow = new BN(10).pow(new BN(decimals));
+      const result = new BN(rewards).div(pow).toString(10);
+      return result;
+    } catch (e) {
+      console.error('ContractStakingService getLpRewardOnStake:', e);
       return null;
     }
   };

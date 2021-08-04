@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
+import { BigNumber as BN } from 'bignumber.js/bignumber';
 import dayjs from 'dayjs';
-import Web3 from 'web3';
 
 import bnbLogo from '../../../assets/img/icons/bnb-logo.svg';
 import ethLogo from '../../../assets/img/icons/eth-logo.svg';
@@ -27,7 +27,6 @@ import './index.scss';
 
 const { chainSymbols, explorers }: any = config;
 const Backend = new BackendService();
-const { BN }: any = Web3.utils;
 
 const chainsInfo: any = [
   { key: 'Ethereum', title: 'Ethereum', symbol: 'ETH', logo: ethLogo },
@@ -53,7 +52,7 @@ const Pool: React.FC = () => {
 
   // const [lessDecimals, setLessDecimals] = useState<number>();
   // const [lpDecimals, setLpDecimals] = useState<number>();
-  const [tokenDecimals, setTokenDecimals] = useState<number>();
+  const [tokenDecimals, setTokenDecimals] = useState<number>(0);
 
   const [investments, setInvestments] = useState<any>({ amountEth: 0, amountTokens: 0 });
   const [amountToInvest, setAmountToInvest] = useState<string>('');
@@ -205,7 +204,9 @@ const Pool: React.FC = () => {
         poolPercentages,
         stakingTiers,
       } = resultGetPoolSignature.data;
-      const tokenAmount = new BN(amount).mul(new BN(10).pow(new BN(tokenDecimals))).toString(10);
+      const tokenAmount = new BN(amount)
+        .multipliedBy(new BN(10).pow(new BN(tokenDecimals)))
+        .toString(10);
       const stakedAmount = new BN(`${totalStakedAmount}`).toString(10);
       const resultVote = await ContractPresalePublicWithMetamask.invest({
         userAddress,
