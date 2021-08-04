@@ -76,6 +76,16 @@ export default class ContractStakingService {
     this.ContractLpToken = new ContractLpTokenService({ web3Provider, chainType });
   }
 
+  public getMinStakeTime = async (): Promise<any> => {
+    try {
+      const result = await this.contract.methods.getMinStakeTime().call();
+      return +result * 1000;
+    } catch (e) {
+      console.error('ContractStakingService getMinStakeTime:', e);
+      return null;
+    }
+  };
+
   // get balance of staked Less
   public getLessBalanceByAddress = async (props: TypeGetStakedBalanceProps): Promise<any> => {
     try {

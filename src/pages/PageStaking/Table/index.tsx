@@ -11,6 +11,7 @@ import s from './Table.module.scss';
 
 interface ITableRow {
   stakeId?: string;
+  minStakeTime?: number;
 }
 
 interface ITableRowProps extends ITableRow {
@@ -18,7 +19,7 @@ interface ITableRowProps extends ITableRow {
 }
 
 const TableRow: React.FC<ITableRowProps> = (props) => {
-  const { stakeId, index } = props;
+  const { stakeId, index, minStakeTime } = props;
   const { ContractStaking } = useContractsContext();
 
   const [info, setInfo] = useState<any>();
@@ -66,6 +67,7 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
   if (!info) return null; // todo
 
   const { stakedLess, stakedLp, startTime, lessReward, lpReward } = info;
+  const minStakeTimestamp = startTime + minStakeTime;
 
   return (
     <div className={`${s.row} ${index % 2 === 1 && s.filled}`}>
@@ -93,6 +95,10 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
         {isMobile && <div className={s.row_header}>Reward ETH-LESS LP</div>}
         {prettyNumber(lpReward) || '0'}
       </div>
+      <div className={s.row_cell}>
+        {isMobile && <div className={s.row_header}>Min stake time</div>}
+        {dayjs(minStakeTimestamp).fromNow()}
+      </div>
       <div className={`${s.row_cell} ${isMobile && s.row_cell_allCells}`}>
         <div role="button" tabIndex={0} onKeyDown={() => {}} onClick={unstake} className={s.button}>
           Claim Rewards and Unstake
@@ -109,9 +115,12 @@ interface ITableProps {
 const Table: React.FC<ITableProps> = (props) => {
   let { data = [] } = props;
   if (!data) data = [];
+  const { ContractStaking } = useContractsContext();
 
   const [page, setPage] = useState<number>(0);
   const [dataFiltered, setDataFiltrered] = useState<any[]>(data);
+
+  const [minStakeTime, setMinStakeTime] = useState<number>(0);
 
   const itemsOnPage = 12;
   let countOfPages = +(data.length / itemsOnPage).toFixed();
@@ -119,6 +128,15 @@ const Table: React.FC<ITableProps> = (props) => {
   if (moduloOfPages > 0) countOfPages += 1;
 
   const isMobile = useMedia({ maxWidth: 768 });
+
+  const getMinStakeTime = async () => {
+    try {
+      const result = await ContractStaking.getMinStakeTime();
+      setMinStakeTime(result);
+    } catch (e) {
+      console.error('StakingPage getMinStakeTime:', e);
+    }
+  };
 
   const handleChangePage = (p: number) => {
     setPage(p);
@@ -142,6 +160,12 @@ const Table: React.FC<ITableProps> = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, data]);
 
+  useEffect(() => {
+    if (!ContractStaking) return;
+    getMinStakeTime();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ContractStaking]);
+
   if (!data.length)
     return (
       <div className={s.table}>
@@ -161,13 +185,19 @@ const Table: React.FC<ITableProps> = (props) => {
             <div className={s.cell}>Staked ETH-LESS LP</div>
             <div className={s.cell}>Reward $LESS</div>
             <div className={s.cell}>Reward ETH-LESS LP</div>
+            <div className={s.cell}>Min stake time</div>
           </div>
         )}
         <div className={s.table_body}>
           {dataFiltered.map((stakeId, index) => {
             return (
-              // eslint-disable-next-line react/no-array-index-key
-              <TableRow key={JSON.stringify(stakeId) + index} index={index + 1} stakeId={stakeId} />
+              <TableRow
+                // eslint-disable-next-line react/no-array-index-key
+                key={JSON.stringify(stakeId) + index}
+                index={index + 1}
+                stakeId={stakeId}
+                minStakeTime={minStakeTime}
+              />
             );
           })}
         </div>
