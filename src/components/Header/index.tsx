@@ -26,6 +26,7 @@ cryptoLogos.set('Binance-Smart-Chain', bnbLogo);
 cryptoLogos.set('Matic', maticLogo);
 
 const Header: React.FC = () => {
+  const isMinWidth370 = useMedia({ minWidth: 370 });
   const isDesktop = useMedia({ minWidth: 1024 });
 
   const [isPopUpOpen, setIsPopUpOpen] = useState<boolean>(false);
@@ -225,15 +226,17 @@ const Header: React.FC = () => {
           </div>
           <div className={s.right}>
             <div className={s.buttons}>
-              {!userAddress ? (
-                <Button filled marginRight={isDesktop ? 20 : 0} onClick={handleConnectWallet}>
-                  Connect Wallet
-                </Button>
-              ) : (
-                <Button filled marginRight={isDesktop ? 20 : 0} onClick={handleDisconnect}>
-                  {`${userAddress.slice(0, 10)}...`}
-                </Button>
-              )}
+              {isMinWidth370 ? (
+                !userAddress ? (
+                  <Button filled marginRight={isDesktop ? 20 : 0} onClick={handleConnectWallet}>
+                    Connect Wallet
+                  </Button>
+                ) : (
+                  <Button filled marginRight={isDesktop ? 20 : 0} onClick={handleDisconnect}>
+                    {`${userAddress?.slice(0, 10)}...`}
+                  </Button>
+                )
+              ) : null}
               {isDesktop && <Button to="/create-pool">Create Pool</Button>}
               {isDesktop && (
                 <Button marginRight={0} onClick={() => setIsPopUpOpen(true)}>
