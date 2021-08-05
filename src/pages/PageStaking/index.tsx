@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useDispatch, useSelector } from 'react-redux';
-import { BigNumber as BN } from 'bignumber.js/bignumber';
 
+// import { BigNumber as BN } from 'bignumber.js/bignumber';
 import maxImg from '../../assets/img/icons/max.svg';
 import Button from '../../components/Button/index';
 import YourTier from '../../components/YourTier/index';
@@ -17,28 +17,28 @@ import Table from './Table';
 
 import s from './Staking.module.scss';
 
-const tiers = [
-  {
-    tier: 'pawn',
-    minStake: 1000,
-  },
-  {
-    tier: 'bishop',
-    minStake: 5000,
-  },
-  {
-    tier: 'rook',
-    minStake: 20000,
-  },
-  {
-    tier: 'queen',
-    minStake: 50000,
-  },
-  {
-    tier: 'king',
-    minStake: 200000,
-  },
-];
+// const tiers = [
+//   {
+//     tier: 'pawn',
+//     minStake: 1000,
+//   },
+//   {
+//     tier: 'bishop',
+//     minStake: 5000,
+//   },
+//   {
+//     tier: 'rook',
+//     minStake: 20000,
+//   },
+//   {
+//     tier: 'queen',
+//     minStake: 50000,
+//   },
+//   {
+//     tier: 'king',
+//     minStake: 200000,
+//   },
+// ];
 
 const StakingPage: React.FC = () => {
   const { ContractStaking, ContractLessToken, ContractLPToken } = useContractsContext();
@@ -117,20 +117,8 @@ const StakingPage: React.FC = () => {
 
   const getTier = async () => {
     try {
-      const stakedInfo = await ContractStaking.getStakedInfo({ userAddress });
-      const { stakedBalance } = stakedInfo;
-      const balanceInEther = new BN(stakedBalance)
-        .div(new BN(10).pow(new BN(lessDecimals)))
-        .toString(10);
-      let newTier = '';
-      for (let i = 0; i < tiers.length; i += 1) {
-        const item = tiers[i];
-        if (+balanceInEther >= item.minStake) {
-          newTier = item.tier;
-        }
-      }
-      console.log('StakingPage getTier:', newTier);
-      setTier(newTier);
+      const userTier = await ContractStaking.getUserTier({ userAddress });
+      setTier(userTier);
     } catch (e) {
       console.error(e);
     }
