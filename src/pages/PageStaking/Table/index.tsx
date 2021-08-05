@@ -85,7 +85,7 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
       </div>
       <div className={s.row_cell}>
         {isMobile && <div className={s.row_header}>Staked</div>}
-        {stakeDays}
+        {stakeDays} {stakeDays === 1 ? 'day' : 'days'} ago
       </div>
       <div className={s.row_cell}>
         {isMobile && <div className={s.row_header}>Staked $LESS</div>}
@@ -105,7 +105,9 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
       </div>
       <div className={s.row_cell}>
         {isMobile && <div className={s.row_header}>Min stake time ({minStakeTime} days)</div>}
-        {isMinStakeTimePassed ? 'Passed' : minDaysToStake}
+        {isMinStakeTimePassed
+          ? 'Passed'
+          : `${minDaysToStake} ${minDaysToStake === 1 ? 'day' : 'days'}`}
       </div>
       <div className={`${s.row_cell} ${isMobile && s.row_cell_allCells}`}>
         <div role="button" tabIndex={0} onKeyDown={() => {}} onClick={unstake} className={s.button}>
