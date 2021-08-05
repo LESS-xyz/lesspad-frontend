@@ -14,7 +14,7 @@ dayjs.extend(duration);
 
 interface ITableRow {
   stakeId?: string;
-  minStakeTime?: number;
+  minStakeTimeInDays?: number;
 }
 
 interface ITableRowProps extends ITableRow {
@@ -22,7 +22,7 @@ interface ITableRowProps extends ITableRow {
 }
 
 const TableRow: React.FC<ITableRowProps> = (props) => {
-  const { stakeId, index, minStakeTime = 0 } = props;
+  const { stakeId, index, minStakeTimeInDays = 0 } = props;
   const { ContractStaking } = useContractsContext();
 
   const [info, setInfo] = useState<any>();
@@ -74,8 +74,8 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
 
   const { stakedLess, stakedLp, startTime, lessReward, lpReward } = info;
   const stakeDays = currentDay - startTime;
-  const minDaysToStake = minStakeTime - stakeDays - 1; // в последний день награда уже приходит
-  const isMinStakeTimePassed = stakeDays >= minStakeTime;
+  const minDaysToStake = minStakeTimeInDays - stakeDays - 1; // в последний день награда уже приходит
+  const isMinStakeTimePassed = stakeDays >= minStakeTimeInDays;
 
   return (
     <div className={`${s.row} ${index % 2 === 1 && s.filled}`}>
@@ -104,7 +104,7 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
         {prettyNumber(lpReward) || '0'}
       </div>
       <div className={s.row_cell}>
-        {isMobile && <div className={s.row_header}>Min stake time ({minStakeTime} days)</div>}
+        {isMobile && <div className={s.row_header}>Min stake time ({minStakeTimeInDays} days)</div>}
         {isMinStakeTimePassed
           ? 'Passed'
           : `${minDaysToStake} ${minDaysToStake === 1 ? 'day' : 'days'}`}
@@ -131,11 +131,14 @@ const Table: React.FC<ITableProps> = (props) => {
   const [dataFiltered, setDataFiltrered] = useState<any[]>(data);
 
   const [minStakeTime, setMinStakeTime] = useState<number>(0);
+  const [dayDuration, setDayDuration] = useState<number>(0);
 
   const itemsOnPage = 12;
   let countOfPages = +(data.length / itemsOnPage).toFixed();
   const moduloOfPages = data.length % itemsOnPage;
   if (moduloOfPages > 0) countOfPages += 1;
+  // const monthInSecs = 60 * 60 * 24 * 30;
+  const minStakeTimeInDays = minStakeTime / dayDuration;
 
   const isMobile = useMedia({ maxWidth: 768 });
 
@@ -143,6 +146,15 @@ const Table: React.FC<ITableProps> = (props) => {
     try {
       const result = await ContractStaking.getMinStakeTime();
       setMinStakeTime(result);
+    } catch (e) {
+      console.error('StakingPage getMinStakeTime:', e);
+    }
+  };
+
+  const getDayDuration = async () => {
+    try {
+      const result = await ContractStaking.dayDuration();
+      setDayDuration(result);
     } catch (e) {
       console.error('StakingPage getMinStakeTime:', e);
     }
@@ -173,6 +185,7 @@ const Table: React.FC<ITableProps> = (props) => {
   useEffect(() => {
     if (!ContractStaking) return;
     getMinStakeTime();
+    getDayDuration();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ContractStaking]);
 
@@ -197,7 +210,7 @@ const Table: React.FC<ITableProps> = (props) => {
             <div className={s.cell}>Reward ETH-LESS LP</div>
             <div className={s.cell}>
               {/*Min stake time ({dayjs.duration(minStakeTime).asDays().toFixed()}*/}
-              Min stake time ({minStakeTime} days)
+              Min stake time ({minStakeTimeInDays} days)
             </div>
           </div>
         )}
@@ -209,7 +222,7 @@ const Table: React.FC<ITableProps> = (props) => {
                 key={JSON.stringify(stakeId) + index}
                 index={index + 1}
                 stakeId={stakeId}
-                minStakeTime={minStakeTime}
+                minStakeTimeInDays={minStakeTimeInDays}
               />
             );
           })}

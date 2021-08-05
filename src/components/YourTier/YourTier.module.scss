@@ -31,16 +31,12 @@
     text-align: center;
     opacity: 0.5;
     @include b(mobile) {
-      display: grid;
-      grid-template-columns: 5fr 1fr;
-      gap: 20px;
+      @include grid(1fr 70px, 1fr, 17px);
       align-items: center;
       margin-bottom: 20px;
     }
     @include b(extramobile) {
-      display: grid;
-      grid-template-columns: 3fr 1fr;
-      gap: 20px;
+      @include grid(1fr 70px, 1fr, 17px);
     }
 
     &.active {
@@ -87,6 +83,7 @@
       color: var(--grey);
       @include b(mobile) {
         text-align: left;
+        width: 70px;
       }
     }
   }
