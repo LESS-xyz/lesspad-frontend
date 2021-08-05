@@ -284,7 +284,7 @@ export default [
     type: 'function',
   },
   {
-    inputs: [{ internalType: 'uint256', name: '_minTime', type: 'uint256' }],
+    inputs: [{ internalType: 'uint256', name: '_minTimeInDays', type: 'uint256' }],
     name: 'setMinTimeToStake',
     outputs: [],
     stateMutability: 'nonpayable',
