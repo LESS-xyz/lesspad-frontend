@@ -22,10 +22,11 @@ interface ITableRowProps extends ITableRow {
 }
 
 const TableRow: React.FC<ITableRowProps> = (props) => {
-  const { stakeId, index, minStakeTime } = props;
+  const { stakeId, index, minStakeTime = 0 } = props;
   const { ContractStaking } = useContractsContext();
 
   const [info, setInfo] = useState<any>();
+  const [currentDay, setCurrentDay] = useState<number>(0);
 
   // const { address: userAddress } = useSelector(({ user }: any) => user);
 
@@ -41,6 +42,8 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
       const lessReward = await ContractStaking.getLessRewardOnStake({ stakeId });
       const lpReward = await ContractStaking.getLpRewardOnStake({ stakeId });
       const newInfo = await ContractStaking.stakes({ stakeId });
+      const resultCurrentDay = await ContractStaking.currentDay();
+      setCurrentDay(resultCurrentDay);
       if (newInfo) setInfo({ ...newInfo, ...{ lessReward }, ...{ lpReward } });
       console.log('TableRow getInfo:', newInfo);
     } catch (e) {
@@ -70,8 +73,9 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
   if (!info) return null; // todo
 
   const { stakedLess, stakedLp, startTime, lessReward, lpReward } = info;
-  const minStakeTimestamp = startTime + minStakeTime;
-  const isMinStakeTimePassed = minStakeTimestamp <= Date.now();
+  const stakeDays = currentDay - startTime;
+  const minDaysToStake = minStakeTime - stakeDays - 1; // в последний день награда уже приходит
+  const isMinStakeTimePassed = stakeDays >= minStakeTime;
 
   return (
     <div className={`${s.row} ${index % 2 === 1 && s.filled}`}>
@@ -81,7 +85,7 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
       </div>
       <div className={s.row_cell}>
         {isMobile && <div className={s.row_header}>Staked</div>}
-        {dayjs(startTime).fromNow()}
+        {stakeDays}
       </div>
       <div className={s.row_cell}>
         {isMobile && <div className={s.row_header}>Staked $LESS</div>}
@@ -100,8 +104,8 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
         {prettyNumber(lpReward) || '0'}
       </div>
       <div className={s.row_cell}>
-        {isMobile && <div className={s.row_header}>Min stake time</div>}
-        {isMinStakeTimePassed ? 'Passed' : dayjs(minStakeTimestamp).fromNow()}
+        {isMobile && <div className={s.row_header}>Min stake time ({minStakeTime} days)</div>}
+        {isMinStakeTimePassed ? 'Passed' : minDaysToStake}
       </div>
       <div className={`${s.row_cell} ${isMobile && s.row_cell_allCells}`}>
         <div role="button" tabIndex={0} onKeyDown={() => {}} onClick={unstake} className={s.button}>
@@ -190,8 +194,8 @@ const Table: React.FC<ITableProps> = (props) => {
             <div className={s.cell}>Reward $LESS</div>
             <div className={s.cell}>Reward ETH-LESS LP</div>
             <div className={s.cell}>
-              Min stake time ({dayjs.duration(minStakeTime).asDays().toFixed()}
-              days)
+              {/*Min stake time ({dayjs.duration(minStakeTime).asDays().toFixed()}*/}
+              Min stake time ({minStakeTime} days)
             </div>
           </div>
         )}

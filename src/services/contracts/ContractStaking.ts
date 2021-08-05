@@ -76,10 +76,20 @@ export default class ContractStakingService {
     this.ContractLpToken = new ContractLpTokenService({ web3Provider, chainType });
   }
 
+  public currentDay = async (): Promise<any> => {
+    try {
+      const result = await this.contract.methods.currentDay().call();
+      return +result;
+    } catch (e) {
+      console.error('ContractStakingService currentDay:', e);
+      return null;
+    }
+  };
+
   public getMinStakeTime = async (): Promise<any> => {
     try {
       const result = await this.contract.methods.minStakeTime().call();
-      return +result * 1000;
+      return +result;
     } catch (e) {
       console.error('ContractStakingService getMinStakeTime:', e);
       return null;
@@ -174,9 +184,9 @@ export default class ContractStakingService {
       const stakedLessInEth = convertFromWei(stakedLess, decimalsLess);
       const decimalsLp = await this.ContractLpToken.decimals();
       const stakedLpInEth = convertFromWei(stakedLp, decimalsLp);
-      const startTimeInMs = startTime * 1000;
+      const startTimeInDays = startTime;
       // result
-      return { stakedLess: stakedLessInEth, stakedLp: stakedLpInEth, startTime: startTimeInMs };
+      return { stakedLess: stakedLessInEth, stakedLp: stakedLpInEth, startTime: startTimeInDays };
     } catch (e) {
       console.error('ContractStakingService stakes:', e);
       return null;
