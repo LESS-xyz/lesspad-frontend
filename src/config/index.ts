@@ -118,7 +118,7 @@ export default {
       'Ethereum': {
         LessToken: '0x87feef975fd65f32A0836f910Fd13d9Cf4553690',
         LPToken: '0x4fe142c6CBD294ef96DbBa8a837CdE3035850A97',
-        Staking: '0x7Df33Ed90d6278b8cfc0DA2392dD19a5481C32c8',
+        Staking: '0x34b7D74dC886c065E16448E8A8948Cb29C107778',
         LessLibrary: '0x8A60F3FA37f9e3BA08909ace4edfea0c7D183587',
         PresaleFactory: '0x73D55c3720De899814B28d2cfd8b14077665dEE6',
         PresaleFactoryCertified: '0x73D55c3720De899814B28d2cfd8b14077665dEE6',

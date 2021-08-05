@@ -1,9 +1,10 @@
 export default [
   {
     inputs: [
-      { internalType: 'contract ERC20Burnable', name: '_lp', type: 'address' },
-      { internalType: 'contract ERC20Burnable', name: '_less', type: 'address' },
-      { internalType: 'address', name: '_safeLibrary', type: 'address' },
+      { internalType: 'contract ERC20', name: '_lp', type: 'address' },
+      { internalType: 'contract ERC20', name: '_less', type: 'address' },
+      { internalType: 'uint256', name: '_dayDuration', type: 'uint256' },
+      { internalType: 'uint256', name: '_startTime', type: 'uint256' },
     ],
     stateMutability: 'nonpayable',
     type: 'constructor',
@@ -41,6 +42,16 @@ export default [
     type: 'event',
   },
   {
+    inputs: [
+      { internalType: 'uint256', name: 'lpAmount', type: 'uint256' },
+      { internalType: 'uint256', name: 'lessAmount', type: 'uint256' },
+    ],
+    name: 'addRewards',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
     inputs: [],
     name: 'allLess',
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
@@ -50,6 +61,27 @@ export default [
   {
     inputs: [],
     name: 'allLp',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'contractStart',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'currentDay',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'dayDuration',
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
@@ -104,10 +136,22 @@ export default [
     type: 'function',
   },
   {
-    inputs: [{ internalType: 'address', name: '_sender', type: 'address' }],
-    name: 'getStakedInfo',
+    inputs: [{ internalType: 'uint256', name: 'day', type: 'uint256' }],
+    name: 'getRewardDeposits',
     outputs: [
       { internalType: 'uint256', name: '', type: 'uint256' },
+      { internalType: 'uint256', name: '', type: 'uint256' },
+      { internalType: 'uint256', name: '', type: 'uint256' },
+      { internalType: 'uint256', name: '', type: 'uint256' },
+      { internalType: 'uint256[]', name: '', type: 'uint256[]' },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'getTodayPenalty',
+    outputs: [
       { internalType: 'uint256', name: '', type: 'uint256' },
       { internalType: 'uint256', name: '', type: 'uint256' },
     ],
@@ -129,13 +173,6 @@ export default [
     type: 'function',
   },
   {
-    inputs: [{ internalType: 'uint256', name: 'id', type: 'uint256' }],
-    name: 'isMinTimePassed',
-    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
     inputs: [],
     name: 'lessPerLp',
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
@@ -145,14 +182,14 @@ export default [
   {
     inputs: [],
     name: 'lessToken',
-    outputs: [{ internalType: 'contract ERC20Burnable', name: '', type: 'address' }],
+    outputs: [{ internalType: 'contract ERC20', name: '', type: 'address' }],
     stateMutability: 'view',
     type: 'function',
   },
   {
     inputs: [],
     name: 'lpToken',
-    outputs: [{ internalType: 'contract ERC20Burnable', name: '', type: 'address' }],
+    outputs: [{ internalType: 'contract ERC20', name: '', type: 'address' }],
     stateMutability: 'view',
     type: 'function',
   },
@@ -167,6 +204,13 @@ export default [
     inputs: [],
     name: 'owner',
     outputs: [{ internalType: 'address', name: '', type: 'address' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'participants',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
   },
@@ -199,10 +243,23 @@ export default [
     type: 'function',
   },
   {
-    inputs: [],
-    name: 'safeLibrary',
-    outputs: [{ internalType: 'contract LessLibrary', name: '', type: 'address' }],
+    inputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    name: 'rewardDeposits',
+    outputs: [
+      { internalType: 'uint256', name: 'day', type: 'uint256' },
+      { internalType: 'uint256', name: 'lpShares', type: 'uint256' },
+      { internalType: 'uint256', name: 'lessShares', type: 'uint256' },
+      { internalType: 'uint256', name: 'lpReward', type: 'uint256' },
+      { internalType: 'uint256', name: 'lessReward', type: 'uint256' },
+    ],
     stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'uint256', name: '_timeInSec', type: 'uint256' }],
+    name: 'setDayDuration',
+    outputs: [],
+    stateMutability: 'nonpayable',
     type: 'function',
   },
   {
@@ -215,13 +272,6 @@ export default [
   {
     inputs: [{ internalType: 'uint256', name: 'amount', type: 'uint256' }],
     name: 'setLessInLP',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [{ internalType: 'address', name: '_newInfo', type: 'address' }],
-    name: 'setLibraryAddress',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
