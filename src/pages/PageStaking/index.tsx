@@ -593,7 +593,7 @@ const StakingPage: React.FC = () => {
                 <span>Already staked $LESS</span>
               </div>
               <div className={s.small_balance_subtitle}>
-                <span>{stakedLess} $LESS</span>
+                <span>{prettyNumber(stakedLess || '0')} $LESS</span>
               </div>
               {/*<div className={s.balance_amount}>*/}
               {/*  <div className={s.balance_amount__inner}>*/}
@@ -622,7 +622,7 @@ const StakingPage: React.FC = () => {
                 <span>Already staked ETH-LESS LP</span>
               </div>
               <div className={s.small_balance_subtitle}>
-                <span>{stakedLP} ETH-LESS LP</span>
+                <span>{prettyNumber(stakedLP || '0')} ETH-LESS LP</span>
               </div>
               {/*<div className={s.balance_amount}>*/}
               {/*  <div className={s.balance_amount__inner}>*/}
