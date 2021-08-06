@@ -70,6 +70,10 @@ const StakingPage: React.FC = () => {
 
   const [tier, setTier] = useState<string>('');
 
+  const [isStakeWaiting, setIsStakeWaiting] = useState<boolean>(false);
+  const [isApproveLessWaiting, setIsApproveLessWaiting] = useState<boolean>(false);
+  const [isApproveLpWaiting, setIsApproveLpWaiting] = useState<boolean>(false);
+
   const { chainType } = useSelector(({ wallet }: any) => wallet);
   const { address: userAddress } = useSelector(({ user }: any) => user);
 
@@ -249,6 +253,7 @@ const StakingPage: React.FC = () => {
     try {
       if (!checkLessBalance()) return;
       const stakeLessValueInWei = convertToWei(debouncedStakeLessValue || 0, lessDecimals);
+      setIsApproveLessWaiting(true);
       const resultApprove = await ContractLessToken.approve({
         userAddress,
         spender: stakingContractAddress,
@@ -256,7 +261,9 @@ const StakingPage: React.FC = () => {
       });
       console.log('StakingPage approveLess:', resultApprove);
       await getAllowances();
+      setIsApproveLessWaiting(false);
     } catch (e) {
+      setIsApproveLessWaiting(false);
       console.error(e);
     }
   };
@@ -265,6 +272,7 @@ const StakingPage: React.FC = () => {
     try {
       if (!checkLpBalance()) return;
       const stakeLpValueInWei = convertToWei(debouncedStakeLpValue || 0, lpDecimals);
+      setIsApproveLpWaiting(true);
       const resultApprove = await ContractLPToken.approve({
         userAddress,
         spender: stakingContractAddress,
@@ -272,7 +280,9 @@ const StakingPage: React.FC = () => {
       });
       console.log('StakingPage approveLp:', resultApprove);
       await getAllowances();
+      setIsApproveLpWaiting(false);
     } catch (e) {
+      setIsApproveLpWaiting(false);
       console.error(e);
     }
   };
@@ -337,12 +347,14 @@ const StakingPage: React.FC = () => {
       if (!checkAllowancesAndFields()) return;
       const stakeLessValueInWei = convertToWei(debouncedStakeLessValue || 0, lessDecimals);
       const stakeLpValueInWei = convertToWei(debouncedStakeLpValue || 0, lpDecimals);
+      setIsStakeWaiting(true);
       const result = await ContractStaking.stake({
         userAddress,
         lessAmount: stakeLessValueInWei,
         lpAmount: stakeLpValueInWei,
       });
       if (result) {
+        setIsStakeWaiting(false);
         setStakeLessValue('');
         setStakeLPValue('');
         getLessTokenBalance();
@@ -352,6 +364,7 @@ const StakingPage: React.FC = () => {
       }
       console.log('StakingPage stake:', result);
     } catch (e) {
+      setIsStakeWaiting(false);
       console.error('StakingPage stake:', e);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -496,11 +509,17 @@ const StakingPage: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                {debouncedStakeLessValue && !isLessAllowed && (
-                  <Button long onClick={approveLess}>
-                    Approve
-                  </Button>
-                )}
+                {debouncedStakeLessValue && !isLessAllowed ? (
+                  isApproveLessWaiting ? (
+                    <Button long onClick={() => {}}>
+                      Waiting...
+                    </Button>
+                  ) : (
+                    <Button long onClick={approveLess}>
+                      Approve
+                    </Button>
+                  )
+                ) : null}
               </div>
               <div className={s.balance_inner}>
                 <div className={s.balance_title}>
@@ -531,16 +550,28 @@ const StakingPage: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                {debouncedStakeLpValue && !isLpAllowed && (
-                  <Button long onClick={approveLp}>
-                    Approve
-                  </Button>
-                )}
+                {debouncedStakeLpValue && !isLpAllowed ? (
+                  isApproveLpWaiting ? (
+                    <Button long onClick={() => {}}>
+                      Waiting...
+                    </Button>
+                  ) : (
+                    <Button long onClick={approveLp}>
+                      Approve
+                    </Button>
+                  )
+                ) : null}
               </div>
             </div>
-            <Button long onClick={stake}>
-              Stake
-            </Button>
+            {isStakeWaiting ? (
+              <Button long onClick={() => {}}>
+                Waiting...
+              </Button>
+            ) : (
+              <Button long onClick={stake}>
+                Stake
+              </Button>
+            )}
           </div>
         </div>
 
