@@ -209,6 +209,46 @@ const StakingPage: React.FC = () => {
     }
   };
 
+  const checkLessValue = () => {
+    try {
+      if (!isStakeLessValue || +stakeLessValue === 0) {
+        toggleModal({
+          open: true,
+          text: (
+            <div className={s.messageContainer}>
+              <p>Please, enter one of the tokens amounts</p>
+            </div>
+          ),
+        });
+        return false;
+      }
+      return true;
+    } catch (e) {
+      console.error('StakingPage checkValues:', e);
+      return false;
+    }
+  };
+
+  const checkLpValue = () => {
+    try {
+      if (!isStakeLPValue || +stakeLPValue === 0) {
+        toggleModal({
+          open: true,
+          text: (
+            <div className={s.messageContainer}>
+              <p>Please, enter one of the tokens amounts</p>
+            </div>
+          ),
+        });
+        return false;
+      }
+      return true;
+    } catch (e) {
+      console.error('StakingPage checkValues:', e);
+      return false;
+    }
+  };
+
   const checkLessBalance = () => {
     try {
       if (isStakeLessValue && +stakeLessValue > +balanceLessToken) {
@@ -224,7 +264,7 @@ const StakingPage: React.FC = () => {
       }
       return true;
     } catch (e) {
-      console.error('StakingPage stake:', e);
+      console.error('StakingPage checkLessBalance:', e);
       return false;
     }
   };
@@ -244,13 +284,14 @@ const StakingPage: React.FC = () => {
       }
       return true;
     } catch (e) {
-      console.error('StakingPage stake:', e);
+      console.error('StakingPage checkLpBalance:', e);
       return false;
     }
   };
 
   const approveLess = async () => {
     try {
+      if (!checkLessValue()) return;
       if (!checkLessBalance()) return;
       const stakeLessValueInWei = convertToWei(debouncedStakeLessValue || 0, lessDecimals);
       setIsApproveLessWaiting(true);
@@ -270,6 +311,7 @@ const StakingPage: React.FC = () => {
 
   const approveLp = async () => {
     try {
+      if (!checkLpValue()) return;
       if (!checkLpBalance()) return;
       const stakeLpValueInWei = convertToWei(debouncedStakeLpValue || 0, lpDecimals);
       setIsApproveLpWaiting(true);
@@ -342,6 +384,7 @@ const StakingPage: React.FC = () => {
 
   const stake = async () => {
     try {
+      if (!checkLessValue() && !checkLpValue()) return;
       if (isStakeLessValue && !checkLessBalance()) return;
       if (isStakeLPValue && !checkLpBalance()) return;
       if (!checkAllowancesAndFields()) return;
