@@ -421,6 +421,10 @@ const StakingPage: React.FC = () => {
   //   setRewardLPValue(lpRewards);
   // };
 
+  const onUnstake = () => {
+    getUserStakeIds();
+  };
+
   const getAllInfo = () => {
     getTier();
     getLPTokenBalance();
@@ -702,7 +706,7 @@ const StakingPage: React.FC = () => {
             </div>
           </div>
         </div>
-        <Table data={userStakeIds} />
+        <Table data={userStakeIds} onUnstake={onUnstake} />
         {/*<div className={s.button_center}>*/}
         {/*  <div*/}
         {/*    role="button"*/}

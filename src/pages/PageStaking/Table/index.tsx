@@ -12,17 +12,15 @@ import s from './Table.module.scss';
 
 dayjs.extend(duration);
 
-interface ITableRow {
+interface ITableRowProps {
   stakeId?: string;
   minStakeTimeInDays?: number;
-}
-
-interface ITableRowProps extends ITableRow {
   index: number;
+  onUnstake?: () => void;
 }
 
 const TableRow: React.FC<ITableRowProps> = (props) => {
-  const { stakeId, index, minStakeTimeInDays = 0 } = props;
+  const { stakeId, index, minStakeTimeInDays = 0, onUnstake = () => {} } = props;
   const { ContractStaking } = useContractsContext();
 
   const [info, setInfo] = useState<any>();
@@ -57,6 +55,7 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
       setIsUnstakeWaiting(true);
       const resultUnstake = await ContractStaking.unstake({ stakeId });
       setIsUnstakeWaiting(false);
+      onUnstake();
       console.log('TableRow unstake:', resultUnstake);
     } catch (e) {
       setIsUnstakeWaiting(false);
@@ -142,10 +141,12 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
 
 interface ITableProps {
   data: any[];
+  onUnstake?: () => void;
 }
 
 const Table: React.FC<ITableProps> = (props) => {
   let { data = [] } = props;
+  const { onUnstake = () => {} } = props;
   if (!data) data = [];
   const { ContractStaking } = useContractsContext();
 
@@ -245,6 +246,7 @@ const Table: React.FC<ITableProps> = (props) => {
                 index={index + 1}
                 stakeId={stakeId}
                 minStakeTimeInDays={minStakeTimeInDays}
+                onUnstake={onUnstake}
               />
             );
           })}
