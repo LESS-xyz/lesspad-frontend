@@ -4,6 +4,7 @@
 @import '../../styles/mixins/flex.scss';
 @import '../../styles/mixins/media';
 .page {
+  font-family: Celias, sans-serif;
   padding-top: 170px;
   padding-bottom: 60px;
   min-height: 100vh;
@@ -46,6 +47,7 @@
   }
   &_bnb {
     margin-bottom: 60px;
+    font-family: Celias, sans-serif;
     font-size: 16px;
     font-weight: 500;
     span {
@@ -54,6 +56,7 @@
   }
   &_subtitle {
     margin-bottom: 20px;
+    font-family: Celias, sans-serif;
     font-size: 16px;
     font-weight: 500;
   }
