@@ -211,7 +211,7 @@ const StakingPage: React.FC = () => {
 
   const checkLessBalance = () => {
     try {
-      if (isStakeLessValue && +debouncedStakeLessValue > +balanceLessToken) {
+      if (isStakeLessValue && +stakeLessValue > +balanceLessToken) {
         toggleModal({
           open: true,
           text: (
@@ -231,7 +231,7 @@ const StakingPage: React.FC = () => {
 
   const checkLpBalance = () => {
     try {
-      if (isStakeLPValue && +debouncedStakeLpValue > +balanceLPToken) {
+      if (isStakeLPValue && +stakeLPValue > +balanceLPToken) {
         toggleModal({
           open: true,
           text: (
