@@ -397,6 +397,18 @@ const StakingPage: React.FC = () => {
   //   }
   // };
 
+  const handleChangeStakeLessValue = (e) => {
+    const value = e.target.value.replace(/[^\d.,]/g, '').replace(/,/g, '.');
+    console.log('Staking handleChangeStakeLessValue:', value);
+    setStakeLessValue(value);
+  };
+
+  const handleChangeStakeLpValue = (e) => {
+    const value = e.target.value.replace(/[^\d.,]/g, '').replace(/,/g, '.');
+    console.log('Staking handleChangeStakeLpValue:', value);
+    setStakeLPValue(value);
+  };
+
   const handleSetMaxLessStake = () => {
     setStakeLessValue(balanceLessToken);
   };
@@ -499,7 +511,7 @@ const StakingPage: React.FC = () => {
                         type="text"
                         placeholder="0.0"
                         value={stakeLessValue}
-                        onChange={(e) => setStakeLessValue(e.target.value.replace(/[^\d.,]/g, ''))}
+                        onChange={handleChangeStakeLessValue}
                       />
                     </div>
                     <div
@@ -540,7 +552,7 @@ const StakingPage: React.FC = () => {
                         type="text"
                         placeholder="0.0"
                         value={stakeLPValue}
-                        onChange={(e) => setStakeLPValue(e.target.value.replace(/[^\d.,]/g, ''))}
+                        onChange={handleChangeStakeLpValue}
                       />
                     </div>
                     <div
