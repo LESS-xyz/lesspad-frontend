@@ -256,13 +256,6 @@ export default [
     type: 'function',
   },
   {
-    inputs: [{ internalType: 'uint256', name: '_timeInSec', type: 'uint256' }],
-    name: 'setDayDuration',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
     inputs: [{ internalType: 'address', name: '_less', type: 'address' }],
     name: 'setLess',
     outputs: [],
