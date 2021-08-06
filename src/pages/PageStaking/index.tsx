@@ -354,7 +354,6 @@ const StakingPage: React.FC = () => {
         lpAmount: stakeLpValueInWei,
       });
       if (result) {
-        setIsStakeWaiting(false);
         setStakeLessValue('');
         setStakeLPValue('');
         getLessTokenBalance();
@@ -362,6 +361,7 @@ const StakingPage: React.FC = () => {
         getTier();
         getUserStakeIds();
       }
+      setIsStakeWaiting(false);
       console.log('StakingPage stake:', result);
     } catch (e) {
       setIsStakeWaiting(false);

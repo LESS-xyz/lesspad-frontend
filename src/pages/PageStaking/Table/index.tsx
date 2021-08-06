@@ -27,6 +27,7 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
 
   const [info, setInfo] = useState<any>();
   const [currentDay, setCurrentDay] = useState<number>(0);
+  const [isUnstakeWaiting, setIsUnstakeWaiting] = useState<boolean>(false);
 
   // const { address: userAddress } = useSelector(({ user }: any) => user);
 
@@ -53,9 +54,12 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
 
   const unstake = async () => {
     try {
+      setIsUnstakeWaiting(true);
       const resultUnstake = await ContractStaking.unstake({ stakeId });
+      setIsUnstakeWaiting(false);
       console.log('TableRow unstake:', resultUnstake);
     } catch (e) {
+      setIsUnstakeWaiting(false);
       console.error('TableRow vote:', e);
     }
   };
@@ -110,9 +114,27 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
           : `${minDaysToStake} ${minDaysToStake === 1 ? 'day' : 'days'}`}
       </div>
       <div className={`${s.row_cell} ${isMobile && s.row_cell_allCells}`}>
-        <div role="button" tabIndex={0} onKeyDown={() => {}} onClick={unstake} className={s.button}>
-          Claim Rewards and Unstake
-        </div>
+        {isUnstakeWaiting ? (
+          <div
+            role="button"
+            tabIndex={0}
+            onKeyDown={() => {}}
+            onClick={() => {}}
+            className={s.button}
+          >
+            Waiting...
+          </div>
+        ) : (
+          <div
+            role="button"
+            tabIndex={0}
+            onKeyDown={() => {}}
+            onClick={unstake}
+            className={s.button}
+          >
+            Claim Rewards and Unstake
+          </div>
+        )}
       </div>
     </div>
   );

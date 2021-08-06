@@ -169,5 +169,7 @@
   display: inline-block;
   cursor: pointer;
   background: var(--gradient);
+  width: 100%;
   max-width: 270px;
+  text-align: center;
 }
