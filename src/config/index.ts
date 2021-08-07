@@ -10,7 +10,7 @@ import PresalePublicAbi from '../data/abi/PresalePublicAbi';
 import StakingAbi from '../data/abi/StakingAbi';
 import UniswapRouterAbi from '../data/abi/UniswapRouterAbi';
 
-const IS_PRODUCTION = false;
+const IS_PRODUCTION = true;
 const IS_TESTING_ON_ROPSTEN = false;
 const SHOW_CONSOLE_LOGS = true;
 const INFURA_KEY = 'bf1db577e6bb42bf93893e1ea5dd1630';
@@ -99,13 +99,14 @@ export default {
   addresses: {
     mainnet: {
       // todo
-      // 'Ethereum': {
-      //   LessToken: '0xa372d1d35041714092900B233934fB2D002755E2',
-      //   LessLibrary: '0x46589Ab934277E44A5060f3273761b86396d5429',
-      //   Staking: '0xF4Fa7Fd880Eb889B4829126d89C4F09304B73270',
-      //   PresaleFactory: '0xB9733F217111A845A268d1D98EE91800907860e2',
-      //   PresalePublic: '0xeA63Bfc235c1f70BE88287BCed13A42550C40DF3',
-      // },
+      Ethereum: {
+        LessToken: '0x62786eeacc9246b4018e0146cb7a3efeacd9459d',
+        LessLibrary: '0x46589Ab934277E44A5060f3273761b86396d5429',
+        Staking: '0xE751ffdC2a684EEbcaB9Dc95fEe05c083F963Bf1',
+        PresaleFactory: '0xB9733F217111A845A268d1D98EE91800907860e2',
+        PresalePublic: '0xeA63Bfc235c1f70BE88287BCed13A42550C40DF3',
+        LPToken: '0x432dbbd09fee1dfb2cae40c5abc1a301a2ef76ee',
+      },
       // 'Binance-Smart-Chain': {
       //   LessToken: '0xa372d1d35041714092900B233934fB2D002755E2',
       //   LessLibrary: '0x46589Ab934277E44A5060f3273761b86396d5429',
