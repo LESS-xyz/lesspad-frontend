@@ -5,6 +5,7 @@ import { BigNumber as BN } from 'bignumber.js/bignumber';
 import dayjs from 'dayjs';
 
 import calendarImg from '../../assets/img/icons/calendar.svg';
+import Button from '../../components/Button';
 import Calendar from '../../components/Calendar/index';
 import Checkbox from '../../components/Checkbox/index';
 import Input from '../../components/Input/index';
@@ -13,6 +14,8 @@ import { useContractsContext } from '../../contexts/ContractsContext';
 import { useWeb3ConnectorContext } from '../../contexts/Web3Connector';
 import { modalActions } from '../../redux/actions';
 import { BackendService } from '../../services/Backend';
+import { convertFromWei } from '../../utils/ethereum';
+import { prettyNumber } from '../../utils/prettifiers';
 
 import s from './CreatePool.module.scss';
 
@@ -36,6 +39,9 @@ const CreatePoolPage: React.FC = () => {
 
   const [lessDecimals, setLessDecimals] = useState<number>(0);
   const [lpDecimals, setLpDecimals] = useState<number>(0);
+
+  const [stakedLess, setStakedLess] = useState<string>('0.000');
+  const [stakedLP, setStakedLP] = useState<string>('0.000');
 
   const [saleTitle, setSaleTitle] = useState<string>('Title');
   const [description, setDescription] = useState<string>('');
@@ -217,31 +223,46 @@ const CreatePoolPage: React.FC = () => {
     return true;
   };
 
+  const getStakedLess = async () => {
+    try {
+      const result = await ContractStaking.getLessBalanceByAddress({ userAddress });
+      const resultInEth = convertFromWei(result, lessDecimals);
+      if (resultInEth) setStakedLess(resultInEth);
+      console.log('PageCreatePool getStakedLess:', resultInEth);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const getStakedLp = async () => {
+    try {
+      const result = await ContractStaking.getLpBalanceByAddress({ userAddress });
+      const resultInEth = convertFromWei(result, lpDecimals);
+      if (resultInEth) setStakedLP(resultInEth);
+      console.log('PageCreatePool getStakedLP:', resultInEth);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const checkStakingBalance = async () => {
     try {
-      const decimals = await ContractLessToken.decimals();
+      const stakedSum = +stakedLess + +stakedLP * 300;
       const minCreatorStakedBalance = await ContractLessLibrary.getMinCreatorStakedBalance();
-      const minCreatorStakedBalanceInEther = new BN(minCreatorStakedBalance)
-        .div(new BN(10).pow(new BN(decimals)))
-        .toString(10);
-      const stakedInfo = await ContractStaking.getStakedInfo({ userAddress });
-      const { stakedBalance } = stakedInfo;
-      const balanceStakedSumInEther = new BN(stakedBalance)
-        .div(new BN(10).pow(new BN(lessDecimals)))
-        .toString(10);
-      console.log('CreatePool checkStakingBalance:', {
-        minCreatorStakedBalanceInEther,
-        balanceStakedSumInEther,
-      });
-      if (balanceStakedSumInEther < minCreatorStakedBalance)
+      const minCreatorStakedBalanceInLp = minCreatorStakedBalance / 300;
+      if (stakedSum < minCreatorStakedBalance)
         toggleModal({
           open: true,
           text: (
             <div className={s.messageContainer}>
               <p>
-                To be able to create new pool, please stake {minCreatorStakedBalanceInEther} LESS
+                To be able to create new pool, please stake {prettyNumber(minCreatorStakedBalance)}{' '}
+                $LESS or {prettyNumber(minCreatorStakedBalanceInLp.toString())} ETH-LESS LP
               </p>
-              <p>Your staking balance is: {balanceStakedSumInEther} ($LESS + LESS LP)</p>
+              <p>Your staking balance is: {stakedSum} ($LESS + ETH-LESS LP)</p>
+              <div className={s.messageContainerButtons}>
+                <Button to="/staking">Go to Staking</Button>
+              </div>
             </div>
           ),
         });
@@ -255,19 +276,19 @@ const CreatePoolPage: React.FC = () => {
   const approve = async () => {
     try {
       const totalSupply = await ContractLessToken.totalSupply();
-      console.log('Staking stake stakeValueBN:', totalSupply);
+      console.log('CreatePool stake stakeValueBN:', totalSupply);
       const { addresses }: any = config;
       const spender = addresses[config.isMainnetOrTestnet][chainType].PresaleFactory;
-      console.log('Staking stake spender:', spender);
+      console.log('CreatePool stake spender:', spender);
       const allowance = await ContractLessToken.allowance({ userAddress, spender });
-      console.log('Staking stake allowance:', allowance);
+      console.log('CreatePool stake allowance:', allowance);
       if (allowance < totalSupply) {
         const resultApprove = await ContractLessToken.approve({
           userAddress,
           spender,
           amount: totalSupply,
         });
-        console.log('Staking stake resultApprove:', resultApprove);
+        console.log('CreatePool stake resultApprove:', resultApprove);
         return true;
       }
       return true;
@@ -417,6 +438,8 @@ const CreatePoolPage: React.FC = () => {
     if (!ContractLessLibrary) return;
     if (!ContractStaking) return;
     getDecimals();
+    getStakedLess();
+    getStakedLp();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ContractStaking, userAddress]);
 

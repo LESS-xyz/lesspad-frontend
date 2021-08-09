@@ -1,6 +1,10 @@
+import { BigNumber as BN } from 'bignumber.js/bignumber';
 import Web3 from 'web3';
 
 import config from '../../config';
+
+import ContractLessTokenService from './ContractLessToken';
+import ContractLpTokenService from './ContractLPToken';
 
 type TypeConstructorProps = {
   web3Provider: any;
@@ -16,6 +20,10 @@ export default class ContractLessLibraryService {
 
   public contractName: any;
 
+  public ContractLessToken: any;
+
+  public ContractLpToken: any;
+
   constructor(props: TypeConstructorProps) {
     const { web3Provider, chainType } = props;
     const { addresses, isMainnetOrTestnet, abis }: any = config;
@@ -25,6 +33,8 @@ export default class ContractLessLibraryService {
     this.contractName = 'LessLibrary';
     this.contractAddress = addressesOfNetType[chainType][this.contractName];
     this.contractAbi = abisOfNetType[chainType][this.contractName];
+    this.ContractLessToken = new ContractLessTokenService({ web3Provider, chainType });
+    this.ContractLpToken = new ContractLpTokenService({ web3Provider, chainType });
   }
 
   public getPresalesCount = async () => {
@@ -84,7 +94,10 @@ export default class ContractLessLibraryService {
     try {
       const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
       const balance = await contract.methods.getMinCreatorStakedBalance().call();
-      return balance;
+      const decimals = await this.ContractLessToken.decimals();
+      const pow = new BN(10).pow(new BN(decimals));
+      const result = new BN(balance).div(pow).toString(10);
+      return result;
     } catch (e) {
       console.error('ContractLessLibraryService getMinCreatorStakedBalance:', e);
       return null;

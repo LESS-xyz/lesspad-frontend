@@ -146,8 +146,9 @@ interface ITableProps {
 
 const Table: React.FC<ITableProps> = (props) => {
   let { data = [] } = props;
-  const { onUnstake = () => {} } = props;
   if (!data) data = [];
+  const { onUnstake = () => {} } = props;
+
   const { ContractStaking } = useContractsContext();
 
   const [page, setPage] = useState<number>(0);
@@ -201,6 +202,7 @@ const Table: React.FC<ITableProps> = (props) => {
   };
 
   useEffect(() => {
+    if (!data.length) return;
     filterData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, data]);
