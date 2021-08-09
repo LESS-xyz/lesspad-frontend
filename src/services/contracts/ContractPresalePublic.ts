@@ -114,6 +114,8 @@ export default class ContractPresalePublicService {
         liquidityAdded,
         participants,
         raisedAmount,
+        yesVotes,
+        noVotes,
       } = intermediate;
       // format
       const pow = new BN(10).pow(new BN(decimals));
@@ -163,6 +165,8 @@ export default class ContractPresalePublicService {
         liquidityAdded,
         participants,
         raisedAmount: raisedAmountInEth,
+        yesVotes,
+        noVotes,
       };
     } catch (e) {
       console.error('ContractPresalePublicService getInfo:', e);

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 import useMedia from 'use-media';
 
 import thumbUpGreen from '../../../assets/img/icons/thumb-up-green.svg';
@@ -7,6 +8,7 @@ import thumbUpRed from '../../../assets/img/icons/thumb-up-red.svg';
 import Pagination from '../../../components/Pagination';
 import { useContractsContext } from '../../../contexts/ContractsContext';
 import { modalActions } from '../../../redux/actions';
+import { addHttps } from '../../../utils/prettifiers';
 
 import s from './Table.module.scss';
 
@@ -31,13 +33,13 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
     address,
     index,
     // name,
-    logo,
+    // logo,
     // priceBNB,
     // softcap,
     // hardcap,
     daysBeforeOpen,
-    likesPercent,
-    dislikesPercent,
+    // likesPercent,
+    // dislikesPercent,
   } = props;
   const { ContractPresalePublic, ContractPresaleCertified } = useContractsContext();
 
@@ -106,27 +108,30 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
   if (!address) return null; // todo
   if (!info) return null; // todo
 
-  const { hardCap, softCap, saleTitle, listingPrice } = info;
+  const { hardCap, softCap, saleTitle, listingPrice, linkLogo, yesVotes = 0, noVotes = 0 } = info;
+
+  const yesVotesPercent = yesVotes ? (yesVotes / (yesVotes + noVotes)).toFixed(1) : 0;
+  const noVotesPercent = 100 - +yesVotesPercent;
 
   return (
     <div className={`${s.row} ${index % 2 === 1 && s.filled}`}>
       {isMobile ? (
-        <div className={`${s.row_cell} ${s.title}`}>
+        <Link className={`${s.row_cell} ${s.title}`} to={`/pool/${address}`}>
           <div className={`${s.img}`}>
-            <img src={logo} alt="logo" />
+            <img src={addHttps(linkLogo)} alt="logo" />
           </div>
           <div className={`${s.name}`}>
             <div>{saleTitle || 'Name'}</div>
           </div>
-        </div>
+        </Link>
       ) : (
         <>
-          <div className={`${s.row_cell} ${s.img}`}>
-            <img src={logo} alt="logo" />
-          </div>
-          <div className={`${s.row_cell} ${s.name}`}>
+          <Link className={`${s.row_cell} ${s.img}`} to={`/pool/${address}`}>
+            {linkLogo ? <img src={addHttps(linkLogo)} alt="logo" /> : null}
+          </Link>
+          <Link className={`${s.row_cell} ${s.name}`} to={`/pool/${address}`}>
             <div>{saleTitle || 'Name'}</div>
-          </div>
+          </Link>
         </>
       )}
       <div className={`${s.row_cell} ${s.price}`}>
@@ -159,7 +164,9 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
               <img src={thumbUpGreen} alt="thumbUpGreen" />
             </div>
             <div className={s.likes_data}>
-              {likesPercent && (likesPercent < 10 ? +`0${likesPercent}` : likesPercent).toFixed(2)}%
+              {yesVotesPercent &&
+                (+yesVotesPercent < 10 ? +`0${yesVotesPercent}` : yesVotesPercent)}
+              %
             </div>
           </div>
           <div className={s.like}>
@@ -173,9 +180,9 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
               <img src={thumbUpRed} alt="thumbUpRed" />
             </div>
             <div className={s.likes_data}>
-              {likesPercent &&
-                dislikesPercent &&
-                (likesPercent < 10 ? +`0${likesPercent}` : dislikesPercent).toFixed(2)}
+              {noVotesPercent &&
+                noVotesPercent &&
+                (noVotesPercent < 10 ? +`0${noVotesPercent}` : noVotesPercent)}
               %
             </div>
           </div>

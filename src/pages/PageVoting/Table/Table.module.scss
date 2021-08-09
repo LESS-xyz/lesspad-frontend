@@ -50,6 +50,8 @@
   font-weight: 400;
   padding: 17px 0;
   @include flex(row, center);
+  text-decoration: none;
+  color: var(--color-text-primary) !important;
 
   > * {
     justify-self: center;
@@ -119,9 +121,14 @@
 
 .likes {
   @include flex(row, center);
-  margin: 10px;
+  margin: 0 10px;
   @include b('mobile') {
     margin: 0;
+  }
+
+  &_img {
+    padding: 10px;
+    cursor: pointer;
   }
 }
 
