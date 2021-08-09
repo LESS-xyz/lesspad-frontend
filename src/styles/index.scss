@@ -17,6 +17,11 @@
   src: url('../assets/fonts/Poppins-Bold.ttf');
 }
 
+@font-face {
+  font-family: 'Poppins Regular';
+  src: url('../assets/fonts/Poppins-Regular.ttf');
+}
+
 :root {
   --body-text-color: #fff;
   --body-bg-color: linear-gradient(to bottom right, #1c0e40, #040404 50%);
@@ -48,3 +53,6 @@ body {
   background-repeat: no-repeat;
 }
 
+input {
+  font: 400 15px "Poppins Regular";
+}
