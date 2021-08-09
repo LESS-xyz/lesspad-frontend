@@ -217,7 +217,7 @@ const Table: React.FC<ITableProps> = ({ data }) => {
         return true;
       });
       setDataFiltrered(newData);
-      console.log('newData:', data, newData);
+      console.log('TableVoting newData:', data, newData);
     } catch (e) {
       console.error(e);
     }

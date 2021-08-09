@@ -195,7 +195,7 @@ const Table: React.FC<ITableProps> = (props) => {
         return true;
       });
       setDataFiltrered(newData);
-      console.log('newData:', data, newData);
+      console.log('TableStaking newData:', data, newData);
     } catch (e) {
       console.error(e);
     }

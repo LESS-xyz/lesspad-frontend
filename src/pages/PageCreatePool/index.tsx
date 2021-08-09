@@ -64,7 +64,11 @@ const CreatePoolPage: React.FC = () => {
     defaultLiquidityAllocationTime,
   );
   // инпут для Certified type
-  const [whitelist, setWhitelist] = useState<string>('');
+  const [whitelist1, setWhitelist1] = useState<string>('');
+  const [whitelist2, setWhitelist2] = useState<string>('');
+  const [whitelist3, setWhitelist3] = useState<string>('');
+  const [whitelist4, setWhitelist4] = useState<string>('');
+  const [whitelist5, setWhitelist5] = useState<string>('');
   const [nativeToken, setNativeToken] = useState<string>('WETH');
   // links
   const [linkLogo, setLinkLogo] = useState<string>('');
@@ -93,7 +97,7 @@ const CreatePoolPage: React.FC = () => {
   const isLiquidity = liquidity === 'Liquidity';
   const isAutomatically = automatically === 'Automatically';
   const isVesting = vesting === 'Vesting';
-  const isWhiteListed = whiteListed === 'Whitelisted';
+  const isWhiteListed = whiteListed === 'Whitelist';
 
   const { chainType } = useSelector(({ wallet }: any) => wallet);
   const { address: userAddress } = useSelector(({ user }: any) => user);
@@ -135,15 +139,6 @@ const CreatePoolPage: React.FC = () => {
     return undefined;
   };
 
-  const signMessage = async () => {
-    try {
-      // const result = await web3.signMessage({ userAddress, message: 'Hello' });
-      // console.log('PageCreatePool signMessage result:', result);
-    } catch (e) {
-      console.error('PageCreatePool signMessage result:', e);
-    }
-  };
-
   const validateForm = () => {
     if (!saleTitle) return false;
     if (!tokenAddress) return false;
@@ -154,13 +149,14 @@ const CreatePoolPage: React.FC = () => {
     if (!minInvestInWei) return false;
     if (!openTime) return false;
     if (!closeTime) return false;
-    // if (!presaleType) return false;
-    // if (!liquidityPercent) return false;
-    // if (!whitelistArray) return false;
-    // if (!listingPriceInWei) return false;
-    // if (!lpTokensLockDurationInDays) return false;
-    // if (!liquidityPercentageAllocation) return false;
-    // if (!liquidityAllocationTime) return false;x
+    if (!isPublic) {
+      // if (!liquidityPercent) return false;
+      // if (!whitelistArray) return false;
+      // if (!listingPriceInWei) return false;
+      // if (!lpTokensLockDurationInDays) return false;
+      // if (!liquidityPercentageAllocation) return false;
+      // if (!liquidityAllocationTime) return false;
+    }
     return true;
   };
 
@@ -404,12 +400,20 @@ const CreatePoolPage: React.FC = () => {
         // uint8 vesting; - процент вестинга
         // address[] whitelist; - список адресов для приватного пресейла (если список пустой, то проводится регистрация как на публичном)
         // address nativeToken; - в какой валюте продавать токены (котируются WETH, USDT, USDC)
-        const whiteListArray = splitWhitelist(whitelist);
+        const whiteListArray1 = splitWhitelist(whitelist1);
+        const whiteListArray2 = splitWhitelist(whitelist2);
+        const whiteListArray3 = splitWhitelist(whitelist3);
+        const whiteListArray4 = splitWhitelist(whitelist4);
+        const whiteListArray5 = splitWhitelist(whitelist5);
         const certifiedAddition = [
           isLiquidity,
           isAutomatically,
           isVesting,
-          whiteListArray,
+          whiteListArray1, // todo check
+          whiteListArray2, // todo check
+          whiteListArray3, // todo check
+          whiteListArray4, // todo check
+          whiteListArray5, // todo check
           nativeToken,
         ];
         console.log('CreatePool handleSubmit:', {
@@ -442,12 +446,6 @@ const CreatePoolPage: React.FC = () => {
     getStakedLp();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ContractStaking, userAddress]);
-
-  useEffect(() => {
-    if (!userAddress) return;
-    signMessage();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userAddress]);
 
   useEffect(() => {
     if (!ContractLessToken) return;
@@ -663,12 +661,34 @@ const CreatePoolPage: React.FC = () => {
                       { key: 'Without whitelist', text: 'Without whitelist' },
                     ]}
                   />
-                  {isWhiteListed && ( // todo: matrix
-                    <Input
-                      title="Adresses, comma separated"
-                      value={whitelist}
-                      onChange={setWhitelist}
-                    />
+                  {isWhiteListed && (
+                    <>
+                      <Input
+                        title="Tier 1 adresses, comma separated"
+                        value={whitelist1}
+                        onChange={setWhitelist1}
+                      />
+                      <Input
+                        title="Tier 2 adresses, comma separated"
+                        value={whitelist2}
+                        onChange={setWhitelist2}
+                      />
+                      <Input
+                        title="Tier 3 adresses, comma separated"
+                        value={whitelist3}
+                        onChange={setWhitelist3}
+                      />
+                      <Input
+                        title="Tier 4 adresses, comma separated"
+                        value={whitelist4}
+                        onChange={setWhitelist4}
+                      />
+                      <Input
+                        title="Tier 5 adresses, comma separated"
+                        value={whitelist5}
+                        onChange={setWhitelist5}
+                      />
+                    </>
                   )}
                   <Checkbox
                     name="vesting / without vesting"
