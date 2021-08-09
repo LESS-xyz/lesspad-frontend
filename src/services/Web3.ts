@@ -188,4 +188,15 @@ export default class Web3Service {
       return null;
     }
   };
+
+  public isAddress = async (address: string) => {
+    try {
+      const result = await this.web3Provider.utils.isAddress(address);
+      // console.log('Web3ProviderService isAddress:', result);
+      return result;
+    } catch (e) {
+      console.error('Web3ProviderService isAddress:', e);
+      return null;
+    }
+  };
 }

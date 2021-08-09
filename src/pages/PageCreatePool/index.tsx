@@ -21,6 +21,18 @@ import s from './CreatePool.module.scss';
 
 const Backend = new BackendService();
 
+// enum EnumFieldType {
+//   ADDRESS = 'ADDRESS',
+//   TIME = 'TIME',
+//   STRING = 'STRING',
+// }
+//
+// type TypeHandleError = {
+//   value: any;
+//   message?: string;
+//   type?: EnumFieldType;
+// };
+
 const CreatePoolPage: React.FC = () => {
   const { web3 } = useWeb3ConnectorContext();
   const {
@@ -91,7 +103,9 @@ const CreatePoolPage: React.FC = () => {
   const [automatically, setAutomatically] = useState<string>('Automatically');
   const [vesting, setVesting] = useState<string>('Vesting');
   const [whiteListed, setWhiteListed] = useState<string>('Whitelist');
-  const [isFormSubmitted, setIsFormSubmitted] = useState<boolean>(false);
+  // const [isFormSubmitted, setIsFormSubmitted] = useState<boolean>(false);
+
+  const [errors, setErrors] = useState<any>({});
 
   const isPublic = presaleType === 'Public';
   const isLiquidity = liquidity === 'Liquidity';
@@ -134,12 +148,28 @@ const CreatePoolPage: React.FC = () => {
     }
   };
 
-  const handleError = (value: any, message?: string) => {
-    if (isFormSubmitted && !value) return message || 'Enter value';
-    return undefined;
-  };
+  // const handleError = async ({ value, message, type }: TypeHandleError) => {
+  //   if (type === EnumFieldType.ADDRESS) {
+  //     const isTokenAddressValid = await web3.isAddress(value);
+  //     if (!isTokenAddressValid) return 'Address is not valid';
+  //   }
+  //   if (isFormSubmitted && !value) return message || 'Enter value';
+  //   return '';
+  // };
 
-  const validateForm = () => {
+  const validateForm = async () => {
+    const message = 'Enter value';
+    const newErrors = {
+      saleTitle: saleTitle ? null : message,
+      tokenPriceInWei: tokenPriceInWei ? null : message,
+      softCapInWei: softCapInWei ? null : message,
+      hardCapInWei: hardCapInWei ? null : message,
+      maxInvestInWei: maxInvestInWei ? null : message,
+      minInvestInWei: minInvestInWei ? null : message,
+      openTime: openTime ? null : message,
+      closeTime: closeTime ? null : message,
+    };
+    setErrors({ ...errors, ...newErrors });
     if (!saleTitle) return false;
     if (!tokenAddress) return false;
     if (!tokenPriceInWei) return false;
@@ -158,6 +188,27 @@ const CreatePoolPage: React.FC = () => {
       // if (!liquidityAllocationTime) return false;
     }
     return true;
+  };
+
+  const validateAddresses = async () => {
+    try {
+      if (!web3) return false;
+      const isTokenAddressValid = await web3.isAddress(tokenAddress);
+      const messageEnterValue = tokenAddress ? null : 'Enter value';
+      const messageAddressNotValid = isTokenAddressValid ? null : 'Address is not valid';
+      const newErrors = {
+        tokenAddress: messageEnterValue || messageAddressNotValid,
+      };
+      setErrors({ ...errors, ...newErrors });
+      if (!isTokenAddressValid) return false;
+      if (!isPublic) {
+        // if (!web3.isAddress(tokenAddress)) return false;
+      }
+      return true;
+    } catch (e) {
+      console.error(e);
+      return false;
+    }
   };
 
   const checkTime = () => {
@@ -309,7 +360,7 @@ const CreatePoolPage: React.FC = () => {
       event.preventDefault();
       console.log('PageCreatePool handleSubmit:', { vestingPercent });
       if (!validateForm()) {
-        setIsFormSubmitted(true);
+        // setIsFormSubmitted(true);
         toggleModal({
           open: true,
           text: (
@@ -320,8 +371,21 @@ const CreatePoolPage: React.FC = () => {
         });
         return;
       }
+      const areAddressesValid = await validateAddresses();
+      if (!areAddressesValid) {
+        // setIsFormSubmitted(true);
+        toggleModal({
+          open: true,
+          text: (
+            <div className={s.messageContainer}>
+              <p>Please, check addresses</p>
+            </div>
+          ),
+        });
+        return;
+      }
       if (!checkTime) return;
-      setIsFormSubmitted(true);
+      // setIsFormSubmitted(true);
       const resultApprove = await approve();
       if (!resultApprove) return;
       // login to backend
@@ -456,6 +520,25 @@ const CreatePoolPage: React.FC = () => {
   }, [ContractStaking, userAddress]);
 
   useEffect(() => {
+    validateForm();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    saleTitle,
+    tokenPriceInWei,
+    softCapInWei,
+    hardCapInWei,
+    maxInvestInWei,
+    minInvestInWei,
+    openTime,
+    closeTime,
+  ]);
+
+  useEffect(() => {
+    validateAddresses();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tokenAddress]);
+
+  useEffect(() => {
     if (!ContractLessToken) return;
     if (!ContractLessLibrary) return;
     if (!ContractStaking) return;
@@ -499,33 +582,33 @@ const CreatePoolPage: React.FC = () => {
                 title="Sale title"
                 value={saleTitle}
                 onChange={setSaleTitle}
-                error={handleError(saleTitle)}
+                error={errors.saleTitle}
               />
               <Input title="Description" value={description} onChange={setDescription} />
               <Input
                 title="Token Contract Address"
                 value={tokenAddress}
                 onChange={setTokenAddress}
-                error={handleError(tokenAddress)}
+                error={errors.tokenAddress}
               />
               <Input
                 title="Token Price (in wei)"
                 value={tokenPriceInWei}
                 onChange={setTokenPriceInWei}
-                error={handleError(tokenPriceInWei)}
+                error={errors.tokenPriceInWei}
               />
               <div className={s.small_inputs}>
                 <Input
                   title="Soft Cap (in wei)"
                   value={softCapInWei}
                   onChange={setSoftCapInWei}
-                  error={handleError(softCapInWei)}
+                  error={errors.softCapInWei}
                 />
                 <Input
                   title="Hard Cap (in wei)"
                   value={hardCapInWei}
                   onChange={setHardCapInWei}
-                  error={handleError(hardCapInWei)}
+                  error={errors.hardCapInWei}
                 />
               </div>
               {/* date pickers */}
