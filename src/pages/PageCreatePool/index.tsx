@@ -310,7 +310,15 @@ const CreatePoolPage: React.FC = () => {
       console.log('PageCreatePool handleSubmit:', { vestingPercent });
       if (!validateForm()) {
         setIsFormSubmitted(true);
-        // return; // todo
+        toggleModal({
+          open: true,
+          text: (
+            <div className={s.messageContainer}>
+              <p>Please, check fields</p>
+            </div>
+          ),
+        });
+        return;
       }
       if (!checkTime) return;
       setIsFormSubmitted(true);
