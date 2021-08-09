@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
+import Button from '../../components/Button';
 // import logo1 from '../../assets/img/sections/logos/logo1.png';
 import Search from '../../components/Search/index';
+import { modalActions } from '../../redux/actions';
 
 import Table from './Table/index';
 
@@ -48,6 +50,11 @@ const PageVoting: React.FC = () => {
 
   const { pools } = useSelector(({ pool }: any) => pool);
 
+  const dispatch = useDispatch();
+  const toggleModal = React.useCallback((params) => dispatch(modalActions.toggleModal(params)), [
+    dispatch,
+  ]);
+
   const filterTable = async () => {
     try {
       const presalesInfoNew = pools.filter((item: any) => {
@@ -62,6 +69,24 @@ const PageVoting: React.FC = () => {
       });
       const presalesAddressesFilteredNew = presalesInfoNew.map((item: any) => item.address);
       setPresalesAddressesFiltered(presalesAddressesFilteredNew);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleShowInfo = () => {
+    try {
+      toggleModal({
+        open: true,
+        text: (
+          <div className={s.messageContainer}>
+            You need 500 $LESS or ... ETH-LESS LP in stake to be able to vote
+            <div className={s.messageContainerButtons}>
+              <Button to="/staking">Go to Staking</Button>
+            </div>
+          </div>
+        ),
+      });
     } catch (e) {
       console.error(e);
     }
@@ -86,7 +111,9 @@ const PageVoting: React.FC = () => {
         <div className={s.inner}>
           <div className={s.title}>Presale Voting</div>
           <div className={s.subtitle}>
-            <span>Info</span>
+            <span role="button" tabIndex={0} onClick={handleShowInfo} onKeyDown={() => {}}>
+              Info
+            </span>
           </div>
           <div className={s.input}>
             <Search

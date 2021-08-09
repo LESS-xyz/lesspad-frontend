@@ -110,8 +110,8 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
 
   const { hardCap, softCap, saleTitle, listingPrice, linkLogo, yesVotes = 0, noVotes = 0 } = info;
 
-  const yesVotesPercent = yesVotes ? (yesVotes / (yesVotes + noVotes)).toFixed(1) : 0;
-  const noVotesPercent = 100 - +yesVotesPercent;
+  const yesVotesPercent = yesVotes ? ((yesVotes / (yesVotes + noVotes)) * 100).toFixed(2) : 0;
+  const noVotesPercent = noVotes === 0 ? 0 : 100 - +yesVotesPercent;
 
   return (
     <div className={`${s.row} ${index % 2 === 1 && s.filled}`}>

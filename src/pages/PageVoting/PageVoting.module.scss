@@ -39,6 +39,7 @@
     border-radius: 30px;
     display: inline-flex;
     align-items: center;
+    cursor: pointer;
     &::before {
       content: '';
       height: 20px;
@@ -51,4 +52,15 @@
 
 .input {
   margin-bottom: 30px;
+}
+
+.messageContainer {
+  @include flex(row, center);
+  height: 100%;
+}
+
+.messageContainerButtons {
+  @include flex(row, center, center);
+  width: 100%;
+  margin: 10px 0 0 0;
 }
