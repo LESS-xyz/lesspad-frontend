@@ -20,6 +20,11 @@ type TypeGetVotingSignatureProps = {
   pool: string;
 };
 
+type TypeGetWhitelistSignatureProps = {
+  token: string;
+  pool: string;
+};
+
 type TypeGetTierSignatureProps = {
   token: string;
   presale: string;
@@ -115,7 +120,7 @@ export class BackendService {
     }
   };
 
-  getWhitelistSignature = async (props: TypeGetVotingSignatureProps) => {
+  getWhitelistSignature = async (props: TypeGetWhitelistSignatureProps) => {
     try {
       const url = `/whitelist/`;
       const result = await this.axios.post(url, props);

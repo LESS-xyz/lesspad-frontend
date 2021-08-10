@@ -17,7 +17,7 @@
 
 .table_header {
   display: grid;
-  grid-template-columns: 0.65fr 1fr 1fr 1fr 1fr 1fr 2fr;
+  grid-template-columns: 0.65fr 1fr 1fr 1fr 1fr 1fr 2fr 150px;
   grid-column-gap: 25px;
   padding-bottom: 20px;
 }
@@ -32,7 +32,7 @@
 }
 
 .row {
-  @include grid(0.65fr 1fr 1fr 1fr 1fr 1fr 2fr, 1fr, 25px);
+  @include grid(0.65fr 1fr 1fr 1fr 1fr 1fr 2fr 150px, 1fr, 25px);
   border-radius: 10px;
 
   @include b('mobile') {
@@ -120,7 +120,7 @@
 }
 
 .likes {
-  @include flex(row, center);
+  @include flex(row, center, center, nowrap);
   margin: 0 10px;
   @include b('mobile') {
     margin: 0;
@@ -155,4 +155,36 @@
 .pagination {
   @include flex(row, center, center);
   margin: 50px 0 0 0;
+}
+
+.button_border {
+  margin: 0 10px;
+  padding: 2px;
+  width: fit-content;
+  min-width: 132px;
+  height: 44px;
+
+  background: linear-gradient(to right, #6f45ff, #ff6365);
+
+  border-radius: 28px;
+
+  .button {
+    @include flex(row, center, center);
+    height: 40px;
+    cursor: pointer;
+    font-size: 16px;
+
+    background: #1c0e40 !important;
+
+    border-radius: 28px;
+
+    .gradient-button-text {
+      @include gradient-text();
+      font-family: 'Poppins Bold', sans-serif;
+    }
+  }
+}
+
+.buttonDarkBg {
+  background: #1c0e40 !important;
 }

@@ -21,6 +21,14 @@ type TypeVoteProps = {
   yes: boolean;
 };
 
+type TypeRegisterProps = {
+  userAddress: string;
+  tokenAmount: string;
+  signature: string;
+  tier: string;
+  timestamp: string;
+};
+
 type TypeInvestProps = {
   userAddress: string;
   contractAddress: string;
@@ -45,6 +53,8 @@ export default class ContractPresalePublicService {
 
   public contractAbi: any;
 
+  public contract: any;
+
   public contractName: any;
 
   constructor(props: TypeConstructorProps) {
@@ -57,6 +67,7 @@ export default class ContractPresalePublicService {
     this.contractName = 'PresalePublic';
     this.contractAddress = addressesOfNetType[chainType][this.contractName];
     this.contractAbi = abisOfNetType[chainType][this.contractName];
+    this.contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
   }
 
   public getInfo = async ({ contractAddress }: TypeGetInfoProps): Promise<any> => {
@@ -239,6 +250,19 @@ export default class ContractPresalePublicService {
       };
     } catch (e) {
       console.error('ContractPresalePublicService investments:', e);
+      return null;
+    }
+  };
+
+  public register = async (props: TypeRegisterProps): Promise<any> => {
+    try {
+      const { userAddress, tokenAmount, signature, tier, timestamp } = props;
+      // console.log('ContractPresalePublicService vote:', props);
+      return await this.contract.methods
+        .register(tokenAmount, tier, timestamp, signature)
+        .send({ from: userAddress });
+    } catch (e) {
+      console.error('ContractPresalePublicService vote:', e);
       return null;
     }
   };

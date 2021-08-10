@@ -7,13 +7,17 @@ import thumbUpGreen from '../../../assets/img/icons/thumb-up-green.svg';
 import thumbUpRed from '../../../assets/img/icons/thumb-up-red.svg';
 import Pagination from '../../../components/Pagination';
 import { useContractsContext } from '../../../contexts/ContractsContext';
+import { useWeb3ConnectorContext } from '../../../contexts/Web3Connector';
 import { modalActions } from '../../../redux/actions';
+import { BackendService } from '../../../services/Backend';
 import { addHttps } from '../../../utils/prettifiers';
 
 import s from './Table.module.scss';
 
+const Backend = new BackendService();
+
 interface ITableRow {
-  address?: string;
+  address: string;
   logo?: string;
   name?: string;
   priceBNB?: number;
@@ -41,6 +45,7 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
     // likesPercent,
     // dislikesPercent,
   } = props;
+  const { web3 } = useWeb3ConnectorContext();
   const { ContractPresalePublic, ContractPresaleCertified } = useContractsContext();
 
   const [info, setInfo] = useState<any>();
@@ -93,6 +98,67 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
       });
     } catch (e) {
       console.error('TableRow vote:', e);
+    }
+  };
+
+  const register = async () => {
+    try {
+      // login to backend
+      let tokenAmount;
+      let date;
+      let tier;
+      let signature;
+      const resultGetMetamaskMessage = await Backend.getMetamaskMessage();
+      console.log('TableRow resultGetMetamaskMessage:', resultGetMetamaskMessage);
+      if (resultGetMetamaskMessage.data) {
+        const msg = resultGetMetamaskMessage.data;
+        const signedMsg = await web3.signMessage({ userAddress, message: msg });
+        console.log('TableRow signedMsg:', signedMsg);
+        if (signedMsg) {
+          const resultMetamaskLogin = await Backend.metamaskLogin({
+            address: userAddress,
+            msg,
+            signedMsg,
+          });
+          console.log('TableRow resultMetamaskLogin:', resultMetamaskLogin);
+          if (!resultMetamaskLogin.data) return;
+          const { key: token } = resultMetamaskLogin.data;
+          const resultGetWhitelistSignature = await Backend.getWhitelistSignature({
+            token,
+            pool: address,
+          });
+          console.log('TableRow resultGetWhitelistSignature:', resultGetWhitelistSignature);
+          if (!resultGetWhitelistSignature.data) return;
+          tokenAmount = resultGetWhitelistSignature.data.user_balance;
+          signature = resultGetWhitelistSignature.data.signature;
+          const resultGetTierSignature = await Backend.getTierSignature({
+            token,
+            presale: address,
+          });
+          console.log('TableRow resultGetTierSignature:', resultGetTierSignature);
+          if (!resultGetTierSignature.data) return;
+          date = resultGetTierSignature.data.date;
+          tier = resultGetTierSignature.data.type_tier;
+          const resultRegister = await ContractPresalePublic.register({
+            userAddress,
+            tokenAmount,
+            signature,
+            tier,
+            timestamp: date,
+          });
+          console.log('TableRow resultRegister:', resultRegister);
+        }
+      }
+    } catch (e) {
+      console.error('TableRow register:', e);
+    }
+  };
+
+  const handleRegister = async () => {
+    try {
+      await register();
+    } catch (e) {
+      console.error('TableRow handleRegister:', e);
     }
   };
 
@@ -185,6 +251,20 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
                 (noVotesPercent < 10 ? +`0${noVotesPercent}` : noVotesPercent)}
               %
             </div>
+          </div>
+        </div>
+      </div>
+
+      <div className={s.row_cell}>
+        <div className={s.button_border}>
+          <div
+            className={`${s.button} ${index % 2 === 1 && s.buttonDarkBg}`}
+            role="button"
+            tabIndex={0}
+            onClick={handleRegister}
+            onKeyDown={() => {}}
+          >
+            <div className="gradient-button-text">Get in presale</div>
           </div>
         </div>
       </div>
