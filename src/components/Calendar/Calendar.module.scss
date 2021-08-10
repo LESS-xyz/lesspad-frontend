@@ -7,6 +7,7 @@
   width: 300px;
   background: linear-gradient(90deg, #040404 0%, #1c0e40 100%);
   padding: 10px;
+  z-index: 999;
 
   &_header {
     @include flex(row, center, space-between);
