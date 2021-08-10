@@ -2,11 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useDispatch, useSelector } from 'react-redux';
 import { BigNumber as BN } from 'bignumber.js/bignumber';
-import dayjs from 'dayjs';
 
-import calendarImg from '../../assets/img/icons/calendar.svg';
 import Button from '../../components/Button';
-import Calendar from '../../components/Calendar/index';
 import Checkbox from '../../components/Checkbox/index';
 import DateInput from '../../components/DateInput';
 import Input from '../../components/Input/index';
@@ -90,14 +87,6 @@ const CreatePoolPage: React.FC = () => {
   const [linkGithub, setLinkGithub] = useState<string>('');
   const [linkTwitter, setLinkTwitter] = useState<string>('');
   const [whitepaper, setWhitepaper] = useState<string>('');
-  // стейт календарей открыт/закрыт
-  const [isCalendarVoting, setIsCalendarVoting] = useState<boolean>(false);
-  const [isCalendar1, setIsCalendar1] = useState<boolean>(false);
-  const [isCalendar2, setIsCalendar2] = useState<boolean>(false);
-  const [
-    isCalendarLiquidityAllocationTime,
-    setIsCalendarLiquidityAllocationTime,
-  ] = useState<boolean>(false);
   // чекбоксы
   const [presaleType, setPresaleType] = useState<string>('Public');
   const [liquidity, setLiquidity] = useState<string>('Liquidity');
@@ -158,14 +147,14 @@ const CreatePoolPage: React.FC = () => {
   //   return '';
   // };
 
-  const validateForm = async () => {
+  const validateForm = () => {
     try {
       const checkIfValueExists = (value: any) => {
-        return value ? null : 'Enter value';
+        return !value && 'Enter value';
       };
       const checkPercent = (value: any) => {
         const isPercentageValid = +value >= 0 && +value <= 100;
-        return isPercentageValid ? null : 'Percent value should be between 0 and 100';
+        return !isPercentageValid && 'Percent value should be between 0 and 100';
       };
       const newErrors = {
         saleTitle: checkIfValueExists(saleTitle),
@@ -210,8 +199,8 @@ const CreatePoolPage: React.FC = () => {
     try {
       if (!web3) return false;
       const isTokenAddressValid = await web3.isAddress(tokenAddress);
-      const messageEnterValue = tokenAddress ? null : 'Enter value';
-      const messageAddressNotValid = isTokenAddressValid ? null : 'Address is not valid';
+      const messageEnterValue = !tokenAddress && 'Enter value';
+      const messageAddressNotValid = !isTokenAddressValid && 'Address is not valid';
       const newErrors = {
         tokenAddress: messageEnterValue || messageAddressNotValid,
       };
@@ -232,56 +221,45 @@ const CreatePoolPage: React.FC = () => {
     // openVotingTime + safeLibrary.getVotingTime() + 86400 <= openTime &&
     // openTime < closeTime &&
     // closeTime < _cakeInfo.liquidityAllocationTime,
+    // checks
     // todo block timestamp
-    const isOpenTimeMoreThanBlockTimestamp = openTime > Date.now();
-    // todo getVotingTime, check ms/s
-    const isOpenVotingTimePlus24LessThanOpenTime =
-      openVotingTime + 600 * 1000 + 86400 * 1000 <= openTime;
+    const isOpenVotingTimeMoreThanBlockTimestamp = openTime > Date.now();
+    // todo add getVotingTime from contract, check ms/s
+    const isOpenVotingTimePlus24HLessThanOpenTime =
+      openVotingTime + 600 * 1000 + 86400 * 1000 < openTime;
     const isOpenTimeLessThanCloseTime = openTime < closeTime;
     const isCloseTimeLessThanLiquidityAllocationTime = closeTime < liquidityAllocationTime;
-    if (!isOpenTimeMoreThanBlockTimestamp) {
-      toggleModal({
-        open: true,
-        text: (
-          <div className={s.messageContainer}>
-            <p>Open time should be more than last block time</p>
-          </div>
-        ),
-      });
-      return false;
-    }
-    if (!isOpenVotingTimePlus24LessThanOpenTime) {
-      toggleModal({
-        open: true,
-        text: (
-          <div className={s.messageContainer}>
-            <p>Open time should be less or equal to: open voting time + voting time + 24H</p>
-          </div>
-        ),
-      });
-      return false;
-    }
-    if (!isOpenTimeLessThanCloseTime) {
-      toggleModal({
-        open: true,
-        text: (
-          <div className={s.messageContainer}>
-            <p>Open time should be less than close time</p>
-          </div>
-        ),
-      });
-      return false;
-    }
-    if (!isCloseTimeLessThanLiquidityAllocationTime) {
-      toggleModal({
-        open: true,
-        text: (
-          <div className={s.messageContainer}>
-            <p>Close time should be less than liquidity allocation time</p>
-          </div>
-        ),
-      });
-      return false;
+    // messages
+    const messageIsOpenVotingTimeMoreThanBlockTimestamp =
+      !isOpenVotingTimeMoreThanBlockTimestamp &&
+      'Open voting time should be more than last block time';
+    const messageIsOpenVotingTimePlus24HLessThanOpenTime =
+      !isOpenVotingTimePlus24HLessThanOpenTime &&
+      'Open time should be less or equal to: open voting time + voting time + 24H';
+    const messageIsOpenTimeLessThanCloseTime =
+      !isOpenTimeLessThanCloseTime && 'Open time should be less than close time';
+    const messageIsCloseTimeLessThanLiquidityAllocationTime =
+      !isCloseTimeLessThanLiquidityAllocationTime &&
+      'Close time should be less than liquidity allocation time';
+    // errors
+    const newErrors = {
+      openVotingTime:
+        messageIsOpenVotingTimeMoreThanBlockTimestamp ||
+        messageIsOpenVotingTimePlus24HLessThanOpenTime,
+      openTime:
+        messageIsOpenTimeLessThanCloseTime || messageIsOpenVotingTimePlus24HLessThanOpenTime,
+      closeTime:
+        messageIsOpenTimeLessThanCloseTime || messageIsCloseTimeLessThanLiquidityAllocationTime,
+      liquidityAllocationTime: messageIsCloseTimeLessThanLiquidityAllocationTime,
+    };
+    setErrors({ ...errors, ...newErrors });
+    // returns
+    if (!isOpenVotingTimeMoreThanBlockTimestamp) return false;
+    if (!isOpenVotingTimePlus24HLessThanOpenTime) return false;
+    if (!isOpenTimeLessThanCloseTime) return false;
+    if (!isCloseTimeLessThanLiquidityAllocationTime) return false;
+    if (!isPublic) {
+      //
     }
     return true;
   };
@@ -400,7 +378,17 @@ const CreatePoolPage: React.FC = () => {
         });
         return;
       }
-      if (!validateTime) return;
+      if (!validateTime()) {
+        toggleModal({
+          open: true,
+          text: (
+            <div className={s.messageContainer}>
+              <p>Please, check time values</p>
+            </div>
+          ),
+        });
+        return;
+      }
       // setIsFormSubmitted(true);
       const resultApprove = await approve();
       if (!resultApprove) return;
@@ -552,6 +540,11 @@ const CreatePoolPage: React.FC = () => {
   ]);
 
   useEffect(() => {
+    validateTime();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openTime, closeTime, openVotingTime, liquidityAllocationTime]);
+
+  useEffect(() => {
     validateAddresses();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tokenAddress]);
@@ -629,64 +622,27 @@ const CreatePoolPage: React.FC = () => {
                   error={errors.hardCapInWei}
                 />
               </div>
+
               {/* date pickers */}
-              <div className={s.datePicker}>
-                <div className={s.datePicker_title}>Open voting Time</div>
-                <div className={s.datePicker_inner}>
-                  <div className={s.datePicker_value}>
-                    {dayjs(openVotingTime).format('DD MMM YYYY HH:mm')}
-                  </div>
-                  <div
-                    className={s.datePicker_img}
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => setIsCalendarVoting(true)}
-                    onKeyDown={() => {}}
-                  >
-                    <img src={calendarImg} alt="calendarImg" />
-                  </div>
-                </div>
-                <div className={s.datePicker_subtitle}>In Your Timezone</div>
-              </div>
-              <div className={s.small_inputs}>
-                <div className={s.datePicker}>
-                  <div className={s.datePicker_title}>Open Time</div>
-                  <div className={s.datePicker_inner}>
-                    <div className={s.datePicker_value}>
-                      {dayjs(openTime).format('DD MMM YYYY HH:mm')}
-                    </div>
-                    <div
-                      className={s.datePicker_img}
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => setIsCalendar1(true)}
-                      onKeyDown={() => {}}
-                    >
-                      <img src={calendarImg} alt="calendarImg" />
-                    </div>
-                  </div>
-                  <div className={s.datePicker_subtitle}>In Your Timezone</div>
-                </div>
-                <div className={s.datePicker}>
-                  <div className={s.datePicker_title}>Close Time</div>
-                  <div className={s.datePicker_inner}>
-                    <div className={s.datePicker_value}>
-                      {dayjs(closeTime).format('DD MMM YYYY HH:mm')}
-                    </div>
-                    <div
-                      className={s.datePicker_img}
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => setIsCalendar2(true)}
-                      onKeyDown={() => {}}
-                    >
-                      <img src={calendarImg} alt="calendarImg" />
-                    </div>
-                  </div>
-                  <div className={s.datePicker_subtitle}>In Your Timezone</div>
-                </div>
-              </div>
-              {/* date pickers end */}
+              <DateInput
+                title="Open voting Time"
+                value={openVotingTime}
+                onChange={setOpenVotingTime}
+                error={errors.openVotingTime}
+              />
+              <DateInput
+                title="Open Time"
+                value={openTime}
+                onChange={setOpenTime}
+                error={errors.openTime}
+              />
+              <DateInput
+                title="Close Time"
+                value={closeTime}
+                onChange={setCloseTime}
+                error={errors.closeTime}
+              />
+
               {!isPublic && (
                 <Checkbox
                   name="liquidity / without liquidity"
@@ -732,24 +688,6 @@ const CreatePoolPage: React.FC = () => {
                     onChange={setLiquidityAllocationTime}
                     error={errors.liquidityAllocationTime}
                   />
-                  <div className={s.datePicker}>
-                    <div className={s.datePicker_title}>Liquidity Allocation Time</div>
-                    <div className={s.datePicker_inner}>
-                      <div className={s.datePicker_value}>
-                        {dayjs(liquidityAllocationTime).format('DD MMM YYYY HH:mm')}
-                      </div>
-                      <div
-                        className={s.datePicker_img}
-                        role="button"
-                        tabIndex={0}
-                        onClick={() => setIsCalendarLiquidityAllocationTime(true)}
-                        onKeyDown={() => {}}
-                      >
-                        <img src={calendarImg} alt="calendarImg" />
-                      </div>
-                    </div>
-                    <div className={s.datePicker_subtitle}>In Your Timezone</div>
-                  </div>
                   {!isPublic && (
                     <Checkbox
                       name="Automatically / Not Automatically"
@@ -853,42 +791,6 @@ const CreatePoolPage: React.FC = () => {
               </div>
             </form>
           </div>
-          {isCalendarVoting && (
-            <div className={s.calender}>
-              <Calendar
-                defaultTimestamp={openVotingTime}
-                onChange={(date: number) => setOpenVotingTime(date)}
-                closeCalendar={() => setIsCalendarVoting(false)}
-              />
-            </div>
-          )}
-          {isCalendar1 && (
-            <div className={s.calender}>
-              <Calendar
-                defaultTimestamp={openTime}
-                onChange={(date: number) => setOpenTime(date)}
-                closeCalendar={() => setIsCalendar1(false)}
-              />
-            </div>
-          )}
-          {isCalendar2 && (
-            <div className={s.calender}>
-              <Calendar
-                defaultTimestamp={closeTime}
-                onChange={(date: number) => setCloseTime(date)}
-                closeCalendar={() => setIsCalendar2(false)}
-              />
-            </div>
-          )}
-          {isCalendarLiquidityAllocationTime && (
-            <div className={s.calender}>
-              <Calendar
-                defaultTimestamp={liquidityAllocationTime}
-                onChange={(date: number) => setLiquidityAllocationTime(date)}
-                closeCalendar={() => setIsCalendarLiquidityAllocationTime(false)}
-              />
-            </div>
-          )}
         </div>
       </div>
     </section>
