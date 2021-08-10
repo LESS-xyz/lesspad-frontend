@@ -730,7 +730,7 @@ const CreatePoolPage: React.FC = () => {
                     title="Liquidity Allocation Time"
                     value={liquidityAllocationTime}
                     onChange={setLiquidityAllocationTime}
-                    error="Err"
+                    error={errors.liquidityAllocationTime}
                   />
                   <div className={s.datePicker}>
                     <div className={s.datePicker_title}>Liquidity Allocation Time</div>

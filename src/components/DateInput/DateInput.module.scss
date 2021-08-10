@@ -49,7 +49,21 @@
   }
 }
 
+.invalid_input {
+  color: var(--create-pool-input-invalid-color) !important;
+  border: 2px solid var(--create-pool-input-invalid-color);
 
+  svg {
+    path {
+      fill: var(--create-pool-input-invalid-color) !important;
+      stroke: var(--create-pool-input-invalid-color) !important;
+    }
+  }
+}
+
+.invalid_title {
+  color: var(--create-pool-input-invalid-color) !important;
+}
 
 // input
 .input {
