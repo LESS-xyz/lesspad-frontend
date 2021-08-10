@@ -13,6 +13,7 @@ type TypeGetInfoProps = {
   presaleInfo: any;
   presalePancakeSwapInfo: any;
   presaleStringInfo: any;
+  usdToEthFee: string;
 };
 
 export default class ContractPresaleFactoryService {
@@ -37,8 +38,13 @@ export default class ContractPresaleFactoryService {
 
   public createPresalePublic = async (props: TypeGetInfoProps) => {
     try {
-      const { userAddress, presaleInfo, presalePancakeSwapInfo, presaleStringInfo } = props;
-      const valueInWei = this.web3.utils.toWei('0.5', 'ether'); // todo
+      const {
+        userAddress,
+        presaleInfo,
+        presalePancakeSwapInfo,
+        presaleStringInfo,
+        usdToEthFee,
+      } = props;
       const presaleStringInfoFormatted = presaleStringInfo.map((item: string, ii: number) => {
         const hex = this.web3.utils.toHex(item);
         const zeros = new Array(66 - hex.length).fill('0').join('');
@@ -46,7 +52,7 @@ export default class ContractPresaleFactoryService {
         return item;
       });
       console.log('ContractPresaleFactoryService createPresalePublic:', {
-        valueInWei,
+        usdToEthFee,
         userAddress,
         presaleStringInfoFormatted,
       });
@@ -55,7 +61,7 @@ export default class ContractPresaleFactoryService {
         .createPresalePublic(presaleInfo, presalePancakeSwapInfo, presaleStringInfoFormatted)
         .send({
           from: userAddress,
-          value: valueInWei,
+          value: usdToEthFee,
         });
       return result;
     } catch (e) {

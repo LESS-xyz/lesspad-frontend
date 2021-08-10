@@ -22,6 +22,7 @@ const Backend = new BackendService();
 const CreatePoolPage: React.FC = () => {
   const { web3 } = useWeb3ConnectorContext();
   const {
+    ContractCalculations,
     ContractPresaleFactory,
     ContractLessToken,
     ContractLPToken,
@@ -83,6 +84,7 @@ const CreatePoolPage: React.FC = () => {
   const [whiteListed, setWhiteListed] = useState<string>('Whitelist');
   // const [isFormSubmitted, setIsFormSubmitted] = useState<boolean>(false);
 
+  const [usdtToEthFee, setUsdtToEthFee] = useState<string>();
   const [errors, setErrors] = useState<any>({});
 
   const isPublic = presaleType === 'Public';
@@ -121,6 +123,17 @@ const CreatePoolPage: React.FC = () => {
       setLessDecimals(resultLessDecimals);
       const resultLpDecimals = await ContractLPToken.decimals();
       setLpDecimals(resultLpDecimals);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  // todo: не работает со старым контрактом библиотеки
+  const getUsdtFeeForCreation = async () => {
+    try {
+      const resultUsdtToEthFee = await ContractCalculations.usdtToEthFee();
+      setUsdtToEthFee(resultUsdtToEthFee);
+      console.log('PageCreatePool getUsdtFeeForCreation:', resultUsdtToEthFee);
     } catch (e) {
       console.error(e);
     }
@@ -453,6 +466,7 @@ const CreatePoolPage: React.FC = () => {
           presaleInfo,
           presalePancakeSwapInfo,
           presaleStringInfo,
+          usdtToEthFee,
         });
         console.log('CreatePool handleSubmit', resultCreatePresalePublic);
       } else {
@@ -505,6 +519,8 @@ const CreatePoolPage: React.FC = () => {
     getDecimals();
     getStakedLess();
     getStakedLp();
+    if (!ContractCalculations) return;
+    getUsdtFeeForCreation();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ContractStaking, userAddress]);
 
@@ -653,17 +669,11 @@ const CreatePoolPage: React.FC = () => {
                     onChange={setLiquidityPercentageAllocation}
                     error={errors.liquidityPercentageAllocation}
                   />
-                  <Input
-                    title="Listing price"
-                    value={listingPrice}
-                    onChange={setListingPrice}
-                    // error={handleError(listingPrice)}
-                  />
+                  <Input title="Listing price" value={listingPrice} onChange={setListingPrice} />
                   <Input
                     title="Number Of Days To Lock LP Tokens"
                     value={lpTokensLockDurationInDays}
                     onChange={setLpTokensLockDurationInDays}
-                    // error={handleError(lpTokensLockDurationInDays)}
                   />
                   <DateInput
                     title="Liquidity Allocation Time"

@@ -1,11 +1,10 @@
+import CalculationsAbi from '../data/abi/CalculationsAbi';
 import ERC20Abi from '../data/abi/ERC20Abi';
 import LessLibraryAbi from '../data/abi/LessLibraryAbi';
 import LPTokenAbi from '../data/abi/LPTokenAbi';
 import PresaleCertifiedAbi from '../data/abi/PresaleCertifiedAbi';
 import PresaleFactoryAbi from '../data/abi/PresaleFactoryAbi';
-/*eslint-disable*/
 import PresaleFactoryCertifiedAbi from '../data/abi/PresaleFactoryCertifiedAbi';
-/*eslint-enable*/
 import PresalePublicAbi from '../data/abi/PresalePublicAbi';
 import StakingAbi from '../data/abi/StakingAbi';
 import UniswapRouterAbi from '../data/abi/UniswapRouterAbi';
@@ -100,6 +99,7 @@ export default {
     mainnet: {
       // todo
       Ethereum: {
+        // Calculations: '0x62786eeacc9246b4018e0146cb7a3efeacd9459d',
         LessToken: '0x62786eeacc9246b4018e0146cb7a3efeacd9459d',
         LessLibrary: '0x46589Ab934277E44A5060f3273761b86396d5429',
         Staking: '0xE751ffdC2a684EEbcaB9Dc95fEe05c083F963Bf1',
@@ -117,6 +117,7 @@ export default {
     },
     testnet: {
       'Ethereum': {
+        Calculations: '0xfd9a99354A1A7B171DBdA29F20c08625A5080c5C',
         LessToken: '0x87feef975fd65f32A0836f910Fd13d9Cf4553690',
         LPToken: '0x4fe142c6CBD294ef96DbBa8a837CdE3035850A97',
         Staking: '0x262a40e8780ac4E71813f010C93f04a20AA91782',
@@ -137,6 +138,7 @@ export default {
   abis: {
     mainnet: {
       Ethereum: {
+        Calculations: CalculationsAbi,
         ERC20: ERC20Abi,
         LessToken: ERC20Abi,
         LPToken: LPTokenAbi,
@@ -151,6 +153,7 @@ export default {
     },
     testnet: {
       Ethereum: {
+        Calculations: CalculationsAbi,
         ERC20: ERC20Abi,
         LessToken: ERC20Abi,
         LPToken: LPTokenAbi,
