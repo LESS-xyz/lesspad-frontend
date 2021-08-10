@@ -1,5 +1,6 @@
 const initialState = {
   minVoterBalance: '',
+  minCreatorStakedBalance: '',
 };
 
 export default (state = initialState, params: any) => {

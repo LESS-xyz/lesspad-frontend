@@ -10,7 +10,7 @@ import Input from '../../components/Input/index';
 import config from '../../config';
 import { useContractsContext } from '../../contexts/ContractsContext';
 import { useWeb3ConnectorContext } from '../../contexts/Web3Connector';
-import { modalActions } from '../../redux/actions';
+import { libraryActions, modalActions } from '../../redux/actions';
 import { BackendService } from '../../services/Backend';
 import { convertFromWei, convertToWei } from '../../utils/ethereum';
 import { prettyNumber } from '../../utils/prettifiers';
@@ -95,9 +95,13 @@ const CreatePoolPage: React.FC = () => {
 
   const { chainType } = useSelector(({ wallet }: any) => wallet);
   const { address: userAddress } = useSelector(({ user }: any) => user);
+  const { minCreatorStakedBalance } = useSelector(({ library }: any) => library);
 
   const dispatch = useDispatch();
   const toggleModal = React.useCallback((params) => dispatch(modalActions.toggleModal(params)), [
+    dispatch,
+  ]);
+  const setLibrary = React.useCallback((params) => dispatch(libraryActions.setLibrary(params)), [
     dispatch,
   ]);
 
@@ -123,6 +127,15 @@ const CreatePoolPage: React.FC = () => {
       setLessDecimals(resultLessDecimals);
       const resultLpDecimals = await ContractLPToken.decimals();
       setLpDecimals(resultLpDecimals);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const getMinCreatorStakedBalance = async () => {
+    try {
+      const resultGetMinCreatorStakedBalance = await ContractLessLibrary.getMinCreatorStakedBalance();
+      setLibrary({ minCreatorStakedBalance: resultGetMinCreatorStakedBalance });
     } catch (e) {
       console.error(e);
     }
@@ -286,7 +299,6 @@ const CreatePoolPage: React.FC = () => {
   const checkStakingBalance = async () => {
     try {
       const stakedSum = +stakedLess + +stakedLP * 300;
-      const minCreatorStakedBalance = await ContractLessLibrary.getMinCreatorStakedBalance();
       const minCreatorStakedBalanceInLp = minCreatorStakedBalance / 300;
       if (stakedSum < minCreatorStakedBalance)
         toggleModal({
@@ -514,6 +526,7 @@ const CreatePoolPage: React.FC = () => {
     if (!ContractLessLibrary) return;
     if (!ContractStaking) return;
     getDecimals();
+    getMinCreatorStakedBalance();
     getStakedLess();
     getStakedLp();
     if (!ContractCalculations) return;
