@@ -30,6 +30,10 @@ type TypeGetTierSignatureProps = {
   presale: string;
 };
 
+type TypeGetTiersAndWinnersProps = {
+  pool: string;
+};
+
 // type TypeAddPoolProps = {
 //   type_presale?: string;
 //   name: string;
@@ -148,6 +152,19 @@ export class BackendService {
     try {
       const url = `/tier/`;
       const result = await this.axios.post(url, props);
+      // console.log('BackendService getAllPools:', result);
+      return { data: result.data };
+    } catch (e) {
+      // console.error('BackendService getAllPools:', e);
+      return { data: null, error: e.response.data };
+    }
+  };
+
+  getTiersAndWinners = async (props: TypeGetTiersAndWinnersProps) => {
+    try {
+      const { pool } = props;
+      const url = `/${pool}/tiers/`;
+      const result = await this.axios.get(url, props);
       // console.log('BackendService getAllPools:', result);
       return { data: result.data };
     } catch (e) {

@@ -99,9 +99,24 @@ const Pool: React.FC = () => {
     }
   };
 
+  const getTiersAndWinners = async () => {
+    try {
+      const resultGetTiersAndWinners = await Backend.getTiersAndWinners({
+        pool: address,
+      });
+      console.log('PagePool getTiersAndWinners:', resultGetTiersAndWinners);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const getChainInfo = () => {
-    const chainInfoNew = chainsInfo.filter((item: any) => item.key === chainType);
-    setChainInfo(chainInfoNew[0]);
+    try {
+      const chainInfoNew = chainsInfo.filter((item: any) => item.key === chainType);
+      setChainInfo(chainInfoNew[0]);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const getInfo = async () => {
@@ -290,6 +305,13 @@ const Pool: React.FC = () => {
     getTokenDecimals();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ContractLessToken, userAddress, info]);
+
+  useEffect(() => {
+    if (!address) return;
+    // getDecimals();
+    getTiersAndWinners();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [address]);
 
   useEffect(() => {
     if (!chainType) return;
