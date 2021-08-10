@@ -46,9 +46,14 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
     // dislikesPercent,
   } = props;
   const { web3 } = useWeb3ConnectorContext();
-  const { ContractPresalePublic, ContractPresaleCertified } = useContractsContext();
+  const {
+    ContractPresalePublic,
+    ContractPresaleCertified,
+    ContractLessLibrary,
+  } = useContractsContext();
 
   const [info, setInfo] = useState<any>();
+  const [votingTime, setVotingTime] = useState<number>();
 
   const { address: userAddress } = useSelector(({ user }: any) => user);
   const { chainType } = useSelector(({ wallet }: any) => wallet);
@@ -74,6 +79,16 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
       const newInfo = await ContractPresalePublic.getInfo({ contractAddress: address });
       console.log('TokenCard getInfo public:', newInfo);
       if (newInfo) setInfo(newInfo);
+    }
+  };
+
+  const getVotingTime = async () => {
+    try {
+      const newInfo = await ContractLessLibrary.getVotingTime();
+      console.log('TokenCard getVotingTime:', newInfo);
+      setVotingTime(newInfo);
+    } catch (e) {
+      console.error('TableRow getVotingTime:', e);
     }
   };
 
@@ -169,15 +184,32 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ContractPresalePublic, address]);
 
+  useEffect(() => {
+    if (!ContractLessLibrary) return;
+    getVotingTime();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ContractLessLibrary]);
+
   // console.log('TableRow:', address, info);
 
   if (!address) return null; // todo
   if (!info) return null; // todo
 
-  const { hardCap, softCap, saleTitle, listingPrice, linkLogo, yesVotes = 0, noVotes = 0 } = info;
+  const {
+    hardCap,
+    softCap,
+    saleTitle,
+    listingPrice,
+    linkLogo,
+    yesVotes = 1,
+    noVotes = 0,
+    openVotingTime = 0, // todo: remove 0
+  } = info;
 
   const yesVotesPercent = yesVotes ? ((yesVotes / (yesVotes + noVotes)) * 100).toFixed(2) : 0;
   const noVotesPercent = noVotes === 0 ? 0 : 100 - +yesVotesPercent;
+  const isYesVotesMore = yesVotes > noVotes;
+  const isVotingEnded = Date.now() > openVotingTime + votingTime; // todo: check work
 
   return (
     <div className={`${s.row} ${index % 2 === 1 && s.filled}`}>
@@ -256,17 +288,19 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
       </div>
 
       <div className={s.row_cell}>
-        <div className={s.button_border}>
-          <div
-            className={`${s.button} ${index % 2 === 1 && s.buttonDarkBg}`}
-            role="button"
-            tabIndex={0}
-            onClick={handleRegister}
-            onKeyDown={() => {}}
-          >
-            <div className="gradient-button-text">Get in presale</div>
+        {isVotingEnded && isYesVotesMore && (
+          <div className={s.button_border}>
+            <div
+              className={`${s.button} ${index % 2 === 1 && s.buttonDarkBg}`}
+              role="button"
+              tabIndex={0}
+              onClick={handleRegister}
+              onKeyDown={() => {}}
+            >
+              <div className="gradient-button-text">Get in presale</div>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

@@ -20,6 +20,8 @@ export default class ContractLessLibraryService {
 
   public contractName: any;
 
+  public contract: any;
+
   public ContractLessToken: any;
 
   public ContractLpToken: any;
@@ -33,6 +35,7 @@ export default class ContractLessLibraryService {
     this.contractName = 'LessLibrary';
     this.contractAddress = addressesOfNetType[chainType][this.contractName];
     this.contractAbi = abisOfNetType[chainType][this.contractName];
+    this.contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
     this.ContractLessToken = new ContractLessTokenService({ web3Provider, chainType });
     this.ContractLpToken = new ContractLpTokenService({ web3Provider, chainType });
   }
@@ -134,6 +137,16 @@ export default class ContractLessLibraryService {
       return result;
     } catch (e) {
       console.error('ContractLessLibraryService getUniswapRouter:', e);
+      return null;
+    }
+  };
+
+  public getVotingTime = async () => {
+    try {
+      const result = await this.contract.methods.getVotingTime().call();
+      return result;
+    } catch (e) {
+      console.error('ContractLessLibraryService getVotingTime:', e);
       return null;
     }
   };
