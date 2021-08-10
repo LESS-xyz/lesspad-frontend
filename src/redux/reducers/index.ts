@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux';
 
+import library from './library';
 import modal from './modal';
 import pool from './pool';
 import status from './status';
@@ -12,4 +13,5 @@ export default combineReducers({
   modal,
   status,
   pool,
+  library,
 });

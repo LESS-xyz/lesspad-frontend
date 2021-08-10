@@ -43,8 +43,7 @@ export default class ContractLessLibraryService {
   public getPresalesCount = async () => {
     try {
       // console.log('ContractLessLibraryService getPresalesCount:', this.contractAbi, this.contractAddress)
-      const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
-      const result = await contract.methods.getPresalesCount().call();
+      const result = await this.contract.methods.getPresalesCount().call();
       return result;
     } catch (e) {
       console.error('ContractLessLibraryService getPresalesCount:', e);
@@ -55,12 +54,11 @@ export default class ContractLessLibraryService {
   public getPresalesAddresses = async () => {
     try {
       // console.log('ContractLessLibraryService getPresalesAddresses:', this.contractAbi, this.contractAddress)
-      const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
-      const count = await contract.methods.getPresalesCount().call();
+      const count = await this.contract.methods.getPresalesCount().call();
       const addresses: string[] = [];
       if (count) {
         for (let i = 0; i < count; i += 1) {
-          const address = await contract.methods.getPresaleAddress(i).call();
+          const address = await this.contract.methods.getPresaleAddress(i).call();
           addresses.push(address);
         }
       }
@@ -73,8 +71,7 @@ export default class ContractLessLibraryService {
 
   public getMinUnstakeTime = async () => {
     try {
-      const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
-      const result = await contract.methods.getMinUnstakeTime().call();
+      const result = await this.contract.methods.getMinUnstakeTime().call();
       return result;
     } catch (e) {
       console.error('ContractLessLibraryService getMinUnstakeTime:', e);
@@ -84,9 +81,11 @@ export default class ContractLessLibraryService {
 
   public getMinVoterBalance = async () => {
     try {
-      const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
-      const balance = await contract.methods.getMinVoterBalance().call();
-      return balance;
+      const balance = await this.contract.methods.getMinVoterBalance().call();
+      const decimals = await this.ContractLessToken.decimals();
+      const pow = new BN(10).pow(new BN(decimals));
+      const result = new BN(balance).div(pow).toString(10);
+      return result;
     } catch (e) {
       console.error('ContractLessLibraryService getMinVoterBalance:', e);
       return null;
@@ -95,8 +94,7 @@ export default class ContractLessLibraryService {
 
   public getMinCreatorStakedBalance = async () => {
     try {
-      const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
-      const balance = await contract.methods.getMinCreatorStakedBalance().call();
+      const balance = await this.contract.methods.getMinCreatorStakedBalance().call();
       const decimals = await this.ContractLessToken.decimals();
       const pow = new BN(10).pow(new BN(decimals));
       const result = new BN(balance).div(pow).toString(10);
@@ -109,8 +107,7 @@ export default class ContractLessLibraryService {
 
   public getArrForSearch = async () => {
     try {
-      const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
-      const arrForSearch = await contract.methods.getArrForSearch().call();
+      const arrForSearch = await this.contract.methods.getArrForSearch().call();
       const arrForSearchFormatted = arrForSearch.map((item: any) => {
         let { description, title } = item;
         const { isCertified, presaleAddress } = item;
@@ -132,8 +129,7 @@ export default class ContractLessLibraryService {
 
   public getUniswapRouter = async () => {
     try {
-      const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
-      const result = await contract.methods.getUniswapRouter().call();
+      const result = await this.contract.methods.getUniswapRouter().call();
       return result;
     } catch (e) {
       console.error('ContractLessLibraryService getUniswapRouter:', e);

@@ -5,7 +5,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import Button from '../../components/Button';
 // import logo1 from '../../assets/img/sections/logos/logo1.png';
 import Search from '../../components/Search/index';
-import { modalActions } from '../../redux/actions';
+import { useContractsContext } from '../../contexts/ContractsContext';
+import { libraryActions, modalActions } from '../../redux/actions';
+import { prettyNumber } from '../../utils/prettifiers';
 
 import Table from './Table/index';
 
@@ -45,13 +47,19 @@ import s from './PageVoting.module.scss';
 // ];
 
 const PageVoting: React.FC = () => {
+  const { ContractLessLibrary } = useContractsContext();
+
   const [search, setSearch] = useState<string>('');
   const [presalesAddressesFiltered, setPresalesAddressesFiltered] = useState<any[]>([]);
 
   const { pools } = useSelector(({ pool }: any) => pool);
+  const { minVoterBalance } = useSelector(({ library }: any) => library);
 
   const dispatch = useDispatch();
   const toggleModal = React.useCallback((params) => dispatch(modalActions.toggleModal(params)), [
+    dispatch,
+  ]);
+  const setLibrary = React.useCallback((params) => dispatch(libraryActions.setLibrary(params)), [
     dispatch,
   ]);
 
@@ -74,13 +82,24 @@ const PageVoting: React.FC = () => {
     }
   };
 
+  const getMinVoterBalance = async () => {
+    try {
+      const resultGetMinVoterBalance = await ContractLessLibrary.getMinVoterBalance();
+      setLibrary({ minVoterBalance: resultGetMinVoterBalance });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const handleShowInfo = () => {
     try {
       toggleModal({
         open: true,
         text: (
           <div className={s.messageContainer}>
-            You need 500 $LESS or ... ETH-LESS LP in stake to be able to vote
+            You need at least {minVoterBalance} $LESS or{' '}
+            {prettyNumber((+minVoterBalance / 300).toString())} ETH-LESS LP in stake to be able to
+            vote
             <div className={s.messageContainerButtons}>
               <Button to="/staking">Go to Staking</Button>
             </div>
@@ -91,6 +110,13 @@ const PageVoting: React.FC = () => {
       console.error(e);
     }
   };
+
+  useEffect(() => {
+    if (!ContractLessLibrary) return;
+    // console.log('PageVoting pools:', pools)
+    getMinVoterBalance();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ContractLessLibrary]);
 
   useEffect(() => {
     if (!pools || !pools.length) return;

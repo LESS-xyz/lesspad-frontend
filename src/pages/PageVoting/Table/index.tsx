@@ -310,7 +310,9 @@ interface ITableProps {
   data: string[];
 }
 
-const Table: React.FC<ITableProps> = ({ data }) => {
+const Table: React.FC<ITableProps> = (props) => {
+  const { data } = props;
+
   const { chainType } = useSelector(({ wallet }: any) => wallet);
 
   const [page, setPage] = useState<number>(0);
