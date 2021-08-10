@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useDispatch, useSelector } from 'react-redux';
-import { BigNumber as BN } from 'bignumber.js/bignumber';
 
+// import { BigNumber as BN } from 'bignumber.js/bignumber';
 import Button from '../../components/Button';
 import Checkbox from '../../components/Checkbox/index';
 import DateInput from '../../components/DateInput';
@@ -12,24 +12,12 @@ import { useContractsContext } from '../../contexts/ContractsContext';
 import { useWeb3ConnectorContext } from '../../contexts/Web3Connector';
 import { modalActions } from '../../redux/actions';
 import { BackendService } from '../../services/Backend';
-import { convertFromWei } from '../../utils/ethereum';
+import { convertFromWei, convertToWei } from '../../utils/ethereum';
 import { prettyNumber } from '../../utils/prettifiers';
 
 import s from './CreatePool.module.scss';
 
 const Backend = new BackendService();
-
-// enum EnumFieldType {
-//   ADDRESS = 'ADDRESS',
-//   TIME = 'TIME',
-//   STRING = 'STRING',
-// }
-//
-// type TypeHandleError = {
-//   value: any;
-//   message?: string;
-//   type?: EnumFieldType;
-// };
 
 const CreatePoolPage: React.FC = () => {
   const { web3 } = useWeb3ConnectorContext();
@@ -58,16 +46,16 @@ const CreatePoolPage: React.FC = () => {
   const [tokenAddress, setTokenAddress] = useState<string>(
     '0xa372d1d35041714092900B233934fB2D002755E2',
   );
-  const [tokenPriceInWei, setTokenPriceInWei] = useState<string>('1000000000000000000');
+  const [tokenPrice, setTokenPrice] = useState<string>('1');
   // инпуты для Public type
-  const [softCapInWei, setSoftCapInWei] = useState<string>('1000000000000000000');
-  const [hardCapInWei, setHardCapInWei] = useState<string>('2000000000000000000');
+  const [softCap, setSoftCap] = useState<string>('1');
+  const [hardCap, setHardCap] = useState<string>('2');
   const [openVotingTime, setOpenVotingTime] = useState<number>(defaultOpenVotingTime);
   const [openTime, setOpenTime] = useState<number>(defaultOpenTime);
   const [closeTime, setCloseTime] = useState<number>(defaultCloseTime);
   const [liquidityPercent, setLiquidityPercent] = useState<string>('0');
   const [liquidityPercentageAllocation, setLiquidityPercentageAllocation] = useState<string>('1');
-  const [listingPriceInWei, setListingPriceInWei] = useState<string>('1000000000000000000');
+  const [listingPrice, setListingPrice] = useState<string>('1');
   const [lpTokensLockDurationInDays, setLpTokensLockDurationInDays] = useState('0');
   const [vestingPercent, setVestingPercent] = useState<string>('0');
   const [liquidityAllocationTime, setLiquidityAllocationTime] = useState<number>(
@@ -111,8 +99,8 @@ const CreatePoolPage: React.FC = () => {
     dispatch,
   ]);
 
-  const minInvestInWei = new BN(10).pow(new BN(10)).toString(10); // todo
-  const maxInvestInWei = new BN(10).pow(new BN(20)).toString(10); // todo
+  // const minInvest = new BN(10).pow(new BN(10)).toString(10); // todo
+  // const maxInvest = new BN(10).pow(new BN(20)).toString(10); // todo
   // const presaleType = isPublic ? 1 : 0;
   // const whitelistArray = whitelist ? whitelist.split(',') : [];
 
@@ -158,11 +146,9 @@ const CreatePoolPage: React.FC = () => {
       };
       const newErrors = {
         saleTitle: checkIfValueExists(saleTitle),
-        tokenPriceInWei: checkIfValueExists(tokenPriceInWei),
-        softCapInWei: checkIfValueExists(softCapInWei),
-        hardCapInWei: checkIfValueExists(hardCapInWei),
-        maxInvestInWei: checkIfValueExists(maxInvestInWei),
-        minInvestInWei: checkIfValueExists(minInvestInWei),
+        tokenPrice: checkIfValueExists(tokenPrice),
+        softCap: checkIfValueExists(softCap),
+        hardCap: checkIfValueExists(hardCap),
         openTime: checkIfValueExists(openTime),
         closeTime: checkIfValueExists(closeTime),
         liquidityPercent: checkIfValueExists(liquidityPercent) || checkPercent(liquidityPercent),
@@ -173,17 +159,15 @@ const CreatePoolPage: React.FC = () => {
       setErrors({ ...errors, ...newErrors });
       if (!saleTitle) return false;
       if (!tokenAddress) return false;
-      if (!tokenPriceInWei) return false;
-      if (!softCapInWei) return false;
-      if (!hardCapInWei) return false;
-      if (!maxInvestInWei) return false;
-      if (!minInvestInWei) return false;
+      if (!tokenPrice) return false;
+      if (!softCap) return false;
+      if (!hardCap) return false;
       if (!openTime) return false;
       if (!closeTime) return false;
       if (!isPublic) {
         // if (!liquidityPercent) return false;
         // if (!whitelistArray) return false;
-        // if (!listingPriceInWei) return false;
+        // if (!listingPrice) return false;
         // if (!lpTokensLockDurationInDays) return false;
         // if (!liquidityPercentageAllocation) return false;
         // if (!liquidityAllocationTime) return false;
@@ -424,28 +408,29 @@ const CreatePoolPage: React.FC = () => {
           }
         }
       }
-      const tokenAmountInEth = new BN(`${tokenAmount}`)
-        .div(new BN(10).pow(new BN(lessDecimals)))
-        .toString(10);
+
+      const tokenDecimals = await ContractUniswapRouter.decimals({ contractAddress: tokenAddress });
+      const hardCapInWei = convertToWei(hardCap, tokenDecimals);
+      const softCapInWei = convertToWei(softCap, tokenDecimals);
 
       const WETHAddress = await ContractUniswapRouter.getWETHAddress(); // todo: убрать в новом контракте
-      console.log('PageCreatePool handleSubmit WETHAddress:', WETHAddress);
+
       const presaleInfo = [
         tokenAddress,
-        tokenPriceInWei,
+        tokenPrice,
         hardCapInWei,
         softCapInWei,
         (openVotingTime / 1000).toFixed(),
         (openTime / 1000).toFixed(),
         (closeTime / 1000).toFixed(),
-        tokenAmountInEth,
+        tokenAmount,
         // hexToBytes(signature),
         signature,
         timestamp.toString(),
         WETHAddress,
       ];
       const presalePancakeSwapInfo = [
-        listingPriceInWei,
+        listingPrice,
         lpTokensLockDurationInDays,
         liquidityPercentageAllocation,
         liquidityAllocationTime,
@@ -528,11 +513,9 @@ const CreatePoolPage: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     saleTitle,
-    tokenPriceInWei,
-    softCapInWei,
-    hardCapInWei,
-    maxInvestInWei,
-    minInvestInWei,
+    tokenPrice,
+    softCap,
+    hardCap,
     openTime,
     closeTime,
     liquidityPercent,
@@ -603,23 +586,23 @@ const CreatePoolPage: React.FC = () => {
                 error={errors.tokenAddress}
               />
               <Input
-                title="Token Price (in wei)"
-                value={tokenPriceInWei}
-                onChange={setTokenPriceInWei}
-                error={errors.tokenPriceInWei}
+                title="Token Price"
+                value={tokenPrice}
+                onChange={setTokenPrice}
+                error={errors.tokenPrice}
               />
               <div className={s.small_inputs}>
                 <Input
-                  title="Soft Cap (in wei)"
-                  value={softCapInWei}
-                  onChange={setSoftCapInWei}
-                  error={errors.softCapInWei}
+                  title="Soft Cap"
+                  value={softCap}
+                  onChange={setSoftCap}
+                  error={errors.softCap}
                 />
                 <Input
-                  title="Hard Cap (in wei)"
-                  value={hardCapInWei}
-                  onChange={setHardCapInWei}
-                  error={errors.hardCapInWei}
+                  title="Hard Cap"
+                  value={hardCap}
+                  onChange={setHardCap}
+                  error={errors.hardCap}
                 />
               </div>
 
@@ -671,10 +654,10 @@ const CreatePoolPage: React.FC = () => {
                     error={errors.liquidityPercentageAllocation}
                   />
                   <Input
-                    title="Listing price (in wei)"
-                    value={listingPriceInWei}
-                    onChange={setListingPriceInWei}
-                    // error={handleError(listingPriceInWei)}
+                    title="Listing price"
+                    value={listingPrice}
+                    onChange={setListingPrice}
+                    // error={handleError(listingPrice)}
                   />
                   <Input
                     title="Number Of Days To Lock LP Tokens"
