@@ -158,36 +158,51 @@ const CreatePoolPage: React.FC = () => {
   // };
 
   const validateForm = async () => {
-    const message = 'Enter value';
-    const newErrors = {
-      saleTitle: saleTitle ? null : message,
-      tokenPriceInWei: tokenPriceInWei ? null : message,
-      softCapInWei: softCapInWei ? null : message,
-      hardCapInWei: hardCapInWei ? null : message,
-      maxInvestInWei: maxInvestInWei ? null : message,
-      minInvestInWei: minInvestInWei ? null : message,
-      openTime: openTime ? null : message,
-      closeTime: closeTime ? null : message,
-    };
-    setErrors({ ...errors, ...newErrors });
-    if (!saleTitle) return false;
-    if (!tokenAddress) return false;
-    if (!tokenPriceInWei) return false;
-    if (!softCapInWei) return false;
-    if (!hardCapInWei) return false;
-    if (!maxInvestInWei) return false;
-    if (!minInvestInWei) return false;
-    if (!openTime) return false;
-    if (!closeTime) return false;
-    if (!isPublic) {
-      // if (!liquidityPercent) return false;
-      // if (!whitelistArray) return false;
-      // if (!listingPriceInWei) return false;
-      // if (!lpTokensLockDurationInDays) return false;
-      // if (!liquidityPercentageAllocation) return false;
-      // if (!liquidityAllocationTime) return false;
+    try {
+      const checkIfValueExists = (value: any) => {
+        return value ? null : 'Enter value';
+      };
+      const checkPercent = (value: any) => {
+        const isPercentageValid = +value >= 0 && +value <= 100;
+        return isPercentageValid ? null : 'Percent value should be between 0 and 100';
+      };
+      const newErrors = {
+        saleTitle: checkIfValueExists(saleTitle),
+        tokenPriceInWei: checkIfValueExists(tokenPriceInWei),
+        softCapInWei: checkIfValueExists(softCapInWei),
+        hardCapInWei: checkIfValueExists(hardCapInWei),
+        maxInvestInWei: checkIfValueExists(maxInvestInWei),
+        minInvestInWei: checkIfValueExists(minInvestInWei),
+        openTime: checkIfValueExists(openTime),
+        closeTime: checkIfValueExists(closeTime),
+        liquidityPercent: checkIfValueExists(liquidityPercent) || checkPercent(liquidityPercent),
+        liquidityPercentageAllocation: liquidityPercentageAllocation
+          ? checkPercent(liquidityPercentageAllocation)
+          : null,
+      };
+      setErrors({ ...errors, ...newErrors });
+      if (!saleTitle) return false;
+      if (!tokenAddress) return false;
+      if (!tokenPriceInWei) return false;
+      if (!softCapInWei) return false;
+      if (!hardCapInWei) return false;
+      if (!maxInvestInWei) return false;
+      if (!minInvestInWei) return false;
+      if (!openTime) return false;
+      if (!closeTime) return false;
+      if (!isPublic) {
+        // if (!liquidityPercent) return false;
+        // if (!whitelistArray) return false;
+        // if (!listingPriceInWei) return false;
+        // if (!lpTokensLockDurationInDays) return false;
+        // if (!liquidityPercentageAllocation) return false;
+        // if (!liquidityAllocationTime) return false;
+      }
+      return true;
+    } catch (e) {
+      console.error(e);
+      return false;
     }
-    return true;
   };
 
   const validateAddresses = async () => {
@@ -211,7 +226,7 @@ const CreatePoolPage: React.FC = () => {
     }
   };
 
-  const checkTime = () => {
+  const validateTime = () => {
     // openTime > block.timestamp &&
     // openVotingTime + safeLibrary.getVotingTime() + 86400 <= openTime &&
     // openTime < closeTime &&
@@ -384,7 +399,7 @@ const CreatePoolPage: React.FC = () => {
         });
         return;
       }
-      if (!checkTime) return;
+      if (!validateTime) return;
       // setIsFormSubmitted(true);
       const resultApprove = await approve();
       if (!resultApprove) return;
@@ -531,6 +546,8 @@ const CreatePoolPage: React.FC = () => {
     minInvestInWei,
     openTime,
     closeTime,
+    liquidityPercent,
+    liquidityPercentageAllocation,
   ]);
 
   useEffect(() => {
@@ -688,13 +705,13 @@ const CreatePoolPage: React.FC = () => {
                     title="Liquidity Percent"
                     value={liquidityPercent}
                     onChange={setLiquidityPercent}
-                    // error={handleError(liquidityPercent)}
+                    error={errors.liquidityPercent}
                   />
                   <Input
                     title="Liquidity Percentage allocation"
                     value={liquidityPercentageAllocation}
                     onChange={setLiquidityPercentageAllocation}
-                    // error={handleError(liquidityPercentageAllocation)}
+                    error={errors.liquidityPercentageAllocation}
                   />
                   <Input
                     title="Listing price (in wei)"
