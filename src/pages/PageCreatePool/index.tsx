@@ -351,7 +351,6 @@ const CreatePoolPage: React.FC = () => {
       event.preventDefault();
       console.log('PageCreatePool handleSubmit:', { vestingPercent });
       if (!validateForm()) {
-        // setIsFormSubmitted(true);
         toggleModal({
           open: true,
           text: (
@@ -364,7 +363,6 @@ const CreatePoolPage: React.FC = () => {
       }
       const areAddressesValid = await validateAddresses();
       if (!areAddressesValid) {
-        // setIsFormSubmitted(true);
         toggleModal({
           open: true,
           text: (
@@ -386,7 +384,6 @@ const CreatePoolPage: React.FC = () => {
         });
         return;
       }
-      // setIsFormSubmitted(true);
       const resultApprove = await approve();
       if (!resultApprove) return;
       // login to backend
@@ -547,6 +544,20 @@ const CreatePoolPage: React.FC = () => {
     validateAddresses();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tokenAddress]);
+
+  useEffect(() => {
+    if (!isPublic) {
+      toggleModal({
+        open: true,
+        text: (
+          <div className={s.messageContainer}>
+            <p>Creating certified presale is coming soon</p>
+          </div>
+        ),
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPublic]);
 
   useEffect(() => {
     if (!ContractLessToken) return;
