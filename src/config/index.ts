@@ -121,7 +121,7 @@ export default {
         LPToken: '0x4fe142c6CBD294ef96DbBa8a837CdE3035850A97',
         Staking: '0x262a40e8780ac4E71813f010C93f04a20AA91782',
         LessLibrary: '0x8A60F3FA37f9e3BA08909ace4edfea0c7D183587',
-        PresaleFactory: '0x73D55c3720De899814B28d2cfd8b14077665dEE6',
+        PresaleFactory: '0x451d4bC560404b0aF65f967B125c864EbD69559d',
         PresaleFactoryCertified: '0x73D55c3720De899814B28d2cfd8b14077665dEE6',
       },
       'Binance-Smart-Chain': {

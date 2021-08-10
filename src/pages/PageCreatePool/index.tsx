@@ -8,6 +8,7 @@ import calendarImg from '../../assets/img/icons/calendar.svg';
 import Button from '../../components/Button';
 import Calendar from '../../components/Calendar/index';
 import Checkbox from '../../components/Checkbox/index';
+import DateInput from '../../components/DateInput';
 import Input from '../../components/Input/index';
 import config from '../../config';
 import { useContractsContext } from '../../contexts/ContractsContext';
@@ -724,6 +725,12 @@ const CreatePoolPage: React.FC = () => {
                     value={lpTokensLockDurationInDays}
                     onChange={setLpTokensLockDurationInDays}
                     // error={handleError(lpTokensLockDurationInDays)}
+                  />
+                  <DateInput
+                    title="Liquidity Allocation Time"
+                    value={liquidityAllocationTime}
+                    onChange={setLiquidityAllocationTime}
+                    error="Err"
                   />
                   <div className={s.datePicker}>
                     <div className={s.datePicker_title}>Liquidity Allocation Time</div>
