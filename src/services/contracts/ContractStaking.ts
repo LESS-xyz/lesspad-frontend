@@ -351,4 +351,32 @@ export default class ContractStakingService {
       return null;
     }
   };
+
+  public poolPercentages = async (): Promise<any> => {
+    try {
+      const result: string[] = [];
+      for (let i = 0; i <= 3; i += 1) {
+        const resultPoolPercentages = await this.contract.methods.poolPercentages(i).call();
+        result.push(resultPoolPercentages);
+      }
+      return result;
+    } catch (e) {
+      console.error('ContractStakingService poolPercentages:', e);
+      return null;
+    }
+  };
+
+  public stakingTiers = async (): Promise<any> => {
+    try {
+      const result: string[] = [];
+      for (let i = 0; i <= 4; i += 1) {
+        const resultStakingTiers = await this.contract.methods.stakingTiers(i).call();
+        result.push(resultStakingTiers);
+      }
+      return result;
+    } catch (e) {
+      console.error('ContractStakingService stakingTiers:', e);
+      return null;
+    }
+  };
 }

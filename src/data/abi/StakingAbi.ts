@@ -87,6 +87,13 @@ export default [
     type: 'function',
   },
   {
+    inputs: [],
+    name: 'emergencyWithdraw',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
     inputs: [{ internalType: 'address', name: 'user', type: 'address' }],
     name: 'getAmountOfUsersStakes',
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
@@ -132,29 +139,6 @@ export default [
     inputs: [{ internalType: 'address', name: 'user', type: 'address' }],
     name: 'getOverallBalanceInLessByAddress',
     outputs: [{ internalType: 'uint256', name: 'overall', type: 'uint256' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [{ internalType: 'uint256', name: 'day', type: 'uint256' }],
-    name: 'getRewardDeposits',
-    outputs: [
-      { internalType: 'uint256', name: '', type: 'uint256' },
-      { internalType: 'uint256', name: '', type: 'uint256' },
-      { internalType: 'uint256', name: '', type: 'uint256' },
-      { internalType: 'uint256', name: '', type: 'uint256' },
-      { internalType: 'uint256[]', name: '', type: 'uint256[]' },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'getTodayPenalty',
-    outputs: [
-      { internalType: 'uint256', name: '', type: 'uint256' },
-      { internalType: 'uint256', name: '', type: 'uint256' },
-    ],
     stateMutability: 'view',
     type: 'function',
   },

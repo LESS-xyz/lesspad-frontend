@@ -58,7 +58,7 @@ export default class ContractPresaleFactoryService {
       });
       const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
       const result = await contract.methods
-        .createPresalePublic(presaleInfo, presalePancakeSwapInfo, presaleStringInfoFormatted)
+        .createPresale(presaleInfo, presalePancakeSwapInfo, presaleStringInfoFormatted)
         .send({
           from: userAddress,
           value: usdToEthFee,
