@@ -152,15 +152,6 @@ const CreatePoolPage: React.FC = () => {
     }
   };
 
-  // const handleError = async ({ value, message, type }: TypeHandleError) => {
-  //   if (type === EnumFieldType.ADDRESS) {
-  //     const isTokenAddressValid = await web3.isAddress(value);
-  //     if (!isTokenAddressValid) return 'Address is not valid';
-  //   }
-  //   if (isFormSubmitted && !value) return message || 'Enter value';
-  //   return '';
-  // };
-
   const validateForm = () => {
     try {
       const checkIfValueExists = (value: any) => {
@@ -217,7 +208,7 @@ const CreatePoolPage: React.FC = () => {
       setErrors({ ...errors, ...newErrors });
       if (!isTokenAddressValid) return false;
       if (!isPublic) {
-        // if (!web3.isAddress(tokenAddress)) return false;
+        //
       }
       return true;
     } catch (e) {
@@ -227,10 +218,6 @@ const CreatePoolPage: React.FC = () => {
   };
 
   const validateTime = () => {
-    // openTime > block.timestamp &&
-    // openVotingTime + safeLibrary.getVotingTime() + 86400 <= openTime &&
-    // openTime < closeTime &&
-    // closeTime < _cakeInfo.liquidityAllocationTime,
     // checks
     // todo block timestamp
     const isOpenVotingTimeMoreThanBlockTimestamp = openTime > Date.now();
@@ -361,6 +348,17 @@ const CreatePoolPage: React.FC = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     try {
       event.preventDefault();
+      if (!isPublic) {
+        toggleModal({
+          open: true,
+          text: (
+            <div className={s.messageContainer}>
+              <p>Creating certified presale is coming soon</p>
+            </div>
+          ),
+        });
+        return;
+      }
       console.log('PageCreatePool handleSubmit:', { vestingPercent });
       if (!validateForm()) {
         toggleModal({
@@ -484,6 +482,7 @@ const CreatePoolPage: React.FC = () => {
         // uint8 vesting; - процент вестинга
         // address[] whitelist; - список адресов для приватного пресейла (если список пустой, то проводится регистрация как на публичном)
         // address nativeToken; - в какой валюте продавать токены (котируются WETH, USDT, USDC)
+        // const nativeTokenAddress = // todo: get from library contract?
         const whiteListArray1 = splitWhitelist(whitelist1);
         const whiteListArray2 = splitWhitelist(whitelist2);
         const whiteListArray3 = splitWhitelist(whitelist3);
@@ -498,7 +497,7 @@ const CreatePoolPage: React.FC = () => {
           whiteListArray3, // todo check
           whiteListArray4, // todo check
           whiteListArray5, // todo check
-          nativeToken,
+          nativeToken, // todo: nativeTokenAddress get from library contract?
         ];
         console.log('CreatePool handleSubmit:', {
           isPublic,
