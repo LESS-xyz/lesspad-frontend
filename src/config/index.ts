@@ -104,7 +104,6 @@ export default {
         LessLibrary: '0x46589Ab934277E44A5060f3273761b86396d5429',
         Staking: '0xE751ffdC2a684EEbcaB9Dc95fEe05c083F963Bf1',
         PresaleFactory: '0xB9733F217111A845A268d1D98EE91800907860e2',
-        PresalePublic: '0xeA63Bfc235c1f70BE88287BCed13A42550C40DF3',
         LPToken: '0x432dbbd09fee1dfb2cae40c5abc1a301a2ef76ee',
       },
       // 'Binance-Smart-Chain': {
@@ -117,12 +116,12 @@ export default {
     },
     testnet: {
       'Ethereum': {
-        Calculations: '0xfd9a99354A1A7B171DBdA29F20c08625A5080c5C',
-        LessToken: '0x87feef975fd65f32A0836f910Fd13d9Cf4553690',
+        Calculations: '0x8fFdc72Ca758984D0A0E1084e35340Fe04de9b45',
+        LessToken: '0x3561A02e1192B89e2415724f43521f898e867013',
         LPToken: '0x4fe142c6CBD294ef96DbBa8a837CdE3035850A97',
         Staking: '0x262a40e8780ac4E71813f010C93f04a20AA91782',
-        LessLibrary: '0x8A60F3FA37f9e3BA08909ace4edfea0c7D183587',
-        PresaleFactory: '0x451d4bC560404b0aF65f967B125c864EbD69559d',
+        LessLibrary: '0xef38c1f4fA0f3ceA1bA1756947ad5dd1B0BC9640',
+        PresaleFactory: '0xc151A54530b7F33EdC7a486876b602D6324eF63D',
         PresaleFactoryCertified: '0x73D55c3720De899814B28d2cfd8b14077665dEE6',
       },
       'Binance-Smart-Chain': {
