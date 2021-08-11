@@ -31,6 +31,16 @@ export default class ContractERC20 {
     this.contractAbi = abisOfNetType[chainType][this.contractName];
   }
 
+  public symbol = async ({ contractAddress }): Promise<number | null> => {
+    try {
+      const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
+      return await contract.methods.symbol().call();
+    } catch (e) {
+      console.error('ContractERC20 symbol:', e);
+      return null;
+    }
+  };
+
   public decimals = async ({ contractAddress }): Promise<number | null> => {
     try {
       const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);

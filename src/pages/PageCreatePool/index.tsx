@@ -413,6 +413,9 @@ const CreatePoolPage: React.FC = () => {
       const decimals = await ContractERC20.decimals({
         contractAddress: tokenAddress,
       });
+      const symbol = await ContractERC20.symbol({
+        contractAddress: tokenAddress,
+      });
       const amountOfTokensToCreateInEth = convertFromWei(amountOfTokensToCreate, decimals);
       const isBalanceOfTokensLessThanNeededToCreate = balanceOf < amountOfTokensToCreate;
       console.log('PageCreatePool handleSubmit:', { balanceOf, amountOfTokensToCreate });
@@ -421,7 +424,10 @@ const CreatePoolPage: React.FC = () => {
           open: true,
           text: (
             <div className={s.messageContainer}>
-              <p>You need {amountOfTokensToCreateInEth} of your tokens to create</p>
+              <p>
+                You need to have {amountOfTokensToCreateInEth} {symbol} tokens on balance to create
+                pool
+              </p>
             </div>
           ),
         });
