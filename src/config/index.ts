@@ -120,7 +120,7 @@ export default {
         LessToken: '0x87feef975fd65f32A0836f910Fd13d9Cf4553690',
         LPToken: '0x4fe142c6cbd294ef96dbba8a837cde3035850a97',
         Staking: '0xE4D00cA4eceFB3bEE229FFf97ffF3de3bBAD4B4B',
-        LessLibrary: '0xef38c1f4fA0f3ceA1bA1756947ad5dd1B0BC9640',
+        LessLibrary: '0xc0F0352a566681790D76D32842537D06032D36Bb',
         PresaleFactory: '0x2900756111e324f6493CbFfc1b678D6531D29A09',
         PresaleFactoryCertified: '0x73D55c3720De899814B28d2cfd8b14077665dEE6',
       },
