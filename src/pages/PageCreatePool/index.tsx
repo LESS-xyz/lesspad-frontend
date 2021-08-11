@@ -54,10 +54,9 @@ const CreatePoolPage: React.FC = () => {
   const [openVotingTime, setOpenVotingTime] = useState<number>(defaultOpenVotingTime);
   const [openTime, setOpenTime] = useState<number>(defaultOpenTime);
   const [closeTime, setCloseTime] = useState<number>(defaultCloseTime);
-  const [liquidityPercent, setLiquidityPercent] = useState<string>('0');
   const [liquidityPercentageAllocation, setLiquidityPercentageAllocation] = useState<string>('1');
   const [listingPrice, setListingPrice] = useState<string>('1');
-  const [lpTokensLockDurationInDays, setLpTokensLockDurationInDays] = useState('0');
+  const [lpTokensLockDurationInDays, setLpTokensLockDurationInDays] = useState('30');
   const [vestingPercent, setVestingPercent] = useState<string>('0');
   const [liquidityAllocationTime, setLiquidityAllocationTime] = useState<number>(
     defaultLiquidityAllocationTime,
@@ -161,6 +160,8 @@ const CreatePoolPage: React.FC = () => {
         const isPercentageValid = +value >= 0 && +value <= 100;
         return !isPercentageValid && 'Percent value should be between 0 and 100';
       };
+      const isLiquidityAllocationTimeValid = liquidityAllocationTime < 30;
+      const messageAddressNotValid = !isLiquidityAllocationTimeValid && 'Min 30 days';
       const newErrors = {
         saleTitle: checkIfValueExists(saleTitle),
         tokenPrice: checkIfValueExists(tokenPrice),
@@ -168,10 +169,10 @@ const CreatePoolPage: React.FC = () => {
         hardCap: checkIfValueExists(hardCap),
         openTime: checkIfValueExists(openTime),
         closeTime: checkIfValueExists(closeTime),
-        liquidityPercent: checkIfValueExists(liquidityPercent) || checkPercent(liquidityPercent),
-        liquidityPercentageAllocation: liquidityPercentageAllocation
-          ? checkPercent(liquidityPercentageAllocation)
-          : null,
+        liquidityPercentageAllocation:
+          checkIfValueExists(liquidityPercentageAllocation) ||
+          checkPercent(liquidityPercentageAllocation),
+        liquidityAllocationTime: messageAddressNotValid,
       };
       setErrors({ ...errors, ...newErrors });
       if (!saleTitle) return false;
@@ -181,6 +182,7 @@ const CreatePoolPage: React.FC = () => {
       if (!hardCap) return false;
       if (!openTime) return false;
       if (!closeTime) return false;
+      if (!liquidityAllocationTime) return false;
       if (!isPublic) {
         // if (!liquidityPercent) return false;
         // if (!whitelistArray) return false;
@@ -310,27 +312,53 @@ const CreatePoolPage: React.FC = () => {
     }
   };
 
-  const approve = async () => {
+  const approveLess = async () => {
     try {
       const totalSupply = await ContractLessToken.totalSupply();
-      console.log('CreatePool stake totalSupply:', totalSupply);
       const { addresses }: any = config;
       const spender = addresses[config.isMainnetOrTestnet][chainType].PresaleFactory;
-      console.log('CreatePool stake spender:', spender);
       const allowance = await ContractLessToken.allowance({ userAddress, spender });
-      console.log('CreatePool stake allowance:', allowance);
+      console.log('CreatePool approveLess:', { totalSupply, spender, allowance });
       if (allowance < totalSupply) {
         const resultApprove = await ContractLessToken.approve({
           userAddress,
           spender,
           amount: totalSupply,
         });
-        console.log('CreatePool stake resultApprove:', resultApprove);
+        console.log('CreatePool approveLess resultApprove:', resultApprove);
         return true;
       }
       return true;
     } catch (e) {
-      console.error('CreatePool approve:', e);
+      console.error('CreatePool approveLess:', e);
+      return false;
+    }
+  };
+
+  const approveTokens = async () => {
+    try {
+      const totalSupply = await ContractERC20.totalSupply({ contractAddress: tokenAddress });
+      const { addresses }: any = config;
+      const spender = addresses[config.isMainnetOrTestnet][chainType].PresaleFactory;
+      const allowance = await ContractERC20.allowance({
+        contractAddress: tokenAddress,
+        userAddress,
+        spender,
+      });
+      console.log('CreatePool approveTokens:', { totalSupply, spender, allowance });
+      if (allowance < totalSupply) {
+        const resultApprove = await ContractERC20.approve({
+          contractAddress: tokenAddress,
+          userAddress,
+          spender,
+          amount: totalSupply,
+        });
+        console.log('CreatePool approveTokens resultApprove:', resultApprove);
+        return true;
+      }
+      return true;
+    } catch (e) {
+      console.error('CreatePool approveTokens:', e);
       return false;
     }
   };
@@ -344,6 +372,23 @@ const CreatePoolPage: React.FC = () => {
   //     return false;
   //   }
   // };
+
+  const countAmountOfTokensToCreate = async () => {
+    try {
+      const decimals = await ContractERC20.decimals({ contractAddress: tokenAddress });
+      const result = await ContractCalculations.countAmountOfTokens({
+        hardCap,
+        tokenPrice,
+        listingPrice,
+        liquidityPercentageAllocation,
+        decimals,
+      });
+      return result;
+    } catch (e) {
+      console.error('CreatePool subscribeEvent:', e);
+      return null;
+    }
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     try {
@@ -359,7 +404,28 @@ const CreatePoolPage: React.FC = () => {
         });
         return;
       }
-      console.log('PageCreatePool handleSubmit:', { vestingPercent });
+      const amountOfTokensToCreate = await countAmountOfTokensToCreate();
+      const balanceOf = await ContractERC20.balanceOf({
+        contractAddress: tokenAddress,
+        userAddress,
+      });
+      const decimals = await ContractERC20.decimals({
+        contractAddress: tokenAddress,
+      });
+      const amountOfTokensToCreateInEth = convertFromWei(amountOfTokensToCreate, decimals);
+      const isBalanceOfTokensLessThanNeededToCreate = balanceOf < amountOfTokensToCreate;
+      console.log('PageCreatePool handleSubmit:', { balanceOf, amountOfTokensToCreate });
+      if (isBalanceOfTokensLessThanNeededToCreate) {
+        toggleModal({
+          open: true,
+          text: (
+            <div className={s.messageContainer}>
+              <p>You need {amountOfTokensToCreateInEth} of your tokens to create</p>
+            </div>
+          ),
+        });
+        return;
+      }
       if (!validateForm()) {
         toggleModal({
           open: true,
@@ -394,9 +460,11 @@ const CreatePoolPage: React.FC = () => {
         });
         return;
       }
-      // todo: check allowance before approve
-      const resultApprove = await approve();
-      if (!resultApprove) return;
+      // todo: add approve on tokenAddress for amountOfTokensToCreate
+      const resultApproveLess = await approveLess();
+      if (!resultApproveLess) return;
+      const resultApproveTokens = await approveTokens();
+      if (!resultApproveTokens) return;
       // login to backend
       let userLessAndLpBalance;
       let timestamp;
@@ -437,9 +505,11 @@ const CreatePoolPage: React.FC = () => {
         tokenDecimals,
         userLessAndLpBalance,
       });
+      const tokenPriceInWei = convertToWei(tokenPrice, 18); // todo: check 18
       const hardCapInWei = convertToWei(hardCap, tokenDecimals);
       const softCapInWei = convertToWei(softCap, tokenDecimals);
-      const userLessAndLpBalanceFormatted = new BN(userLessAndLpBalance.toString()).toString(10); // todo: why 0?
+      const listingPriceInWei = convertToWei(listingPrice, 18); // todo: check 18
+      const userLessAndLpBalanceFormatted = new BN(userLessAndLpBalance.toString()).toString(10);
       const poolPercentages = await ContractStaking.poolPercentages();
       const stakingTiers = await ContractStaking.stakingTiers();
 
@@ -457,7 +527,7 @@ const CreatePoolPage: React.FC = () => {
       // uint256[5] stakingTiers;   // мин. количества токенов для тиров
       const presaleInfo = [
         tokenAddress,
-        tokenPrice,
+        tokenPriceInWei,
         hardCapInWei,
         softCapInWei,
         (openVotingTime / 1000).toFixed(),
@@ -471,7 +541,7 @@ const CreatePoolPage: React.FC = () => {
         stakingTiers,
       ];
       const presalePancakeSwapInfo = [
-        listingPrice,
+        listingPriceInWei,
         lpTokensLockDurationInDays,
         liquidityPercentageAllocation,
         liquidityAllocationTime,
@@ -488,7 +558,13 @@ const CreatePoolPage: React.FC = () => {
         whitepaper,
       ];
       if (isPublic) {
-        console.log({ isPublic, presaleInfo, presalePancakeSwapInfo, presaleStringInfo });
+        console.log('CreatePool handleSubmit', {
+          isPublic,
+          presaleInfo,
+          presalePancakeSwapInfo,
+          presaleStringInfo,
+          usdtToEthFee,
+        });
         const resultCreatePresalePublic = await ContractPresaleFactory.createPresalePublic({
           userAddress,
           presaleInfo,
@@ -498,11 +574,6 @@ const CreatePoolPage: React.FC = () => {
         });
         console.log('CreatePool handleSubmit', resultCreatePresalePublic);
       } else {
-        // bool liquidity; - с ликвидностью / без
-        // bool automatically; - если с ликвидностью, то через бэк, либо ручками
-        // uint8 vesting; - процент вестинга
-        // address[] whitelist; - список адресов для приватного пресейла (если список пустой, то проводится регистрация как на публичном)
-        // address nativeToken; - в какой валюте продавать токены (котируются WETH, USDT, USDC)
         // const nativeTokenAddress = // todo: get from library contract?
         const whiteListArray1 = splitWhitelist(whitelist1);
         const whiteListArray2 = splitWhitelist(whitelist2);
@@ -549,24 +620,20 @@ const CreatePoolPage: React.FC = () => {
     getMinCreatorStakedBalance();
     getStakedLess();
     getStakedLp();
-    if (!ContractCalculations) return;
-    getUsdtFeeForCreation();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ContractStaking, userAddress]);
 
   useEffect(() => {
+    if (!userAddress) return;
+    if (!ContractCalculations) return;
+    getUsdtFeeForCreation();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ContractCalculations, userAddress]);
+
+  useEffect(() => {
     validateForm();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    saleTitle,
-    tokenPrice,
-    softCap,
-    hardCap,
-    openTime,
-    closeTime,
-    liquidityPercent,
-    liquidityPercentageAllocation,
-  ]);
+  }, [saleTitle, tokenPrice, softCap, hardCap, openTime, closeTime, liquidityPercentageAllocation]);
 
   useEffect(() => {
     if (!userAddress) return;
@@ -702,12 +769,6 @@ const CreatePoolPage: React.FC = () => {
               {/* Liquidity inputs */}
               {(isPublic || isLiquidity) && (
                 <>
-                  <Input
-                    title="Liquidity Percent"
-                    value={liquidityPercent}
-                    onChange={setLiquidityPercent}
-                    error={errors.liquidityPercent}
-                  />
                   <Input
                     title="Liquidity Percentage allocation"
                     value={liquidityPercentageAllocation}
