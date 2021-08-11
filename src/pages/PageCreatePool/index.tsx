@@ -160,8 +160,9 @@ const CreatePoolPage: React.FC = () => {
         const isPercentageValid = +value >= 0 && +value <= 100;
         return !isPercentageValid && 'Percent value should be between 0 and 100';
       };
-      const isLiquidityAllocationTimeValid = liquidityAllocationTime < 30;
-      const messageAddressNotValid = !isLiquidityAllocationTimeValid && 'Min 30 days';
+      const isLpTokensLockDurationInDaysValid = +lpTokensLockDurationInDays >= 30;
+      const messageLpTokensLockDurationInDaysValid =
+        !isLpTokensLockDurationInDaysValid && 'Min 30 days';
       const newErrors = {
         saleTitle: checkIfValueExists(saleTitle),
         tokenPrice: checkIfValueExists(tokenPrice),
@@ -172,7 +173,7 @@ const CreatePoolPage: React.FC = () => {
         liquidityPercentageAllocation:
           checkIfValueExists(liquidityPercentageAllocation) ||
           checkPercent(liquidityPercentageAllocation),
-        liquidityAllocationTime: messageAddressNotValid,
+        lpTokensLockDurationInDays: messageLpTokensLockDurationInDaysValid,
       };
       setErrors({ ...errors, ...newErrors });
       if (!saleTitle) return false;
@@ -633,7 +634,16 @@ const CreatePoolPage: React.FC = () => {
   useEffect(() => {
     validateForm();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [saleTitle, tokenPrice, softCap, hardCap, openTime, closeTime, liquidityPercentageAllocation]);
+  }, [
+    saleTitle,
+    tokenPrice,
+    softCap,
+    hardCap,
+    openTime,
+    closeTime,
+    liquidityPercentageAllocation,
+    lpTokensLockDurationInDays,
+  ]);
 
   useEffect(() => {
     if (!userAddress) return;
@@ -780,6 +790,7 @@ const CreatePoolPage: React.FC = () => {
                     title="Number Of Days To Lock LP Tokens"
                     value={lpTokensLockDurationInDays}
                     onChange={setLpTokensLockDurationInDays}
+                    error={errors.lpTokensLockDurationInDays}
                   />
                   <DateInput
                     title="Liquidity Allocation Time"
