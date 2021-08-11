@@ -1,5 +1,6 @@
 @import '../../styles/mixins/gradient-text.scss';
 @import '../../styles/mixins/container.scss';
+@import '../../styles/mixins/flex.scss';
 
 
 .darkBg {
@@ -37,4 +38,9 @@
       margin-bottom: 33px;
     }
   }
+}
+
+.messageContainer {
+  @include flex(row, center);
+  height: 100%;
 }

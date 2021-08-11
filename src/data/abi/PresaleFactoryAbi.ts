@@ -1,33 +1,8 @@
 export default [
   {
-    inputs: [
-      { internalType: 'address', name: '_bscsInfoAddress', type: 'address' },
-      { internalType: 'address', name: '_bscsToken', type: 'address' },
-      { internalType: 'address', name: '_safeStakingPool', type: 'address' },
-    ],
+    inputs: [{ internalType: 'address', name: '_bscsInfoAddress', type: 'address' }],
     stateMutability: 'nonpayable',
     type: 'constructor',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      { indexed: false, internalType: 'uint256', name: 'presaleId', type: 'uint256' },
-      { indexed: false, internalType: 'address', name: 'creator', type: 'address' },
-      { indexed: false, internalType: 'address', name: 'tokenAddress', type: 'address' },
-      { indexed: false, internalType: 'uint256', name: 'timeForLiquidity', type: 'uint256' },
-    ],
-    name: 'CertifiedAutoPresaleCreated',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      { indexed: false, internalType: 'uint256', name: 'presaleId', type: 'uint256' },
-      { indexed: false, internalType: 'address', name: 'creator', type: 'address' },
-      { indexed: false, internalType: 'address', name: 'tokenAddress', type: 'address' },
-    ],
-    name: 'CertifiedPresaleCreated',
-    type: 'event',
   },
   {
     anonymous: false,
@@ -52,16 +27,6 @@ export default [
   },
   {
     inputs: [
-      { internalType: 'address', name: '_address', type: 'address' },
-      { internalType: 'bool', name: '_canSign', type: 'bool' },
-    ],
-    name: 'addOrRemoveSigner',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [
       {
         components: [
           { internalType: 'address', name: 'tokenAddress', type: 'address' },
@@ -74,9 +39,10 @@ export default [
           { internalType: 'uint256', name: '_tokenAmount', type: 'uint256' },
           { internalType: 'bytes', name: '_signature', type: 'bytes' },
           { internalType: 'uint256', name: '_timestamp', type: 'uint256' },
-          { internalType: 'address', name: 'WETHAddress', type: 'address' },
+          { internalType: 'uint8[4]', name: 'poolPercentages', type: 'uint8[4]' },
+          { internalType: 'uint256[5]', name: 'stakingTiers', type: 'uint256[5]' },
         ],
-        internalType: 'struct PresaleFactory.PresaleInfo',
+        internalType: 'struct PresaleFactoryPublic.PresaleInfo',
         name: '_info',
         type: 'tuple',
       },
@@ -87,7 +53,7 @@ export default [
           { internalType: 'uint8', name: 'liquidityPercentageAllocation', type: 'uint8' },
           { internalType: 'uint256', name: 'liquidityAllocationTime', type: 'uint256' },
         ],
-        internalType: 'struct PresaleFactory.PresalePancakeSwapInfo',
+        internalType: 'struct PresaleFactoryPublic.PresalePancakeSwapInfo',
         name: '_cakeInfo',
         type: 'tuple',
       },
@@ -102,21 +68,14 @@ export default [
           { internalType: 'string', name: 'description', type: 'string' },
           { internalType: 'string', name: 'whitepaper', type: 'string' },
         ],
-        internalType: 'struct PresaleFactory.PresaleStringInfo',
+        internalType: 'struct PresaleFactoryPublic.PresaleStringInfo',
         name: '_stringInfo',
         type: 'tuple',
       },
     ],
-    name: 'createPresalePublic',
+    name: 'createPresale',
     outputs: [{ internalType: 'uint256', name: 'presaleId', type: 'uint256' }],
     stateMutability: 'payable',
-    type: 'function',
-  },
-  {
-    inputs: [{ internalType: 'address', name: '_address', type: 'address' }],
-    name: 'isSigner',
-    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
-    stateMutability: 'view',
     type: 'function',
   },
   {
@@ -137,31 +96,6 @@ export default [
     inputs: [],
     name: 'safeLibrary',
     outputs: [{ internalType: 'contract LessLibrary', name: '', type: 'address' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'safeStakingPool',
-    outputs: [{ internalType: 'contract Staking', name: '', type: 'address' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { internalType: 'address', name: '_lib', type: 'address' },
-      { internalType: 'address', name: '_staking', type: 'address' },
-      { internalType: 'address', name: '_token', type: 'address' },
-    ],
-    name: 'setLibStakingToken',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'token',
-    outputs: [{ internalType: 'contract ERC20', name: '', type: 'address' }],
     stateMutability: 'view',
     type: 'function',
   },

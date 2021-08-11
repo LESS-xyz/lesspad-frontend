@@ -13,7 +13,7 @@ type TypeGetInfoProps = {
   presaleInfo: any;
   presalePancakeSwapInfo: any;
   presaleStringInfo: any;
-  usdToEthFee: string;
+  usdtToEthFee: string;
 };
 
 export default class ContractPresaleFactoryService {
@@ -43,7 +43,7 @@ export default class ContractPresaleFactoryService {
         presaleInfo,
         presalePancakeSwapInfo,
         presaleStringInfo,
-        usdToEthFee,
+        usdtToEthFee,
       } = props;
       const presaleStringInfoFormatted = presaleStringInfo.map((item: string, ii: number) => {
         const hex = this.web3.utils.toHex(item);
@@ -52,16 +52,17 @@ export default class ContractPresaleFactoryService {
         return item;
       });
       console.log('ContractPresaleFactoryService createPresalePublic:', {
-        usdToEthFee,
+        usdtToEthFee,
         userAddress,
         presaleStringInfoFormatted,
       });
       const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
+      // const value = this.web3.utils.toHex(usdToEthFee);
       const result = await contract.methods
-        .createPresalePublic(presaleInfo, presalePancakeSwapInfo, presaleStringInfoFormatted)
+        .createPresale(presaleInfo, presalePancakeSwapInfo, presaleStringInfoFormatted)
         .send({
           from: userAddress,
-          value: usdToEthFee,
+          value: usdtToEthFee,
         });
       return result;
     } catch (e) {
