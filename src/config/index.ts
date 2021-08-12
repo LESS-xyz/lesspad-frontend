@@ -12,12 +12,14 @@ import UniswapRouterAbi from '../data/abi/UniswapRouterAbi';
 const IS_PRODUCTION = false;
 const IS_TESTING_ON_ROPSTEN = false;
 const SHOW_CONSOLE_LOGS = true;
+const SHOW_FORM_VALUES = false;
 const INFURA_KEY = 'bf1db577e6bb42bf93893e1ea5dd1630';
 
 export default {
   IS_PRODUCTION,
   IS_TESTING_ON_ROPSTEN,
   SHOW_CONSOLE_LOGS,
+  SHOW_FORM_VALUES,
   version: IS_PRODUCTION ? 'Mainnet beta' : IS_TESTING_ON_ROPSTEN ? 'Ropsten beta' : 'Kovan beta',
   isMainnetOrTestnet: IS_PRODUCTION ? 'mainnet' : 'testnet',
   netType: IS_PRODUCTION ? 'mainnet' : IS_TESTING_ON_ROPSTEN ? 'ropsten' : 'kovan',

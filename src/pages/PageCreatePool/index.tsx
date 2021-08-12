@@ -18,6 +18,36 @@ import { prettyNumber } from '../../utils/prettifiers';
 import s from './CreatePool.module.scss';
 
 const Backend = new BackendService();
+const { SHOW_FORM_VALUES } = config;
+
+const checkIfExists = (value: any) => value;
+const checkPercentage = (value: number) => value >= 0 && value <= 100;
+const checkDuration = (value: number) => value >= 30;
+
+const messageEnterValue = 'Enter value';
+const messagePercentValue = 'Percent value should be between 0 and 100';
+const messageMin30Days = 'Minimum 30 days';
+const messageAddressIsNotValid = 'Address is not valid';
+const messageSoftCapLessThanHardCap = 'Softcap should be less than hardcap';
+
+const validationIfExists = [
+  {
+    equation: checkIfExists,
+    message: messageEnterValue,
+  },
+];
+const validationPercentage = [
+  {
+    equation: checkPercentage,
+    message: messagePercentValue,
+  },
+];
+const validationOfDuration = [
+  {
+    equation: checkDuration,
+    message: messageMin30Days,
+  },
+];
 
 const CreatePoolPage: React.FC = () => {
   const { web3 } = useWeb3ConnectorContext();
@@ -42,22 +72,26 @@ const CreatePoolPage: React.FC = () => {
   const [stakedLess, setStakedLess] = useState<string>('0.000');
   const [stakedLP, setStakedLP] = useState<string>('0.000');
 
-  const [saleTitle, setSaleTitle] = useState<string>('Title');
+  const [saleTitle, setSaleTitle] = useState<string>(SHOW_FORM_VALUES ? 'Title' : '');
   const [description, setDescription] = useState<string>('');
   const [tokenAddress, setTokenAddress] = useState<string>(
-    '0x3561A02e1192B89e2415724f43521f898e867013',
+    SHOW_FORM_VALUES ? '0x3561A02e1192B89e2415724f43521f898e867013' : '',
   );
-  const [tokenPrice, setTokenPrice] = useState<string>('1');
+  const [tokenPrice, setTokenPrice] = useState<string>(SHOW_FORM_VALUES ? '1' : '');
   // инпуты для Public type
-  const [softCap, setSoftCap] = useState<string>('1');
-  const [hardCap, setHardCap] = useState<string>('2');
+  const [softCap, setSoftCap] = useState<string>(SHOW_FORM_VALUES ? '1' : '');
+  const [hardCap, setHardCap] = useState<string>(SHOW_FORM_VALUES ? '2' : '');
   const [openVotingTime, setOpenVotingTime] = useState<number>(defaultOpenVotingTime);
   const [openTime, setOpenTime] = useState<number>(defaultOpenTime);
   const [closeTime, setCloseTime] = useState<number>(defaultCloseTime);
-  const [liquidityPercentageAllocation, setLiquidityPercentageAllocation] = useState<string>('1');
-  const [listingPrice, setListingPrice] = useState<string>('1');
-  const [lpTokensLockDurationInDays, setLpTokensLockDurationInDays] = useState('30');
-  const [vestingPercent, setVestingPercent] = useState<string>('0');
+  const [liquidityPercentageAllocation, setLiquidityPercentageAllocation] = useState<string>(
+    SHOW_FORM_VALUES ? '1' : '',
+  );
+  const [listingPrice, setListingPrice] = useState<string>(SHOW_FORM_VALUES ? '1' : '');
+  const [lpTokensLockDurationInDays, setLpTokensLockDurationInDays] = useState(
+    SHOW_FORM_VALUES ? '30' : '',
+  );
+  const [vestingPercent, setVestingPercent] = useState<string>(SHOW_FORM_VALUES ? '0' : '');
   const [liquidityAllocationTime, setLiquidityAllocationTime] = useState<number>(
     defaultLiquidityAllocationTime,
   );
@@ -151,30 +185,52 @@ const CreatePoolPage: React.FC = () => {
     }
   };
 
-  const validateForm = () => {
+  const clearErrors = () => {
     try {
-      const checkIfValueExists = (value: any) => {
-        return !value && 'Enter value';
+      const fields = {
+        saleTitle,
+        tokenAddress,
+        tokenPrice,
+        softCap,
+        hardCap,
+        openTime,
+        closeTime,
+        liquidityPercentageAllocation,
+        lpTokensLockDurationInDays,
       };
-      const checkPercent = (value: any) => {
-        const isPercentageValid = +value >= 0 && +value <= 100;
-        return !isPercentageValid && 'Percent value should be between 0 and 100';
+      const newErrors = {};
+      const entries = Object.entries(fields);
+      for (let i = 0; i < entries.length; i += 1) {
+        const [variableName, variable] = entries[i];
+        if (variable) {
+          newErrors[variableName] = variable && '';
+        }
+      }
+      setErrors({ ...errors, ...newErrors });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const validateFormForExistingValues = () => {
+    try {
+      const fields = {
+        saleTitle,
+        tokenAddress,
+        tokenPrice,
+        softCap,
+        hardCap,
+        openTime,
+        closeTime,
+        liquidityPercentageAllocation,
+        lpTokensLockDurationInDays,
       };
-      const isLpTokensLockDurationInDaysValid = +lpTokensLockDurationInDays >= 30;
-      const messageLpTokensLockDurationInDaysValid =
-        !isLpTokensLockDurationInDaysValid && 'Min 30 days';
-      const newErrors = {
-        saleTitle: checkIfValueExists(saleTitle),
-        tokenPrice: checkIfValueExists(tokenPrice),
-        softCap: checkIfValueExists(softCap),
-        hardCap: checkIfValueExists(hardCap),
-        openTime: checkIfValueExists(openTime),
-        closeTime: checkIfValueExists(closeTime),
-        liquidityPercentageAllocation:
-          checkIfValueExists(liquidityPercentageAllocation) ||
-          checkPercent(liquidityPercentageAllocation),
-        lpTokensLockDurationInDays: messageLpTokensLockDurationInDaysValid,
-      };
+      const newErrors = {};
+      const entries = Object.entries(fields);
+      for (let i = 0; i < entries.length; i += 1) {
+        const [variableName, variable] = entries[i];
+        newErrors[variableName] = !checkIfExists(variable) && messageEnterValue;
+      }
       setErrors({ ...errors, ...newErrors });
       if (!saleTitle) return false;
       if (!tokenAddress) return false;
@@ -183,15 +239,44 @@ const CreatePoolPage: React.FC = () => {
       if (!hardCap) return false;
       if (!openTime) return false;
       if (!closeTime) return false;
-      if (!liquidityAllocationTime) return false;
-      if (!isPublic) {
-        // if (!liquidityPercent) return false;
-        // if (!whitelistArray) return false;
-        // if (!listingPrice) return false;
-        // if (!lpTokensLockDurationInDays) return false;
-        // if (!liquidityPercentageAllocation) return false;
-        // if (!liquidityAllocationTime) return false;
-      }
+      if (!liquidityPercentageAllocation) return false;
+      return true;
+    } catch (e) {
+      console.error(e);
+      return false;
+    }
+  };
+
+  const validateSoftCapAndHardCap = () => {
+    try {
+      const isSoftCapLessThanHardCap = +softCap < +hardCap;
+      const messageIfIsSoftCapLessThanHardCap =
+        !isSoftCapLessThanHardCap && messageSoftCapLessThanHardCap;
+      const newErrors = {
+        softCap: messageIfIsSoftCapLessThanHardCap,
+        hardCap: messageIfIsSoftCapLessThanHardCap,
+      };
+      setErrors({ ...errors, ...newErrors });
+      if (!isSoftCapLessThanHardCap) return false;
+      return true;
+    } catch (e) {
+      console.error(e);
+      return false;
+    }
+  };
+
+  const validateFormValues = () => {
+    try {
+      const isSoftCapLessThanHardCap = +softCap < +hardCap;
+      const messageIfIsSoftCapLessThanHardCap =
+        !isSoftCapLessThanHardCap && messageSoftCapLessThanHardCap;
+      const newErrors = {
+        softCap: messageIfIsSoftCapLessThanHardCap,
+        hardCap: messageIfIsSoftCapLessThanHardCap,
+      };
+      setErrors({ ...errors, ...newErrors });
+      if (!checkPercentage(+liquidityPercentageAllocation)) return false;
+      if (!checkDuration(+lpTokensLockDurationInDays)) return false;
       return true;
     } catch (e) {
       console.error(e);
@@ -203,10 +288,10 @@ const CreatePoolPage: React.FC = () => {
     try {
       if (!web3) return false;
       const isTokenAddressValid = await web3.isAddress(tokenAddress);
-      const messageEnterValue = !tokenAddress && 'Enter value';
-      const messageAddressNotValid = !isTokenAddressValid && 'Address is not valid';
+      const messageIfEnterValue = !tokenAddress && messageEnterValue;
+      const messageIfAddressNotValid = !isTokenAddressValid && messageAddressIsNotValid;
       const newErrors = {
-        tokenAddress: messageEnterValue || messageAddressNotValid,
+        tokenAddress: messageIfEnterValue || messageIfAddressNotValid,
       };
       setErrors({ ...errors, ...newErrors });
       if (!isTokenAddressValid) return false;
@@ -405,6 +490,30 @@ const CreatePoolPage: React.FC = () => {
         });
         return;
       }
+      const areFieldsNotValid = !validateFormForExistingValues() || !validateFormValues();
+      if (areFieldsNotValid) {
+        toggleModal({
+          open: true,
+          text: (
+            <div className={s.messageContainer}>
+              <p>Please, check fields</p>
+            </div>
+          ),
+        });
+        return;
+      }
+      const areAddressesValid = await validateAddresses();
+      if (!areAddressesValid) {
+        toggleModal({
+          open: true,
+          text: (
+            <div className={s.messageContainer}>
+              <p>Please, check addresses</p>
+            </div>
+          ),
+        });
+        return;
+      }
       const amountOfTokensToCreate = await countAmountOfTokensToCreate();
       const balanceOf = await ContractERC20.balanceOf({
         contractAddress: tokenAddress,
@@ -433,24 +542,12 @@ const CreatePoolPage: React.FC = () => {
         });
         return;
       }
-      if (!validateForm()) {
+      if (!validateSoftCapAndHardCap()) {
         toggleModal({
           open: true,
           text: (
             <div className={s.messageContainer}>
-              <p>Please, check fields</p>
-            </div>
-          ),
-        });
-        return;
-      }
-      const areAddressesValid = await validateAddresses();
-      if (!areAddressesValid) {
-        toggleModal({
-          open: true,
-          text: (
-            <div className={s.messageContainer}>
-              <p>Please, check addresses</p>
+              <p>Please, check softcap and hardcap</p>
             </div>
           ),
         });
@@ -467,7 +564,6 @@ const CreatePoolPage: React.FC = () => {
         });
         return;
       }
-      // todo: add approve on tokenAddress for amountOfTokensToCreate
       const resultApproveLess = await approveLess();
       if (!resultApproveLess) return;
       const resultApproveTokens = await approveTokens();
@@ -619,6 +715,20 @@ const CreatePoolPage: React.FC = () => {
   };
 
   useEffect(() => {
+    if (!isPublic) {
+      toggleModal({
+        open: true,
+        text: (
+          <div className={s.messageContainer}>
+            <p>Creating certified presale is coming soon</p>
+          </div>
+        ),
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPublic]);
+
+  useEffect(() => {
     if (!userAddress) return;
     if (!ContractLessToken) return;
     if (!ContractLessLibrary) return;
@@ -638,10 +748,11 @@ const CreatePoolPage: React.FC = () => {
   }, [ContractCalculations, userAddress]);
 
   useEffect(() => {
-    validateForm();
+    clearErrors();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     saleTitle,
+    tokenAddress,
     tokenPrice,
     softCap,
     hardCap,
@@ -652,29 +763,11 @@ const CreatePoolPage: React.FC = () => {
   ]);
 
   useEffect(() => {
-    if (!userAddress) return;
-    validateTime();
+    if (!softCap) return;
+    if (!hardCap) return;
+    validateSoftCapAndHardCap();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [openTime, closeTime, openVotingTime, liquidityAllocationTime]);
-
-  useEffect(() => {
-    validateAddresses();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tokenAddress]);
-
-  useEffect(() => {
-    if (!isPublic) {
-      toggleModal({
-        open: true,
-        text: (
-          <div className={s.messageContainer}>
-            <p>Creating certified presale is coming soon</p>
-          </div>
-        ),
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPublic]);
+  }, [softCap, hardCap]);
 
   useEffect(() => {
     if (!ContractLessToken) return;
@@ -718,35 +811,45 @@ const CreatePoolPage: React.FC = () => {
             <form action="" onSubmit={(e) => handleSubmit(e)}>
               <Input
                 title="Sale title"
+                placeholder="Title"
                 value={saleTitle}
                 onChange={setSaleTitle}
                 error={errors.saleTitle}
+                validations={validationIfExists}
               />
               <Input title="Description" value={description} onChange={setDescription} />
               <Input
                 title="Token Contract Address"
+                placeholder="0x3561A02e...8e867013"
                 value={tokenAddress}
                 onChange={setTokenAddress}
                 error={errors.tokenAddress}
+                validations={validationIfExists}
               />
               <Input
                 title="Token Price"
+                placeholder="1"
                 value={tokenPrice}
                 onChange={setTokenPrice}
                 error={errors.tokenPrice}
+                validations={validationIfExists}
               />
               <div className={s.small_inputs}>
                 <Input
                   title="Soft Cap"
+                  placeholder="1"
                   value={softCap}
                   onChange={setSoftCap}
                   error={errors.softCap}
+                  validations={validationIfExists}
                 />
                 <Input
                   title="Hard Cap"
+                  placeholder="2"
                   value={hardCap}
                   onChange={setHardCap}
                   error={errors.hardCap}
+                  validations={validationIfExists}
                 />
               </div>
 
@@ -787,16 +890,20 @@ const CreatePoolPage: React.FC = () => {
                 <>
                   <Input
                     title="Liquidity Percentage allocation"
+                    placeholder="10"
                     value={liquidityPercentageAllocation}
                     onChange={setLiquidityPercentageAllocation}
                     error={errors.liquidityPercentageAllocation}
+                    validations={[...validationIfExists, ...validationPercentage]}
                   />
                   <Input title="Listing price" value={listingPrice} onChange={setListingPrice} />
                   <Input
                     title="Number Of Days To Lock LP Tokens"
+                    placeholder="30"
                     value={lpTokensLockDurationInDays}
                     onChange={setLpTokensLockDurationInDays}
                     error={errors.lpTokensLockDurationInDays}
+                    validations={[...validationIfExists, ...validationOfDuration]}
                   />
                   <DateInput
                     title="Liquidity Allocation Time"
@@ -872,6 +979,7 @@ const CreatePoolPage: React.FC = () => {
                     <>
                       <Input
                         title="Vesting Percent"
+                        placeholder="10"
                         value={vestingPercent}
                         onChange={setVestingPercent}
                       />

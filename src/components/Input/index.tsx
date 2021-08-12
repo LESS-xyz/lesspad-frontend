@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import cancelIcon from '../../assets/img/icons/cancel.svg';
+import useDebounce from '../../hooks/useDebounce';
 
 import s from './Input.module.scss';
 
@@ -11,31 +12,65 @@ interface IInputProps {
   error?: string;
   required?: boolean;
   subtitle?: string;
+  placeholder?: string;
+  validations?: { equation: any; message: string }[];
+  delay?: number;
 }
 
 const Input: React.FC<IInputProps> = (props) => {
-  const { title, value, onChange, error, subtitle, required = false } = props;
-  const [inputVal, setInputVal] = useState(value);
-  const handleChange = (str: string) => {
-    setInputVal(str);
-    onChange(str);
+  const {
+    title,
+    value,
+    onChange,
+    error,
+    subtitle,
+    required = false,
+    placeholder = '',
+    validations,
+    delay = 0,
+  } = props;
+
+  const [errorInner, setErrorInner] = useState(error);
+  const [inputValue, setInputValue] = useState(value);
+  const debouncedInputValue = useDebounce(inputValue, delay);
+
+  const handleChange = async (str: string) => {
+    if (validations) {
+      for (let i = 0; i < validations.length; i += 1) {
+        const { equation, message } = validations[i];
+        const equal = await equation(str);
+        if (!equal) {
+          setErrorInner(message);
+          break; // show only first message if equation returns false
+        } else {
+          setErrorInner('');
+        }
+      }
+    }
+    setInputValue(str);
   };
+
+  useEffect(() => {
+    onChange(debouncedInputValue);
+  }, [debouncedInputValue, onChange]);
+
   return (
-    <div className={`${s.input} ${error ? s.invalid : ''}`}>
+    <div className={`${s.input} ${error || errorInner ? s.invalid : ''}`}>
       <div className={s.input_title}>{title}</div>
       <input
         required={required}
-        value={inputVal}
+        value={inputValue}
+        placeholder={placeholder}
         onChange={(e) => handleChange(e.target.value)}
         type="text"
       />
       {subtitle && <div className={s.input_subtitle}>{subtitle}</div>}
-      {error && (
+      {(error || errorInner) && (
         <div className={s.invalid_err}>
           <div className={s.invalid_err__img}>
             <img src={cancelIcon} alt="cancelIcon" />
           </div>
-          <div className={s.invalid_err__text}>{error}</div>
+          <div className={s.invalid_err__text}>{error || errorInner}</div>
         </div>
       )}
     </div>
