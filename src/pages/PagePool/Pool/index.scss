@@ -255,13 +255,13 @@
     &-bg {
       background: linear-gradient(to right, #040404, #1c0e40);
     }
+    .row + .row {
+      border-top: 1px solid rgba(103, 77, 246, 0.5);
+    }
 
     .row {
       display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-
-      border-bottom: 1px solid rgba(103, 77, 246, 0.5);
+      justify-content: center;
       @include b(tablet) {
         border-bottom: none;
       }
@@ -285,23 +285,35 @@
         }
       }
 
+      .item + .item {
+        border-left: 1px solid rgba(103, 77, 246, 0.5);
+        @include b(tablet) {
+          border-left: unset;
+        }
+      }
+      .item:only-child {
+        width: 220px;
+      }
+
       .item {
         margin: 30px 0;
         padding: 10px 30px 10px;
 
         @include flex(column, normal, space-between);
 
-        width: 25%;
+        width: 100%;
 
         color: #674df6;
-
-        border-right: 1px solid rgba(103, 77, 246, 0.5);
         @include b(tablet) {
           width: 100%;
           border-right: none;
           border-bottom: 1px solid rgba(103, 77, 246, 0.5);
           padding: 10px 20px 10px;
           margin: 15px 0;
+        }
+
+        img {
+          width: fit-content;
         }
 
         .gradient-text {
@@ -374,17 +386,6 @@
           }
         }
       }
-
-      .last {
-        border: none;
-        @include b(tablet) {
-          border-bottom: 1px solid rgba(103, 77, 246, 0.5);
-        }
-      }
-    }
-
-    .last {
-      border: none;
     }
 
     &-links {
