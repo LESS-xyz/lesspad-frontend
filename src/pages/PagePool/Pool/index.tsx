@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { BigNumber as BN } from 'bignumber.js/bignumber';
 import dayjs from 'dayjs';
 
@@ -34,8 +34,14 @@ const chainsInfo: any = [
   { key: 'Matic', title: 'Polygon (Matic)', symbol: 'MATIC', logo: maticLogo },
 ];
 
+declare global {
+  interface Window {
+    dayjs: any;
+  }
+}
 const Pool: React.FC = () => {
   const { address }: any = useParams();
+  const history = useHistory();
 
   const { web3 } = useWeb3ConnectorContext();
   const {
@@ -44,11 +50,13 @@ const Pool: React.FC = () => {
     ContractPresalePublic,
     ContractPresaleCertified,
     ContractLessToken,
+    ContractStaking,
   } = useContractsContext();
 
   const [info, setInfo] = useState<any>();
   const [isCertified, setIsCertified] = useState<boolean>();
   const [chainInfo, setChainInfo] = useState<any>();
+  const [tier, setTier] = React.useState<string>('');
 
   // const [lessDecimals, setLessDecimals] = useState<number>();
   // const [lpDecimals, setLpDecimals] = useState<number>();
@@ -65,8 +73,6 @@ const Pool: React.FC = () => {
   const toggleModal = React.useCallback((params) => dispatch(modalActions.toggleModal(params)), [
     dispatch,
   ]);
-
-  const { amountEth, amountTokens } = investments;
 
   // const getDecimals = async () => {
   //   try {
@@ -261,6 +267,15 @@ const Pool: React.FC = () => {
     }
   };
 
+  const getTier = React.useCallback(async () => {
+    try {
+      const userTier = await ContractStaking.getUserTier({ userAddress });
+      setTier(userTier);
+    } catch (e) {
+      console.error(e);
+    }
+  }, [ContractStaking, userAddress]);
+
   const handleVote = async (yes: boolean) => {
     try {
       await vote(yes);
@@ -295,6 +310,12 @@ const Pool: React.FC = () => {
       console.error('PagePool handleInvest:', e);
     }
   };
+
+  useEffect(() => {
+    if (!address) {
+      history.push('/');
+    }
+  }, [address, history]);
 
   useEffect(() => {
     if (!info) return;
@@ -334,7 +355,12 @@ const Pool: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ContractPresalePublic, ContractPresaleCertified, isCertified]);
 
-  if (!address) return null; // todo: show loader
+  useEffect(() => {
+    if (userAddress) {
+      getTier();
+    }
+  }, [getTier, userAddress]);
+
   if (!info) return null; // todo: show loader
 
   const {
@@ -350,7 +376,7 @@ const Pool: React.FC = () => {
     // tokensForLiquidityLeft,
     openTimePresale,
     closeTimePresale,
-    // openTimeVoting,
+    openTimeVoting,
     // closeTimeVoting,
     // collectedFee,
     // #string info
@@ -638,13 +664,13 @@ const Pool: React.FC = () => {
       </div>
 
       {/*Your Tier*/}
-      <YourTier tier="king" className="tier-block" />
+      <YourTier tier={tier} className="tier-block" />
 
       {/*Your Investment*/}
       <div className="container-header">Your Investment</div>
       <div className="box box-bg">
         <div className="row last">
-          {!isCertified && (
+          {!isCertified && openTimeVoting <= dayjs().unix() * 1000 && (
             <div className="item">
               VOTE
               <div className="item-text">
@@ -679,7 +705,7 @@ const Pool: React.FC = () => {
           <div className="item">
             Your Tokens
             <div className="item-text">
-              <div className="item-text-bold">{amountTokens}</div>
+              <div className="item-text-bold">{investments.amountTokens}</div>
               <div className="item-text-gradient">{tokenSymbol}</div>
             </div>
             {/*<div className="item-count">$13,780,000 USD</div>*/}
@@ -699,7 +725,7 @@ const Pool: React.FC = () => {
             Your {currency} Investment
             <div className="item-text">
               <div className="item-text-bold">
-                {amountEth} {currency}
+                {investments.amountEth} {currency}
               </div>
             </div>
             {/*<div className="item-count">$0.0 USD</div>*/}
