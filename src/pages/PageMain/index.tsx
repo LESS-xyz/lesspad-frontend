@@ -1,6 +1,9 @@
 import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
 import Button from '../../components/Button';
+import { modalActions } from '../../redux/actions';
 // import logo1 from '../../assets/img/sections/alumni-logos/logo-1.svg';
 import PoweredBy from '../About/PoweredBy/index';
 
@@ -16,6 +19,39 @@ import s from './PageMain.module.scss';
 // const partnersLogos = [logo1, logo1, logo1, logo1, logo1, logo1, logo1, logo1];
 
 const PageMain: React.FC = () => {
+  const history = useHistory();
+
+  const dispatch = useDispatch();
+  const toggleModal = React.useCallback((params) => dispatch(modalActions.toggleModal(params)), [
+    dispatch,
+  ]);
+  const { address: userAddress } = useSelector(({ user }: any) => user);
+
+  const showMessageIfNoMetamask = async () => {
+    try {
+      if (userAddress) return;
+      toggleModal({
+        open: true,
+        text: (
+          <div className={s.messageContainer}>
+            <p>Please, connect metamask to be able to create pool</p>
+          </div>
+        ),
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleGoToCreatePool = () => {
+    try {
+      history.push('/create-pool');
+      showMessageIfNoMetamask();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   return (
     <main className={s.page}>
       <TopBlock />
@@ -37,7 +73,7 @@ const PageMain: React.FC = () => {
               <div className={s.info_right__text}>
                 Funding? Exposure? <br /> LessPad has it all, click below!
               </div>
-              <Button to="/create-pool">Start application</Button>
+              <Button onClick={handleGoToCreatePool}>Start application</Button>
             </div>
           </div>
         </div>

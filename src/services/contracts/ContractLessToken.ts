@@ -49,8 +49,10 @@ export default class ContractLessToken {
   public totalSupply = async (): Promise<any> => {
     try {
       // console.log('ContractPresalePublicService getInfo:', this.contractAbi, this.contractAddress)
-      const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
-      return await contract.methods.totalSupply().call();
+      const result = await this.contract.methods.totalSupply().call();
+      // const decimals = await this.decimals();
+      // const resultInEth = convertFromWei(result, decimals);
+      return result;
     } catch (e) {
       console.error('ContractLessToken totalSupply:', e);
       return null;
@@ -76,9 +78,9 @@ export default class ContractLessToken {
     try {
       // console.log('ContractPresalePublicService getInfo:', this.contractAbi, this.contractAddress)
       const result = await this.contract.methods.allowance(userAddress, spender).call();
-      const decimals = await this.decimals();
-      const resultInEth = convertFromWei(result, decimals);
-      return resultInEth;
+      // const decimals = await this.decimals();
+      // const resultInEth = convertFromWei(result, decimals);
+      return result;
     } catch (e) {
       console.error('ContractLessToken allowance:', e);
       return null;
@@ -88,8 +90,7 @@ export default class ContractLessToken {
   public approve = async ({ userAddress, spender, amount }: any): Promise<any> => {
     try {
       // console.log('ContractPresalePublicService getInfo:', this.contractAbi, this.contractAddress)
-      const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
-      return await contract.methods.approve(spender, amount).send({ from: userAddress });
+      return await this.contract.methods.approve(spender, amount).send({ from: userAddress });
     } catch (e) {
       console.error('ContractLessToken approve:', e);
       return null;

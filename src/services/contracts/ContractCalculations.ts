@@ -1,3 +1,4 @@
+// import { BigNumber as BN } from 'bignumber.js/bignumber';
 import Web3 from 'web3';
 
 import config from '../../config';
@@ -5,6 +6,14 @@ import config from '../../config';
 type TypeConstructorProps = {
   web3Provider: any;
   chainType: string;
+};
+
+type TypeCountAmountOfTokensProps = {
+  hardCap: string;
+  tokenPrice: string;
+  listingPrice: string;
+  liquidityPercentageAllocation: string;
+  decimals: string;
 };
 
 export default class ContractCalculationsService {
@@ -35,11 +44,36 @@ export default class ContractCalculationsService {
     this.contractLessLibraryAddress = addressesOfNetType[chainType].LessLibrary;
   }
 
-  public usdtToEthFee = async (): Promise<number | null> => {
+  public usdtToEthFee = async (): Promise<string | null> => {
     try {
-      return await this.contract.methods.usdtToEthFee(this.contractLessLibraryAddress).call();
+      const resultUsdtToEthFee = await this.contract.methods
+        .usdtToEthFee(this.contractLessLibraryAddress)
+        .call();
+      // const result = convertFromWei(resultUsdtToEthFee, 18);
+      return resultUsdtToEthFee;
     } catch (e) {
       console.error('ContractCalculationsService usdtToEthFee:', e);
+      return null;
+    }
+  };
+
+  public countAmountOfTokens = async (
+    props: TypeCountAmountOfTokensProps,
+  ): Promise<string | null> => {
+    try {
+      const { hardCap, tokenPrice, listingPrice, liquidityPercentageAllocation, decimals } = props;
+      const resultArray = await this.contract.methods
+        .countAmountOfTokens(
+          hardCap,
+          tokenPrice,
+          listingPrice,
+          liquidityPercentageAllocation,
+          decimals,
+        )
+        .call();
+      return resultArray[2];
+    } catch (e) {
+      console.error('ContractCalculationsService countAmountOfTokens:', e);
       return null;
     }
   };
