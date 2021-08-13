@@ -56,3 +56,9 @@ body {
 input {
   font: 400 15px "Poppins Regular";
 }
+
+input::placeholder {
+  font: 700 20px "Celias";
+  color: var(--body-color);
+  opacity: 0.5;
+}
