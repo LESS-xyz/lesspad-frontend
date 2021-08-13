@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { BigNumber as BN } from 'bignumber.js/bignumber';
 import dayjs from 'dayjs';
 
@@ -10,6 +10,7 @@ import ethLogo from '../../../assets/img/icons/eth-logo.svg';
 import Github from '../../../assets/img/icons/gh-icon.svg';
 import Link from '../../../assets/img/icons/link-icon.svg';
 import maticLogo from '../../../assets/img/icons/matic-logo.svg';
+import RegisterImg from '../../../assets/img/icons/register.svg';
 import Subscribe from '../../../assets/img/icons/subscribe.svg';
 import Telegram from '../../../assets/img/icons/tg-icon.svg';
 import Twitter from '../../../assets/img/icons/twitter-icon.svg';
@@ -20,6 +21,7 @@ import { useContractsContext } from '../../../contexts/ContractsContext';
 import { useWeb3ConnectorContext } from '../../../contexts/Web3Connector';
 import { modalActions } from '../../../redux/actions';
 import { BackendService } from '../../../services/Backend';
+import { convertFromWei } from '../../../utils/ethereum';
 import { addHttps } from '../../../utils/prettifiers';
 import ParticipantsTable from '../ParticipantsTable';
 
@@ -34,8 +36,14 @@ const chainsInfo: any = [
   { key: 'Matic', title: 'Polygon (Matic)', symbol: 'MATIC', logo: maticLogo },
 ];
 
+declare global {
+  interface Window {
+    dayjs: any;
+  }
+}
 const Pool: React.FC = () => {
   const { address }: any = useParams();
+  const history = useHistory();
 
   const { web3 } = useWeb3ConnectorContext();
   const {
@@ -44,18 +52,24 @@ const Pool: React.FC = () => {
     ContractPresalePublic,
     ContractPresaleCertified,
     ContractLessToken,
+    ContractStaking,
   } = useContractsContext();
 
   const [info, setInfo] = useState<any>();
   const [isCertified, setIsCertified] = useState<boolean>();
   const [chainInfo, setChainInfo] = useState<any>();
+  const [tier, setTier] = React.useState<string>('');
 
-  // const [lessDecimals, setLessDecimals] = useState<number>();
+  const [lessDecimals, setLessDecimals] = useState<number>();
   // const [lpDecimals, setLpDecimals] = useState<number>();
   const [tokenDecimals, setTokenDecimals] = useState<number>(0);
 
   const [investments, setInvestments] = useState<any>({ amountEth: 0, amountTokens: 0 });
   const [amountToInvest, setAmountToInvest] = useState<string>('');
+  const [myVote, setMyVote] = useState<number>(0);
+  const [isInvestStart, setInvestStart] = useState<boolean>(false);
+  const [isUserRegister, setUserRegister] = useState<boolean>(false);
+  console.log(isUserRegister, 'isUserRegister');
 
   const { pools } = useSelector(({ pool }: any) => pool);
   const { chainType } = useSelector(({ wallet }: any) => wallet);
@@ -65,8 +79,6 @@ const Pool: React.FC = () => {
   const toggleModal = React.useCallback((params) => dispatch(modalActions.toggleModal(params)), [
     dispatch,
   ]);
-
-  const { amountEth, amountTokens } = investments;
 
   // const getDecimals = async () => {
   //   try {
@@ -135,9 +147,14 @@ const Pool: React.FC = () => {
     }
   };
 
+  const getMyVote = useCallback(async () => {
+    const resultVote = await ContractPresalePublic.getMyVote(address, userAddress);
+    setMyVote(+resultVote);
+  }, [address, userAddress, ContractPresalePublic]);
+
   const getInvestments = async () => {
     try {
-      const resultInvestments = await ContractPresaleCertified.investments({
+      const resultInvestments = await ContractPresalePublic.investments({
         contractAddress: address,
         userAddress,
         tokenDecimals,
@@ -184,17 +201,19 @@ const Pool: React.FC = () => {
       });
       console.log('PagePool vote resultGetPoolSignature:', resultGetPoolSignature);
       if (!resultGetPoolSignature.data) throw new Error('Cannot get pool signature');
-      const { timestamp, signature, user_balance } = resultGetPoolSignature.data;
+      const { date, signature, user_balance } = resultGetPoolSignature.data;
       const stakingAmountInEth = new BN(`${user_balance}`).toString(10);
       const resultVote = await ContractPresalePublicWithMetamask.vote({
         contractAddress: address,
         stakingAmount: stakingAmountInEth,
         userAddress,
-        timestamp,
+        date,
         signature,
         yes,
       });
       console.log('PagePool vote:', resultVote);
+      await getMyVote();
+      await getInfo();
     } catch (e) {
       console.error('PagePool vote:', e);
     }
@@ -239,6 +258,64 @@ const Pool: React.FC = () => {
     }
   };
 
+  const getUserRegister = useCallback(async () => {
+    const resultRegister = await ContractPresalePublic.getUserRegister(address, userAddress);
+    setUserRegister(resultRegister);
+  }, [userAddress, ContractPresalePublic, address]);
+
+  const register = async () => {
+    try {
+      // login to backend
+      let tokenAmount;
+      let date;
+      let t;
+      let signature;
+      const resultGetMetamaskMessage = await Backend.getMetamaskMessage();
+      console.log('TableRow resultGetMetamaskMessage:', resultGetMetamaskMessage);
+      if (resultGetMetamaskMessage.data) {
+        const msg = resultGetMetamaskMessage.data;
+        const signedMsg = await web3.signMessage({ userAddress, message: msg });
+        console.log('TableRow signedMsg:', signedMsg);
+        if (signedMsg) {
+          const resultMetamaskLogin = await Backend.metamaskLogin({
+            address: userAddress,
+            msg,
+            signedMsg,
+          });
+          console.log('TableRow resultMetamaskLogin:', resultMetamaskLogin);
+          if (!resultMetamaskLogin.data) return;
+          const { key: token } = resultMetamaskLogin.data;
+          const resultGetWhitelistSignature = await Backend.getWhitelistSignature({
+            token,
+            pool: address,
+          });
+          console.log('TableRow resultGetWhitelistSignature:', resultGetWhitelistSignature);
+          if (!resultGetWhitelistSignature.data) return;
+          tokenAmount = resultGetWhitelistSignature.data.user_balance;
+          signature = resultGetWhitelistSignature.data.signature;
+          const resultGetTierSignature = await Backend.getTierSignature({
+            token,
+            presale: address,
+          });
+          console.log('TableRow resultGetTierSignature:', resultGetTierSignature);
+          if (!resultGetTierSignature.data) return;
+          date = resultGetTierSignature.data.date;
+          t = resultGetTierSignature.data.type_tier;
+          const resultRegister = await ContractPresalePublic.register({
+            userAddress,
+            tokenAmount,
+            signature,
+            tier: t,
+            timestamp: date,
+          });
+          console.log('TableRow resultRegister:', resultRegister);
+        }
+      }
+    } catch (e) {
+      console.error('TableRow register:', e);
+    }
+  };
+
   const getRefund = async () => {
     try {
       let newInfo;
@@ -261,6 +338,24 @@ const Pool: React.FC = () => {
     }
   };
 
+  const getDecimals = async () => {
+    try {
+      const resultLessDecimals = await ContractLessToken.decimals();
+      setLessDecimals(resultLessDecimals);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const getTier = React.useCallback(async () => {
+    try {
+      const userTier = await ContractStaking.getUserTier({ userAddress });
+      setTier(userTier);
+    } catch (e) {
+      console.error(e);
+    }
+  }, [ContractStaking, userAddress]);
+
   const handleVote = async (yes: boolean) => {
     try {
       await vote(yes);
@@ -268,6 +363,13 @@ const Pool: React.FC = () => {
       console.error('PagePool handleVote:', e);
     }
   };
+
+  const getPoolStatus = useCallback(async () => {
+    if (info && info.closeTimeVoting < dayjs().unix() * 1000) {
+      const { data } = await Backend.getPoolStatus(address);
+      setInvestStart(data.investment);
+    }
+  }, [address, info]);
 
   const handleInvest = async () => {
     try {
@@ -295,6 +397,12 @@ const Pool: React.FC = () => {
       console.error('PagePool handleInvest:', e);
     }
   };
+
+  useEffect(() => {
+    if (!address) {
+      history.push('/');
+    }
+  }, [address, history]);
 
   useEffect(() => {
     if (!info) return;
@@ -329,19 +437,42 @@ const Pool: React.FC = () => {
     if (!ContractPresalePublic) return;
     if (!ContractPresaleCertified) return;
     if (isCertified === undefined) return;
+
+    getDecimals();
     getInfo();
     getInvestments();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ContractPresalePublic, ContractPresaleCertified, isCertified]);
 
-  if (!address) return null; // todo: show loader
+  useEffect(() => {
+    if (isCertified !== undefined && ContractPresalePublicWithMetamask && userAddress && address) {
+      getMyVote();
+    }
+  }, [getMyVote, isCertified, ContractPresalePublicWithMetamask, userAddress, address]);
+
+  useEffect(() => {
+    if (userAddress && ContractStaking) {
+      getTier();
+    }
+  }, [getTier, userAddress, ContractStaking]);
+
+  useEffect(() => {
+    getPoolStatus();
+  }, [getPoolStatus]);
+
+  useEffect(() => {
+    if (ContractPresalePublic && address && userAddress) {
+      getUserRegister();
+    }
+  }, [getUserRegister, ContractPresalePublic, address, userAddress]);
+
   if (!info) return null; // todo: show loader
 
   const {
     // #additional info
     tokenSymbol,
     // #general info
-    // creator,
+    creator,
     token,
     tokenPrice,
     softCap,
@@ -350,8 +481,8 @@ const Pool: React.FC = () => {
     // tokensForLiquidityLeft,
     openTimePresale,
     closeTimePresale,
-    // openTimeVoting,
-    // closeTimeVoting,
+    openTimeVoting,
+    closeTimeVoting,
     // collectedFee,
     // #string info
     saleTitle,
@@ -375,6 +506,8 @@ const Pool: React.FC = () => {
     // liquidityAdded,
     participants,
     raisedAmount,
+    yesVotes,
+    noVotes,
   } = info;
   console.log('Pool info:', info);
 
@@ -400,28 +533,24 @@ const Pool: React.FC = () => {
       value: `${softCap} ${currency}`,
       gradient: true,
       less: false,
-      last: false,
     },
     {
       header: 'Presale Rate',
       value: `${tokenPrice} ${currency}`,
       gradient: false,
       less: false,
-      last: false,
     },
     {
       header: 'Liquidity Allocation',
       value: `${liquidityPercentageAllocation}%`,
       gradient: false,
       less: false,
-      last: false,
     },
     {
       header: 'Open Time',
       value: dayjs(openTimePresale).format('MMMM DD, YYYY HH:mm A GMT'),
       gradient: false,
       less: false,
-      last: true,
     },
   ];
 
@@ -431,28 +560,24 @@ const Pool: React.FC = () => {
       value: `${hardCap} ${currency}`,
       gradient: true,
       less: false,
-      last: false,
     },
     {
       header: `${exchange} Listing Rate`,
       value: `${listingPrice} ${currency}`,
       gradient: false,
       less: false,
-      last: false,
     },
     {
       header: 'Liquidity Lock Duration',
       value: `${lpTokensLockDurationInDays} days`,
       gradient: true,
       less: false,
-      last: false,
     },
     {
       header: 'Close Time',
       value: dayjs(closeTimePresale).format('MMMM DD, YYYY HH:mm A GMT'),
       gradient: false,
       less: false,
-      last: true,
     },
   ];
 
@@ -462,28 +587,24 @@ const Pool: React.FC = () => {
       value: `${isCertified ? 'Certified' : 'Public'} Presale`,
       gradient: false,
       less: false,
-      last: false,
     },
     {
       header: isCertified ? '' : 'Yes Votes',
-      value: isCertified ? '' : '125556',
+      value: isCertified ? '' : convertFromWei(yesVotes, lessDecimals || 18),
       gradient: false,
       less: false,
-      last: false,
     },
     {
       header: isCertified ? '' : 'No Votes',
-      value: isCertified ? '' : '0',
+      value: isCertified ? '' : convertFromWei(noVotes, lessDecimals || 18),
       gradient: false,
       less: false,
-      last: false,
     },
     {
       header: '',
       value: '',
       gradient: false,
       less: false,
-      last: true,
     },
   ];
 
@@ -592,7 +713,7 @@ const Pool: React.FC = () => {
       <div className="box">
         <div className="row row-items">
           {row1.map((item, i) => (
-            <div className={`${item.last ? 'item last' : 'item'} ${i % 2 !== 0 && 'cell'}`}>
+            <div className={`${'item'} ${i % 2 !== 0 && 'cell'}`}>
               {item.header}
               {item.gradient ? (
                 <div className="gradient-text">{item.value}</div>
@@ -607,7 +728,7 @@ const Pool: React.FC = () => {
         </div>
         <div className="row row-items">
           {row2.map((item, i) => (
-            <div className={`${item.last ? 'item last' : 'item'} ${i % 2 !== 0 && 'cell'}`}>
+            <div className={`${'item'} ${i % 2 !== 0 && 'cell'}`}>
               {item.header}
               {item.gradient ? (
                 <div className="gradient-text">{item.value}</div>
@@ -620,9 +741,9 @@ const Pool: React.FC = () => {
             </div>
           ))}
         </div>
-        <div className="row row-items last">
+        <div className="row row-items">
           {row3.map((item, i) => (
-            <div className={`${item.last ? 'item last' : 'item'} ${i % 2 !== 0 && 'cell'}`}>
+            <div className={`${'item'} ${i % 2 !== 0 && 'cell'}`}>
               {item.header}
               {item.gradient ? (
                 <div className="gradient-text">{item.value}</div>
@@ -638,102 +759,127 @@ const Pool: React.FC = () => {
       </div>
 
       {/*Your Tier*/}
-      <YourTier tier="king" className="tier-block" />
+      <YourTier tier={tier} className="tier-block" />
 
       {/*Your Investment*/}
       <div className="container-header">Your Investment</div>
       <div className="box box-bg">
-        <div className="row last">
-          {!isCertified && (
-            <div className="item">
-              VOTE
-              <div className="item-text">
-                <div className="item-text-bold">0.000</div>
-                <div className="item-text-gradient">LESS</div>
-              </div>
-              {/*<div className="item-count">$0.0 USD</div>*/}
-              <div className="button-border" style={{ marginBottom: 5 }}>
-                <div
-                  className="button"
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => handleVote(true)}
-                  onKeyDown={() => {}}
-                >
-                  <div className="gradient-button-text">Vote Yes</div>
+        <div className="row">
+          {!isCertified &&
+            openTimeVoting <= dayjs().unix() * 1000 &&
+            closeTimeVoting > dayjs().unix() * 1000 &&
+            creator.toLowerCase() !== userAddress.toLowerCase() &&
+            !myVote && (
+              <div className="item">
+                VOTE
+                <div className="item-text">
+                  <div className="item-text-bold">0.000</div>
+                  <div className="item-text-gradient">LESS</div>
+                </div>
+                {/*<div className="item-count">$0.0 USD</div>*/}
+                <div className="button-border" style={{ marginBottom: 5 }}>
+                  <div
+                    className="button"
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => handleVote(true)}
+                    onKeyDown={() => {}}
+                  >
+                    <div className="gradient-button-text">Vote Yes</div>
+                  </div>
+                </div>
+                <div className="button-border" style={{ marginTop: 5 }}>
+                  <div
+                    className="button"
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => handleVote(false)}
+                    onKeyDown={() => {}}
+                  >
+                    <div className="gradient-button-text">Vote No</div>
+                  </div>
                 </div>
               </div>
-              <div className="button-border" style={{ marginTop: 5 }}>
-                <div
-                  className="button"
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => handleVote(false)}
-                  onKeyDown={() => {}}
-                >
-                  <div className="gradient-button-text">Vote No</div>
+            )}
+          {isInvestStart ? (
+            <>
+              <div className="item">
+                Register for Presale
+                <img src={RegisterImg} alt="" />
+                <div className="button-border">
+                  <div
+                    className="button"
+                    role="button"
+                    tabIndex={0}
+                    onClick={register}
+                    onKeyDown={() => {}}
+                  >
+                    <div className="gradient-button-text">Register</div>
+                  </div>
                 </div>
               </div>
-            </div>
+              <div className="item">
+                Your Tokens
+                <div className="item-text">
+                  <div className="item-text-bold">{investments.amountTokens}</div>
+                  <div className="item-text-gradient">{tokenSymbol}</div>
+                </div>
+                {/*<div className="item-count">$13,780,000 USD</div>*/}
+                <div className="button-border">
+                  <div
+                    className="button"
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => {}}
+                    onKeyDown={() => {}}
+                  >
+                    <div className="gradient-button-text">Claim Token</div>
+                  </div>
+                </div>
+              </div>
+              <div className="item">
+                Your {currency} Investment
+                <div className="item-text">
+                  <div className="item-text-bold">
+                    {investments.amountEth} {currency}
+                  </div>
+                </div>
+                {/*<div className="item-count">$0.0 USD</div>*/}
+                <div className="button-border">
+                  <div
+                    className="button"
+                    role="button"
+                    tabIndex={0}
+                    onClick={getRefund}
+                    onKeyDown={() => {}}
+                  >
+                    <div className="gradient-button-text">Get Refund</div>
+                  </div>
+                </div>
+              </div>
+              <div className="item">
+                Buy Tokens
+                <div className="item-text">
+                  <div className="item-text-bold">
+                    1 {tokenSymbol} = {tokenPrice} {currency}
+                  </div>
+                </div>
+                <div className="button-border">
+                  <div
+                    className="button"
+                    role="button"
+                    tabIndex={0}
+                    onClick={handleInvest}
+                    onKeyDown={() => {}}
+                  >
+                    <div className="gradient-button-text">Invest</div>
+                  </div>
+                </div>
+              </div>
+            </>
+          ) : (
+            ''
           )}
-          <div className="item">
-            Your Tokens
-            <div className="item-text">
-              <div className="item-text-bold">{amountTokens}</div>
-              <div className="item-text-gradient">{tokenSymbol}</div>
-            </div>
-            {/*<div className="item-count">$13,780,000 USD</div>*/}
-            <div className="button-border">
-              <div
-                className="button"
-                role="button"
-                tabIndex={0}
-                onClick={() => {}}
-                onKeyDown={() => {}}
-              >
-                <div className="gradient-button-text">Claim Token</div>
-              </div>
-            </div>
-          </div>
-          <div className="item">
-            Your {currency} Investment
-            <div className="item-text">
-              <div className="item-text-bold">
-                {amountEth} {currency}
-              </div>
-            </div>
-            {/*<div className="item-count">$0.0 USD</div>*/}
-            <div className="button-border">
-              <div
-                className="button"
-                role="button"
-                tabIndex={0}
-                onClick={getRefund}
-                onKeyDown={() => {}}
-              >
-                <div className="gradient-button-text">Get Refund</div>
-              </div>
-            </div>
-          </div>
-          <div className="item last">
-            Buy Tokens
-            <div className="item-text">
-              <div className="item-text-bold">
-                1 {tokenSymbol} = {tokenPrice} {currency}
-              </div>
-            </div>
-            <div className="button-border">
-              <div
-                className="button"
-                role="button"
-                tabIndex={0}
-                onClick={handleInvest}
-                onKeyDown={() => {}}
-              >
-                <div className="gradient-button-text">Invest</div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 

@@ -172,4 +172,13 @@ export class BackendService {
       return { data: null, error: e.response.data };
     }
   };
+
+  getPoolStatus = async (pool: string) => {
+    try {
+      const result = await this.axios.post('/invest/status/', { pool });
+      return result;
+    } catch (e) {
+      return null;
+    }
+  };
 }

@@ -19,6 +19,7 @@ type TypeVoteProps = {
   stakingAmount: string;
   signature: string;
   yes: boolean;
+  date: number | string;
 };
 
 type TypeRegisterProps = {
@@ -185,13 +186,39 @@ export default class ContractPresalePublicService {
     }
   };
 
+  public getUserRegister = async (contractAddress: string, userAddress: string) => {
+    try {
+      const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
+      const result = contract.methods.whitelistTier(userAddress).call();
+
+      return result;
+    } catch (e) {
+      console.error('ContractPresalePublicService getUserRegister:', e);
+      return null;
+    }
+  };
+
+  public getMyVote = async (contractAddress: string, userAddress: string): Promise<any> => {
+    try {
+      const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
+      const vote = await contract.methods.voters(userAddress).call();
+
+      return vote;
+    } catch (e) {
+      console.error('ContractPresalePublicService getMyVote:', e);
+      return null;
+    }
+  };
+
   public vote = async (props: TypeVoteProps): Promise<any> => {
     try {
-      const { userAddress, contractAddress, yes, stakingAmount, signature } = props;
+      const { userAddress, contractAddress, yes, stakingAmount, signature, date } = props;
       // console.log('ContractPresalePublicService vote:', props);
       const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
       // todo: add timestamp in new contract
-      return await contract.methods.vote(yes, stakingAmount, signature).send({ from: userAddress });
+      return await contract.methods
+        .vote(yes, stakingAmount, date, signature)
+        .send({ from: userAddress });
     } catch (e) {
       console.error('ContractPresalePublicService vote:', e);
       return null;

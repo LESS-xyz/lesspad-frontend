@@ -528,7 +528,7 @@ const CreatePoolPage: React.FC = () => {
         contractAddress: tokenAddress,
       });
       const amountOfTokensToCreateInEth = convertFromWei(amountOfTokensToCreate, decimals);
-      const isBalanceOfTokensLessThanNeededToCreate = balanceOf < amountOfTokensToCreate;
+      const isBalanceOfTokensLessThanNeededToCreate = +balanceOf < +amountOfTokensToCreate;
       console.log('PageCreatePool handleSubmit:', { balanceOf, amountOfTokensToCreate });
       if (isBalanceOfTokensLessThanNeededToCreate) {
         toggleModal({
