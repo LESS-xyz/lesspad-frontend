@@ -903,7 +903,7 @@ const CreatePoolPage: React.FC = () => {
               {(isPublic || isLiquidity) && (
                 <>
                   <Input
-                    title="Liquidity Percentage allocation"
+                    title="Liquidity Percentage"
                     placeholder="10"
                     value={liquidityPercentageAllocation}
                     onChange={setLiquidityPercentageAllocation}
