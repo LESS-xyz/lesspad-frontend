@@ -130,7 +130,6 @@ const ContractsContext: React.FC = ({ children }) => {
 
   useEffect(() => {
     if (!chainType) return;
-    if (!userAddress) return;
     initRpc();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chainType, web3, userAddress]);

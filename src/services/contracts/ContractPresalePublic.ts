@@ -13,6 +13,11 @@ type TypeGetInfoProps = {
   contractAddress: string;
 };
 
+type TypeClaimTokensProps = {
+  contractAddress: string;
+  userAddress: string;
+};
+
 type TypeVoteProps = {
   userAddress: string;
   contractAddress: string;
@@ -24,9 +29,9 @@ type TypeVoteProps = {
 
 type TypeRegisterProps = {
   userAddress: string;
-  tokenAmount: string;
+  stakedAmount: string;
   signature: string;
-  tier: string;
+  totalStakedAmount: string;
   timestamp: string;
 };
 
@@ -283,13 +288,25 @@ export default class ContractPresalePublicService {
 
   public register = async (props: TypeRegisterProps): Promise<any> => {
     try {
-      const { userAddress, tokenAmount, signature, tier, timestamp } = props;
+      const { userAddress, stakedAmount, signature, totalStakedAmount, timestamp } = props;
       // console.log('ContractPresalePublicService vote:', props);
       return await this.contract.methods
-        .register(tokenAmount, tier, timestamp, signature)
+        .register(signature, stakedAmount, totalStakedAmount, timestamp)
         .send({ from: userAddress });
     } catch (e) {
       console.error('ContractPresalePublicService vote:', e);
+      return null;
+    }
+  };
+
+  public claimTokens = async (props: TypeClaimTokensProps): Promise<any> => {
+    try {
+      const { userAddress, contractAddress } = props;
+      // console.log('ContractPresalePublicService claimTokens:', props);
+      const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
+      return await contract.methods.claimTokens().send({ from: userAddress });
+    } catch (e) {
+      console.error('ContractPresalePublicService claimTokens:', e);
       return null;
     }
   };

@@ -655,7 +655,7 @@ const CreatePoolPage: React.FC = () => {
         listingPriceInWei,
         lpTokensLockDurationInDays,
         liquidityPercentageAllocation,
-        liquidityAllocationTime,
+        (liquidityAllocationTime / 1000).toFixed(),
       ];
       // todo: add CertifiedAddition for certified presale, where nativeToken is
       const presaleStringInfo = [

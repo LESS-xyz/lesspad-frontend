@@ -293,6 +293,7 @@
       }
       .item:only-child {
         width: 220px;
+        @include flex(column, normal, center, nowrap);
       }
 
       .item {

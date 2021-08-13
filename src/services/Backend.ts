@@ -162,9 +162,8 @@ export class BackendService {
 
   getTiersAndWinners = async (props: TypeGetTiersAndWinnersProps) => {
     try {
-      const { pool } = props;
-      const url = `/${pool}/tiers/`;
-      const result = await this.axios.get(url, props);
+      const url = `/pool/tiers/`;
+      const result = await this.axios.post(url, props);
       // console.log('BackendService getAllPools:', result);
       return { data: result.data };
     } catch (e) {
