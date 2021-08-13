@@ -49,6 +49,8 @@ const validationOfDuration = [
   },
 ];
 
+const day = 1000 * 60 * 60 * 24;
+
 const CreatePoolPage: React.FC = () => {
   const { web3 } = useWeb3ConnectorContext();
   const {
@@ -61,10 +63,10 @@ const CreatePoolPage: React.FC = () => {
     ContractLessLibrary,
   } = useContractsContext();
 
-  const defaultOpenVotingTime = new Date().getTime() + 1000 * 60 * 60 * 24; // todo
-  const defaultOpenTime = defaultOpenVotingTime + 1000 * 60 * 60 * 48 + 1000 * 60 * 10; // todo
-  const defaultCloseTime = defaultOpenTime + 1000 * 60 * 60 * 24; // todo
-  const defaultLiquidityAllocationTime = defaultCloseTime + 1000 * 60 * 60 * 24; // todo
+  const defaultOpenVotingTime = new Date().getTime() + day; // todo
+  const defaultOpenTime = defaultOpenVotingTime + day * 2 + 1000 * 60 * 10; // todo
+  const defaultCloseTime = defaultOpenTime + day; // todo
+  const defaultLiquidityAllocationTime = defaultCloseTime + day; // todo
 
   const [lessDecimals, setLessDecimals] = useState<number>(0);
   const [lpDecimals, setLpDecimals] = useState<number>(0);
