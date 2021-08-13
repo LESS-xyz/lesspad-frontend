@@ -23,12 +23,14 @@ const { SHOW_FORM_VALUES } = config;
 const checkIfExists = (value: any) => value;
 const checkPercentage = (value: number) => value >= 0 && value <= 100;
 const checkDuration = (value: number) => value >= 30;
+const checkGt0 = (value: number) => value > 0;
 
 const messageEnterValue = 'Enter value';
 const messagePercentValue = 'Percent value should be between 0 and 100';
 const messageMin30Days = 'Minimum 30 days';
 const messageAddressIsNotValid = 'Address is not valid';
 const messageSoftCapLessThanHardCap = 'Softcap should be less than hardcap';
+const messageGt0 = 'Value should be greater than 0';
 
 const validationIfExists = [
   {
@@ -46,6 +48,12 @@ const validationOfDuration = [
   {
     equation: checkDuration,
     message: messageMin30Days,
+  },
+];
+const validationGt0 = [
+  {
+    equation: checkGt0,
+    message: messageGt0,
   },
 ];
 
@@ -269,12 +277,16 @@ const CreatePoolPage: React.FC = () => {
 
   const validateFormValues = () => {
     try {
+      const isSoftCapLessThan0 = +softCap < 0;
+      const isHardCapLessThan0 = +hardCap < 0;
       const isSoftCapLessThanHardCap = +softCap < +hardCap;
       const messageIfIsSoftCapLessThanHardCap =
         !isSoftCapLessThanHardCap && messageSoftCapLessThanHardCap;
+      const messageIfIsSoftCapLessThan0 = !isSoftCapLessThan0 && messageGt0;
+      const messageIfIsHardCapLessThan0 = !isHardCapLessThan0 && messageGt0;
       const newErrors = {
-        softCap: messageIfIsSoftCapLessThanHardCap,
-        hardCap: messageIfIsSoftCapLessThanHardCap,
+        softCap: messageIfIsSoftCapLessThanHardCap || messageIfIsSoftCapLessThan0,
+        hardCap: messageIfIsSoftCapLessThanHardCap || messageIfIsHardCapLessThan0,
       };
       setErrors({ ...errors, ...newErrors });
       if (!checkPercentage(+liquidityPercentageAllocation)) return false;
@@ -834,7 +846,7 @@ const CreatePoolPage: React.FC = () => {
                 value={tokenPrice}
                 onChange={setTokenPrice}
                 error={errors.tokenPrice}
-                validations={validationIfExists}
+                validations={[...validationIfExists, ...validationGt0]}
               />
               <div className={s.small_inputs}>
                 <Input
@@ -843,7 +855,7 @@ const CreatePoolPage: React.FC = () => {
                   value={softCap}
                   onChange={setSoftCap}
                   error={errors.softCap}
-                  validations={validationIfExists}
+                  validations={[...validationIfExists, ...validationGt0]}
                 />
                 <Input
                   title="Hard Cap"
@@ -851,7 +863,7 @@ const CreatePoolPage: React.FC = () => {
                   value={hardCap}
                   onChange={setHardCap}
                   error={errors.hardCap}
-                  validations={validationIfExists}
+                  validations={[...validationIfExists, ...validationGt0]}
                 />
               </div>
 
