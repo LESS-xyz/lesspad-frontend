@@ -184,7 +184,6 @@ const CreatePoolPage: React.FC = () => {
     }
   };
 
-  // todo: не работает со старым контрактом библиотеки
   const getUsdtFeeForCreation = async () => {
     try {
       const resultUsdtToEthFee = await ContractCalculations.usdtToEthFee();
@@ -320,6 +319,7 @@ const CreatePoolPage: React.FC = () => {
   };
 
   const validateTime = () => {
+    return true; // todo: remove!!!
     // checks
     // todo block timestamp
     const isOpenVotingTimeMoreThanBlockTimestamp = openTime > Date.now();
