@@ -19,11 +19,4 @@ export default [
     stateMutability: 'view',
     type: 'function',
   },
-  {
-    inputs: [{ internalType: 'address', name: '_library', type: 'address' }],
-    name: 'wethReturn',
-    outputs: [{ internalType: 'address', name: '', type: 'address' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
 ];
