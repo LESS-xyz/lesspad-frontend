@@ -90,10 +90,9 @@ Fundraising Capital"
                 chain: 'BNB',
                 type: 'public',
                 fundingToken: 'BNB',
-                status: 'not opened',
+                status: 'all',
                 isCertified,
               };
-              // eslint-disable-next-line react/no-array-index-key
               return <TokenCard key={uuid()} {...props} statusChoosenInFilter={currentOption} />;
             })}
           </div>
