@@ -15,6 +15,10 @@ interface IInputProps {
   placeholder?: string;
   validations?: { equation: any; message: string }[];
   delay?: number;
+  style?: any;
+  styleInput?: any;
+  styleTitle?: any;
+  styleSubtitle?: any;
 }
 
 const Input: React.FC<IInputProps> = (props) => {
@@ -28,6 +32,10 @@ const Input: React.FC<IInputProps> = (props) => {
     placeholder = '',
     validations,
     delay = 0,
+    style,
+    styleInput,
+    styleTitle,
+    styleSubtitle,
   } = props;
 
   const [errorInner, setErrorInner] = useState(error);
@@ -55,16 +63,23 @@ const Input: React.FC<IInputProps> = (props) => {
   }, [debouncedInputValue, onChange]);
 
   return (
-    <div className={`${s.input} ${error || errorInner ? s.invalid : ''}`}>
-      <div className={s.input_title}>{title}</div>
+    <div className={`${s.input} ${error || errorInner ? s.invalid : ''}`} style={style}>
+      <div className={s.input_title} style={styleTitle}>
+        {title}
+      </div>
       <input
         required={required}
         value={inputValue}
         placeholder={placeholder}
         onChange={(e) => handleChange(e.target.value)}
         type="text"
+        style={styleInput}
       />
-      {subtitle && <div className={s.input_subtitle}>{subtitle}</div>}
+      {subtitle && (
+        <div className={s.input_subtitle} style={styleSubtitle}>
+          {subtitle}
+        </div>
+      )}
       {(error || errorInner) && (
         <div className={s.invalid_err}>
           <div className={s.invalid_err__img}>

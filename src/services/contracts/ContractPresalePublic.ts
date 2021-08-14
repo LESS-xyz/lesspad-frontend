@@ -197,7 +197,6 @@ export default class ContractPresalePublicService {
     try {
       const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
       const result = contract.methods.whitelistTier(userAddress).call();
-
       return result;
     } catch (e) {
       console.error('ContractPresalePublicService getUserRegister:', e);

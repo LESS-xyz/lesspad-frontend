@@ -307,8 +307,12 @@ const Pool: React.FC = () => {
   };
 
   const getUserRegister = useCallback(async () => {
-    const resultRegister = await ContractPresalePublic.getUserRegister(address, userAddress);
-    setUserRegister(resultRegister);
+    try {
+      const resultRegister = await ContractPresalePublic.getUserRegister(address, userAddress);
+      setUserRegister(resultRegister);
+    } catch (e) {
+      console.error(e);
+    }
   }, [userAddress, ContractPresalePublic, address]);
 
   const register = async () => {
@@ -431,7 +435,12 @@ const Pool: React.FC = () => {
         text: (
           <div className="messageContainer">
             <p>Please, enter amount to invest (in ether)</p>
-            <Input title="" value={amountToInvest} onChange={setAmountToInvest} />
+            <Input
+              title=""
+              value={amountToInvest}
+              onChange={setAmountToInvest}
+              style={{ marginBottom: 10 }}
+            />
             <div className="button-border" style={{ margin: '5px 0' }}>
               <div
                 className="button"
@@ -911,66 +920,77 @@ const Pool: React.FC = () => {
             </div>
           )}
 
-          {isRegistrationTime && (
-            <>
+          {isRegistrationTime ? (
+            isUserRegister ? (
               <div className="item">
                 <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
-                  Register for Presale
+                  Registration
                 </div>
-                <img src={RegisterImg} alt="" />
-                <div className="button-border">
-                  <div
-                    className="button"
-                    role="button"
-                    tabIndex={0}
-                    onClick={register}
-                    onKeyDown={() => {}}
-                  >
-                    <div className="gradient-button-text">Register</div>
+                <div className="item-text">You are registered</div>
+              </div>
+            ) : (
+              <>
+                <div className="item">
+                  <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
+                    Registration
+                  </div>
+                  <img src={RegisterImg} alt="" />
+                  <div className="button-border">
+                    <div
+                      className="button"
+                      role="button"
+                      tabIndex={0}
+                      onClick={register}
+                      onKeyDown={() => {}}
+                    >
+                      <div className="gradient-button-text">Register</div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </>
-          )}
+              </>
+            )
+          ) : null}
 
-          {isInvestmentTime && isInvestStart && isUserRegister ? (
-            <>
+          {isInvestmentTime && isInvestStart ? (
+            isUserRegister ? (
+              <>
+                <div className="item">
+                  Your {currency} Investment
+                  <div className="item-text">
+                    <div className="item-text-bold">
+                      {investments.amountEth} {currency}
+                    </div>
+                  </div>
+                </div>
+                <div className="item">
+                  Buy Tokens
+                  <div className="item-text">
+                    <div className="item-text-bold">
+                      1 {tokenSymbol} = {tokenPrice} {currency}
+                    </div>
+                  </div>
+                  <div className="button-border">
+                    <div
+                      className="button"
+                      role="button"
+                      tabIndex={0}
+                      onClick={handleInvest}
+                      onKeyDown={() => {}}
+                    >
+                      <div className="gradient-button-text">Invest</div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            ) : (
               <div className="item">
-                Your {currency} Investment
-                <div className="item-text">
-                  <div className="item-text-bold">
-                    {investments.amountEth} {currency}
-                  </div>
+                <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
+                  Investment
                 </div>
+                <div className="item-text">You need to be registered on presale to invest</div>
               </div>
-              <div className="item">
-                Buy Tokens
-                <div className="item-text">
-                  <div className="item-text-bold">
-                    1 {tokenSymbol} = {tokenPrice} {currency}
-                  </div>
-                </div>
-                <div className="button-border">
-                  <div
-                    className="button"
-                    role="button"
-                    tabIndex={0}
-                    onClick={handleInvest}
-                    onKeyDown={() => {}}
-                  >
-                    <div className="gradient-button-text">Invest</div>
-                  </div>
-                </div>
-              </div>
-            </>
-          ) : (
-            <div className="item">
-              <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
-                Investment
-              </div>
-              <div className="item-text">You need to be registered on presale to invest</div>
-            </div>
-          )}
+            )
+          ) : null}
 
           {isPresaleClosed && liquidityAdded && (
             <>
