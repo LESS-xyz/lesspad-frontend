@@ -27,10 +27,8 @@ import ParticipantsTable from '../ParticipantsTable';
 
 import './index.scss';
 
-const { chainSymbols, explorers }: any = config;
+const { chainSymbols, explorers, NOW }: any = config;
 const Backend = new BackendService();
-
-const now = Date.now();
 
 const chainsInfo: any = [
   { key: 'Ethereum', title: 'Ethereum', symbol: 'ETH', logo: ethLogo },
@@ -276,79 +274,62 @@ const Pool: React.FC = () => {
   const register = async () => {
     try {
       // login to backend
-      let stakedAmount;
-      let signature;
-      let timestamp;
-      let totalStakedAmount;
       const resultGetMetamaskMessage = await Backend.getMetamaskMessage();
       console.log('PagePool resultGetMetamaskMessage:', resultGetMetamaskMessage);
-      if (resultGetMetamaskMessage.data) {
-        const msg = resultGetMetamaskMessage.data;
-        const signedMsg = await web3.signMessage({ userAddress, message: msg });
-        console.log('PagePool signedMsg:', signedMsg);
-        if (signedMsg) {
-          const resultMetamaskLogin = await Backend.metamaskLogin({
-            address: userAddress,
-            msg,
-            signedMsg,
-          });
-          console.log('PagePool resultMetamaskLogin:', resultMetamaskLogin);
-          if (!resultMetamaskLogin.data) return;
-          const { key: token } = resultMetamaskLogin.data;
-          const resultGetWhitelistSignature = await Backend.getWhitelistSignature({
-            token,
-            pool: address,
-          });
-          console.log('PagePool resultGetWhitelistSignature:', resultGetWhitelistSignature);
-          if (!resultGetWhitelistSignature.data) return;
-          signature = resultGetWhitelistSignature.data.signature;
-          timestamp = resultGetWhitelistSignature.data.date;
-          stakedAmount = resultGetWhitelistSignature.data.user_balance;
-          const stakingAmountInEth = new BN(`${stakedAmount}`).toString(10);
-          const resultGetInvestSignature = await Backend.getInvestSignature({
-            token,
-            pool: address,
-          });
-          console.log('PagePool resultGetInvestSignature:', resultGetInvestSignature);
-          if (!resultGetInvestSignature.data) return;
-          totalStakedAmount = resultGetWhitelistSignature.data.totalStakedAmount;
-          const resultVote = await ContractPresalePublicWithMetamask.register({
-            userAddress,
-            contractAddress: address,
-            totalStakedAmount,
-            signature,
-            stakedAmount: stakingAmountInEth,
-            timestamp,
-          });
-          console.log('PagePool resultVote:', resultVote);
-        }
-      }
+      if (!resultGetMetamaskMessage.data)
+        throw new Error('PagePool: getMetamaskMessage unsuccesful');
+      const msg = resultGetMetamaskMessage.data;
+      const signedMsg = await web3.signMessage({ userAddress, message: msg });
+      console.log('PagePool signedMsg:', signedMsg);
+      if (!signedMsg) throw new Error('PagePool: signMessage unsuccesful');
+      const resultMetamaskLogin = await Backend.metamaskLogin({
+        address: userAddress,
+        msg,
+        signedMsg,
+      });
+      console.log('PagePool resultMetamaskLogin:', resultMetamaskLogin);
+      if (!resultMetamaskLogin.data) throw new Error('PagePool: metamaskLogin unsuccesful');
+      const { key: token } = resultMetamaskLogin.data;
+      const resultGetWhitelistSignature = await Backend.getWhitelistSignature({
+        token,
+        pool: address,
+      });
+      console.log('PagePool resultGetWhitelistSignature:', resultGetWhitelistSignature);
+      if (!resultGetWhitelistSignature.data)
+        throw new Error('PagePool: getWhitelistSignature unsuccesful');
+      const {
+        signature,
+        timestamp,
+        user_balance: stakedAmount,
+        totalStakedAmount,
+      } = resultGetWhitelistSignature.data;
+      const userTier = await ContractStaking.getUserTier({
+        userAddress,
+      });
+      if (!userTier)
+        toggleModal({
+          open: true,
+          text: (
+            <div className="messageContainer">
+              <p>You are not in a tier. Please, stake minimum 1000 $LESS or 3.4 ETH-LESS LP</p>
+            </div>
+          ),
+        });
+      const stakingAmountInEth = new BN(`${stakedAmount}`).toString(10);
+      const resultVote = await ContractPresalePublicWithMetamask.register({
+        userAddress,
+        contractAddress: address,
+        tier: userTier,
+        totalStakedAmount,
+        signature,
+        stakedAmount: stakingAmountInEth,
+        timestamp,
+      });
+      console.log('PagePool resultVote:', resultVote);
     } catch (e) {
       console.error('PagePool register:', e);
     }
   };
-
-  // const getRefund = async () => {
-  //   try {
-  //     let newInfo;
-  //     if (isCertified) {
-  //       newInfo = await ContractPresaleCertified.collectFundsRaised({
-  //         contractAddress: address,
-  //         userAddress,
-  //       });
-  //       console.log('PagePool getRefund certified:', newInfo);
-  //     } else {
-  //       newInfo = await ContractPresalePublic.collectFundsRaised({
-  //         contractAddress: address,
-  //         userAddress,
-  //       });
-  //       console.log('PagePool getRefund public:', newInfo);
-  //     }
-  //     if (newInfo) setInfo(newInfo);
-  //   } catch (e) {
-  //     console.error('PagePool getRefund:', e);
-  //   }
-  // };
 
   const getDecimals = async () => {
     try {
@@ -370,7 +351,8 @@ const Pool: React.FC = () => {
 
   const getPoolStatus = useCallback(async () => {
     try {
-      if (info && info.closeTimeVoting < dayjs().unix() * 1000) {
+      if (!info) return;
+      if (info.closeTimeVoting < NOW) {
         const { data } = await Backend.getPoolStatus(address);
         setInvestStart(data.investment);
       }
@@ -532,9 +514,12 @@ const Pool: React.FC = () => {
   } = info;
   console.log('Pool info:', info);
 
-  const isOpened = openTimePresale < now;
-  const isVotingOpened = openTimeVoting <= now && closeTimeVoting > now;
-  const isPresaleClosed = closeTimePresale <= now;
+  const isBeforeVotimgTime = openTimeVoting > NOW;
+  const isVotingTime = openTimeVoting <= NOW && closeTimeVoting > NOW;
+  const isRegistrationTime = closeTimeVoting <= NOW && openTimePresale > NOW;
+  const isInvestmentTime = openTimePresale <= NOW && isInvestStart;
+  const isOpened = openTimePresale <= NOW;
+  const isPresaleClosed = closeTimePresale <= NOW;
 
   const isEthereum = chainType === 'Ethereum';
   const isBinanceSmartChain = chainType === 'Binance-Smart-Chain';
@@ -788,12 +773,25 @@ const Pool: React.FC = () => {
       <div className="container-header">Your Investment</div>
       <div className="box box-bg">
         <div className="row">
+          {isBeforeVotimgTime && (
+            <div className="item">
+              <div className="item-text-gradient" style={{ fontSize: 35 }}>
+                Voting will start
+              </div>
+              <div className="item-text" style={{ minWidth: 200 }}>
+                <div className="item-text-bold">{dayjs(openTimeVoting).fromNow()}</div>
+              </div>
+            </div>
+          )}
+
           {!isCertified &&
-            isVotingOpened &&
+            isVotingTime &&
             creator.toLowerCase() !== userAddress.toLowerCase() &&
             (!myVote ? (
               <div className="item">
-                VOTE
+                <div className="item-text-gradient" style={{ fontSize: 35 }}>
+                  Voting
+                </div>
                 <div className="item-text">
                   <div className="item-text-bold">0.000</div>
                   <div className="item-text-gradient">LESS</div>
@@ -828,7 +826,7 @@ const Pool: React.FC = () => {
               </div>
             ))}
 
-          {!isVotingOpened && !isInvestStart && !isPresaleClosed && (
+          {isRegistrationTime && (
             <>
               <div className="item">
                 Register for Presale
@@ -848,7 +846,7 @@ const Pool: React.FC = () => {
             </>
           )}
 
-          {isInvestStart && !isPresaleClosed && (
+          {isInvestmentTime && (
             <>
               <div className="item">
                 Your {currency} Investment
