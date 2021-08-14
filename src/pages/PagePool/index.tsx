@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Route, Switch, useRouteMatch } from 'react-router-dom';
 
 import Page404 from '../Page404';
@@ -20,4 +20,4 @@ const Project: React.FC = () => {
   );
 };
 
-export default Project;
+export default memo(Project);

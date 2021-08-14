@@ -1,7 +1,8 @@
 const styles = {
-  App: 'color: black; font-weight: bold;',
-  AllPoolsPage: 'color: #065a66; font-weight: bold;',
   login: 'color: grey; font-weight: bold;',
+  App: 'color: black; font-weight: bold;',
+  Pool: 'color: #065a66; font-weight: bold;',
+  PagePool: 'color: #065a66; font-weight: bold;',
   ContractPresalePublicService: 'color: #996655; font-weight: bold;',
   ContractLessTokenService: 'color: #996655; font-weight: bold;',
   ContractLessLibraryService: 'color: #996655; font-weight: bold;',

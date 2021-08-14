@@ -1,7 +1,10 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import { setInterval } from 'timers';
+
+import React, { memo, useCallback, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
+import axios from 'axios';
 import { BigNumber as BN } from 'bignumber.js/bignumber';
 import dayjs from 'dayjs';
 
@@ -71,6 +74,8 @@ const Pool: React.FC = () => {
   const [isUserRegister, setUserRegister] = useState<boolean>(false);
   console.log('Pool isUserRegister:', isUserRegister);
 
+  const [timeBeforeVoting, setTimeBeforeVoting] = useState<string>('');
+
   const { pools } = useSelector(({ pool }: any) => pool);
   const { chainType } = useSelector(({ wallet }: any) => wallet);
   const { address: userAddress } = useSelector(({ user }: any) => user);
@@ -91,7 +96,29 @@ const Pool: React.FC = () => {
   //   }
   // };
 
-  const getTokenDecimals = async () => {
+  const getImage = useCallback(async () => {
+    try {
+      const { linkLogo } = info;
+      const result = await axios.get(linkLogo);
+      console.log('Pool getImage:', result);
+      return { data: result.data };
+    } catch (e) {
+      // console.error('BackendService getAllPools:', e);
+      return { data: null, error: e.response.data };
+    }
+  }, [info]);
+
+  const updateTimerBeforeVoting = useCallback(() => {
+    try {
+      const { openTimeVoting } = info;
+      const newTimeBeforeVoting = dayjs(openTimeVoting).fromNow();
+      setTimeBeforeVoting(newTimeBeforeVoting);
+    } catch (e) {
+      console.error(e);
+    }
+  }, [info]);
+
+  const getTokenDecimals = useCallback(async () => {
     try {
       const { token } = info;
       const resultTokenDecimals = await ContractERC20.decimals({ contractAddress: token });
@@ -99,26 +126,29 @@ const Pool: React.FC = () => {
     } catch (e) {
       console.error(e);
     }
-  };
+  }, [info, ContractERC20]);
 
-  const getIsCertified = (presaleAddress: string) => {
-    try {
-      const isCertifiedNew = pools?.filter((item: any) => item.address === presaleAddress)[0]
-        .isCertified;
-      setIsCertified(isCertifiedNew);
-    } catch (e) {
-      console.error(e);
-    }
-  };
+  const getIsCertified = useCallback(
+    (presaleAddress: string) => {
+      try {
+        const isCertifiedNew = pools?.filter((item: any) => item.address === presaleAddress)[0]
+          .isCertified;
+        setIsCertified(isCertifiedNew);
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    [pools],
+  );
 
-  const getChainInfo = () => {
+  const getChainInfo = useCallback(() => {
     try {
       const chainInfoNew = chainsInfo.filter((item: any) => item.key === chainType);
       setChainInfo(chainInfoNew[0]);
     } catch (e) {
       console.error(e);
     }
-  };
+  }, [chainType]);
 
   const getInfo = async () => {
     try {
@@ -145,7 +175,7 @@ const Pool: React.FC = () => {
     }
   }, [address, userAddress, ContractPresalePublic]);
 
-  const getInvestments = async () => {
+  const getInvestments = useCallback(async () => {
     try {
       const resultInvestments = await ContractPresalePublic.investments({
         contractAddress: address,
@@ -157,7 +187,7 @@ const Pool: React.FC = () => {
     } catch (e) {
       console.error('PagePool getRefund:', e);
     }
-  };
+  }, [ContractPresalePublic, address, tokenDecimals, userAddress]);
 
   const loginToBackend = async () => {
     try {
@@ -413,26 +443,32 @@ const Pool: React.FC = () => {
   }, [address, history]);
 
   useEffect(() => {
+    if (!info) return () => {};
+    getImage();
+    const interval = setInterval(() => updateTimerBeforeVoting(), 1000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [info, getImage, updateTimerBeforeVoting]);
+
+  useEffect(() => {
     if (!info) return;
     if (!userAddress) return;
     if (!ContractLessToken) return;
     if (!ContractERC20) return;
     // getDecimals();
     getTokenDecimals();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ContractLessToken, userAddress, info]);
+  }, [ContractLessToken, userAddress, info, getTokenDecimals, ContractERC20]);
 
   useEffect(() => {
     if (!chainType) return;
     getChainInfo();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chainType]);
+  }, [chainType, getChainInfo]);
 
   useEffect(() => {
     if (!pools || !pools.length) return;
     getIsCertified(address);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pools]);
+  }, [pools, address, getIsCertified]);
 
   useEffect(() => {
     if (!ContractPresalePublic) return;
@@ -440,9 +476,16 @@ const Pool: React.FC = () => {
     if (isCertified === undefined) return;
     getDecimals();
     getInfo();
-    getInvestments();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ContractPresalePublic, ContractPresaleCertified, isCertified]);
+
+  useEffect(() => {
+    if (!ContractPresalePublic) return;
+    if (!address) return;
+    if (!userAddress) return;
+    if (!tokenDecimals) return;
+    getInvestments();
+  }, [address, userAddress, tokenDecimals, ContractPresalePublic, getInvestments]);
 
   useEffect(() => {
     if (isCertified !== undefined && ContractPresalePublicWithMetamask && userAddress && address) {
@@ -779,7 +822,7 @@ const Pool: React.FC = () => {
                 Voting will start
               </div>
               <div className="item-text" style={{ minWidth: 200 }}>
-                <div className="item-text-bold">{dayjs(openTimeVoting).fromNow()}</div>
+                <div className="item-text-bold">{timeBeforeVoting}</div>
               </div>
             </div>
           )}
@@ -948,4 +991,4 @@ const Pool: React.FC = () => {
   );
 };
 
-export default Pool;
+export default memo(Pool);
