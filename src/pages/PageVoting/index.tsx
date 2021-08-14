@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -47,8 +47,8 @@ import s from './PageVoting.module.scss';
 // ];
 
 const PageVoting: React.FC = () => {
-  const { ContractLessLibrary } = useContractsContext();
-
+  const { ContractLessLibrary, ContractPresalePublic } = useContractsContext();
+  //
   const [search, setSearch] = useState<string>('');
   const [presalesAddressesFiltered, setPresalesAddressesFiltered] = useState<any[]>([]);
 
@@ -62,25 +62,59 @@ const PageVoting: React.FC = () => {
   const setLibrary = React.useCallback((params) => dispatch(libraryActions.setLibrary(params)), [
     dispatch,
   ]);
+  //
+  // const getInfo = async (address) => {
+  //   try {
+  //     const newInfo = await ContractPresalePublic.getInfo({ contractAddress: address });
+  //     if (newInfo) return newInfo;
+  //   } catch (e) {
+  //     console.error('TableRow getInfo:', e);
+  //   }
+  //   return null;
+  // };
+  const [info, setInfo] = useState<any[]>();
 
-  const filterTable = async () => {
-    try {
-      const presalesInfoNew = pools.filter((item: any) => {
-        const { address = '', title = '', description = '' } = item;
-        if (search && search !== '') {
-          const isAddressInSearch = address.toLowerCase().includes(search.toLowerCase());
-          const isTitleInSearch = title.toLowerCase().includes(search.toLowerCase());
-          const isDescriptionInSearch = description.toLowerCase().includes(search.toLowerCase());
-          if (!isAddressInSearch && !isTitleInSearch && !isDescriptionInSearch) return false;
-        }
-        return true;
-      });
-      const presalesAddressesFilteredNew = presalesInfoNew.map((item: any) => item.address);
-      setPresalesAddressesFiltered(presalesAddressesFilteredNew);
-    } catch (e) {
-      console.error(e);
+  useEffect(() => {
+    for (let i = 0, newInfo: any[] = []; i < pools.length; i += 1) {
+      if (!pools[i].isCertified) {
+        ContractPresalePublic.getInfo({ contractAddress: pools[i].address }).then((data) => {
+          newInfo.push({ ...data, address: pools[i].address });
+        });
+        setInfo(newInfo);
+      }
     }
-  };
+  }, [ContractPresalePublic, pools]);
+  //
+  const filterTable = useCallback(async () => {
+    // const info = pools.map(async (pool: any) => {
+    //   const newInfo = await getInfo(pool.address);
+    //   return newInfo;
+    // });
+    //
+    // console.log('only public presales', info);
+    if (info && info.length !== 0) {
+      try {
+        const presalesInfoNew = info.filter((item: any) => {
+          const { address = '', description = '' } = item;
+          const { saleTitle = '', closeTimeVoting = 0 } = item;
+          if (search && search !== '') {
+            const isAddressInSearch = address.toLowerCase().includes(search.toLowerCase());
+            const isTitleInSearch = saleTitle.toLowerCase().includes(search.toLowerCase());
+            const isDescriptionInSearch = description.toLowerCase().includes(search.toLowerCase());
+            const isVotingEnded = Date.now() > closeTimeVoting;
+            if (!isAddressInSearch && !isTitleInSearch && !isDescriptionInSearch && isVotingEnded)
+              return false;
+            return true;
+          }
+          return true;
+        });
+        const presalesAddressesFilteredNew = presalesInfoNew.map((item: any) => item.address);
+        setPresalesAddressesFiltered(presalesAddressesFilteredNew);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  }, [info, search]);
 
   const getMinVoterBalance = async () => {
     try {
@@ -120,11 +154,10 @@ const PageVoting: React.FC = () => {
 
   useEffect(() => {
     if (!pools || !pools.length) return;
-    // console.log('PageVoting pools:', pools)
+    setPresalesAddressesFiltered(pools.map((item: any) => item.address));
+    if (!info || !info.length) return;
     filterTable();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pools, search]);
-
+  }, [pools, search, info, filterTable]);
   return (
     <div className={s.page}>
       <Helmet>
