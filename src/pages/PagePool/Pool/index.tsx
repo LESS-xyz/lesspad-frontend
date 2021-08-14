@@ -4,10 +4,11 @@ import React, { memo, useCallback, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
-import axios from 'axios';
+// import axios from 'axios';
 import { BigNumber as BN } from 'bignumber.js/bignumber';
 import dayjs from 'dayjs';
 
+// import projectLogo from '../../../assets/img/icons/project-logo.svg';
 import bnbLogo from '../../../assets/img/icons/bnb-logo.svg';
 import ethLogo from '../../../assets/img/icons/eth-logo.svg';
 import Github from '../../../assets/img/icons/gh-icon.svg';
@@ -63,6 +64,8 @@ const Pool: React.FC = () => {
   const [chainInfo, setChainInfo] = useState<any>();
   const [tier, setTier] = React.useState<string>('');
 
+  // const [logo, setLogo] = React.useState<string>(projectLogo);
+
   const [lessDecimals, setLessDecimals] = useState<number>();
   // const [lpDecimals, setLpDecimals] = useState<number>();
   const [tokenDecimals, setTokenDecimals] = useState<number>(0);
@@ -96,17 +99,18 @@ const Pool: React.FC = () => {
   //   }
   // };
 
-  const getImage = useCallback(async () => {
-    try {
-      const { linkLogo } = info;
-      const result = await axios.get(linkLogo);
-      console.log('Pool getImage:', result);
-      return { data: result.data };
-    } catch (e) {
-      // console.error('BackendService getAllPools:', e);
-      return { data: null, error: e.response.data };
-    }
-  }, [info]);
+  // const getImage = useCallback(async () => {
+  //   try {
+  //     const { linkLogo } = info;
+  //     const result = await axios.get(linkLogo);
+  //     console.log('Pool getImage:', result);
+  //     if (!result.data) return;
+  //     setLogo(result.data);
+  //     return;
+  //   } catch (e) {
+  //     console.error('Pool getImage:', e);
+  //   }
+  // }, [info]);
 
   const updateTimerBeforeVoting = useCallback(() => {
     try {
@@ -329,9 +333,9 @@ const Pool: React.FC = () => {
         throw new Error('PagePool: getWhitelistSignature unsuccesful');
       const {
         signature,
-        timestamp,
-        user_balance: stakedAmount,
-        totalStakedAmount,
+        date: timestamp,
+        user_balance: userBalance,
+        stakedAmount,
       } = resultGetWhitelistSignature.data;
       const userTier = await ContractStaking.getUserTier({
         userAddress,
@@ -345,7 +349,8 @@ const Pool: React.FC = () => {
             </div>
           ),
         });
-      const stakingAmountInEth = new BN(`${stakedAmount}`).toString(10);
+      const totalStakedAmount = new BN(`${stakedAmount}`).toString(10);
+      const stakingAmountInEth = new BN(`${userBalance}`).toString(10);
       const resultVote = await ContractPresalePublicWithMetamask.register({
         userAddress,
         contractAddress: address,
@@ -442,14 +447,18 @@ const Pool: React.FC = () => {
     if (!address) history.push('/');
   }, [address, history]);
 
+  // useEffect(() => {
+  //   if (!info) return () => {};
+  //   getImage();
+  // }, [info, getImage]);
+
   useEffect(() => {
     if (!info) return () => {};
-    getImage();
     const interval = setInterval(() => updateTimerBeforeVoting(), 1000);
     return () => {
       clearInterval(interval);
     };
-  }, [info, getImage, updateTimerBeforeVoting]);
+  }, [info, updateTimerBeforeVoting]);
 
   useEffect(() => {
     if (!info) return;

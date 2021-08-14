@@ -29,6 +29,7 @@ type TypeVoteProps = {
 
 type TypeRegisterProps = {
   userAddress: string;
+  contractAddress: string;
   tier: string;
   stakedAmount: string;
   signature: string;
@@ -289,9 +290,18 @@ export default class ContractPresalePublicService {
 
   public register = async (props: TypeRegisterProps): Promise<any> => {
     try {
-      const { userAddress, stakedAmount, signature, totalStakedAmount, timestamp, tier } = props;
+      const {
+        contractAddress,
+        userAddress,
+        stakedAmount,
+        signature,
+        totalStakedAmount,
+        timestamp,
+        tier,
+      } = props;
       console.log('ContractPresalePublicService register:', props);
-      return await this.contract.methods
+      const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
+      return await contract.methods
         .register(stakedAmount, tier, timestamp, totalStakedAmount, signature)
         .send({ from: userAddress });
     } catch (e) {

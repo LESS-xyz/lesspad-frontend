@@ -74,7 +74,7 @@ const CreatePoolPage: React.FC = () => {
     ContractLessLibrary,
   } = useContractsContext();
 
-  const defaultOpenVotingTime = now + day; // todo: next block time
+  const defaultOpenVotingTime = now + day * 0.5; // todo: next block time
   const votingDuration = day; // todo
   const registerDuration = day; // todo
   const defaultOpenTime = defaultOpenVotingTime + votingDuration + registerDuration; // todo
