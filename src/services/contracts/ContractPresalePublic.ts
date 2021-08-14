@@ -29,6 +29,7 @@ type TypeVoteProps = {
 
 type TypeRegisterProps = {
   userAddress: string;
+  tier: string;
   stakedAmount: string;
   signature: string;
   totalStakedAmount: string;
@@ -248,7 +249,7 @@ export default class ContractPresalePublicService {
         .invest(tokenAmount, signature, stakedAmount, timestamp, poolPercentages, stakingTiers)
         .send({ from: userAddress });
     } catch (e) {
-      console.error('ContractPresalePublicService vote:', e);
+      console.error('ContractPresalePublicService invest:', e);
       return null;
     }
   };
@@ -288,13 +289,13 @@ export default class ContractPresalePublicService {
 
   public register = async (props: TypeRegisterProps): Promise<any> => {
     try {
-      const { userAddress, stakedAmount, signature, totalStakedAmount, timestamp } = props;
-      // console.log('ContractPresalePublicService vote:', props);
+      const { userAddress, stakedAmount, signature, totalStakedAmount, timestamp, tier } = props;
+      console.log('ContractPresalePublicService register:', props);
       return await this.contract.methods
-        .register(signature, stakedAmount, totalStakedAmount, timestamp)
+        .register(stakedAmount, tier, timestamp, totalStakedAmount, signature)
         .send({ from: userAddress });
     } catch (e) {
-      console.error('ContractPresalePublicService vote:', e);
+      console.error('ContractPresalePublicService register:', e);
       return null;
     }
   };

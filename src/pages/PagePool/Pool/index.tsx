@@ -1,7 +1,10 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import { setInterval } from 'timers';
+
+import React, { memo, useCallback, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
+import axios from 'axios';
 import { BigNumber as BN } from 'bignumber.js/bignumber';
 import dayjs from 'dayjs';
 
@@ -27,10 +30,8 @@ import ParticipantsTable from '../ParticipantsTable';
 
 import './index.scss';
 
-const { chainSymbols, explorers }: any = config;
+const { chainSymbols, explorers, NOW }: any = config;
 const Backend = new BackendService();
-
-const now = Date.now();
 
 const chainsInfo: any = [
   { key: 'Ethereum', title: 'Ethereum', symbol: 'ETH', logo: ethLogo },
@@ -73,6 +74,8 @@ const Pool: React.FC = () => {
   const [isUserRegister, setUserRegister] = useState<boolean>(false);
   console.log('Pool isUserRegister:', isUserRegister);
 
+  const [timeBeforeVoting, setTimeBeforeVoting] = useState<string>('');
+
   const { pools } = useSelector(({ pool }: any) => pool);
   const { chainType } = useSelector(({ wallet }: any) => wallet);
   const { address: userAddress } = useSelector(({ user }: any) => user);
@@ -93,7 +96,29 @@ const Pool: React.FC = () => {
   //   }
   // };
 
-  const getTokenDecimals = async () => {
+  const getImage = useCallback(async () => {
+    try {
+      const { linkLogo } = info;
+      const result = await axios.get(linkLogo);
+      console.log('Pool getImage:', result);
+      return { data: result.data };
+    } catch (e) {
+      // console.error('BackendService getAllPools:', e);
+      return { data: null, error: e.response.data };
+    }
+  }, [info]);
+
+  const updateTimerBeforeVoting = useCallback(() => {
+    try {
+      const { openTimeVoting } = info;
+      const newTimeBeforeVoting = dayjs(openTimeVoting).fromNow();
+      setTimeBeforeVoting(newTimeBeforeVoting);
+    } catch (e) {
+      console.error(e);
+    }
+  }, [info]);
+
+  const getTokenDecimals = useCallback(async () => {
     try {
       const { token } = info;
       const resultTokenDecimals = await ContractERC20.decimals({ contractAddress: token });
@@ -101,26 +126,29 @@ const Pool: React.FC = () => {
     } catch (e) {
       console.error(e);
     }
-  };
+  }, [info, ContractERC20]);
 
-  const getIsCertified = (presaleAddress: string) => {
-    try {
-      const isCertifiedNew = pools?.filter((item: any) => item.address === presaleAddress)[0]
-        .isCertified;
-      setIsCertified(isCertifiedNew);
-    } catch (e) {
-      console.error(e);
-    }
-  };
+  const getIsCertified = useCallback(
+    (presaleAddress: string) => {
+      try {
+        const isCertifiedNew = pools?.filter((item: any) => item.address === presaleAddress)[0]
+          .isCertified;
+        setIsCertified(isCertifiedNew);
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    [pools],
+  );
 
-  const getChainInfo = () => {
+  const getChainInfo = useCallback(() => {
     try {
       const chainInfoNew = chainsInfo.filter((item: any) => item.key === chainType);
       setChainInfo(chainInfoNew[0]);
     } catch (e) {
       console.error(e);
     }
-  };
+  }, [chainType]);
 
   const getInfo = async () => {
     try {
@@ -147,7 +175,7 @@ const Pool: React.FC = () => {
     }
   }, [address, userAddress, ContractPresalePublic]);
 
-  const getInvestments = async () => {
+  const getInvestments = useCallback(async () => {
     try {
       const resultInvestments = await ContractPresalePublic.investments({
         contractAddress: address,
@@ -159,7 +187,7 @@ const Pool: React.FC = () => {
     } catch (e) {
       console.error('PagePool getRefund:', e);
     }
-  };
+  }, [ContractPresalePublic, address, tokenDecimals, userAddress]);
 
   const loginToBackend = async () => {
     try {
@@ -276,79 +304,62 @@ const Pool: React.FC = () => {
   const register = async () => {
     try {
       // login to backend
-      let stakedAmount;
-      let signature;
-      let timestamp;
-      let totalStakedAmount;
       const resultGetMetamaskMessage = await Backend.getMetamaskMessage();
       console.log('PagePool resultGetMetamaskMessage:', resultGetMetamaskMessage);
-      if (resultGetMetamaskMessage.data) {
-        const msg = resultGetMetamaskMessage.data;
-        const signedMsg = await web3.signMessage({ userAddress, message: msg });
-        console.log('PagePool signedMsg:', signedMsg);
-        if (signedMsg) {
-          const resultMetamaskLogin = await Backend.metamaskLogin({
-            address: userAddress,
-            msg,
-            signedMsg,
-          });
-          console.log('PagePool resultMetamaskLogin:', resultMetamaskLogin);
-          if (!resultMetamaskLogin.data) return;
-          const { key: token } = resultMetamaskLogin.data;
-          const resultGetWhitelistSignature = await Backend.getWhitelistSignature({
-            token,
-            pool: address,
-          });
-          console.log('PagePool resultGetWhitelistSignature:', resultGetWhitelistSignature);
-          if (!resultGetWhitelistSignature.data) return;
-          signature = resultGetWhitelistSignature.data.signature;
-          timestamp = resultGetWhitelistSignature.data.date;
-          stakedAmount = resultGetWhitelistSignature.data.user_balance;
-          const stakingAmountInEth = new BN(`${stakedAmount}`).toString(10);
-          const resultGetInvestSignature = await Backend.getInvestSignature({
-            token,
-            pool: address,
-          });
-          console.log('PagePool resultGetInvestSignature:', resultGetInvestSignature);
-          if (!resultGetInvestSignature.data) return;
-          totalStakedAmount = resultGetWhitelistSignature.data.totalStakedAmount;
-          const resultVote = await ContractPresalePublicWithMetamask.register({
-            userAddress,
-            contractAddress: address,
-            totalStakedAmount,
-            signature,
-            stakedAmount: stakingAmountInEth,
-            timestamp,
-          });
-          console.log('PagePool resultVote:', resultVote);
-        }
-      }
+      if (!resultGetMetamaskMessage.data)
+        throw new Error('PagePool: getMetamaskMessage unsuccesful');
+      const msg = resultGetMetamaskMessage.data;
+      const signedMsg = await web3.signMessage({ userAddress, message: msg });
+      console.log('PagePool signedMsg:', signedMsg);
+      if (!signedMsg) throw new Error('PagePool: signMessage unsuccesful');
+      const resultMetamaskLogin = await Backend.metamaskLogin({
+        address: userAddress,
+        msg,
+        signedMsg,
+      });
+      console.log('PagePool resultMetamaskLogin:', resultMetamaskLogin);
+      if (!resultMetamaskLogin.data) throw new Error('PagePool: metamaskLogin unsuccesful');
+      const { key: token } = resultMetamaskLogin.data;
+      const resultGetWhitelistSignature = await Backend.getWhitelistSignature({
+        token,
+        pool: address,
+      });
+      console.log('PagePool resultGetWhitelistSignature:', resultGetWhitelistSignature);
+      if (!resultGetWhitelistSignature.data)
+        throw new Error('PagePool: getWhitelistSignature unsuccesful');
+      const {
+        signature,
+        timestamp,
+        user_balance: stakedAmount,
+        totalStakedAmount,
+      } = resultGetWhitelistSignature.data;
+      const userTier = await ContractStaking.getUserTier({
+        userAddress,
+      });
+      if (!userTier)
+        toggleModal({
+          open: true,
+          text: (
+            <div className="messageContainer">
+              <p>You are not in a tier. Please, stake minimum 1000 $LESS or 3.4 ETH-LESS LP</p>
+            </div>
+          ),
+        });
+      const stakingAmountInEth = new BN(`${stakedAmount}`).toString(10);
+      const resultVote = await ContractPresalePublicWithMetamask.register({
+        userAddress,
+        contractAddress: address,
+        tier: userTier,
+        totalStakedAmount,
+        signature,
+        stakedAmount: stakingAmountInEth,
+        timestamp,
+      });
+      console.log('PagePool resultVote:', resultVote);
     } catch (e) {
       console.error('PagePool register:', e);
     }
   };
-
-  // const getRefund = async () => {
-  //   try {
-  //     let newInfo;
-  //     if (isCertified) {
-  //       newInfo = await ContractPresaleCertified.collectFundsRaised({
-  //         contractAddress: address,
-  //         userAddress,
-  //       });
-  //       console.log('PagePool getRefund certified:', newInfo);
-  //     } else {
-  //       newInfo = await ContractPresalePublic.collectFundsRaised({
-  //         contractAddress: address,
-  //         userAddress,
-  //       });
-  //       console.log('PagePool getRefund public:', newInfo);
-  //     }
-  //     if (newInfo) setInfo(newInfo);
-  //   } catch (e) {
-  //     console.error('PagePool getRefund:', e);
-  //   }
-  // };
 
   const getDecimals = async () => {
     try {
@@ -370,7 +381,8 @@ const Pool: React.FC = () => {
 
   const getPoolStatus = useCallback(async () => {
     try {
-      if (info && info.closeTimeVoting < dayjs().unix() * 1000) {
+      if (!info) return;
+      if (info.closeTimeVoting < NOW) {
         const { data } = await Backend.getPoolStatus(address);
         setInvestStart(data.investment);
       }
@@ -431,26 +443,32 @@ const Pool: React.FC = () => {
   }, [address, history]);
 
   useEffect(() => {
+    if (!info) return () => {};
+    getImage();
+    const interval = setInterval(() => updateTimerBeforeVoting(), 1000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [info, getImage, updateTimerBeforeVoting]);
+
+  useEffect(() => {
     if (!info) return;
     if (!userAddress) return;
     if (!ContractLessToken) return;
     if (!ContractERC20) return;
     // getDecimals();
     getTokenDecimals();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ContractLessToken, userAddress, info]);
+  }, [ContractLessToken, userAddress, info, getTokenDecimals, ContractERC20]);
 
   useEffect(() => {
     if (!chainType) return;
     getChainInfo();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chainType]);
+  }, [chainType, getChainInfo]);
 
   useEffect(() => {
     if (!pools || !pools.length) return;
     getIsCertified(address);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pools]);
+  }, [pools, address, getIsCertified]);
 
   useEffect(() => {
     if (!ContractPresalePublic) return;
@@ -458,9 +476,16 @@ const Pool: React.FC = () => {
     if (isCertified === undefined) return;
     getDecimals();
     getInfo();
-    getInvestments();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ContractPresalePublic, ContractPresaleCertified, isCertified]);
+
+  useEffect(() => {
+    if (!ContractPresalePublic) return;
+    if (!address) return;
+    if (!userAddress) return;
+    if (!tokenDecimals) return;
+    getInvestments();
+  }, [address, userAddress, tokenDecimals, ContractPresalePublic, getInvestments]);
 
   useEffect(() => {
     if (isCertified !== undefined && ContractPresalePublicWithMetamask && userAddress && address) {
@@ -532,9 +557,12 @@ const Pool: React.FC = () => {
   } = info;
   console.log('Pool info:', info);
 
-  const isOpened = openTimePresale < now;
-  const isVotingOpened = openTimeVoting <= now && closeTimeVoting > now;
-  const isPresaleClosed = closeTimePresale <= now;
+  const isBeforeVotimgTime = openTimeVoting > NOW;
+  const isVotingTime = openTimeVoting <= NOW && closeTimeVoting > NOW;
+  const isRegistrationTime = closeTimeVoting <= NOW && openTimePresale > NOW;
+  const isInvestmentTime = openTimePresale <= NOW && isInvestStart;
+  const isOpened = openTimePresale <= NOW;
+  const isPresaleClosed = closeTimePresale <= NOW;
 
   const isEthereum = chainType === 'Ethereum';
   const isBinanceSmartChain = chainType === 'Binance-Smart-Chain';
@@ -788,12 +816,25 @@ const Pool: React.FC = () => {
       <div className="container-header">Your Investment</div>
       <div className="box box-bg">
         <div className="row">
+          {isBeforeVotimgTime && (
+            <div className="item">
+              <div className="item-text-gradient" style={{ fontSize: 35 }}>
+                Voting will start
+              </div>
+              <div className="item-text" style={{ minWidth: 200 }}>
+                <div className="item-text-bold">{timeBeforeVoting}</div>
+              </div>
+            </div>
+          )}
+
           {!isCertified &&
-            isVotingOpened &&
+            isVotingTime &&
             creator.toLowerCase() !== userAddress.toLowerCase() &&
             (!myVote ? (
               <div className="item">
-                VOTE
+                <div className="item-text-gradient" style={{ fontSize: 35 }}>
+                  Voting
+                </div>
                 <div className="item-text">
                   <div className="item-text-bold">0.000</div>
                   <div className="item-text-gradient">LESS</div>
@@ -828,7 +869,7 @@ const Pool: React.FC = () => {
               </div>
             ))}
 
-          {!isVotingOpened && !isInvestStart && !isPresaleClosed && (
+          {isRegistrationTime && (
             <>
               <div className="item">
                 Register for Presale
@@ -848,7 +889,7 @@ const Pool: React.FC = () => {
             </>
           )}
 
-          {isInvestStart && !isPresaleClosed && (
+          {isInvestmentTime && (
             <>
               <div className="item">
                 Your {currency} Investment
@@ -950,4 +991,4 @@ const Pool: React.FC = () => {
   );
 };
 
-export default Pool;
+export default memo(Pool);

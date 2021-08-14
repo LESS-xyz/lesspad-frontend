@@ -18,7 +18,7 @@ import { prettyNumber } from '../../utils/prettifiers';
 import s from './CreatePool.module.scss';
 
 const Backend = new BackendService();
-const { SHOW_FORM_VALUES } = config;
+const { IS_PRODUCTION, SHOW_FORM_VALUES } = config;
 
 const checkIfExists = (value: any) => value;
 const checkPercentage = (value: number) => value >= 0 && value <= 100;
@@ -57,7 +57,10 @@ const validationGt0 = [
   },
 ];
 
-const day = 1000 * 60 * 60 * 24;
+// const day = 1000 * 60 * 60 * 24;
+const now = Date.now(); // todo
+const day = 1000 * 60 * 20; // todo
+const tierTime = IS_PRODUCTION ? 1000 * 60 * 60 : 1000 * 60 * 5; // todo:
 
 const CreatePoolPage: React.FC = () => {
   const { web3 } = useWeb3ConnectorContext();
@@ -71,9 +74,11 @@ const CreatePoolPage: React.FC = () => {
     ContractLessLibrary,
   } = useContractsContext();
 
-  const defaultOpenVotingTime = new Date().getTime() + day; // todo
-  const defaultOpenTime = defaultOpenVotingTime + day * 2 + 1000 * 60 * 10; // todo
-  const defaultCloseTime = defaultOpenTime + day; // todo
+  const defaultOpenVotingTime = now + day; // todo: next block time
+  const votingDuration = day; // todo
+  const registerDuration = day; // todo
+  const defaultOpenTime = defaultOpenVotingTime + votingDuration + registerDuration; // todo
+  const defaultCloseTime = defaultOpenTime + tierTime * 5; // todo
   const defaultLiquidityAllocationTime = defaultCloseTime + day; // todo
 
   const [lessDecimals, setLessDecimals] = useState<number>(0);
@@ -83,7 +88,7 @@ const CreatePoolPage: React.FC = () => {
   const [stakedLP, setStakedLP] = useState<string>('0.000');
 
   const [saleTitle, setSaleTitle] = useState<string>(SHOW_FORM_VALUES ? 'Title' : '');
-  const [description, setDescription] = useState<string>('');
+  const [description, setDescription] = useState<string>(SHOW_FORM_VALUES ? 'Description' : '');
   const [tokenAddress, setTokenAddress] = useState<string>(
     SHOW_FORM_VALUES ? '0x3561A02e1192B89e2415724f43521f898e867013' : '',
   );
