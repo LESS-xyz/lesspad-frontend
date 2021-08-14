@@ -25,6 +25,7 @@ type TypeVoteProps = {
   signature: string;
   yes: boolean;
   date: number | string;
+  totalStakedAmount: string;
 };
 
 type TypeRegisterProps = {
@@ -33,7 +34,7 @@ type TypeRegisterProps = {
   tier: string;
   stakedAmount: string;
   signature: string;
-  totalStakedAmount: string;
+  // totalStakedAmount: string;
   timestamp: string;
 };
 
@@ -42,7 +43,7 @@ type TypeInvestProps = {
   contractAddress: string;
   tokenAmount: string;
   signature: string;
-  stakedAmount: string;
+  // stakedAmount: string;
   timestamp: number;
   poolPercentages: number[];
   stakingTiers: number[];
@@ -135,6 +136,7 @@ export default class ContractPresalePublicService {
         raisedAmount,
         yesVotes,
         noVotes,
+        lastTotalStakedAmount,
       } = intermediate;
       // format
       const pow = new BN(10).pow(new BN(decimals));
@@ -186,6 +188,7 @@ export default class ContractPresalePublicService {
         raisedAmount: raisedAmountInEth,
         yesVotes,
         noVotes,
+        lastTotalStakedAmount,
       };
     } catch (e) {
       console.error('ContractPresalePublicService getInfo:', e);
@@ -218,12 +221,20 @@ export default class ContractPresalePublicService {
 
   public vote = async (props: TypeVoteProps): Promise<any> => {
     try {
-      const { userAddress, contractAddress, yes, stakingAmount, signature, date } = props;
+      const {
+        userAddress,
+        contractAddress,
+        yes,
+        stakingAmount,
+        signature,
+        date,
+        totalStakedAmount,
+      } = props;
       // console.log('ContractPresalePublicService vote:', props);
       const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
       // todo: add timestamp in new contract
       return await contract.methods
-        .vote(yes, stakingAmount, date, signature)
+        .vote(yes, stakingAmount, date, signature, totalStakedAmount)
         .send({ from: userAddress });
     } catch (e) {
       console.error('ContractPresalePublicService vote:', e);
@@ -238,7 +249,7 @@ export default class ContractPresalePublicService {
         contractAddress,
         tokenAmount,
         signature,
-        stakedAmount,
+        // stakedAmount,
         timestamp,
         poolPercentages,
         stakingTiers,
@@ -246,7 +257,7 @@ export default class ContractPresalePublicService {
       // console.log('ContractPresalePublicService vote props:', props);
       const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
       return await contract.methods
-        .invest(tokenAmount, signature, stakedAmount, timestamp, poolPercentages, stakingTiers)
+        .invest(tokenAmount, signature, timestamp, poolPercentages, stakingTiers)
         .send({ from: userAddress });
     } catch (e) {
       console.error('ContractPresalePublicService invest:', e);
@@ -294,14 +305,14 @@ export default class ContractPresalePublicService {
         userAddress,
         stakedAmount,
         signature,
-        totalStakedAmount,
+        // totalStakedAmount,
         timestamp,
         tier,
       } = props;
       console.log('ContractPresalePublicService register:', props);
       const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
       return await contract.methods
-        .register(stakedAmount, tier, timestamp, totalStakedAmount, signature)
+        .register(stakedAmount, tier, timestamp, signature)
         .send({ from: userAddress });
     } catch (e) {
       console.error('ContractPresalePublicService register:', e);

@@ -26,7 +26,7 @@ import { useWeb3ConnectorContext } from '../../../contexts/Web3Connector';
 import { modalActions } from '../../../redux/actions';
 import { BackendService } from '../../../services/Backend';
 import { convertFromWei } from '../../../utils/ethereum';
-import { addHttps } from '../../../utils/prettifiers';
+import { addHttps, prettyNumber } from '../../../utils/prettifiers';
 import ParticipantsTable from '../ParticipantsTable';
 
 import './index.scss';
@@ -234,7 +234,8 @@ const Pool: React.FC = () => {
       });
       console.log('PagePool vote resultGetPoolSignature:', resultGetPoolSignature);
       if (!resultGetPoolSignature.data) throw new Error('Cannot get pool signature');
-      const { date, signature, user_balance } = resultGetPoolSignature.data;
+      const { date, signature, user_balance, stakedAmount } = resultGetPoolSignature.data;
+      const totalStakedAmountInEth = new BN(`${stakedAmount}`).toString(10);
       const stakingAmountInEth = new BN(`${user_balance}`).toString(10);
       const resultVote = await ContractPresalePublicWithMetamask.vote({
         contractAddress: address,
@@ -243,6 +244,7 @@ const Pool: React.FC = () => {
         date,
         signature,
         yes,
+        totalStakedAmount: totalStakedAmountInEth,
       });
       console.log('PagePool vote:', resultVote);
       await getMyVote();
@@ -263,17 +265,10 @@ const Pool: React.FC = () => {
       });
       console.log('PagePool vote resultGetInvestSignature:', resultGetInvestSignature);
       if (!resultGetInvestSignature.data) throw new Error('Cannot get invest signature');
-      const {
-        timestamp,
-        signature,
-        totalStakedAmount,
-        poolPercentages,
-        stakingTiers,
-      } = resultGetInvestSignature.data;
+      const { timestamp, signature, poolPercentages, stakingTiers } = resultGetInvestSignature.data;
       const tokenAmount = new BN(amount)
         .multipliedBy(new BN(10).pow(new BN(tokenDecimals)))
         .toString(10);
-      const stakedAmount = new BN(`${totalStakedAmount}`).toString(10);
       const resultGetTierSignature = await Backend.getTierSignature({
         token: key,
         presale: address,
@@ -295,7 +290,6 @@ const Pool: React.FC = () => {
         contractAddress: address,
         tokenAmount,
         signature,
-        stakedAmount,
         timestamp,
         poolPercentages,
         stakingTiers,
@@ -345,7 +339,6 @@ const Pool: React.FC = () => {
         signature,
         date: timestamp,
         user_balance: userBalance,
-        stakedAmount,
       } = resultGetWhitelistSignature.data;
       const userTier = await ContractStaking.getUserTier({
         userAddress,
@@ -359,13 +352,11 @@ const Pool: React.FC = () => {
             </div>
           ),
         });
-      const totalStakedAmount = new BN(`${stakedAmount}`).toString(10);
       const stakingAmountInEth = new BN(`${userBalance}`).toString(10);
       const resultVote = await ContractPresalePublicWithMetamask.register({
         userAddress,
         contractAddress: address,
         tier: userTier,
-        totalStakedAmount,
         signature,
         stakedAmount: stakingAmountInEth,
         timestamp,
@@ -590,6 +581,7 @@ const Pool: React.FC = () => {
     raisedAmount,
     yesVotes,
     noVotes,
+    lastTotalStakedAmount,
   } = info;
   console.log('Pool info:', info);
 
@@ -601,6 +593,13 @@ const Pool: React.FC = () => {
   const isInvestmentTime = openTimePresale <= NOW;
   const isOpened = openTimePresale <= NOW;
   const isPresaleClosed = closeTimePresale <= NOW;
+
+  console.log('Pool minVotingCompletion:', { lastTotalStakedAmount, yesVotes });
+  const minVotingCompletion = new BN(lastTotalStakedAmount).multipliedBy(new BN(0.1));
+  const votingCompletion = new BN(yesVotes)
+    .div(minVotingCompletion)
+    .multipliedBy(new BN(100))
+    .toString(10);
 
   const isEthereum = chainType === 'Ethereum';
   const isBinanceSmartChain = chainType === 'Binance-Smart-Chain';
@@ -689,8 +688,8 @@ const Pool: React.FC = () => {
       less: false,
     },
     {
-      header: '',
-      value: '',
+      header: 'Voting completion',
+      value: lastTotalStakedAmount === '0' ? '0%' : `${prettyNumber(votingCompletion)}%`,
       gradient: false,
       less: false,
     },
