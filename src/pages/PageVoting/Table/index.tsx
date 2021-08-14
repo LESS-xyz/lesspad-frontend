@@ -321,7 +321,7 @@ const Table: React.FC<ITableProps> = (props) => {
   const itemsOnPage = 12;
   let countOfPages = +(data.length / itemsOnPage).toFixed();
   const moduloOfPages = data.length % itemsOnPage;
-  if (moduloOfPages > 0 && data.length - moduloOfPages > itemsOnPage) countOfPages += 1;
+  if (moduloOfPages > 0 && data.length > itemsOnPage) countOfPages += 1;
 
   const isMobile = useMedia({ maxWidth: 768 });
 
