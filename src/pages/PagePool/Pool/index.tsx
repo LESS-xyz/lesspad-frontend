@@ -45,6 +45,7 @@ declare global {
     dayjs: any;
   }
 }
+
 const Pool: React.FC = () => {
   const { address }: any = useParams();
   const history = useHistory();
@@ -75,7 +76,7 @@ const Pool: React.FC = () => {
   const [myVote, setMyVote] = useState<number>(0);
   const [isInvestStart, setInvestStart] = useState<boolean>(false);
   const [isUserRegister, setUserRegister] = useState<boolean>(false);
-  console.log('Pool isUserRegister:', isUserRegister);
+  // console.log('Pool isUserRegister:', isUserRegister);
 
   const [timeBeforeVoting, setTimeBeforeVoting] = useState<string>('');
   const [timeBeforeRegistration, setTimeBeforeRegistration] = useState<string>('');
@@ -83,6 +84,7 @@ const Pool: React.FC = () => {
   const { pools } = useSelector(({ pool }: any) => pool);
   const { chainType } = useSelector(({ wallet }: any) => wallet);
   const { address: userAddress } = useSelector(({ user }: any) => user);
+  const { stakedLess } = useSelector(({ library }: any) => library);
 
   const dispatch = useDispatch();
   const toggleModal = React.useCallback((params) => dispatch(modalActions.toggleModal(params)), [
@@ -255,19 +257,19 @@ const Pool: React.FC = () => {
       const resultLoginToBackend = await loginToBackend();
       if (!resultLoginToBackend.success) throw new Error('Not logged to backend');
       const { key }: any = resultLoginToBackend.data;
-      const resultGetPoolSignature = await Backend.getInvestSignature({
+      const resultGetInvestSignature = await Backend.getInvestSignature({
         token: key,
         pool: address,
       });
-      console.log('PagePool vote resultGetPoolSignature:', resultGetPoolSignature);
-      if (!resultGetPoolSignature.data) throw new Error('Cannot get invest signature');
+      console.log('PagePool vote resultGetInvestSignature:', resultGetInvestSignature);
+      if (!resultGetInvestSignature.data) throw new Error('Cannot get invest signature');
       const {
         timestamp,
         signature,
         totalStakedAmount,
         poolPercentages,
         stakingTiers,
-      } = resultGetPoolSignature.data;
+      } = resultGetInvestSignature.data;
       const tokenAmount = new BN(amount)
         .multipliedBy(new BN(10).pow(new BN(tokenDecimals)))
         .toString(10);
@@ -391,6 +393,7 @@ const Pool: React.FC = () => {
   const getPoolStatus = useCallback(async () => {
     try {
       const { closeTimeVoting } = info;
+      console.log('Pool getPoolStatus:', info);
       if (closeTimeVoting < NOW) {
         const { data } = await Backend.getPoolStatus(address);
         console.log('Pool getPoolStatus:', data);
@@ -488,8 +491,16 @@ const Pool: React.FC = () => {
     if (!ContractPresalePublic) return;
     if (!ContractPresaleCertified) return;
     if (isCertified === undefined) return;
-    getDecimals();
     getInfo();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ContractPresalePublic, ContractPresaleCertified, isCertified]);
+
+  useEffect(() => {
+    if (!ContractLessToken) return;
+    if (!ContractPresalePublic) return;
+    if (!ContractPresaleCertified) return;
+    if (isCertified === undefined) return;
+    getDecimals();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ContractPresalePublic, ContractPresaleCertified, isCertified]);
 
@@ -514,8 +525,9 @@ const Pool: React.FC = () => {
   }, [getTier, userAddress, ContractStaking]);
 
   useEffect(() => {
+    if (!info) return () => {};
+    getPoolStatus();
     const interval = setInterval(() => {
-      if (!info) return;
       getPoolStatus();
     }, 10000);
     return () => clearInterval(interval);
@@ -853,7 +865,7 @@ const Pool: React.FC = () => {
                   Voting
                 </div>
                 <div className="item-text">
-                  <div className="item-text-bold">0.000</div>
+                  <div className="item-text-bold">{stakedLess}</div>
                   <div className="item-text-gradient">LESS</div>
                 </div>
                 <div className="button-border" style={{ marginBottom: 5 }}>
@@ -921,7 +933,7 @@ const Pool: React.FC = () => {
             </>
           )}
 
-          {isInvestmentTime && isInvestStart && (
+          {isInvestmentTime && isInvestStart && isUserRegister ? (
             <>
               <div className="item">
                 Your {currency} Investment
@@ -951,6 +963,13 @@ const Pool: React.FC = () => {
                 </div>
               </div>
             </>
+          ) : (
+            <div className="item">
+              <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
+                Investment
+              </div>
+              <div className="item-text">You need to be registered on presale to invest</div>
+            </div>
           )}
 
           {isPresaleClosed && liquidityAdded && (

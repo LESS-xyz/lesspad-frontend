@@ -1,12 +1,13 @@
-import React, { memo, useEffect } from 'react';
+import React, { memo, useCallback, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 import Footer from './components/Footer/index';
 import { Modal } from './components/Modal';
 import { useContractsContext } from './contexts/ContractsContext';
-import { poolActions } from './redux/actions';
+import { libraryActions, poolActions } from './redux/actions';
+import { convertFromWei } from './utils/ethereum';
 import { Header } from './components';
 import {
   AboutPage,
@@ -20,26 +21,85 @@ import {
 } from './pages';
 
 export const App: React.FC = memo(() => {
-  const { ContractLessLibrary } = useContractsContext();
+  const {
+    ContractLessLibrary,
+    ContractStaking,
+    ContractLessToken,
+    ContractLPToken,
+  } = useContractsContext();
 
   const dispatch = useDispatch();
-  const setPools = (params: any[]) => dispatch(poolActions.setPools(params));
+  const setPools = useCallback((params: any[]) => dispatch(poolActions.setPools(params)), [
+    dispatch,
+  ]);
+  const setLibrary = useCallback((params: any) => dispatch(libraryActions.setLibrary(params)), [
+    dispatch,
+  ]);
 
-  const getArrForSearch = async () => {
+  const { address: userAddress } = useSelector(({ user }: any) => user);
+  const { lessDecimals, lpDecimals } = useSelector(({ library }: any) => library);
+
+  const getArrForSearch = useCallback(async () => {
     try {
       const arrForSearch = await ContractLessLibrary.getArrForSearch();
       if (arrForSearch) setPools(arrForSearch);
       console.log('App getArrForSearch:', arrForSearch);
     } catch (e) {
-      console.error(e);
+      console.error('App getArrForSearch:', e);
     }
-  };
+  }, [ContractLessLibrary, setPools]);
+
+  const getDecimals = useCallback(async () => {
+    try {
+      const resultLessDecimals = await ContractLessToken.decimals();
+      setLibrary({ lessDecimals: resultLessDecimals });
+      const resultLpDecimals = await ContractLPToken.decimals();
+      setLibrary({ lpDecimals: resultLpDecimals });
+      console.log('App getDecimals:', { resultLessDecimals, resultLpDecimals });
+    } catch (e) {
+      console.error('App getDecimals:', e);
+    }
+  }, [ContractLessToken, ContractLPToken, setLibrary]);
+
+  const getStakedLess = useCallback(async () => {
+    try {
+      const result = await ContractStaking.getLessBalanceByAddress({ userAddress });
+      const resultInEth = convertFromWei(result, lessDecimals);
+      if (resultInEth) setLibrary({ stakedLess: resultInEth });
+      console.log('App getStakedLess:', resultInEth);
+    } catch (e) {
+      console.error('App getStakedLess:', e);
+    }
+  }, [ContractStaking, setLibrary, lessDecimals, userAddress]);
+
+  const getStakedLp = useCallback(async () => {
+    try {
+      const result = await ContractStaking.getLpBalanceByAddress({ userAddress });
+      const resultInEth = convertFromWei(result, lpDecimals);
+      if (resultInEth) setLibrary({ stakedLp: resultInEth });
+      console.log('App getStakedLP:', resultInEth);
+    } catch (e) {
+      console.error('App getStakedLp:', e);
+    }
+  }, [ContractStaking, setLibrary, lpDecimals, userAddress]);
 
   useEffect(() => {
     if (!ContractLessLibrary) return;
     getArrForSearch();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ContractLessLibrary]);
+  }, [ContractLessLibrary, getArrForSearch]);
+
+  useEffect(() => {
+    if (!ContractLessToken) return;
+    if (!ContractLPToken) return;
+    getDecimals();
+  }, [ContractLessToken, ContractLPToken, getDecimals]);
+
+  useEffect(() => {
+    if (!userAddress) return;
+    if (!ContractStaking) return;
+    getStakedLess();
+    getStakedLp();
+  }, [ContractStaking, getStakedLess, getStakedLp, userAddress]);
 
   return (
     <Router>
