@@ -596,10 +596,11 @@ const Pool: React.FC = () => {
 
   console.log('Pool minVotingCompletion:', { lastTotalStakedAmount, yesVotes });
   const minVotingCompletion = new BN(lastTotalStakedAmount).multipliedBy(new BN(0.1));
-  const votingCompletion = new BN(yesVotes)
+  let votingCompletion = new BN(yesVotes)
     .div(minVotingCompletion)
     .multipliedBy(new BN(100))
     .toString(10);
+  if (+votingCompletion > 100) votingCompletion = '100';
 
   const isEthereum = chainType === 'Ethereum';
   const isBinanceSmartChain = chainType === 'Binance-Smart-Chain';
