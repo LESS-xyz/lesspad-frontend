@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { memo, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { useDispatch } from 'react-redux';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
@@ -19,7 +19,7 @@ import {
   StakingPage,
 } from './pages';
 
-export const App: React.FC = () => {
+export const App: React.FC = memo(() => {
   const { ContractLessLibrary } = useContractsContext();
 
   const dispatch = useDispatch();
@@ -86,4 +86,4 @@ Fundraising Capital"
       <Modal />
     </Router>
   );
-};
+});

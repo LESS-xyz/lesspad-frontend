@@ -1,10 +1,14 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import { setInterval } from 'timers';
+
+import React, { memo, useCallback, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
+// import axios from 'axios';
 import { BigNumber as BN } from 'bignumber.js/bignumber';
 import dayjs from 'dayjs';
 
+// import projectLogo from '../../../assets/img/icons/project-logo.svg';
 import bnbLogo from '../../../assets/img/icons/bnb-logo.svg';
 import ethLogo from '../../../assets/img/icons/eth-logo.svg';
 import Github from '../../../assets/img/icons/gh-icon.svg';
@@ -27,7 +31,7 @@ import ParticipantsTable from '../ParticipantsTable';
 
 import './index.scss';
 
-const { chainSymbols, explorers }: any = config;
+const { chainSymbols, explorers, NOW, REGISTRATION_TIME }: any = config;
 const Backend = new BackendService();
 
 const chainsInfo: any = [
@@ -60,6 +64,8 @@ const Pool: React.FC = () => {
   const [chainInfo, setChainInfo] = useState<any>();
   const [tier, setTier] = React.useState<string>('');
 
+  // const [logo, setLogo] = React.useState<string>(projectLogo);
+
   const [lessDecimals, setLessDecimals] = useState<number>();
   // const [lpDecimals, setLpDecimals] = useState<number>();
   const [tokenDecimals, setTokenDecimals] = useState<number>(0);
@@ -69,7 +75,10 @@ const Pool: React.FC = () => {
   const [myVote, setMyVote] = useState<number>(0);
   const [isInvestStart, setInvestStart] = useState<boolean>(false);
   const [isUserRegister, setUserRegister] = useState<boolean>(false);
-  console.log(isUserRegister, 'isUserRegister');
+  console.log('Pool isUserRegister:', isUserRegister);
+
+  const [timeBeforeVoting, setTimeBeforeVoting] = useState<string>('');
+  const [timeBeforeRegistration, setTimeBeforeRegistration] = useState<string>('');
 
   const { pools } = useSelector(({ pool }: any) => pool);
   const { chainType } = useSelector(({ wallet }: any) => wallet);
@@ -91,7 +100,33 @@ const Pool: React.FC = () => {
   //   }
   // };
 
-  const getTokenDecimals = async () => {
+  // const getImage = useCallback(async () => {
+  //   try {
+  //     const { linkLogo } = info;
+  //     const result = await axios.get(linkLogo);
+  //     console.log('Pool getImage:', result);
+  //     if (!result.data) return;
+  //     setLogo(result.data);
+  //     return;
+  //   } catch (e) {
+  //     console.error('Pool getImage:', e);
+  //   }
+  // }, [info]);
+
+  const updateTimerBeforeVoting = useCallback(() => {
+    try {
+      const { openTimeVoting, openTimePresale } = info;
+      const newTimeBeforeVoting = dayjs(openTimeVoting).fromNow();
+      setTimeBeforeVoting(newTimeBeforeVoting);
+      const openRegistrationTime = openTimePresale - REGISTRATION_TIME;
+      const newTimeBeforeRegistration = dayjs(openRegistrationTime).fromNow();
+      setTimeBeforeRegistration(newTimeBeforeRegistration);
+    } catch (e) {
+      console.error(e);
+    }
+  }, [info]);
+
+  const getTokenDecimals = useCallback(async () => {
     try {
       const { token } = info;
       const resultTokenDecimals = await ContractERC20.decimals({ contractAddress: token });
@@ -99,37 +134,29 @@ const Pool: React.FC = () => {
     } catch (e) {
       console.error(e);
     }
-  };
+  }, [info, ContractERC20]);
 
-  const getIsCertified = (presaleAddress: string) => {
-    try {
-      const isCertifiedNew = pools?.filter((item: any) => item.address === presaleAddress)[0]
-        .isCertified;
-      setIsCertified(isCertifiedNew);
-    } catch (e) {
-      console.error(e);
-    }
-  };
+  const getIsCertified = useCallback(
+    (presaleAddress: string) => {
+      try {
+        const isCertifiedNew = pools?.filter((item: any) => item.address === presaleAddress)[0]
+          .isCertified;
+        setIsCertified(isCertifiedNew);
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    [pools],
+  );
 
-  const getTiersAndWinners = async () => {
-    try {
-      const resultGetTiersAndWinners = await Backend.getTiersAndWinners({
-        pool: address,
-      });
-      console.log('PagePool getTiersAndWinners:', resultGetTiersAndWinners);
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  const getChainInfo = () => {
+  const getChainInfo = useCallback(() => {
     try {
       const chainInfoNew = chainsInfo.filter((item: any) => item.key === chainType);
       setChainInfo(chainInfoNew[0]);
     } catch (e) {
       console.error(e);
     }
-  };
+  }, [chainType]);
 
   const getInfo = async () => {
     try {
@@ -148,11 +175,15 @@ const Pool: React.FC = () => {
   };
 
   const getMyVote = useCallback(async () => {
-    const resultVote = await ContractPresalePublic.getMyVote(address, userAddress);
-    setMyVote(+resultVote);
+    try {
+      const resultVote = await ContractPresalePublic.getMyVote(address, userAddress);
+      setMyVote(+resultVote);
+    } catch (e) {
+      console.error(e);
+    }
   }, [address, userAddress, ContractPresalePublic]);
 
-  const getInvestments = async () => {
+  const getInvestments = useCallback(async () => {
     try {
       const resultInvestments = await ContractPresalePublic.investments({
         contractAddress: address,
@@ -164,7 +195,7 @@ const Pool: React.FC = () => {
     } catch (e) {
       console.error('PagePool getRefund:', e);
     }
-  };
+  }, [ContractPresalePublic, address, tokenDecimals, userAddress]);
 
   const loginToBackend = async () => {
     try {
@@ -219,7 +250,6 @@ const Pool: React.FC = () => {
     }
   };
 
-  // todo: сделать для сертифицированного
   const invest = async (amount: string) => {
     try {
       const resultLoginToBackend = await loginToBackend();
@@ -242,6 +272,22 @@ const Pool: React.FC = () => {
         .multipliedBy(new BN(10).pow(new BN(tokenDecimals)))
         .toString(10);
       const stakedAmount = new BN(`${totalStakedAmount}`).toString(10);
+      const resultGetTierSignature = await Backend.getTierSignature({
+        token: key,
+        presale: address,
+      });
+      console.log('TableRow resultGetTierSignature:', resultGetTierSignature);
+      if (!resultGetTierSignature.data) return;
+      const { date } = resultGetTierSignature.data;
+      const t = resultGetTierSignature.data.type_tier;
+      const resultRegister = await ContractPresalePublic.register({
+        userAddress,
+        tokenAmount,
+        signature,
+        tier: t,
+        timestamp: date,
+      });
+      console.log('TableRow resultRegister:', resultRegister);
       const resultVote = await ContractPresalePublicWithMetamask.invest({
         userAddress,
         contractAddress: address,
@@ -266,75 +312,61 @@ const Pool: React.FC = () => {
   const register = async () => {
     try {
       // login to backend
-      let tokenAmount;
-      let date;
-      let t;
-      let signature;
       const resultGetMetamaskMessage = await Backend.getMetamaskMessage();
-      console.log('TableRow resultGetMetamaskMessage:', resultGetMetamaskMessage);
-      if (resultGetMetamaskMessage.data) {
-        const msg = resultGetMetamaskMessage.data;
-        const signedMsg = await web3.signMessage({ userAddress, message: msg });
-        console.log('TableRow signedMsg:', signedMsg);
-        if (signedMsg) {
-          const resultMetamaskLogin = await Backend.metamaskLogin({
-            address: userAddress,
-            msg,
-            signedMsg,
-          });
-          console.log('TableRow resultMetamaskLogin:', resultMetamaskLogin);
-          if (!resultMetamaskLogin.data) return;
-          const { key: token } = resultMetamaskLogin.data;
-          const resultGetWhitelistSignature = await Backend.getWhitelistSignature({
-            token,
-            pool: address,
-          });
-          console.log('TableRow resultGetWhitelistSignature:', resultGetWhitelistSignature);
-          if (!resultGetWhitelistSignature.data) return;
-          tokenAmount = resultGetWhitelistSignature.data.user_balance;
-          signature = resultGetWhitelistSignature.data.signature;
-          const resultGetTierSignature = await Backend.getTierSignature({
-            token,
-            presale: address,
-          });
-          console.log('TableRow resultGetTierSignature:', resultGetTierSignature);
-          if (!resultGetTierSignature.data) return;
-          date = resultGetTierSignature.data.date;
-          t = resultGetTierSignature.data.type_tier;
-          const resultRegister = await ContractPresalePublic.register({
-            userAddress,
-            tokenAmount,
-            signature,
-            tier: t,
-            timestamp: date,
-          });
-          console.log('TableRow resultRegister:', resultRegister);
-        }
-      }
-    } catch (e) {
-      console.error('TableRow register:', e);
-    }
-  };
-
-  const getRefund = async () => {
-    try {
-      let newInfo;
-      if (isCertified) {
-        newInfo = await ContractPresaleCertified.collectFundsRaised({
-          contractAddress: address,
-          userAddress,
+      console.log('PagePool resultGetMetamaskMessage:', resultGetMetamaskMessage);
+      if (!resultGetMetamaskMessage.data)
+        throw new Error('PagePool: getMetamaskMessage unsuccesful');
+      const msg = resultGetMetamaskMessage.data;
+      const signedMsg = await web3.signMessage({ userAddress, message: msg });
+      console.log('PagePool signedMsg:', signedMsg);
+      if (!signedMsg) throw new Error('PagePool: signMessage unsuccesful');
+      const resultMetamaskLogin = await Backend.metamaskLogin({
+        address: userAddress,
+        msg,
+        signedMsg,
+      });
+      console.log('PagePool resultMetamaskLogin:', resultMetamaskLogin);
+      if (!resultMetamaskLogin.data) throw new Error('PagePool: metamaskLogin unsuccesful');
+      const { key: token } = resultMetamaskLogin.data;
+      const resultGetWhitelistSignature = await Backend.getWhitelistSignature({
+        token,
+        pool: address,
+      });
+      console.log('PagePool resultGetWhitelistSignature:', resultGetWhitelistSignature);
+      if (!resultGetWhitelistSignature.data)
+        throw new Error('PagePool: getWhitelistSignature unsuccesful');
+      const {
+        signature,
+        date: timestamp,
+        user_balance: userBalance,
+        stakedAmount,
+      } = resultGetWhitelistSignature.data;
+      const userTier = await ContractStaking.getUserTier({
+        userAddress,
+      });
+      if (!userTier)
+        toggleModal({
+          open: true,
+          text: (
+            <div className="messageContainer">
+              <p>You are not in a tier. Please, stake minimum 1000 $LESS or 3.4 ETH-LESS LP</p>
+            </div>
+          ),
         });
-        console.log('PagePool getRefund certified:', newInfo);
-      } else {
-        newInfo = await ContractPresalePublic.collectFundsRaised({
-          contractAddress: address,
-          userAddress,
-        });
-        console.log('PagePool getRefund public:', newInfo);
-      }
-      if (newInfo) setInfo(newInfo);
+      const totalStakedAmount = new BN(`${stakedAmount}`).toString(10);
+      const stakingAmountInEth = new BN(`${userBalance}`).toString(10);
+      const resultVote = await ContractPresalePublicWithMetamask.register({
+        userAddress,
+        contractAddress: address,
+        tier: userTier,
+        totalStakedAmount,
+        signature,
+        stakedAmount: stakingAmountInEth,
+        timestamp,
+      });
+      console.log('PagePool resultVote:', resultVote);
     } catch (e) {
-      console.error('PagePool getRefund:', e);
+      console.error('PagePool register:', e);
     }
   };
 
@@ -356,6 +388,19 @@ const Pool: React.FC = () => {
     }
   }, [ContractStaking, userAddress]);
 
+  const getPoolStatus = useCallback(async () => {
+    try {
+      const { closeTimeVoting } = info;
+      if (closeTimeVoting < NOW) {
+        const { data } = await Backend.getPoolStatus(address);
+        console.log('Pool getPoolStatus:', data);
+        setInvestStart(data.investment);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }, [address, info]);
+
   const handleVote = async (yes: boolean) => {
     try {
       await vote(yes);
@@ -364,12 +409,17 @@ const Pool: React.FC = () => {
     }
   };
 
-  const getPoolStatus = useCallback(async () => {
-    if (info && info.closeTimeVoting < dayjs().unix() * 1000) {
-      const { data } = await Backend.getPoolStatus(address);
-      setInvestStart(data.investment);
+  const handleClaimTokens = async () => {
+    try {
+      const resultClaimTokens = await ContractPresalePublicWithMetamask.claimTokens({
+        userAddress,
+        contractAddress: address,
+      });
+      console.log('PagePool resultClaimTokens:', resultClaimTokens);
+    } catch (e) {
+      console.error('PagePool handleVote:', e);
     }
-  }, [address, info]);
+  };
 
   const handleInvest = async () => {
     try {
@@ -399,10 +449,21 @@ const Pool: React.FC = () => {
   };
 
   useEffect(() => {
-    if (!address) {
-      history.push('/');
-    }
+    if (!address) history.push('/');
   }, [address, history]);
+
+  // useEffect(() => {
+  //   if (!info) return () => {};
+  //   getImage();
+  // }, [info, getImage]);
+
+  useEffect(() => {
+    if (!info) return () => {};
+    const interval = setInterval(() => updateTimerBeforeVoting(), 1000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [info, updateTimerBeforeVoting]);
 
   useEffect(() => {
     if (!info) return;
@@ -411,38 +472,34 @@ const Pool: React.FC = () => {
     if (!ContractERC20) return;
     // getDecimals();
     getTokenDecimals();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ContractLessToken, userAddress, info]);
-
-  useEffect(() => {
-    if (!address) return;
-    // getDecimals();
-    getTiersAndWinners();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [address]);
+  }, [ContractLessToken, userAddress, info, getTokenDecimals, ContractERC20]);
 
   useEffect(() => {
     if (!chainType) return;
     getChainInfo();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chainType]);
+  }, [chainType, getChainInfo]);
 
   useEffect(() => {
     if (!pools || !pools.length) return;
     getIsCertified(address);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pools]);
+  }, [pools, address, getIsCertified]);
 
   useEffect(() => {
     if (!ContractPresalePublic) return;
     if (!ContractPresaleCertified) return;
     if (isCertified === undefined) return;
-
     getDecimals();
     getInfo();
-    getInvestments();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ContractPresalePublic, ContractPresaleCertified, isCertified]);
+
+  useEffect(() => {
+    if (!ContractPresalePublic) return;
+    if (!address) return;
+    if (!userAddress) return;
+    if (!tokenDecimals) return;
+    getInvestments();
+  }, [address, userAddress, tokenDecimals, ContractPresalePublic, getInvestments]);
 
   useEffect(() => {
     if (isCertified !== undefined && ContractPresalePublicWithMetamask && userAddress && address) {
@@ -457,8 +514,12 @@ const Pool: React.FC = () => {
   }, [getTier, userAddress, ContractStaking]);
 
   useEffect(() => {
-    getPoolStatus();
-  }, [getPoolStatus]);
+    const interval = setInterval(() => {
+      if (!info) return;
+      getPoolStatus();
+    }, 10000);
+    return () => clearInterval(interval);
+  }, [getPoolStatus, info]);
 
   useEffect(() => {
     if (ContractPresalePublic && address && userAddress) {
@@ -503,7 +564,7 @@ const Pool: React.FC = () => {
     approved,
     beginingAmount,
     // cancelled,
-    // liquidityAdded,
+    liquidityAdded,
     participants,
     raisedAmount,
     yesVotes,
@@ -511,8 +572,14 @@ const Pool: React.FC = () => {
   } = info;
   console.log('Pool info:', info);
 
-  const now = Date.now();
-  const isOpened = openTimePresale < now;
+  const isBeforeVotimgTime = openTimeVoting > NOW;
+  const isVotingTime = openTimeVoting <= NOW && closeTimeVoting > NOW;
+  const isBeforeRegistrationTime =
+    openTimeVoting <= NOW && openTimePresale - REGISTRATION_TIME > NOW;
+  const isRegistrationTime = openTimePresale - REGISTRATION_TIME <= NOW && openTimePresale > NOW;
+  const isInvestmentTime = openTimePresale <= NOW;
+  const isOpened = openTimePresale <= NOW;
+  const isPresaleClosed = closeTimePresale <= NOW;
 
   const isEthereum = chainType === 'Ethereum';
   const isBinanceSmartChain = chainType === 'Binance-Smart-Chain';
@@ -623,10 +690,6 @@ const Pool: React.FC = () => {
     //   value: '0x0e7b582003de0E541548cF02a1F00725Df6E6E6f',
     //   link: `${explorers[chainType]}/token/${token}`,
     // },
-    // {
-    //   header: 'PooCoin Address',
-    //   value: '0x19314Dfa75CfC1E5154f95daFaB217646bdb79AC',
-    // },
     {
       header: 'Presale Contract Address',
       value: address,
@@ -660,7 +723,12 @@ const Pool: React.FC = () => {
             </div>
             <div className="description-info-text">{description}</div>
             <div className="subscription">
-              <a href={`${explorer}/token/${address}`} className="subscription-text">
+              <a
+                href={`${explorer}/address/${address}`}
+                className="subscription-text"
+                target="_blank"
+                rel="noreferrer"
+              >
                 {address}
               </a>
               <img className="icon-subscribe" src={Subscribe} alt="Subscribe" />
@@ -765,18 +833,29 @@ const Pool: React.FC = () => {
       <div className="container-header">Your Investment</div>
       <div className="box box-bg">
         <div className="row">
+          {isBeforeVotimgTime && (
+            <div className="item">
+              <div className="item-text-gradient" style={{ fontSize: 35 }}>
+                Voting will start
+              </div>
+              <div className="item-text" style={{ minWidth: 200 }}>
+                <div className="item-text-bold">{timeBeforeVoting}</div>
+              </div>
+            </div>
+          )}
+
           {!isCertified &&
-            openTimeVoting <= dayjs().unix() * 1000 &&
-            closeTimeVoting > dayjs().unix() * 1000 &&
+            isVotingTime &&
             creator.toLowerCase() !== userAddress.toLowerCase() &&
-            !myVote && (
+            (!myVote ? (
               <div className="item">
-                VOTE
+                <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
+                  Voting
+                </div>
                 <div className="item-text">
                   <div className="item-text-bold">0.000</div>
                   <div className="item-text-gradient">LESS</div>
                 </div>
-                {/*<div className="item-count">$0.0 USD</div>*/}
                 <div className="button-border" style={{ marginBottom: 5 }}>
                   <div
                     className="button"
@@ -800,11 +879,32 @@ const Pool: React.FC = () => {
                   </div>
                 </div>
               </div>
-            )}
-          {isInvestStart ? (
+            ) : (
+              <div className="item">
+                <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
+                  Voting
+                </div>
+                <div className="item-text">You voted</div>
+              </div>
+            ))}
+
+          {isBeforeRegistrationTime && myVote && (
+            <div className="item">
+              <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
+                Registration will start
+              </div>
+              <div className="item-text" style={{ minWidth: 200 }}>
+                <div className="item-text-bold">{timeBeforeRegistration}</div>
+              </div>
+            </div>
+          )}
+
+          {isRegistrationTime && (
             <>
               <div className="item">
-                Register for Presale
+                <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
+                  Register for Presale
+                </div>
                 <img src={RegisterImg} alt="" />
                 <div className="button-border">
                   <div
@@ -818,42 +918,16 @@ const Pool: React.FC = () => {
                   </div>
                 </div>
               </div>
-              <div className="item">
-                Your Tokens
-                <div className="item-text">
-                  <div className="item-text-bold">{investments.amountTokens}</div>
-                  <div className="item-text-gradient">{tokenSymbol}</div>
-                </div>
-                {/*<div className="item-count">$13,780,000 USD</div>*/}
-                <div className="button-border">
-                  <div
-                    className="button"
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => {}}
-                    onKeyDown={() => {}}
-                  >
-                    <div className="gradient-button-text">Claim Token</div>
-                  </div>
-                </div>
-              </div>
+            </>
+          )}
+
+          {isInvestmentTime && isInvestStart && (
+            <>
               <div className="item">
                 Your {currency} Investment
                 <div className="item-text">
                   <div className="item-text-bold">
                     {investments.amountEth} {currency}
-                  </div>
-                </div>
-                {/*<div className="item-count">$0.0 USD</div>*/}
-                <div className="button-border">
-                  <div
-                    className="button"
-                    role="button"
-                    tabIndex={0}
-                    onClick={getRefund}
-                    onKeyDown={() => {}}
-                  >
-                    <div className="gradient-button-text">Get Refund</div>
                   </div>
                 </div>
               </div>
@@ -877,21 +951,43 @@ const Pool: React.FC = () => {
                 </div>
               </div>
             </>
-          ) : (
-            ''
+          )}
+
+          {isPresaleClosed && liquidityAdded && (
+            <>
+              <div className="item">
+                Your Tokens
+                <div className="item-text">
+                  <div className="item-text-bold">{investments.amountTokens}</div>
+                  <div className="item-text-gradient">{tokenSymbol}</div>
+                </div>
+                {/*<div className="item-count">$13,780,000 USD</div>*/}
+                <div className="button-border">
+                  <div
+                    className="button"
+                    role="button"
+                    tabIndex={0}
+                    onClick={handleClaimTokens}
+                    onKeyDown={() => {}}
+                  >
+                    <div className="gradient-button-text">Claim Token</div>
+                  </div>
+                </div>
+              </div>
+            </>
           )}
         </div>
       </div>
 
       {/*Participants*/}
-      <ParticipantsTable />
+      <ParticipantsTable poolAddress={address} />
 
       {/*Important Links*/}
       <div className="container-header">Important Links</div>
       <div className="box">
         <div className="box-links">
           {links.map((item) => (
-            <a href={item.link} className="box-links-link">
+            <a href={item.link} className="box-links-link" target="_blank" rel="noreferrer">
               <div className="box-links-link-content">
                 <div className="box-links-link-content-header">{item.header}</div>
                 <div>{item.value}</div>
@@ -905,7 +1001,12 @@ const Pool: React.FC = () => {
             <div className="box-links-list-header">Connect</div>
             <div className="box-links-list-links">
               {linksIcons.map((item) => (
-                <a href={addHttps(item.link)} className="box-links-list-links-item">
+                <a
+                  href={addHttps(item.link)}
+                  className="box-links-list-links-item"
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   <img src={item.image} alt={`${item.image} icon`} />
                 </a>
               ))}
@@ -922,4 +1023,4 @@ const Pool: React.FC = () => {
   );
 };
 
-export default Pool;
+export default memo(Pool);

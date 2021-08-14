@@ -18,7 +18,7 @@ import { prettyNumber } from '../../utils/prettifiers';
 import s from './CreatePool.module.scss';
 
 const Backend = new BackendService();
-const { SHOW_FORM_VALUES } = config;
+const { SHOW_FORM_VALUES, NOW, DAY, TIER_TIME } = config;
 
 const checkIfExists = (value: any) => value;
 const checkPercentage = (value: number) => value >= 0 && value <= 100;
@@ -57,8 +57,6 @@ const validationGt0 = [
   },
 ];
 
-const day = 1000 * 60 * 60 * 24;
-
 const CreatePoolPage: React.FC = () => {
   const { web3 } = useWeb3ConnectorContext();
   const {
@@ -71,10 +69,13 @@ const CreatePoolPage: React.FC = () => {
     ContractLessLibrary,
   } = useContractsContext();
 
-  const defaultOpenVotingTime = new Date().getTime() + day; // todo
-  const defaultOpenTime = defaultOpenVotingTime + day * 2 + 1000 * 60 * 10; // todo
-  const defaultCloseTime = defaultOpenTime + day; // todo
-  const defaultLiquidityAllocationTime = defaultCloseTime + day; // todo
+  const min5 = 1000 * 60 * 5;
+  const defaultOpenVotingTime = NOW + min5; // todo: next block time
+  const votingDuration = DAY; // todo
+  const registerDuration = DAY; // todo
+  const defaultOpenTime = defaultOpenVotingTime + votingDuration + registerDuration; // todo
+  const defaultCloseTime = defaultOpenTime + TIER_TIME * 5; // todo
+  const defaultLiquidityAllocationTime = defaultCloseTime + DAY; // todo
 
   const [lessDecimals, setLessDecimals] = useState<number>(0);
   const [lpDecimals, setLpDecimals] = useState<number>(0);
@@ -83,7 +84,7 @@ const CreatePoolPage: React.FC = () => {
   const [stakedLP, setStakedLP] = useState<string>('0.000');
 
   const [saleTitle, setSaleTitle] = useState<string>(SHOW_FORM_VALUES ? 'Title' : '');
-  const [description, setDescription] = useState<string>('');
+  const [description, setDescription] = useState<string>(SHOW_FORM_VALUES ? 'Description' : '');
   const [tokenAddress, setTokenAddress] = useState<string>(
     SHOW_FORM_VALUES ? '0x3561A02e1192B89e2415724f43521f898e867013' : '',
   );
@@ -184,7 +185,6 @@ const CreatePoolPage: React.FC = () => {
     }
   };
 
-  // todo: не работает со старым контрактом библиотеки
   const getUsdtFeeForCreation = async () => {
     try {
       const resultUsdtToEthFee = await ContractCalculations.usdtToEthFee();
@@ -195,21 +195,30 @@ const CreatePoolPage: React.FC = () => {
     }
   };
 
+  const fieldsMustExist = {
+    saleTitle,
+    description,
+    tokenAddress,
+    tokenPrice,
+    softCap,
+    hardCap,
+    openTime,
+    closeTime,
+    listingPrice,
+    liquidityPercentageAllocation,
+    lpTokensLockDurationInDays,
+    // linkTelegram,
+    // linkGithub,
+    // linkTwitter,
+    // linkWebsite,
+    // linkLogo,
+    // whitepaper,
+  };
+
   const clearErrors = () => {
     try {
-      const fields = {
-        saleTitle,
-        tokenAddress,
-        tokenPrice,
-        softCap,
-        hardCap,
-        openTime,
-        closeTime,
-        liquidityPercentageAllocation,
-        lpTokensLockDurationInDays,
-      };
       const newErrors = {};
-      const entries = Object.entries(fields);
+      const entries = Object.entries(fieldsMustExist);
       for (let i = 0; i < entries.length; i += 1) {
         const [variableName, variable] = entries[i];
         if (variable) {
@@ -224,32 +233,17 @@ const CreatePoolPage: React.FC = () => {
 
   const validateFormForExistingValues = () => {
     try {
-      const fields = {
-        saleTitle,
-        tokenAddress,
-        tokenPrice,
-        softCap,
-        hardCap,
-        openTime,
-        closeTime,
-        liquidityPercentageAllocation,
-        lpTokensLockDurationInDays,
-      };
       const newErrors = {};
-      const entries = Object.entries(fields);
+      const entries = Object.entries(fieldsMustExist);
       for (let i = 0; i < entries.length; i += 1) {
         const [variableName, variable] = entries[i];
         newErrors[variableName] = !checkIfExists(variable) && messageEnterValue;
       }
       setErrors({ ...errors, ...newErrors });
-      if (!saleTitle) return false;
-      if (!tokenAddress) return false;
-      if (!tokenPrice) return false;
-      if (!softCap) return false;
-      if (!hardCap) return false;
-      if (!openTime) return false;
-      if (!closeTime) return false;
-      if (!liquidityPercentageAllocation) return false;
+      for (let i = 0; i < entries.length; i += 1) {
+        const [, variable] = entries[i];
+        if (!variable) return false;
+      }
       return true;
     } catch (e) {
       console.error(e);
@@ -320,6 +314,7 @@ const CreatePoolPage: React.FC = () => {
   };
 
   const validateTime = () => {
+    return true; // todo: remove!!!
     // checks
     // todo block timestamp
     const isOpenVotingTimeMoreThanBlockTimestamp = openTime > Date.now();
@@ -661,7 +656,7 @@ const CreatePoolPage: React.FC = () => {
         listingPriceInWei,
         lpTokensLockDurationInDays,
         liquidityPercentageAllocation,
-        liquidityAllocationTime,
+        (liquidityAllocationTime / 1000).toFixed(),
       ];
       // todo: add CertifiedAddition for certified presale, where nativeToken is
       const presaleStringInfo = [
@@ -766,14 +761,23 @@ const CreatePoolPage: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     saleTitle,
+    description,
     tokenAddress,
     tokenPrice,
     softCap,
     hardCap,
     openTime,
     closeTime,
+    listingPrice,
     liquidityPercentageAllocation,
     lpTokensLockDurationInDays,
+    linkTelegram,
+    linkGithub,
+    linkTwitter,
+    linkWebsite,
+    linkLogo,
+    description,
+    whitepaper,
   ]);
 
   useEffect(() => {
@@ -831,7 +835,13 @@ const CreatePoolPage: React.FC = () => {
                 error={errors.saleTitle}
                 validations={validationIfExists}
               />
-              <Input title="Description" value={description} onChange={setDescription} />
+              <Input
+                title="Description"
+                value={description}
+                onChange={setDescription}
+                error={errors.description}
+                validations={validationIfExists}
+              />
               <Input
                 title="Token Contract Address"
                 placeholder="0x3561A02e...8e867013"
@@ -903,14 +913,21 @@ const CreatePoolPage: React.FC = () => {
               {(isPublic || isLiquidity) && (
                 <>
                   <Input
-                    title="Liquidity Percentage allocation"
+                    title="Liquidity Percentage"
                     placeholder="10"
                     value={liquidityPercentageAllocation}
                     onChange={setLiquidityPercentageAllocation}
                     error={errors.liquidityPercentageAllocation}
                     validations={[...validationIfExists, ...validationPercentage]}
                   />
-                  <Input title="Listing price" value={listingPrice} onChange={setListingPrice} />
+                  <Input
+                    title="Listing price"
+                    placeholder="1"
+                    value={listingPrice}
+                    onChange={setListingPrice}
+                    error={errors.listingPrice}
+                    validations={validationIfExists}
+                  />
                   <Input
                     title="Number Of Days To Lock LP Tokens"
                     placeholder="30"
@@ -1015,12 +1032,49 @@ const CreatePoolPage: React.FC = () => {
                 />
               )}
 
-              <Input value={linkLogo} onChange={setLinkLogo} title="Link to logo" />
-              <Input value={linkWebsite} onChange={setLinkWebsite} title="Link to Website" />
-              <Input value={linkTelegram} onChange={setLinkTelegram} title="Link to Telegram" />
-              <Input value={linkGithub} onChange={setLinkGithub} title="Link to Github" />
-              <Input value={linkTwitter} onChange={setLinkTwitter} title="Link to Twitter" />
-              <Input value={whitepaper} onChange={setWhitepaper} title="Whitepaper" />
+              <Input
+                value={linkLogo}
+                onChange={setLinkLogo}
+                title="Link to logo"
+                placeholder="https://example.com/logo.png"
+                // error={errors.linkLogo}
+                // validations={validationIfExists}
+              />
+              <Input
+                value={linkWebsite}
+                onChange={setLinkWebsite}
+                title="Link to Website"
+                // error={errors.linkWebsite}
+                // validations={validationIfExists}
+              />
+              <Input
+                value={linkTelegram}
+                onChange={setLinkTelegram}
+                title="Link to Telegram"
+                // error={errors.linkTelegram}
+                // validations={validationIfExists}
+              />
+              <Input
+                value={linkGithub}
+                onChange={setLinkGithub}
+                title="Link to Github"
+                // error={errors.linkGithub}
+                // validations={validationIfExists}
+              />
+              <Input
+                value={linkTwitter}
+                onChange={setLinkTwitter}
+                title="Link to Twitter"
+                // error={errors.linkTwitter}
+                // validations={validationIfExists}
+              />
+              <Input
+                value={whitepaper}
+                onChange={setWhitepaper}
+                title="Whitepaper"
+                // error={errors.whitepaper}
+                // validations={validationIfExists}
+              />
 
               <div className={s.button}>
                 <button type="submit" className={s.button_submit}>

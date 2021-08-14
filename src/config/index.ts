@@ -12,14 +12,24 @@ import UniswapRouterAbi from '../data/abi/UniswapRouterAbi';
 const IS_PRODUCTION = false;
 const IS_TESTING_ON_ROPSTEN = false;
 const SHOW_CONSOLE_LOGS = true;
-const SHOW_FORM_VALUES = false;
+const SHOW_FORM_VALUES = true;
 const INFURA_KEY = 'bf1db577e6bb42bf93893e1ea5dd1630';
+
+const NOW = Date.now(); // todo
+// const DAY = 1000 * 60 * 60 * 24;
+const DAY = 1000 * 60 * 10; // todo
+const TIER_TIME = IS_PRODUCTION ? 1000 * 60 * 60 : 1000 * 60 * 5; // todo:
+const REGISTRATION_TIME = IS_PRODUCTION ? DAY : 1000 * 60 * 10; // todo:
 
 export default {
   IS_PRODUCTION,
   IS_TESTING_ON_ROPSTEN,
   SHOW_CONSOLE_LOGS,
   SHOW_FORM_VALUES,
+  NOW,
+  DAY,
+  TIER_TIME,
+  REGISTRATION_TIME,
   version: IS_PRODUCTION ? 'Mainnet beta' : IS_TESTING_ON_ROPSTEN ? 'Ropsten beta' : 'Kovan beta',
   isMainnetOrTestnet: IS_PRODUCTION ? 'mainnet' : 'testnet',
   netType: IS_PRODUCTION ? 'mainnet' : IS_TESTING_ON_ROPSTEN ? 'ropsten' : 'kovan',
@@ -118,14 +128,14 @@ export default {
     },
     testnet: {
       'Ethereum': {
-        Calculations: '0x88f487A9D4426f1D1ae0F27A76af1ac68AAEec94',
+        Calculations: '0xC397e294EbbB1f91ae7F6B27cB2642c26Be7F5EA',
         LessToken: '0x87feef975fd65f32A0836f910Fd13d9Cf4553690',
         LPToken: '0x4fe142c6cbd294ef96dbba8a837cde3035850a97',
         Staking: '0xE4D00cA4eceFB3bEE229FFf97ffF3de3bBAD4B4B',
-        LessLibrary: '0xc0F0352a566681790D76D32842537D06032D36Bb',
-        PresaleFactory: '0xbe3a5743D8E7ccAf5c61cB71F70b6d256d066eA0',
+        LessLibrary: '0x74Ffc063f448680a9518cE93F8dAfCf78f8f23C6',
+        PresaleFactory: '0xc2758e5728f8b86BeA38684359f0BD8E0F848312',
         PresaleFactoryCertified: '0x30457a87c85b4fcf4127e1d07f64035493e52940',
-        PresalePublic: '0x4c1739f9f729a2c9c2fccb0a70aaf57926b223b2',
+        // PresalePublic: '0x4c1739f9f729a2c9c2fccb0a70aaf57926b223b2',
       },
       'Binance-Smart-Chain': {
         // todo

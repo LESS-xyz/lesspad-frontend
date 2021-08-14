@@ -13,6 +13,11 @@ type TypeGetInfoProps = {
   contractAddress: string;
 };
 
+type TypeClaimTokensProps = {
+  contractAddress: string;
+  userAddress: string;
+};
+
 type TypeVoteProps = {
   userAddress: string;
   contractAddress: string;
@@ -24,9 +29,11 @@ type TypeVoteProps = {
 
 type TypeRegisterProps = {
   userAddress: string;
-  tokenAmount: string;
-  signature: string;
+  contractAddress: string;
   tier: string;
+  stakedAmount: string;
+  signature: string;
+  totalStakedAmount: string;
   timestamp: string;
 };
 
@@ -243,7 +250,7 @@ export default class ContractPresalePublicService {
         .invest(tokenAmount, signature, stakedAmount, timestamp, poolPercentages, stakingTiers)
         .send({ from: userAddress });
     } catch (e) {
-      console.error('ContractPresalePublicService vote:', e);
+      console.error('ContractPresalePublicService invest:', e);
       return null;
     }
   };
@@ -283,13 +290,34 @@ export default class ContractPresalePublicService {
 
   public register = async (props: TypeRegisterProps): Promise<any> => {
     try {
-      const { userAddress, tokenAmount, signature, tier, timestamp } = props;
-      // console.log('ContractPresalePublicService vote:', props);
-      return await this.contract.methods
-        .register(tokenAmount, tier, timestamp, signature)
+      const {
+        contractAddress,
+        userAddress,
+        stakedAmount,
+        signature,
+        totalStakedAmount,
+        timestamp,
+        tier,
+      } = props;
+      console.log('ContractPresalePublicService register:', props);
+      const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
+      return await contract.methods
+        .register(stakedAmount, tier, timestamp, totalStakedAmount, signature)
         .send({ from: userAddress });
     } catch (e) {
-      console.error('ContractPresalePublicService vote:', e);
+      console.error('ContractPresalePublicService register:', e);
+      return null;
+    }
+  };
+
+  public claimTokens = async (props: TypeClaimTokensProps): Promise<any> => {
+    try {
+      const { userAddress, contractAddress } = props;
+      // console.log('ContractPresalePublicService claimTokens:', props);
+      const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
+      return await contract.methods.claimTokens().send({ from: userAddress });
+    } catch (e) {
+      console.error('ContractPresalePublicService claimTokens:', e);
       return null;
     }
   };
