@@ -19,6 +19,7 @@ const NOW = Date.now(); // todo
 // const DAY = 1000 * 60 * 60 * 24;
 const DAY = 1000 * 60 * 20; // todo
 const TIER_TIME = IS_PRODUCTION ? 1000 * 60 * 60 : 1000 * 60 * 5; // todo:
+const REGISTRATION_TIME = IS_PRODUCTION ? DAY : 1000 * 60 * 10; // todo:
 
 export default {
   IS_PRODUCTION,
@@ -28,6 +29,7 @@ export default {
   NOW,
   DAY,
   TIER_TIME,
+  REGISTRATION_TIME,
   version: IS_PRODUCTION ? 'Mainnet beta' : IS_TESTING_ON_ROPSTEN ? 'Ropsten beta' : 'Kovan beta',
   isMainnetOrTestnet: IS_PRODUCTION ? 'mainnet' : 'testnet',
   netType: IS_PRODUCTION ? 'mainnet' : IS_TESTING_ON_ROPSTEN ? 'ropsten' : 'kovan',

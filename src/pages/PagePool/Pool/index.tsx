@@ -31,7 +31,7 @@ import ParticipantsTable from '../ParticipantsTable';
 
 import './index.scss';
 
-const { chainSymbols, explorers, NOW }: any = config;
+const { chainSymbols, explorers, NOW, REGISTRATION_TIME }: any = config;
 const Backend = new BackendService();
 
 const chainsInfo: any = [
@@ -78,6 +78,7 @@ const Pool: React.FC = () => {
   console.log('Pool isUserRegister:', isUserRegister);
 
   const [timeBeforeVoting, setTimeBeforeVoting] = useState<string>('');
+  const [timeBeforeRegistration, setTimeBeforeRegistration] = useState<string>('');
 
   const { pools } = useSelector(({ pool }: any) => pool);
   const { chainType } = useSelector(({ wallet }: any) => wallet);
@@ -114,9 +115,12 @@ const Pool: React.FC = () => {
 
   const updateTimerBeforeVoting = useCallback(() => {
     try {
-      const { openTimeVoting } = info;
+      const { openTimeVoting, openTimePresale } = info;
       const newTimeBeforeVoting = dayjs(openTimeVoting).fromNow();
       setTimeBeforeVoting(newTimeBeforeVoting);
+      const openRegistrationTime = openTimePresale - REGISTRATION_TIME;
+      const newTimeBeforeRegistration = dayjs(openRegistrationTime).fromNow();
+      setTimeBeforeRegistration(newTimeBeforeRegistration);
     } catch (e) {
       console.error(e);
     }
@@ -568,7 +572,9 @@ const Pool: React.FC = () => {
 
   const isBeforeVotimgTime = openTimeVoting > NOW;
   const isVotingTime = openTimeVoting <= NOW && closeTimeVoting > NOW;
-  const isRegistrationTime = closeTimeVoting <= NOW && openTimePresale > NOW;
+  const isBeforeRegistrationTime =
+    closeTimeVoting <= NOW && openTimePresale - REGISTRATION_TIME > NOW;
+  const isRegistrationTime = openTimePresale - REGISTRATION_TIME <= NOW && openTimePresale > NOW;
   const isInvestmentTime = openTimePresale <= NOW && isInvestStart;
   const isOpened = openTimePresale <= NOW;
   const isPresaleClosed = closeTimePresale <= NOW;
@@ -877,6 +883,17 @@ const Pool: React.FC = () => {
                 <div className="item-text">You voted</div>
               </div>
             ))}
+
+          {isBeforeRegistrationTime && (
+            <div className="item">
+              <div className="item-text-gradient" style={{ fontSize: 35 }}>
+                Registration will start
+              </div>
+              <div className="item-text" style={{ minWidth: 200 }}>
+                <div className="item-text-bold">{timeBeforeRegistration}</div>
+              </div>
+            </div>
+          )}
 
           {isRegistrationTime && (
             <>
