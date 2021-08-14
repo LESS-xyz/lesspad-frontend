@@ -41,9 +41,9 @@ type TypeRegisterProps = {
 type TypeInvestProps = {
   userAddress: string;
   contractAddress: string;
-  tokenAmount: string;
+  amount: string;
   signature: string;
-  // stakedAmount: string;
+  userBalance: string;
   timestamp: number;
   poolPercentages: number[];
   stakingTiers: number[];
@@ -247,18 +247,18 @@ export default class ContractPresalePublicService {
       const {
         userAddress,
         contractAddress,
-        tokenAmount,
+        amount,
+        userBalance,
         signature,
-        // stakedAmount,
         timestamp,
-        poolPercentages,
-        stakingTiers,
+        // poolPercentages,
+        // stakingTiers,
       } = props;
-      // console.log('ContractPresalePublicService vote props:', props);
+      console.log('ContractPresalePublicService vote props:', props);
       const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
       return await contract.methods
-        .invest(tokenAmount, signature, timestamp, poolPercentages, stakingTiers)
-        .send({ from: userAddress });
+        .invest(signature, userBalance, timestamp)
+        .send({ from: userAddress, value: amount });
     } catch (e) {
       console.error('ContractPresalePublicService invest:', e);
       return null;

@@ -199,7 +199,7 @@ const Pool: React.FC = () => {
     }
   }, [ContractPresalePublic, address, tokenDecimals, userAddress]);
 
-  const loginToBackend = async () => {
+  const loginToBackend = useCallback(async () => {
     try {
       const resultGetMetamaskMessage = await Backend.getMetamaskMessage();
       console.log('PagePool loginToBackend resultGetMetamaskMessage:', resultGetMetamaskMessage);
@@ -221,7 +221,7 @@ const Pool: React.FC = () => {
       console.error('PagePool vote:', e);
       return { success: false, data: null };
     }
-  };
+  }, [userAddress, web3]);
 
   const vote = async (yes: boolean) => {
     try {
@@ -254,7 +254,7 @@ const Pool: React.FC = () => {
     }
   };
 
-  const invest = async (amount: string) => {
+  const invest = useCallback(async () => {
     try {
       const resultLoginToBackend = await loginToBackend();
       if (!resultLoginToBackend.success) throw new Error('Not logged to backend');
@@ -263,42 +263,48 @@ const Pool: React.FC = () => {
         token: key,
         pool: address,
       });
-      console.log('PagePool vote resultGetInvestSignature:', resultGetInvestSignature);
+      console.log('PagePool invest resultGetInvestSignature:', resultGetInvestSignature);
       if (!resultGetInvestSignature.data) throw new Error('Cannot get invest signature');
-      const { timestamp, signature, poolPercentages, stakingTiers } = resultGetInvestSignature.data;
-      const tokenAmount = new BN(amount)
+      const { user_balance } = resultGetInvestSignature.data;
+      const {
+        date: timestamp,
+        signature,
+        poolPercentages,
+        stakingTiers,
+      } = resultGetInvestSignature.data;
+      console.log('PagePool invest:', { amountToInvest, tokenDecimals });
+      const amountToInvestInWei = new BN(amountToInvest)
         .multipliedBy(new BN(10).pow(new BN(tokenDecimals)))
         .toString(10);
       const resultGetTierSignature = await Backend.getTierSignature({
         token: key,
         presale: address,
       });
-      console.log('TableRow resultGetTierSignature:', resultGetTierSignature);
+      console.log('PagePool resultGetTierSignature:', resultGetTierSignature);
+      const userBalance = new BN(`${user_balance}`).toString(10);
       if (!resultGetTierSignature.data) return;
-      const { date } = resultGetTierSignature.data;
-      const t = resultGetTierSignature.data.type_tier;
-      const resultRegister = await ContractPresalePublic.register({
-        userAddress,
-        tokenAmount,
-        signature,
-        tier: t,
-        timestamp: date,
-      });
-      console.log('TableRow resultRegister:', resultRegister);
       const resultVote = await ContractPresalePublicWithMetamask.invest({
         userAddress,
         contractAddress: address,
-        tokenAmount,
+        amount: amountToInvestInWei,
+        userBalance,
         signature,
         timestamp,
         poolPercentages,
         stakingTiers,
       });
-      console.log('PagePool vote:', resultVote);
+      console.log('PagePool invest:', resultVote);
     } catch (e) {
-      console.error('PagePool vote:', e);
+      console.error('PagePool invest:', e);
     }
-  };
+  }, [
+    amountToInvest,
+    ContractPresalePublicWithMetamask,
+    address,
+    tokenDecimals,
+    loginToBackend,
+    userAddress,
+  ]);
 
   const getUserRegister = useCallback(async () => {
     try {
@@ -437,7 +443,7 @@ const Pool: React.FC = () => {
                 className="button"
                 role="button"
                 tabIndex={0}
-                onClick={() => invest(amountToInvest)}
+                onClick={invest}
                 onKeyDown={() => {}}
               >
                 <div className="gradient-button-text">Submit</div>
@@ -691,7 +697,7 @@ const Pool: React.FC = () => {
     {
       header: 'Voting completion',
       value: lastTotalStakedAmount === '0' ? '0%' : `${prettyNumber(votingCompletion)}%`,
-      gradient: false,
+      gradient: +votingCompletion === 100,
       less: false,
     },
   ];
@@ -967,6 +973,24 @@ const Pool: React.FC = () => {
                   <div className="item-text">
                     <div className="item-text-bold">
                       1 {tokenSymbol} = {tokenPrice} {currency}
+                    </div>
+                  </div>
+                  <p>Please, enter amount to invest (in ether)</p>
+                  <Input
+                    title=""
+                    value={amountToInvest}
+                    onChange={setAmountToInvest}
+                    style={{ marginBottom: 10 }}
+                  />
+                  <div className="button-border" style={{ margin: '5px 0' }}>
+                    <div
+                      className="button"
+                      role="button"
+                      tabIndex={0}
+                      onClick={invest}
+                      onKeyDown={() => {}}
+                    >
+                      <div className="gradient-button-text">Submit</div>
                     </div>
                   </div>
                   <div className="button-border">
