@@ -18,7 +18,7 @@ import { prettyNumber } from '../../utils/prettifiers';
 import s from './CreatePool.module.scss';
 
 const Backend = new BackendService();
-const { IS_PRODUCTION, SHOW_FORM_VALUES } = config;
+const { SHOW_FORM_VALUES, NOW, DAY, TIER_TIME } = config;
 
 const checkIfExists = (value: any) => value;
 const checkPercentage = (value: number) => value >= 0 && value <= 100;
@@ -57,11 +57,6 @@ const validationGt0 = [
   },
 ];
 
-// const day = 1000 * 60 * 60 * 24;
-const now = Date.now(); // todo
-const day = 1000 * 60 * 20; // todo
-const tierTime = IS_PRODUCTION ? 1000 * 60 * 60 : 1000 * 60 * 5; // todo:
-
 const CreatePoolPage: React.FC = () => {
   const { web3 } = useWeb3ConnectorContext();
   const {
@@ -74,12 +69,13 @@ const CreatePoolPage: React.FC = () => {
     ContractLessLibrary,
   } = useContractsContext();
 
-  const defaultOpenVotingTime = now + day * 0.5; // todo: next block time
-  const votingDuration = day; // todo
-  const registerDuration = day; // todo
+  const min5 = 1000 * 60 * 5;
+  const defaultOpenVotingTime = NOW + min5; // todo: next block time
+  const votingDuration = DAY; // todo
+  const registerDuration = DAY; // todo
   const defaultOpenTime = defaultOpenVotingTime + votingDuration + registerDuration; // todo
-  const defaultCloseTime = defaultOpenTime + tierTime * 5; // todo
-  const defaultLiquidityAllocationTime = defaultCloseTime + day; // todo
+  const defaultCloseTime = defaultOpenTime + TIER_TIME * 5; // todo
+  const defaultLiquidityAllocationTime = defaultCloseTime + DAY; // todo
 
   const [lessDecimals, setLessDecimals] = useState<number>(0);
   const [lpDecimals, setLpDecimals] = useState<number>(0);

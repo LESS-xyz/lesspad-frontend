@@ -390,9 +390,10 @@ const Pool: React.FC = () => {
 
   const getPoolStatus = useCallback(async () => {
     try {
-      if (!info) return;
-      if (info.closeTimeVoting < NOW) {
+      const { closeTimeVoting } = info;
+      if (closeTimeVoting < NOW) {
         const { data } = await Backend.getPoolStatus(address);
+        console.log('Pool getPoolStatus:', data);
         setInvestStart(data.investment);
       }
     } catch (e) {
@@ -514,10 +515,11 @@ const Pool: React.FC = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
+      if (!info) return;
       getPoolStatus();
     }, 10000);
     return () => clearInterval(interval);
-  }, [getPoolStatus]);
+  }, [getPoolStatus, info]);
 
   useEffect(() => {
     if (ContractPresalePublic && address && userAddress) {
@@ -573,9 +575,9 @@ const Pool: React.FC = () => {
   const isBeforeVotimgTime = openTimeVoting > NOW;
   const isVotingTime = openTimeVoting <= NOW && closeTimeVoting > NOW;
   const isBeforeRegistrationTime =
-    closeTimeVoting <= NOW && openTimePresale - REGISTRATION_TIME > NOW;
+    openTimeVoting <= NOW && openTimePresale - REGISTRATION_TIME > NOW;
   const isRegistrationTime = openTimePresale - REGISTRATION_TIME <= NOW && openTimePresale > NOW;
-  const isInvestmentTime = openTimePresale <= NOW && isInvestStart;
+  const isInvestmentTime = openTimePresale <= NOW;
   const isOpened = openTimePresale <= NOW;
   const isPresaleClosed = closeTimePresale <= NOW;
 
@@ -847,7 +849,7 @@ const Pool: React.FC = () => {
             creator.toLowerCase() !== userAddress.toLowerCase() &&
             (!myVote ? (
               <div className="item">
-                <div className="item-text-gradient" style={{ fontSize: 35 }}>
+                <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
                   Voting
                 </div>
                 <div className="item-text">
@@ -879,14 +881,16 @@ const Pool: React.FC = () => {
               </div>
             ) : (
               <div className="item">
-                VOTE
+                <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
+                  Voting
+                </div>
                 <div className="item-text">You voted</div>
               </div>
             ))}
 
-          {isBeforeRegistrationTime && (
+          {isBeforeRegistrationTime && myVote && (
             <div className="item">
-              <div className="item-text-gradient" style={{ fontSize: 35 }}>
+              <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
                 Registration will start
               </div>
               <div className="item-text" style={{ minWidth: 200 }}>
@@ -898,7 +902,9 @@ const Pool: React.FC = () => {
           {isRegistrationTime && (
             <>
               <div className="item">
-                Register for Presale
+                <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
+                  Register for Presale
+                </div>
                 <img src={RegisterImg} alt="" />
                 <div className="button-border">
                   <div
@@ -915,7 +921,7 @@ const Pool: React.FC = () => {
             </>
           )}
 
-          {isInvestmentTime && (
+          {isInvestmentTime && isInvestStart && (
             <>
               <div className="item">
                 Your {currency} Investment

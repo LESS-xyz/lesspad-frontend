@@ -17,7 +17,7 @@ const INFURA_KEY = 'bf1db577e6bb42bf93893e1ea5dd1630';
 
 const NOW = Date.now(); // todo
 // const DAY = 1000 * 60 * 60 * 24;
-const DAY = 1000 * 60 * 20; // todo
+const DAY = 1000 * 60 * 10; // todo
 const TIER_TIME = IS_PRODUCTION ? 1000 * 60 * 60 : 1000 * 60 * 5; // todo:
 const REGISTRATION_TIME = IS_PRODUCTION ? DAY : 1000 * 60 * 10; // todo:
 
