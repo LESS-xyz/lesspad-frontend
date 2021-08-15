@@ -453,7 +453,7 @@ const Pool: React.FC = () => {
       const { openTimePresale, closeTimePresale } = info;
       // console.log('PagePool getTierTime:', tier);
       const isInvestmentTime = +openTimePresale <= NOW && +closeTimePresale > NOW;
-      const tierTimeNew = +openTimePresale + TIER_TIME * (+tier - 1);
+      const tierTimeNew = +openTimePresale + TIER_TIME * (5 - +tier);
       const isMyTierTimeNew = isInvestmentTime && tierTimeNew <= NOW;
       const timeBeforeMyTierNew = dayjs(tierTimeNew).fromNow();
       setIsMyTierTime(isMyTierTimeNew);
