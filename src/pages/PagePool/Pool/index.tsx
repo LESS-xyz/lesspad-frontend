@@ -681,7 +681,7 @@ const Pool: React.FC = () => {
     cancelled,
     liquidityAdded,
     participants,
-    raisedAmount,
+    // raisedAmount,
     yesVotes,
     noVotes,
     lastTotalStakedAmount,
@@ -714,14 +714,20 @@ const Pool: React.FC = () => {
   if (+votingCompletion > 100) votingCompletion = '100';
   const isVotingSuccessful = +votingCompletion === 100 && +yesVotes > +noVotes;
 
-  const tokensSoldInNativeCurrency = useMemo(
-    () => (beginingAmount - tokensForSaleLeft) * tokenPrice,
-    [beginingAmount, tokensForSaleLeft, tokenPrice],
-  );
+  const tokensSold = useMemo(() => {
+    const tokensSoldNew = new BN(beginingAmount).minus(tokensForSaleLeft);
+    const pow = new BN(10).pow(tokenDecimals);
+    const result = tokensSoldNew.div(pow).toString(10);
+    return result;
+  }, [beginingAmount, tokensForSaleLeft, tokenDecimals]);
 
-  const hardCapInNativeCurrency = useMemo(() => {
-    return new BN(hardCap).div(tokenPrice).toString(10);
-  }, [hardCap, tokenPrice]);
+  const tokensSoldInNativeCurrency = useMemo(() => {
+    const tokensSoldNew = new BN(beginingAmount).minus(tokensForSaleLeft);
+    const tokenPriceBN = new BN(tokenPrice);
+    const pow = new BN(10).pow(tokenDecimals);
+    const result = tokensSoldNew.div(pow).multipliedBy(tokenPriceBN).toString(10);
+    return result;
+  }, [beginingAmount, tokensForSaleLeft, tokenPrice, tokenDecimals]);
 
   const percentOfTokensSold = useMemo(() => {
     const minus = new BN(beginingAmount).minus(tokensForSaleLeft);
@@ -849,28 +855,6 @@ const Pool: React.FC = () => {
     { image: Link, link: linkWebsite },
     { image: Github, link: linkGithub },
   ];
-
-  const htmlVotingWillStart = (
-    <div className="item">
-      <div className="item-text-gradient" style={{ fontSize: 35 }}>
-        Voting will start
-      </div>
-      <div className="item-text" style={{ minWidth: 200 }}>
-        <div className="item-text-bold">{timeBeforeVoting}</div>
-      </div>
-    </div>
-  );
-
-  const htmlRegistrationWillStart = (
-    <div className="item">
-      <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
-        Registration will start
-      </div>
-      <div className="item-text">
-        <div className="item-text-bold">{timeBeforeRegistration}</div>
-      </div>
-    </div>
-  );
 
   const htmlYouVoted = (
     <div className="item">
@@ -1074,6 +1058,7 @@ const Pool: React.FC = () => {
         <meta name="description" content={`Presale Pool. ${saleTitle}. ${description}`} />
       </Helmet>
 
+      {/*Title*/}
       <div className="preview">
         <div className="description">
           <div className="logo-center">
@@ -1111,13 +1096,15 @@ const Pool: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/*Scale*/}
       <div className="grow">
         <div className="grow-text preview-info-date__text-opacity">
-          {tokenPrice} {currency} per {tokenSymbol}
+          {tokenPrice} {chainInfo.symbol} per {tokenSymbol}
         </div>
         <div className="grow-progress">
           <div>
-            {raisedAmount} {chainInfo.symbol} Raised
+            {tokensSoldInNativeCurrency} {chainInfo.symbol} Raised
           </div>
           <div>{participants} Participants</div>
         </div>
@@ -1135,11 +1122,12 @@ const Pool: React.FC = () => {
             {prettyNumber(percentOfTokensSold.toString())}% (Min {percentOfSoftCap}%)
           </div>
           <div className="grow-max">
-            {tokensSoldInNativeCurrency} / {hardCapInNativeCurrency} {currency}
+            {tokensSold} / {hardCap} {tokenSymbol}
           </div>
         </div>
       </div>
 
+      {/*Table*/}
       <div className="box">
         <div className="row row-items">
           {row1.map((item, i) => (
@@ -1228,11 +1216,7 @@ const Pool: React.FC = () => {
 
       <div className="box box-bg">
         <div className="row">
-          {isBeforeVotimgTime && htmlVotingWillStart}
-
           {!isCertified && isVotingTime && !isUserCreator && (!myVote ? htmlVoting : htmlYouVoted)}
-
-          {isBeforeRegistrationTime && myVote ? htmlRegistrationWillStart : null}
 
           {isRegistrationTime
             ? isVotingSuccessful
