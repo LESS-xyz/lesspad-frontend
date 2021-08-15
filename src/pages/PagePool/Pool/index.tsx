@@ -87,6 +87,10 @@ const defaultInfo = {
   noVotes: '0',
   lastTotalStakedAmount: '0',
 };
+//
+// const InputAmountToInvest: React.FC = () => {
+// //
+// }
 
 const Pool: React.FC = () => {
   const { address }: any = useParams();
@@ -480,37 +484,37 @@ const Pool: React.FC = () => {
     }
   }, [ContractPresalePublicWithMetamask, userAddress, address]);
 
-  const handleInvest = useCallback(async () => {
-    try {
-      toggleModal({
-        open: true,
-        text: (
-          <div className="messageContainer">
-            <p>Please, enter amount to invest (in ether)</p>
-            <Input
-              title=""
-              value={amountToInvest}
-              onChange={setAmountToInvest}
-              style={{ marginBottom: 10 }}
-            />
-            <div className="button-border" style={{ margin: '5px 0' }}>
-              <div
-                className="button"
-                role="button"
-                tabIndex={0}
-                onClick={invest}
-                onKeyDown={() => {}}
-              >
-                <div className="gradient-button-text">Submit</div>
-              </div>
-            </div>
-          </div>
-        ),
-      });
-    } catch (e) {
-      console.error('PagePool handleInvest:', e);
-    }
-  }, [toggleModal, amountToInvest, invest]);
+  // const handleInvest = useCallback(async () => {
+  //   try {
+  //     toggleModal({
+  //       open: true,
+  //       text: (
+  //         <div className="messageContainer">
+  //           <p>Please, enter amount to invest (in ether)</p>
+  //           <Input
+  //             title=""
+  //             value={amountToInvest}
+  //             onChange={setAmountToInvest}
+  //             style={{ marginBottom: 10 }}
+  //           />
+  //           <div className="button-border" style={{ margin: '5px 0' }}>
+  //             <div
+  //               className="button"
+  //               role="button"
+  //               tabIndex={0}
+  //               onClick={invest}
+  //               onKeyDown={() => {}}
+  //             >
+  //               <div className="gradient-button-text">Submit</div>
+  //             </div>
+  //           </div>
+  //         </div>
+  //       ),
+  //     });
+  //   } catch (e) {
+  //     console.error('PagePool handleInvest:', e);
+  //   }
+  // }, [toggleModal, amountToInvest, invest]);
 
   useEffect(() => {
     if (!address) history.push('/');
@@ -1066,20 +1070,20 @@ const Pool: React.FC = () => {
                       onClick={invest}
                       onKeyDown={() => {}}
                     >
-                      <div className="gradient-button-text">Submit</div>
-                    </div>
-                  </div>
-                  <div className="button-border">
-                    <div
-                      className="button"
-                      role="button"
-                      tabIndex={0}
-                      onClick={handleInvest}
-                      onKeyDown={() => {}}
-                    >
                       <div className="gradient-button-text">Invest</div>
                     </div>
                   </div>
+                  {/*<div className="button-border">*/}
+                  {/*  <div*/}
+                  {/*    className="button"*/}
+                  {/*    role="button"*/}
+                  {/*    tabIndex={0}*/}
+                  {/*    onClick={handleInvest}*/}
+                  {/*    onKeyDown={() => {}}*/}
+                  {/*  >*/}
+                  {/*    <div className="gradient-button-text">Invest</div>*/}
+                  {/*  </div>*/}
+                  {/*</div>*/}
                 </div>
               </>
             ) : (

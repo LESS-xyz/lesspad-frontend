@@ -119,6 +119,7 @@ const ParticipantsTable: React.FC<IParticipantsTable> = (props) => {
         queens: [],
         kings: [],
       };
+      console.log('ParticipantsTable getTiersAndWinners:', newParticipantsFormatted);
       setParticipants(newParticipantsFormatted);
       setWinners(newWinnersFormatted);
     } catch (e) {
@@ -138,8 +139,12 @@ const ParticipantsTable: React.FC<IParticipantsTable> = (props) => {
         if (index < page * itemsOnPage || index >= (page + 1) * itemsOnPage) return false;
         return true;
       });
-      setWinnersFiltered(newParticipantsFiltered);
-      setParticipantsFiltered(newWinnersFiltered);
+      console.log('ParticipantsTable filterData:', {
+        newParticipantsFiltered,
+        newWinnersFiltered,
+      });
+      setParticipantsFiltered(newParticipantsFiltered);
+      setWinnersFiltered(newWinnersFiltered);
     } catch (e) {
       console.error('ParticipantsTable:', e);
     }
