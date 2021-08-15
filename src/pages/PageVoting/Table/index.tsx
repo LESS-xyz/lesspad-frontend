@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
-import { BigNumber as BN } from 'bignumber.js/bignumber';
 import useMedia from 'use-media';
 
 import thumbUpGreen from '../../../assets/img/icons/thumb-up-green.svg';
