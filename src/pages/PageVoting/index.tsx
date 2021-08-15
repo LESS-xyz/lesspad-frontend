@@ -48,11 +48,11 @@ import s from './PageVoting.module.scss';
 // ];
 
 const PageVoting: React.FC = () => {
-  const { ContractLessLibrary, ContractPresalePublic } = useContractsContext();
+  const { ContractLessLibrary } = useContractsContext();
   //
   const [search, setSearch] = useState<string>('');
   const [presalesAddressesFiltered, setPresalesAddressesFiltered] = useState<any[]>([]);
-  const [votingTime, setVotingTime] = useState<number>();
+  const [votingTime, setVotingTime] = useState<number>(0);
 
   const { pools } = useSelector(({ pool }: any) => pool);
   const { minVoterBalance } = useSelector(({ library }: any) => library);
@@ -74,7 +74,7 @@ const PageVoting: React.FC = () => {
   //   }
   //   return null;
   // };
-  const [info, setInfo] = useState<any[]>([]);
+  // const [info, setInfo] = useState<any[]>([]);
 
   const getVotingTime = async () => {
     try {
@@ -87,16 +87,16 @@ const PageVoting: React.FC = () => {
   };
 
   const filterTable = async () => {
-    if (info && info.length !== 0) {
+    if (pools && pools.length !== 0) {
       try {
-        const presalesInfoNew = info.filter((item: any) => {
-          const { address = '', description = '', saleTitle = '', openTimeVoting = 0 } = item;
+        const presalesInfoNew = pools.filter((item: any) => {
+          const { address = '', description = '', title = '', openVotingTime = 0 } = item;
           const now = dayjs().valueOf();
-          const isVoting = now > openTimeVoting && now < openTimeVoting + (votingTime ?? 0) * 1000;
+          const isVoting = now > openVotingTime && now < openVotingTime + votingTime * 1000;
           if (!isVoting) return false;
           if (search && search !== '') {
             const isAddressInSearch = address.toLowerCase().includes(search.toLowerCase());
-            const isTitleInSearch = saleTitle.toLowerCase().includes(search.toLowerCase());
+            const isTitleInSearch = title.toLowerCase().includes(search.toLowerCase());
             const isDescriptionInSearch = description.toLowerCase().includes(search.toLowerCase());
             if (!isAddressInSearch && !isTitleInSearch && !isDescriptionInSearch) return false;
           }
@@ -145,16 +145,16 @@ const PageVoting: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ContractLessLibrary]);
 
-  useEffect(() => {
-    for (let i = 0, newInfo: any[] = []; i < pools.length; i += 1) {
-      if (!pools[i].isCertified) {
-        ContractPresalePublic.getInfo({ contractAddress: pools[i].address }).then((data) => {
-          newInfo.push({ ...data, address: pools[i].address });
-          if (i === pools.length - 1) setInfo(newInfo);
-        });
+  /*  useEffect(() => {
+      for (let i = 0, newInfo: any[] = []; i < pools.length; i += 1) {
+        if (!pools[i].isCertified) {
+          ContractPresalePublic.getInfo({ contractAddress: pools[i].address }).then((data) => {
+            newInfo.push({ ...data, address: pools[i].address });
+            if (i === pools.length - 1) setInfo(newInfo);
+          });
+        }
       }
-    }
-  }, [ContractPresalePublic, pools]);
+    }, [ContractPresalePublic, pools]); */
 
   useEffect(() => {
     if (!ContractLessLibrary) return;
@@ -164,11 +164,10 @@ const PageVoting: React.FC = () => {
   }, [ContractLessLibrary]);
 
   useEffect(() => {
-    // if (!pools || !pools.length) return;
-    if (!info || !info.length) return;
+    if (!pools || !pools.length) return;
     filterTable();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, info, info.length]);
+  }, [search, pools, pools.length]);
   return (
     <div className={s.page}>
       <Helmet>

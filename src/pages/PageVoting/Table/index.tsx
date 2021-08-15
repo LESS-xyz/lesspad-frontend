@@ -245,7 +245,7 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
   const isVotingEnded = Date.now() > openVotingTime + votingTime; // todo: check work
 
   const showModal = () => {
-    let message = 'Owner cannot vote on self presale';
+    let message = 'Owner of presale cannot vote';
     if (myVote) message = 'You already voted';
     try {
       toggleModal({
@@ -257,7 +257,7 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
     }
   };
   const vote = async (yes: boolean) => {
-    if (myVote || creator === userAddress) {
+    if (myVote || creator.toLowerCase() === userAddress.toLowerCase()) {
       showModal();
       return;
     }

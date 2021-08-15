@@ -110,7 +110,7 @@ export default class ContractLessLibraryService {
       const arrForSearch = await this.contract.methods.getArrForSearch().call();
       const arrForSearchFormatted = arrForSearch.map((item: any) => {
         let { description, title } = item;
-        const { isCertified, presaleAddress } = item;
+        const { isCertified, presaleAddress, openVotingTime } = item;
         if (description === '') description = '0x';
         if (title === '') title = '0x';
         return {
@@ -118,6 +118,7 @@ export default class ContractLessLibraryService {
           isCertified,
           address: presaleAddress,
           title: this.web3.utils.hexToString(title),
+          openVotingTime: +openVotingTime * 1000,
         };
       });
       return arrForSearchFormatted;

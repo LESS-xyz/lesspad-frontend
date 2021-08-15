@@ -52,7 +52,7 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
     // chain,
     // type,
     // fundingToken,
-    status,
+    // status,
     isCertified,
     statusChoosenInFilter,
   } = props;
@@ -155,9 +155,7 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
     statusChoosenInFilter !== presaleStatus
   )
     return null;
-  return (status === 'not opened' && openTimeVoting > now) ||
-    (status === 'in voting' && presaleStatus === 'In voting') ||
-    status === 'all' ? (
+  return (
     <div className={s.card}>
       <Link to={`/pool/${address}`} className={s.card_header}>
         <div className={s.card_header__logo}>
@@ -239,8 +237,6 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
         </div>
       </div>
     </div>
-  ) : (
-    <></>
   );
 };
 
