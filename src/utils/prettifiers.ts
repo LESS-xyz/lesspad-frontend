@@ -8,6 +8,7 @@ export const addHttps = (url: string) => {
 };
 
 export const prettyNumber = (number: string) => {
-  const result = Number(number).toFixed(3);
+  const result = number ? Number(number).toFixed(3) : '0';
+  // const resultFiltered = result === NaN ? '0' : result;
   return parseFloat(result.toString());
 };
