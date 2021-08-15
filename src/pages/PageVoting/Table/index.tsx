@@ -131,17 +131,22 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
       });
       console.log('PageVote vote resultGetPoolSignature:', resultGetPoolSignature);
       if (!resultGetPoolSignature.data) throw new Error('Cannot get pool signature');
-      const { date, signature, user_balance, stakedAmount } = resultGetPoolSignature.data;
-      const totalStakedAmountInEth = new BN(`${stakedAmount}`).toString(10);
-      const stakingAmountInEth = new BN(`${user_balance}`).toString(10);
+      const {
+        date,
+        signature,
+        user_balance: stakingAmount,
+        stakedAmount: totalStakedAmount,
+      } = resultGetPoolSignature.data;
+      // const totalStakedAmountInEth = new BN(`${stakedAmount}`).toString(10);
+      // const stakingAmountInEth = new BN(`${user_balance}`).toString(10);
       const resultVote = await ContractPresalePublicWithMetamask.vote({
         contractAddress: address,
-        stakingAmount: stakingAmountInEth,
+        stakingAmount,
         userAddress,
         date,
         signature,
         yes,
-        totalStakedAmount: totalStakedAmountInEth,
+        totalStakedAmount,
       });
       let message = 'Voting succeded';
       if (!resultVote) {
