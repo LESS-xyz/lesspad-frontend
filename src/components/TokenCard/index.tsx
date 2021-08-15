@@ -27,7 +27,7 @@ export interface ITokenCardProps {
   chain: string;
   type: 'public' | 'certified';
   fundingToken: string;
-  status: 'ended' | 'in voting' | 'not opened';
+  status: 'ended' | 'in voting' | 'not opened' | 'all';
   isCertified: boolean;
   statusChoosenInFilter?: string;
 }
@@ -41,7 +41,7 @@ const chainsInfo: any = [
 const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
   const {
     address,
-    // logo,
+    logo,
     // daysTillOpen,
     // name,
     // subtitle,
@@ -52,7 +52,7 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
     // chain,
     // type,
     // fundingToken,
-    // status,
+    status,
     isCertified,
     statusChoosenInFilter,
   } = props;
@@ -155,12 +155,13 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
     statusChoosenInFilter !== presaleStatus
   )
     return null;
-
-  return (
+  return (status === 'not opened' && openTimeVoting > now) ||
+    (status === 'in voting' && presaleStatus === 'In voting') ||
+    status === 'all' ? (
     <div className={s.card}>
       <Link to={`/pool/${address}`} className={s.card_header}>
         <div className={s.card_header__logo}>
-          <img src={addHttps(linkLogo)} alt="token-logo" />
+          <img src={linkLogo ? addHttps(linkLogo) : logo} alt="token-logo" />
         </div>
         <div className={s.card_header__info}>
           {/*<div className={s.card_header__info_days}>*/}
@@ -238,6 +239,8 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
         </div>
       </div>
     </div>
+  ) : (
+    <></>
   );
 };
 

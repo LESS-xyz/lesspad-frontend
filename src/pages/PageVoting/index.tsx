@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useDispatch, useSelector } from 'react-redux';
+import dayjs from 'dayjs';
 
 import Button from '../../components/Button';
 // import logo1 from '../../assets/img/sections/logos/logo1.png';
@@ -47,10 +48,11 @@ import s from './PageVoting.module.scss';
 // ];
 
 const PageVoting: React.FC = () => {
-  const { ContractLessLibrary } = useContractsContext();
-
+  const { ContractLessLibrary, ContractPresalePublic } = useContractsContext();
+  //
   const [search, setSearch] = useState<string>('');
   const [presalesAddressesFiltered, setPresalesAddressesFiltered] = useState<any[]>([]);
+  const [votingTime, setVotingTime] = useState<number>();
 
   const { pools } = useSelector(({ pool }: any) => pool);
   const { minVoterBalance } = useSelector(({ library }: any) => library);
@@ -62,23 +64,57 @@ const PageVoting: React.FC = () => {
   const setLibrary = React.useCallback((params) => dispatch(libraryActions.setLibrary(params)), [
     dispatch,
   ]);
+  //
+  // const getInfo = async (address) => {
+  //   try {
+  //     const newInfo = await ContractPresalePublic.getInfo({ contractAddress: address });
+  //     if (newInfo) return newInfo;
+  //   } catch (e) {
+  //     console.error('TableRow getInfo:', e);
+  //   }
+  //   return null;
+  // };
+  const [info, setInfo] = useState<any[]>([]);
+
+  const getVotingTime = async () => {
+    try {
+      const newInfo = await ContractLessLibrary.getVotingTime();
+      console.log('TokenCard getVotingTime:', newInfo);
+      setVotingTime(+newInfo);
+    } catch (e) {
+      console.error('TableRow getVotingTime:', e);
+    }
+  };
 
   const filterTable = async () => {
-    try {
-      const presalesInfoNew = pools.filter((item: any) => {
-        const { address = '', title = '', description = '' } = item;
-        if (search && search !== '') {
-          const isAddressInSearch = address.toLowerCase().includes(search.toLowerCase());
-          const isTitleInSearch = title.toLowerCase().includes(search.toLowerCase());
-          const isDescriptionInSearch = description.toLowerCase().includes(search.toLowerCase());
-          if (!isAddressInSearch && !isTitleInSearch && !isDescriptionInSearch) return false;
-        }
-        return true;
-      });
-      const presalesAddressesFilteredNew = presalesInfoNew.map((item: any) => item.address);
-      setPresalesAddressesFiltered(presalesAddressesFilteredNew);
-    } catch (e) {
-      console.error(e);
+    // const info = pools.map(async (pool: any) => {
+    //   const newInfo = await getInfo(pool.address);
+    //   return newInfo;
+    // });
+    //
+    // console.log('only public presales', info);
+    if (info && info.length !== 0) {
+      try {
+        const presalesInfoNew = info.filter((item: any) => {
+          const { address = '', description = '' } = item;
+          const { saleTitle = '', openTimeVoting = 0 } = item;
+          const now = dayjs().valueOf();
+          const isVotingEnded = now > openTimeVoting + (votingTime ?? 0) * 1000;
+          // console.log(`${address} ended`, isVotingEnded);
+          if (isVotingEnded) return false;
+          if (search && search !== '') {
+            const isAddressInSearch = address.toLowerCase().includes(search.toLowerCase());
+            const isTitleInSearch = saleTitle.toLowerCase().includes(search.toLowerCase());
+            const isDescriptionInSearch = description.toLowerCase().includes(search.toLowerCase());
+            if (!isAddressInSearch && !isTitleInSearch && !isDescriptionInSearch) return false;
+          }
+          return true;
+        });
+        const presalesAddressesFilteredNew = presalesInfoNew.map((item: any) => item.address);
+        setPresalesAddressesFiltered(presalesAddressesFilteredNew);
+      } catch (e) {
+        console.error(e);
+      }
     }
   };
 
@@ -113,18 +149,34 @@ const PageVoting: React.FC = () => {
 
   useEffect(() => {
     if (!ContractLessLibrary) return;
+    getVotingTime();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ContractLessLibrary]);
+
+  useEffect(() => {
+    for (let i = 0, newInfo: any[] = []; i < pools.length; i += 1) {
+      if (!pools[i].isCertified) {
+        ContractPresalePublic.getInfo({ contractAddress: pools[i].address }).then((data) => {
+          newInfo.push({ ...data, address: pools[i].address });
+          if (i === pools.length - 1) setInfo(newInfo);
+        });
+      }
+    }
+  }, [ContractPresalePublic, pools]);
+
+  useEffect(() => {
+    if (!ContractLessLibrary) return;
     // console.log('PageVoting pools:', pools)
     getMinVoterBalance();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ContractLessLibrary]);
 
   useEffect(() => {
-    if (!pools || !pools.length) return;
-    // console.log('PageVoting pools:', pools)
+    // if (!pools || !pools.length) return;
+    if (!info || !info.length) return;
     filterTable();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pools, search]);
-
+  }, [search, info, info.length]);
   return (
     <div className={s.page}>
       <Helmet>

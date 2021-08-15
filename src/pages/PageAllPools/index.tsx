@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useSelector } from 'react-redux';
+import dayjs from 'dayjs';
 import useMedia from 'use-media';
 import { v4 as uuid } from 'uuid';
 
@@ -10,13 +11,18 @@ import Pagination from '../../components/Pagination/index';
 import Search from '../../components/Search/index';
 import Selector from '../../components/Selector/index';
 import TokenCard, { ITokenCardProps } from '../../components/TokenCard/index';
+import { useContractsContext } from '../../contexts/ContractsContext';
 
 import s from './AllPools.module.scss';
 
 const AllPoolsPage: React.FC = () => {
+  const { ContractPresalePublic } = useContractsContext();
   const [search, setSearch] = useState<string>('');
   const [currentOption, setCurrentOption] = useState<string>('All');
   const [page, setPage] = useState<number>(0);
+  const [info, setInfo] = useState<any[]>([]);
+  const [poolsFiltered, setPoolsFiltered] = useState<any[]>([]);
+  const [countOfPages, setCountOfPages] = useState<number>(1);
 
   const { pools } = useSelector(({ pool }: any) => pool);
   console.log('AllPoolsPage pools:', pools);
@@ -24,12 +30,85 @@ const AllPoolsPage: React.FC = () => {
   const isMobile = useMedia({ maxWidth: 768 });
 
   const itemsOnPage = 6;
-  let countOfPages = Math.floor(+(pools.length / itemsOnPage));
-  const moduloOfPages = pools.length % itemsOnPage;
-  if (countOfPages > 0 && moduloOfPages > 0) countOfPages += 1;
+  const setPagesCount = useCallback(() => {
+    let count = Math.floor(+(poolsFiltered.length / itemsOnPage));
+    const moduloOfPages = poolsFiltered.length % itemsOnPage;
+    if (moduloOfPages > 0 && poolsFiltered.length > itemsOnPage) count += 1;
+    setCountOfPages(count);
+  }, [poolsFiltered.length]);
 
   const handleChangePage = (p: number) => setPage(p);
 
+  const filterData = async () => {
+    // const info = pools.map(async (pool: any) => {
+    //   const newInfo = await getInfo(pool.address);
+    //   return newInfo;
+    // });
+    //
+    // console.log('only public presales', info);
+    if (info && info.length !== 0) {
+      try {
+        const poolsInfoNew = info.filter((item: any) => {
+          const {
+            address = '',
+            isCertified,
+            description = '',
+            saleTitle = '',
+            openTimePresale = 0,
+            closeTimePresale = 0,
+            openTimeVoting = 0,
+            closeTimeVoting = 0,
+          } = item;
+          let presaleStatus = '';
+          const now = dayjs().valueOf();
+          if (isCertified) {
+            if (openTimePresale > now) presaleStatus = 'Not opened';
+            if (openTimePresale < now) presaleStatus = 'Opened';
+            if (closeTimePresale < now) presaleStatus = 'Closed';
+          } else {
+            if (openTimePresale > now) presaleStatus = 'Not opened';
+            if (openTimePresale < now) presaleStatus = 'Opened';
+            if (openTimeVoting < now) presaleStatus = 'In voting';
+            if (closeTimeVoting < now) presaleStatus = 'Voting ended';
+            if (closeTimePresale < now) presaleStatus = 'Ended';
+          }
+          if (currentOption && currentOption !== 'All' && currentOption !== presaleStatus)
+            return false;
+          if (search && search !== '') {
+            const isAddressInSearch = address.toLowerCase().includes(search.toLowerCase());
+            const isTitleInSearch = saleTitle.toLowerCase().includes(search.toLowerCase());
+            const isDescriptionInSearch = description.toLowerCase().includes(search.toLowerCase());
+            if (!isAddressInSearch && !isTitleInSearch && !isDescriptionInSearch) return false;
+          }
+          return true;
+        });
+        // const poolsAddressesFilteredNew = poolsInfoNew.map((item: any) => item.address);
+        setPoolsFiltered(poolsInfoNew);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  };
+  useEffect(() => {
+    for (let i = 0, newInfo: any[] = []; i < pools.length; i += 1) {
+      if (!pools[i].isCertified) {
+        ContractPresalePublic.getInfo({ contractAddress: pools[i].address }).then((data) => {
+          newInfo.push({ ...data, isCertified: pools[i].isCertified, address: pools[i].address });
+          if (i === pools.length - 1) setInfo(newInfo);
+        });
+      }
+    }
+  }, [ContractPresalePublic, pools]);
+
+  useEffect(() => {
+    // if (!pools || !pools.length) return;
+    if (!info || !info.length) return;
+    filterData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search, info, info.length, currentOption]);
+  useEffect(() => {
+    setPagesCount();
+  }, [poolsFiltered.length, setPagesCount]);
   return (
     <section className={s.page}>
       <Helmet>
@@ -65,10 +144,11 @@ Fundraising Capital"
             </div>
           </div>
           <div className={s.cards}>
-            {pools.map((item: any, ii: number) => {
-              const { address = '', title = '', description = '', isCertified } = item;
+            {poolsFiltered.map((item: any, ii: number) => {
+              const { address = '', /* title = '', description = '', */ isCertified } = item;
               // todo: fix pagination
               if (ii < page * itemsOnPage || ii >= (page + 1) * itemsOnPage) return null;
+              /*
               if (search) {
                 const isAddressInSearch = address.toLowerCase().includes(search.toLowerCase());
                 const isTitleInSearch = title.toLowerCase().includes(search.toLowerCase());
@@ -76,7 +156,7 @@ Fundraising Capital"
                   .toLowerCase()
                   .includes(search.toLowerCase());
                 if (!isAddressInSearch && !isTitleInSearch && !isDescriptionInSearch) return null;
-              }
+              }*/
               const props: ITokenCardProps = {
                 address,
                 logo: logo1,
@@ -90,11 +170,10 @@ Fundraising Capital"
                 chain: 'BNB',
                 type: 'public',
                 fundingToken: 'BNB',
-                status: 'not opened',
+                status: 'all',
                 isCertified,
               };
-              // eslint-disable-next-line react/no-array-index-key
-              return <TokenCard key={uuid()} {...props} statusChoosenInFilter={currentOption} />;
+              return <TokenCard key={uuid()} {...props} />;
             })}
           </div>
           <div className={s.pagination}>

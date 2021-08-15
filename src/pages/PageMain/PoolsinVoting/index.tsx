@@ -17,26 +17,28 @@ const PoolsiInVoting: React.FC = () => {
         <div className={s.inner}>
           <div className={s.title}>Pools in Voting</div>
           <div className={s.cards}>
-            {pools.slice(0, 3).map((item: any) => {
-              const { address = '', title = '', isCertified } = item;
-              const props: ITokenCardProps = {
-                address,
-                logo: logo1,
-                daysTillOpen: 3,
-                name: title,
-                subtitle: 'Participant',
-                website: 'https://github.com/',
-                telegram: 'https://t.me/durov',
-                whitePaper: 'https://bitcoin.org/ru/bitcoin-paper',
-                blockchainLogo: bnbLogo,
-                chain: 'BNB',
-                type: 'public',
-                fundingToken: 'BNB',
-                status: 'not opened',
-                isCertified,
-              };
-              return <TokenCard key={uuid()} {...props} />;
-            })}
+            {pools
+              .map((item: any) => {
+                const { address = '', title = '', isCertified } = item;
+                const props: ITokenCardProps = {
+                  address,
+                  logo: logo1,
+                  daysTillOpen: 3,
+                  name: title,
+                  subtitle: 'Participant',
+                  website: 'https://github.com/',
+                  telegram: 'https://t.me/durov',
+                  whitePaper: 'https://bitcoin.org/ru/bitcoin-paper',
+                  blockchainLogo: bnbLogo,
+                  chain: 'BNB',
+                  type: 'public',
+                  fundingToken: 'BNB',
+                  status: 'in voting',
+                  isCertified,
+                };
+                return <TokenCard key={uuid()} {...props} />;
+              })
+              .slice(0, 3)}
           </div>
         </div>
       </div>
