@@ -52,15 +52,13 @@
   }
 }
 
-.cards {
-  @include grid(1fr 1fr 1fr, 1fr, 30px);
+.messageContainer {
+  @include flex(row, center);
+  height: 100%;
+}
+
+.messageContainerButtons {
+  @include flex(row, center, center);
   width: 100%;
-
-  @include b('tablet') {
-    @include grid(1fr 1fr, 1fr, 30px);
-  }
-
-  @include b('mobile') {
-    @include grid(1fr, 1fr, 30px);
-  }
+  margin: 10px 0 0 0;
 }
