@@ -740,6 +740,9 @@ const Pool: React.FC = () => {
     },
   ];
 
+  const yesVotesFormatted = convertFromWei(yesVotes, lessDecimals || 18) || 0;
+  const noVotesFormatted = convertFromWei(noVotes, lessDecimals || 18) || 0;
+
   const row3 = [
     {
       header: 'Presale Type',
@@ -749,13 +752,13 @@ const Pool: React.FC = () => {
     },
     {
       header: isCertified ? '' : 'Yes Votes',
-      value: isCertified ? '' : convertFromWei(yesVotes, lessDecimals || 18),
+      value: isCertified ? '' : prettyNumber(yesVotesFormatted.toString()),
       gradient: false,
       less: false,
     },
     {
       header: isCertified ? '' : 'No Votes',
-      value: isCertified ? '' : convertFromWei(noVotes, lessDecimals || 18),
+      value: isCertified ? '' : prettyNumber(noVotesFormatted.toString()),
       gradient: false,
       less: false,
     },

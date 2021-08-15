@@ -1,7 +1,6 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useDispatch, useSelector } from 'react-redux';
-import { BigNumber as BN } from 'bignumber.js/bignumber';
 
 import maxImg from '../../assets/img/icons/max.svg';
 import Button from '../../components/Button/index';
@@ -57,18 +56,28 @@ const StakingPage: React.FC = () => {
   const isStakeLessValue = debouncedStakeLessValue !== '';
   const isStakeLPValue = debouncedStakeLpValue !== '';
 
-  const isLessAllowed = useMemo(() => {
-    const pow = new BN(10).pow(lessDecimals);
-    const allowanceInEth = new BN(lessAllowance).div(pow).toString(10);
-    console.log('StakingPage isLessAllowed:', allowanceInEth);
-    return +allowanceInEth >= +debouncedStakeLessValue;
-  }, [lessAllowance, lessDecimals, debouncedStakeLessValue]);
-  const isLpAllowed = useMemo(() => {
-    const pow = new BN(10).pow(lpDecimals);
-    const allowanceInEth = new BN(lpAllowance).div(pow).toString(10);
-    console.log('StakingPage isLpAllowed:', allowanceInEth);
-    return +allowanceInEth >= +debouncedStakeLpValue;
-  }, [lpAllowance, lpDecimals, debouncedStakeLpValue]);
+  // const powLess = new BN(10).pow(lessDecimals);
+  // const allowanceLessInEth = new BN(lessAllowance).div(powLess).toString(10);
+  // console.log('StakingPage isLessAllowed:', allowanceLessInEth);
+  const isLessAllowed = +lessAllowance >= +debouncedStakeLessValue;
+  //
+  // const powLp = new BN(10).pow(lpDecimals);
+  // const allowanceLpInEth = new BN(lpAllowance).div(powLp).toString(10);
+  // console.log('StakingPage isLpAllowed:', allowanceLpInEth);
+  const isLpAllowed = +lpAllowance >= +debouncedStakeLpValue;
+
+  // const isLessAllowed = useMemo(() => {
+  //   const pow = new BN(10).pow(lessDecimals);
+  //   const allowanceInEth = new BN(lessAllowance).div(pow).toString(10);
+  //   console.log('StakingPage isLessAllowed:', allowanceInEth);
+  //   return +allowanceInEth >= +debouncedStakeLessValue;
+  // }, [lessAllowance, lessDecimals, debouncedStakeLessValue]);
+  // const isLpAllowed = useMemo(() => {
+  //   const pow = new BN(10).pow(lpDecimals);
+  //   const allowanceInEth = new BN(lpAllowance).div(pow).toString(10);
+  //   console.log('StakingPage isLpAllowed:', allowanceInEth);
+  //   return +allowanceInEth >= +debouncedStakeLpValue;
+  // }, [lpAllowance, lpDecimals, debouncedStakeLpValue]);
 
   const stakingContractAddress = config.addresses[config.isMainnetOrTestnet][chainType].Staking;
 
@@ -194,7 +203,7 @@ const StakingPage: React.FC = () => {
 
   const checkLessValue = useCallback(() => {
     try {
-      if (!isStakeLessValue || +stakeLessValue === 0) {
+      if (!isStakeLessValue || +debouncedStakeLessValue === 0) {
         toggleModal({
           open: true,
           text: (
@@ -210,11 +219,11 @@ const StakingPage: React.FC = () => {
       console.error('StakingPage checkValues:', e);
       return false;
     }
-  }, [isStakeLessValue, stakeLessValue, toggleModal]);
+  }, [isStakeLessValue, debouncedStakeLessValue, toggleModal]);
 
   const checkLpValue = useCallback(() => {
     try {
-      if (!isStakeLPValue || +stakeLPValue === 0) {
+      if (!isStakeLPValue || +debouncedStakeLpValue === 0) {
         toggleModal({
           open: true,
           text: (
@@ -230,7 +239,7 @@ const StakingPage: React.FC = () => {
       console.error('StakingPage checkValues:', e);
       return false;
     }
-  }, [isStakeLPValue, stakeLPValue, toggleModal]);
+  }, [isStakeLPValue, debouncedStakeLpValue, toggleModal]);
 
   const checkLessBalance = useCallback(() => {
     try {
@@ -272,11 +281,12 @@ const StakingPage: React.FC = () => {
     }
   }, [isStakeLPValue, stakeLPValue, balanceLPToken, toggleModal]);
 
-  const approveLess = async () => {
+  const approveLess = useCallback(async () => {
     try {
       if (!checkLessValue()) return;
       if (!checkLessBalance()) return;
       const stakeLessValueInWei = convertToWei(debouncedStakeLessValue || 0, lessDecimals);
+      console.log('StakingPage approveLess:', stakeLessValueInWei);
       setIsApproveLessWaiting(true);
       const resultApprove = await ContractLessToken.approve({
         userAddress,
@@ -290,13 +300,23 @@ const StakingPage: React.FC = () => {
       setIsApproveLessWaiting(false);
       console.error(e);
     }
-  };
+  }, [
+    ContractLessToken,
+    checkLessValue,
+    checkLessBalance,
+    debouncedStakeLessValue,
+    lessDecimals,
+    getAllowances,
+    stakingContractAddress,
+    userAddress,
+  ]);
 
-  const approveLp = async () => {
+  const approveLp = useCallback(async () => {
     try {
       if (!checkLpValue()) return;
       if (!checkLpBalance()) return;
       const stakeLpValueInWei = convertToWei(debouncedStakeLpValue || 0, lpDecimals);
+      console.log('StakingPage approveLess:', stakeLpValueInWei);
       setIsApproveLpWaiting(true);
       const resultApprove = await ContractLPToken.approve({
         userAddress,
@@ -310,7 +330,16 @@ const StakingPage: React.FC = () => {
       setIsApproveLpWaiting(false);
       console.error(e);
     }
-  };
+  }, [
+    ContractLPToken,
+    checkLpValue,
+    checkLpBalance,
+    debouncedStakeLpValue,
+    lpDecimals,
+    getAllowances,
+    stakingContractAddress,
+    userAddress,
+  ]);
 
   const checkAllowancesAndFields = useCallback(() => {
     try {
@@ -367,7 +396,6 @@ const StakingPage: React.FC = () => {
 
   const stake = useCallback(async () => {
     try {
-      if (!checkLessValue() && !checkLpValue()) return;
       if (isStakeLessValue && !checkLessBalance()) return;
       if (isStakeLPValue && !checkLpBalance()) return;
       if (!checkAllowancesAndFields()) return;
@@ -395,8 +423,6 @@ const StakingPage: React.FC = () => {
     }
   }, [
     ContractStaking,
-    checkLessValue,
-    checkLpValue,
     checkLessBalance,
     checkLpBalance,
     checkAllowancesAndFields,
@@ -415,13 +441,13 @@ const StakingPage: React.FC = () => {
 
   const handleChangeStakeLessValue = (e) => {
     const value = e.target.value.replace(/[^\d.,]/g, '').replace(/,/g, '.');
-    console.log('Staking handleChangeStakeLessValue:', value);
+    // console.log('Staking handleChangeStakeLessValue:', value);
     setStakeLessValue(value);
   };
 
   const handleChangeStakeLpValue = (e) => {
     const value = e.target.value.replace(/[^\d.,]/g, '').replace(/,/g, '.');
-    console.log('Staking handleChangeStakeLpValue:', value);
+    // console.log('Staking handleChangeStakeLpValue:', value);
     setStakeLPValue(value);
   };
 
