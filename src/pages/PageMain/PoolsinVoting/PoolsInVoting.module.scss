@@ -21,24 +21,44 @@
   font-size: 40px;
   text-align: center;
   color: var(--grey);
-  margin-bottom: 70px;
+  margin-bottom: 20px;
 
   @include b('mobile') {
     font-size: 26px;
     line-height: 33px;
-    margin-bottom: 20px;
+    margin-bottom: 40px;
   }
 }
 
-.cards {
-  @include grid(1fr 1fr 1fr, 1fr, 30px);
+.subtitle {
+  text-align: center;
+  margin-bottom: 40px;
+
+  span {
+    background-color: var(--blue);
+    padding: 8px 17px;
+    border-radius: 30px;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+
+    &::before {
+      content: '';
+      height: 20px;
+      width: 20px;
+      margin-right: 5px;
+      background: url('../../../assets/img/icons/info.svg') no-repeat;
+    }
+  }
+}
+
+.messageContainer {
+  @include flex(row, center);
+  height: 100%;
+}
+
+.messageContainerButtons {
+  @include flex(row, center, center);
   width: 100%;
-
-  @include b('tablet') {
-    @include grid(1fr 1fr, 1fr, 30px);
-  }
-
-  @include b('mobile') {
-    @include grid(1fr, 1fr, 30px);
-  }
+  margin: 10px 0 0 0;
 }

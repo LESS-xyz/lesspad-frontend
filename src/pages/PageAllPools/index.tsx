@@ -16,11 +16,13 @@ import { useContractsContext } from '../../contexts/ContractsContext';
 import s from './AllPools.module.scss';
 
 const AllPoolsPage: React.FC = () => {
-  const { ContractPresalePublic } = useContractsContext();
+  const { ContractLessLibrary } = useContractsContext();
   const [search, setSearch] = useState<string>('');
   const [currentOption, setCurrentOption] = useState<string>('All');
   const [page, setPage] = useState<number>(0);
-  const [info, setInfo] = useState<any[]>([]);
+  const [votingTime, setVotingTime] = useState<number>(0);
+
+  // const [info, setInfo] = useState<any[]>([]);
   const [poolsFiltered, setPoolsFiltered] = useState<any[]>([]);
   const [countOfPages, setCountOfPages] = useState<number>(1);
 
@@ -37,8 +39,20 @@ const AllPoolsPage: React.FC = () => {
     setCountOfPages(count);
   }, [poolsFiltered.length]);
 
-  const handleChangePage = (p: number) => setPage(p);
+  const handleChangePage = useCallback((p: number) => setPage(p), []);
 
+  const getVotingTime = async () => {
+    try {
+      const newInfo = await ContractLessLibrary.getVotingTime();
+      console.log('TokenCard getVotingTime:', newInfo);
+      setVotingTime(+newInfo);
+    } catch (e) {
+      console.error('TableRow getVotingTime:', e);
+    }
+  };
+  const compareOpenVotingTime = (a, b) => {
+    return b.openVotingTime - a.openVotingTime;
+  };
   const filterData = async () => {
     // const info = pools.map(async (pool: any) => {
     //   const newInfo = await getInfo(pool.address);
@@ -46,42 +60,43 @@ const AllPoolsPage: React.FC = () => {
     // });
     //
     // console.log('only public presales', info);
-    if (info && info.length !== 0) {
+    if (pools && pools.length !== 0) {
       try {
-        const poolsInfoNew = info.filter((item: any) => {
-          const {
-            address = '',
-            isCertified,
-            description = '',
-            saleTitle = '',
-            openTimePresale = 0,
-            closeTimePresale = 0,
-            openTimeVoting = 0,
-            closeTimeVoting = 0,
-          } = item;
-          let presaleStatus = '';
-          const now = dayjs().valueOf();
-          if (isCertified) {
-            if (openTimePresale > now) presaleStatus = 'Not opened';
-            if (openTimePresale < now) presaleStatus = 'Opened';
-            if (closeTimePresale < now) presaleStatus = 'Closed';
-          } else {
-            if (openTimePresale > now) presaleStatus = 'Not opened';
-            if (openTimePresale < now) presaleStatus = 'Opened';
-            if (openTimeVoting < now) presaleStatus = 'In voting';
-            if (closeTimeVoting < now) presaleStatus = 'Voting ended';
-            if (closeTimePresale < now) presaleStatus = 'Ended';
-          }
-          if (currentOption && currentOption !== 'All' && currentOption !== presaleStatus)
-            return false;
-          if (search && search !== '') {
-            const isAddressInSearch = address.toLowerCase().includes(search.toLowerCase());
-            const isTitleInSearch = saleTitle.toLowerCase().includes(search.toLowerCase());
-            const isDescriptionInSearch = description.toLowerCase().includes(search.toLowerCase());
-            if (!isAddressInSearch && !isTitleInSearch && !isDescriptionInSearch) return false;
-          }
-          return true;
-        });
+        const poolsInfoNew = pools
+          .filter((item: any) => {
+            const {
+              address = '',
+              isCertified,
+              description = '',
+              title = '',
+              openVotingTime = 0,
+            } = item;
+            let presaleStatus = '';
+            const now = dayjs().valueOf();
+            if (isCertified) {
+              // if (openTimePresale > now) presaleStatus = 'Not opened';
+              // if (openTimePresale < now) presaleStatus = 'Opened';
+              // if (closeTimePresale < now) presaleStatus = 'Closed';
+            } else {
+              // if (openTimePresale > now) presaleStatus = 'Not opened';
+              // if (openTimePresale < now) presaleStatus = 'Opened';
+              if (openVotingTime < now) presaleStatus = 'In voting';
+              // if (openVotingTime + votingTime * 1000 < now) presaleStatus = 'Voting ended';
+              if (openVotingTime + votingTime * 1000 < now) presaleStatus = 'Ended';
+            }
+            if (currentOption && currentOption !== 'All' && currentOption !== presaleStatus)
+              return false;
+            if (search && search !== '') {
+              const isAddressInSearch = address.toLowerCase().includes(search.toLowerCase());
+              const isTitleInSearch = title.toLowerCase().includes(search.toLowerCase());
+              const isDescriptionInSearch = description
+                .toLowerCase()
+                .includes(search.toLowerCase());
+              if (!isAddressInSearch && !isTitleInSearch && !isDescriptionInSearch) return false;
+            }
+            return true;
+          })
+          .sort(compareOpenVotingTime);
         // const poolsAddressesFilteredNew = poolsInfoNew.map((item: any) => item.address);
         setPoolsFiltered(poolsInfoNew);
       } catch (e) {
@@ -89,23 +104,27 @@ const AllPoolsPage: React.FC = () => {
       }
     }
   };
-  useEffect(() => {
-    for (let i = 0, newInfo: any[] = []; i < pools.length; i += 1) {
-      if (!pools[i].isCertified) {
-        ContractPresalePublic.getInfo({ contractAddress: pools[i].address }).then((data) => {
-          newInfo.push({ ...data, isCertified: pools[i].isCertified, address: pools[i].address });
-          if (i === pools.length - 1) setInfo(newInfo);
-        });
+  /*  useEffect(() => {
+      for (let i = 0, newInfo: any[] = []; i < pools.length; i += 1) {
+        if (!pools[i].isCertified) {
+          ContractPresalePublic.getInfo({ contractAddress: pools[i].address }).then((data) => {
+            newInfo.push({ ...data, isCertified: pools[i].isCertified, address: pools[i].address });
+            if (i === pools.length - 1) setInfo(newInfo);
+          });
+        }
       }
-    }
-  }, [ContractPresalePublic, pools]);
+    }, [ContractPresalePublic, pools]); */
 
   useEffect(() => {
-    // if (!pools || !pools.length) return;
-    if (!info || !info.length) return;
+    if (!ContractLessLibrary) return;
+    getVotingTime();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ContractLessLibrary]);
+  useEffect(() => {
+    if (!pools || !pools.length) return;
     filterData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, info, info.length, currentOption]);
+  }, [search, pools, pools.length, currentOption]);
   useEffect(() => {
     setPagesCount();
   }, [poolsFiltered.length, setPagesCount]);
