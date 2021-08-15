@@ -87,9 +87,10 @@ export default class ContractLessToken {
     }
   };
 
-  public approve = async ({ userAddress, spender, amount }: any): Promise<any> => {
+  public approve = async (props: any): Promise<any> => {
     try {
-      // console.log('ContractPresalePublicService getInfo:', this.contractAbi, this.contractAddress)
+      const { userAddress, spender, amount } = props;
+      console.log('ContractLessToken approve:', props);
       return await this.contract.methods.approve(spender, amount).send({ from: userAddress });
     } catch (e) {
       console.error('ContractLessToken approve:', e);

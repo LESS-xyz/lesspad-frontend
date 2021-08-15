@@ -280,17 +280,22 @@ const Pool: React.FC = () => {
         });
         console.log('PagePool vote resultGetPoolSignature:', resultGetPoolSignature);
         if (!resultGetPoolSignature.data) throw new Error('Cannot get pool signature');
-        const { date, signature, user_balance, stakedAmount } = resultGetPoolSignature.data;
-        const totalStakedAmountInEth = new BN(`${stakedAmount}`).toString(10);
-        const stakingAmountInEth = new BN(`${user_balance}`).toString(10);
+        const {
+          date,
+          signature,
+          user_balance: stakingAmount,
+          stakedAmount: totalStakedAmount,
+        } = resultGetPoolSignature.data;
+        // const totalStakedAmountInEth = new BN(`${stakedAmount}`).toString(10);
+        // const stakingAmountInEth = new BN(`${user_balance}`).toString(10);
         const resultVote = await ContractPresalePublicWithMetamask.vote({
           contractAddress: address,
-          stakingAmount: stakingAmountInEth,
+          stakingAmount,
           userAddress,
           date,
           signature,
           yes,
-          totalStakedAmount: totalStakedAmountInEth,
+          totalStakedAmount,
         });
         console.log('PagePool vote:', resultVote);
         await getMyVote();
@@ -313,7 +318,7 @@ const Pool: React.FC = () => {
       });
       console.log('PagePool invest resultGetInvestSignature:', resultGetInvestSignature);
       if (!resultGetInvestSignature.data) throw new Error('Cannot get invest signature');
-      const { user_balance } = resultGetInvestSignature.data;
+      const { user_balance: userBalance } = resultGetInvestSignature.data;
       const {
         date: timestamp,
         signature,
@@ -329,7 +334,7 @@ const Pool: React.FC = () => {
         presale: address,
       });
       console.log('PagePool resultGetTierSignature:', resultGetTierSignature);
-      const userBalance = new BN(`${user_balance}`).toString(10);
+      // const userBalance = new BN(`${user_balance}`).toString(10);
       if (!resultGetTierSignature.data) return;
       const resultVote = await ContractPresalePublicWithMetamask.invest({
         userAddress,
@@ -406,13 +411,12 @@ const Pool: React.FC = () => {
             </div>
           ),
         });
-      const stakingAmountInEth = new BN(`${userBalance}`).toString(10);
       const resultVote = await ContractPresalePublicWithMetamask.register({
         userAddress,
         contractAddress: address,
         tier: userTier,
         signature,
-        stakedAmount: stakingAmountInEth,
+        stakedAmount: userBalance,
         timestamp,
       });
       console.log('PagePool resultVote:', resultVote);

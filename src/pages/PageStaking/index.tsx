@@ -192,7 +192,7 @@ const StakingPage: React.FC = () => {
     }
   }, [ContractStaking, userAddress]);
 
-  const checkLessValue = () => {
+  const checkLessValue = useCallback(() => {
     try {
       if (!isStakeLessValue || +stakeLessValue === 0) {
         toggleModal({
@@ -210,9 +210,9 @@ const StakingPage: React.FC = () => {
       console.error('StakingPage checkValues:', e);
       return false;
     }
-  };
+  }, [isStakeLessValue, stakeLessValue, toggleModal]);
 
-  const checkLpValue = () => {
+  const checkLpValue = useCallback(() => {
     try {
       if (!isStakeLPValue || +stakeLPValue === 0) {
         toggleModal({
@@ -230,9 +230,9 @@ const StakingPage: React.FC = () => {
       console.error('StakingPage checkValues:', e);
       return false;
     }
-  };
+  }, [isStakeLPValue, stakeLPValue, toggleModal]);
 
-  const checkLessBalance = () => {
+  const checkLessBalance = useCallback(() => {
     try {
       if (isStakeLessValue && +stakeLessValue > +balanceLessToken) {
         toggleModal({
@@ -250,9 +250,9 @@ const StakingPage: React.FC = () => {
       console.error('StakingPage checkLessBalance:', e);
       return false;
     }
-  };
+  }, [isStakeLessValue, stakeLessValue, balanceLessToken, toggleModal]);
 
-  const checkLpBalance = () => {
+  const checkLpBalance = useCallback(() => {
     try {
       if (isStakeLPValue && +stakeLPValue > +balanceLPToken) {
         toggleModal({
@@ -270,7 +270,7 @@ const StakingPage: React.FC = () => {
       console.error('StakingPage checkLpBalance:', e);
       return false;
     }
-  };
+  }, [isStakeLPValue, stakeLPValue, balanceLPToken, toggleModal]);
 
   const approveLess = async () => {
     try {
@@ -312,7 +312,7 @@ const StakingPage: React.FC = () => {
     }
   };
 
-  const checkAllowancesAndFields = () => {
+  const checkAllowancesAndFields = useCallback(() => {
     try {
       if (!isStakeLessValue && !isStakeLPValue) {
         toggleModal({
@@ -363,9 +363,9 @@ const StakingPage: React.FC = () => {
       console.error('StakingPage stake:', e);
       return false;
     }
-  };
+  }, [isStakeLessValue, isStakeLPValue, isLessAllowed, isLpAllowed, toggleModal]);
 
-  const stake = async () => {
+  const stake = useCallback(async () => {
     try {
       if (!checkLessValue() && !checkLpValue()) return;
       if (isStakeLessValue && !checkLessBalance()) return;
@@ -393,7 +393,25 @@ const StakingPage: React.FC = () => {
       setIsStakeWaiting(false);
       console.error('StakingPage stake:', e);
     }
-  };
+  }, [
+    ContractStaking,
+    checkLessValue,
+    checkLpValue,
+    checkLessBalance,
+    checkLpBalance,
+    checkAllowancesAndFields,
+    debouncedStakeLessValue,
+    debouncedStakeLpValue,
+    lessDecimals,
+    lpDecimals,
+    getLessTokenBalance,
+    getLPTokenBalance,
+    getTier,
+    getUserStakeIds,
+    isStakeLessValue,
+    isStakeLPValue,
+    userAddress,
+  ]);
 
   const handleChangeStakeLessValue = (e) => {
     const value = e.target.value.replace(/[^\d.,]/g, '').replace(/,/g, '.');
