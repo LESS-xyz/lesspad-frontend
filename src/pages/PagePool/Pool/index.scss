@@ -534,3 +534,32 @@
     }
   }
 }
+
+.container-presale-status {
+  width: 100%;
+  position: relative;
+  background: linear-gradient(to right, #6f45ff, #ff6365);
+  padding: 1px;
+  margin: 0 0 40px 0;
+
+  > div {
+    @include flex(column, center, center, nowrap);
+    background: #040404;
+    color: white;
+    padding: 2rem;
+  }
+
+}
+
+.presale-status-text {
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 26px;
+}
+
+.gradient-header {
+  @include gradient-text();
+  font-size: 35px;
+  line-height: 45px;
+}
+

@@ -46,6 +46,48 @@ declare global {
   }
 }
 
+const defaultInfo = {
+  // #additional info
+  tokenSymbol: '...',
+  // #general info
+  creator: '...',
+  token: '...',
+  tokenPrice: '0',
+  softCap: '0',
+  hardCap: '0',
+  tokensForSaleLeft: '0',
+  tokensForLiquidityLeft: '0',
+  openTimePresale: '0',
+  closeTimePresale: '0',
+  openTimeVoting: '0',
+  closeTimeVoting: '0',
+  collectedFee: '0',
+  // #string info
+  saleTitle: '...',
+  linkTelegram: '...',
+  linkGithub: '...',
+  linkTwitter: '...',
+  linkWebsite: '...',
+  linkLogo: '...',
+  description: '...',
+  whitepaper: '...',
+  // #uniswap info
+  listingPrice: '0',
+  lpTokensLockDurationInDays: '0',
+  liquidityPercentageAllocation: '0',
+  liquidityAllocationTime: '0',
+  // #additional
+  approved: false,
+  beginingAmount: '0',
+  cancelled: false,
+  liquidityAdded: '0',
+  participants: '',
+  raisedAmount: '0',
+  yesVotes: '0',
+  noVotes: '0',
+  lastTotalStakedAmount: '0',
+};
+
 const Pool: React.FC = () => {
   const { address }: any = useParams();
   const history = useHistory();
@@ -60,7 +102,7 @@ const Pool: React.FC = () => {
     ContractStaking,
   } = useContractsContext();
 
-  const [info, setInfo] = useState<any>({});
+  const [info, setInfo] = useState<any>(defaultInfo);
 
   const [isCertified, setIsCertified] = useState<boolean>();
   const [chainInfo, setChainInfo] = useState<any>({});
@@ -119,6 +161,8 @@ const Pool: React.FC = () => {
   const updateTimerBeforeVoting = useCallback(() => {
     try {
       const { openTimeVoting, openTimePresale } = info;
+      if (openTimeVoting === '0') return;
+      if (openTimePresale === '0') return;
       const newTimeBeforeVoting = dayjs(openTimeVoting).fromNow();
       setTimeBeforeVoting(newTimeBeforeVoting);
       const openRegistrationTime = openTimePresale - REGISTRATION_TIME;
@@ -475,7 +519,8 @@ const Pool: React.FC = () => {
 
   useEffect(() => {
     if (!info) return () => {};
-    const interval = setInterval(() => updateTimerBeforeVoting(), 1000);
+    updateTimerBeforeVoting();
+    const interval = setInterval(() => updateTimerBeforeVoting(), 3000);
     return () => {
       clearInterval(interval);
     };
@@ -874,6 +919,14 @@ const Pool: React.FC = () => {
 
       {/*Your Investment*/}
       <div className="container-header">Your Investment</div>
+
+      <div className="container-presale-status">
+        <div className="container-presale-status-inner">
+          <div className="gradient-header">Voting will start</div>
+          <div className="presale-status-text">{timeBeforeVoting}</div>
+        </div>
+      </div>
+
       <div className="box box-bg">
         <div className="row">
           {isBeforeVotimgTime && (
