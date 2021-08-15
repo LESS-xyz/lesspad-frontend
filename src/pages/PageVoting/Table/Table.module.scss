@@ -6,6 +6,7 @@
 .table {
   margin-bottom: 25px;
 }
+
 .inner {
   background: var(--table-background);
   padding-top: 20px;
@@ -73,6 +74,7 @@
   &.img {
     padding-left: 20px;
     mix-blend-mode: luminosity;
+
     img {
       height: 48px;
       width: 48px;
@@ -93,8 +95,7 @@
   }
 
   &.likes {
-    @include flex(row, center, space-around);
-
+    @include flex(row, center, space-between);
     @include b('mobile') {
       @include flex(column, center, center, nowrap);
       background-color: var(--table-row-filled-section);
@@ -120,8 +121,8 @@
 }
 
 .likes {
-  @include flex(row, center, center, nowrap);
-  margin: 0 10px;
+  @include flex(row, center, space-between, nowrap);
+  width: 100%;
   @include b('mobile') {
     margin: 0;
   }
@@ -133,7 +134,8 @@
 }
 
 .like {
-  @include flex(row, center);
+  @include flex(row, center, normal, nowrap);
+
   &_img {
     height: 24px;
     margin-right: 10px;

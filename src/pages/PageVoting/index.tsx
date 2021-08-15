@@ -96,8 +96,7 @@ const PageVoting: React.FC = () => {
     if (info && info.length !== 0) {
       try {
         const presalesInfoNew = info.filter((item: any) => {
-          const { address = '', description = '' } = item;
-          const { saleTitle = '', openTimeVoting = 0 } = item;
+          const { address = '', description = '', saleTitle = '', openTimeVoting = 0 } = item;
           const now = dayjs().valueOf();
           const isVotingEnded = now > openTimeVoting + (votingTime ?? 0) * 1000;
           // console.log(`${address} ended`, isVotingEnded);

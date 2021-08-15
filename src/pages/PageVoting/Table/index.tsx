@@ -76,13 +76,13 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
 
   const getInfo = async () => {
     try {
-      const newInfo = await ContractPresaleCertified.getInfo({ contractAddress: address });
-      console.log('TokenCard getInfo certified:', newInfo);
+      const newInfo = await ContractPresalePublic.getInfo({ contractAddress: address });
+      console.log('TokenCard getInfo public:', newInfo);
       if (newInfo) setInfo(newInfo);
     } catch (e) {
       console.error('TableRow getInfo:', e);
-      const newInfo = await ContractPresalePublic.getInfo({ contractAddress: address });
-      console.log('TokenCard getInfo public:', newInfo);
+      const newInfo = await ContractPresaleCertified.getInfo({ contractAddress: address });
+      console.log('TokenCard getInfo certified:', newInfo);
       if (newInfo) setInfo(newInfo);
     }
   };
@@ -258,11 +258,17 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
     linkLogo,
     yesVotes = 1,
     noVotes = 0,
-    openVotingTime = 0, // todo: remove 0
+    openVotingTime = 0,
   } = info;
 
-  const yesVotesPercent = yesVotes ? ((yesVotes / (yesVotes + noVotes)) * 100).toFixed(2) : 0;
-  const noVotesPercent = noVotes === 0 ? 0 : 100 - +yesVotesPercent;
+  // const yesVotesPercent = +yesVotes ? ((+yesVotes / (+yesVotes + +noVotes)) * 100).toFixed(2) : 0;
+  const yesVotesPercent = +yesVotes
+    ? new BN(new BN(yesVotes).dividedBy(new BN(yesVotes).plus(noVotes)))
+        .multipliedBy(100)
+        .toFixed(2)
+    : 0;
+  // const noVotesPercent = +noVotes === 0 ? 0 : 100 - +yesVotesPercent;
+  const noVotesPercent = +noVotes === 0 ? 0 : new BN(100).minus(yesVotesPercent).toFixed(2);
   const isYesVotesMore = yesVotes > noVotes;
   const isVotingEnded = Date.now() > openVotingTime + votingTime; // todo: check work
 
@@ -333,10 +339,7 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
               <img src={thumbUpRed} alt="thumbUpRed" />
             </div>
             <div className={s.likes_data}>
-              {noVotesPercent &&
-                noVotesPercent &&
-                (noVotesPercent < 10 ? +`0${noVotesPercent}` : noVotesPercent)}
-              %
+              {noVotesPercent && (+noVotesPercent < 10 ? +`0${noVotesPercent}` : noVotesPercent)}%
             </div>
           </div>
         </div>
