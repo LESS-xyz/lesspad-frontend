@@ -450,7 +450,7 @@ const Pool: React.FC = () => {
       if (!info) return;
       if (!tier) return;
       const { openTimePresale, closeTimePresale } = info;
-      console.log('PagePool getTierTime:', tier);
+      // console.log('PagePool getTierTime:', tier);
       const isInvestmentTime = +openTimePresale <= NOW && +closeTimePresale > NOW;
       const tierTimeNew = +openTimePresale + TIER_TIME * (+tier - 1);
       const isMyTierTimeNew = isInvestmentTime && tierTimeNew <= NOW;
@@ -684,6 +684,8 @@ const Pool: React.FC = () => {
   const isOpened = openTimePresale <= NOW;
   const isPresaleClosed = closeTimePresale <= NOW;
 
+  const isUserCreator = userAddress ? creator.toLowerCase() !== userAddress.toLowerCase() : false;
+
   const isEthereum = chainType === 'Ethereum';
   const isBinanceSmartChain = chainType === 'Binance-Smart-Chain';
 
@@ -698,17 +700,25 @@ const Pool: React.FC = () => {
     [yesVotes, minVotingCompletion],
   );
   if (+votingCompletion > 100) votingCompletion = '100';
+  const isVotingCompleted = +votingCompletion > +minVotingCompletion;
 
   const tokensSoldInNativeCurrency = useMemo(
     () => (beginingAmount - tokensForSaleLeft) * tokenPrice,
     [beginingAmount, tokensForSaleLeft, tokenPrice],
   );
-  const hardCapInNativeCurrency = useMemo(() => hardCap * tokenPrice, [hardCap, tokenPrice]);
-  const percentOfTokensSold = useMemo(
-    () => ((beginingAmount - tokensForSaleLeft) / beginingAmount) * 100,
-    [beginingAmount, tokensForSaleLeft],
-  );
-  const percentOfSoftCap = useMemo(() => (softCap / hardCap) * 100, [softCap, hardCap]);
+
+  const hardCapInNativeCurrency = useMemo(() => {
+    return new BN(hardCap).div(tokenPrice).toString(10);
+  }, [hardCap, tokenPrice]);
+
+  const percentOfTokensSold = useMemo(() => {
+    const minus = new BN(beginingAmount).minus(tokensForSaleLeft);
+    return minus.div(beginingAmount).multipliedBy(new BN(100)).toString(10);
+  }, [beginingAmount, tokensForSaleLeft]);
+
+  const percentOfSoftCap = useMemo(() => {
+    return new BN(softCap).div(hardCap).multipliedBy(new BN(100)).toString(10);
+  }, [softCap, hardCap]);
 
   const currency = chainSymbols[chainType];
   const explorer = explorers[chainType];
@@ -825,6 +835,203 @@ const Pool: React.FC = () => {
     { image: Link, link: linkWebsite },
     { image: Github, link: linkGithub },
   ];
+
+  const htmlVotingWillStart = (
+    <div className="item">
+      <div className="item-text-gradient" style={{ fontSize: 35 }}>
+        Voting will start
+      </div>
+      <div className="item-text" style={{ minWidth: 200 }}>
+        <div className="item-text-bold">{timeBeforeVoting}</div>
+      </div>
+    </div>
+  );
+
+  const htmlRegistrationWillStart = (
+    <div className="item">
+      <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
+        Registration will start
+      </div>
+      <div className="item-text">
+        <div className="item-text-bold">{timeBeforeRegistration}</div>
+      </div>
+    </div>
+  );
+
+  const htmlYouVoted = (
+    <div className="item">
+      <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
+        Voting
+      </div>
+      <div className="item-text">You voted</div>
+    </div>
+  );
+
+  const htmlVoting = (
+    <div className="item">
+      <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
+        Voting
+      </div>
+      <div className="item-text">
+        <div className="item-text-bold">{stakedLess}</div>
+        <div className="item-text-gradient">LESS</div>
+      </div>
+      <div className="button-border" style={{ marginBottom: 5 }}>
+        <div
+          className="button"
+          role="button"
+          tabIndex={0}
+          onClick={() => handleVote(true)}
+          onKeyDown={() => {}}
+        >
+          <div className="gradient-button-text">Vote Yes</div>
+        </div>
+      </div>
+      <div className="button-border" style={{ marginTop: 5 }}>
+        <div
+          className="button"
+          role="button"
+          tabIndex={0}
+          onClick={() => handleVote(false)}
+          onKeyDown={() => {}}
+        >
+          <div className="gradient-button-text">Vote No</div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const htmlVotingIsNotSuccessful = (
+    <div className="item">
+      <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
+        Voting
+      </div>
+      <div className="item-text">
+        <div className="item-text-bold">is not successful</div>
+      </div>
+    </div>
+  );
+
+  const htmlYouAreRegistered = (
+    <div className="item">
+      <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
+        Registration
+      </div>
+      <div className="item-text">You are registered</div>
+    </div>
+  );
+
+  const htmlRegistration = (
+    <>
+      <div className="item">
+        <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
+          Registration
+        </div>
+        <img src={RegisterImg} alt="" />
+        <div className="button-border">
+          <div
+            className="button"
+            role="button"
+            tabIndex={0}
+            onClick={register}
+            onKeyDown={() => {}}
+          >
+            <div className="gradient-button-text">Register</div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+
+  const htmlYouNeedToBeRegisteredToInvest = (
+    <div className="item">
+      <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
+        Investment
+      </div>
+      <div className="item-text">You need to be registered on presale to invest</div>
+    </div>
+  );
+
+  const htmlInvestment = (
+    <>
+      <div className="item">
+        Your {currency} Investment
+        <div className="item-text">
+          <div className="item-text-bold">
+            {investments.amountEth} {currency}
+          </div>
+        </div>
+      </div>
+      {isMyTierTime ? (
+        <div className="item">
+          Buy Tokens
+          <div className="item-text">
+            <div className="item-text-bold">
+              1 {tokenSymbol} = {tokenPrice} {currency}
+            </div>
+          </div>
+          <p>Please, enter amount to invest (in ether)</p>
+          <Input
+            title=""
+            value={amountToInvest}
+            onChange={setAmountToInvest}
+            style={{ marginBottom: 10 }}
+          />
+          <div className="button-border" style={{ margin: '5px 0' }}>
+            <div
+              className="button"
+              role="button"
+              tabIndex={0}
+              onClick={invest}
+              onKeyDown={() => {}}
+            >
+              <div className="gradient-button-text">Invest</div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="item">
+          Buy Tokens
+          <div className="item-text">
+            <div className="item-text-bold">Your tier invest time starts {timeBeforeMyTier}</div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+
+  const htmlInvestmentIsClosed = (
+    <div className="item">
+      <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
+        Investment
+      </div>
+      <div className="item-text">Is closed</div>
+    </div>
+  );
+
+  const htmlClaimTokens = (
+    <>
+      <div className="item">
+        Your Tokens
+        <div className="item-text">
+          <div className="item-text-bold">{investments.amountTokens}</div>
+          <div className="item-text-gradient">{tokenSymbol}</div>
+        </div>
+        {/*<div className="item-count">$13,780,000 USD</div>*/}
+        <div className="button-border">
+          <div
+            className="button"
+            role="button"
+            tabIndex={0}
+            onClick={handleClaimTokens}
+            onKeyDown={() => {}}
+          >
+            <div className="gradient-button-text">Claim Token</div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
 
   return (
     <div className="container">
@@ -988,194 +1195,29 @@ const Pool: React.FC = () => {
 
       <div className="box box-bg">
         <div className="row">
-          {isBeforeVotimgTime && (
-            <div className="item">
-              <div className="item-text-gradient" style={{ fontSize: 35 }}>
-                Voting will start
-              </div>
-              <div className="item-text" style={{ minWidth: 200 }}>
-                <div className="item-text-bold">{timeBeforeVoting}</div>
-              </div>
-            </div>
-          )}
+          {isBeforeVotimgTime && htmlVotingWillStart}
 
-          {!isCertified &&
-            isVotingTime &&
-            creator.toLowerCase() !== userAddress.toLowerCase() &&
-            (!myVote ? (
-              <div className="item">
-                <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
-                  Voting
-                </div>
-                <div className="item-text">
-                  <div className="item-text-bold">{stakedLess}</div>
-                  <div className="item-text-gradient">LESS</div>
-                </div>
-                <div className="button-border" style={{ marginBottom: 5 }}>
-                  <div
-                    className="button"
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => handleVote(true)}
-                    onKeyDown={() => {}}
-                  >
-                    <div className="gradient-button-text">Vote Yes</div>
-                  </div>
-                </div>
-                <div className="button-border" style={{ marginTop: 5 }}>
-                  <div
-                    className="button"
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => handleVote(false)}
-                    onKeyDown={() => {}}
-                  >
-                    <div className="gradient-button-text">Vote No</div>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="item">
-                <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
-                  Voting
-                </div>
-                <div className="item-text">You voted</div>
-              </div>
-            ))}
+          {!isCertified && isVotingTime && isUserCreator && (!myVote ? htmlVoting : htmlYouVoted)}
 
-          {isBeforeRegistrationTime && myVote && (
-            <div className="item">
-              <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
-                Registration will start
-              </div>
-              <div className="item-text" style={{ minWidth: 200 }}>
-                <div className="item-text-bold">{timeBeforeRegistration}</div>
-              </div>
-            </div>
-          )}
+          {isBeforeRegistrationTime && myVote ? htmlRegistrationWillStart : null}
 
-          {isRegistrationTime ? (
-            isUserRegister ? (
-              <div className="item">
-                <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
-                  Registration
-                </div>
-                <div className="item-text">You are registered</div>
-              </div>
-            ) : (
-              <>
-                <div className="item">
-                  <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
-                    Registration
-                  </div>
-                  <img src={RegisterImg} alt="" />
-                  <div className="button-border">
-                    <div
-                      className="button"
-                      role="button"
-                      tabIndex={0}
-                      onClick={register}
-                      onKeyDown={() => {}}
-                    >
-                      <div className="gradient-button-text">Register</div>
-                    </div>
-                  </div>
-                </div>
-              </>
-            )
-          ) : null}
+          {isRegistrationTime
+            ? isVotingCompleted
+              ? isUserRegister
+                ? htmlYouAreRegistered
+                : htmlRegistration
+              : htmlVotingIsNotSuccessful
+            : null}
 
-          {isInvestmentTime && isInvestStart ? (
-            isUserRegister ? (
-              <>
-                <div className="item">
-                  Your {currency} Investment
-                  <div className="item-text">
-                    <div className="item-text-bold">
-                      {investments.amountEth} {currency}
-                    </div>
-                  </div>
-                </div>
-                {isMyTierTime ? (
-                  <div className="item">
-                    Buy Tokens
-                    <div className="item-text">
-                      <div className="item-text-bold">
-                        1 {tokenSymbol} = {tokenPrice} {currency}
-                      </div>
-                    </div>
-                    <p>Please, enter amount to invest (in ether)</p>
-                    <Input
-                      title=""
-                      value={amountToInvest}
-                      onChange={setAmountToInvest}
-                      style={{ marginBottom: 10 }}
-                    />
-                    <div className="button-border" style={{ margin: '5px 0' }}>
-                      <div
-                        className="button"
-                        role="button"
-                        tabIndex={0}
-                        onClick={invest}
-                        onKeyDown={() => {}}
-                      >
-                        <div className="gradient-button-text">Invest</div>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="item">
-                    Buy Tokens
-                    <div className="item-text">
-                      <div className="item-text-bold">
-                        Your tier invest time starts {timeBeforeMyTier}
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </>
-            ) : (
-              <div className="item">
-                <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
-                  Investment
-                </div>
-                <div className="item-text">You need to be registered on presale to invest</div>
-              </div>
-            )
-          ) : (
-            isPresaleClosed && (
-              <div className="item">
-                <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
-                  Investment
-                </div>
-                <div className="item-text">Is closed</div>
-              </div>
-            )
-          )}
+          {isInvestmentTime && isInvestStart && isVotingCompleted
+            ? isUserRegister
+              ? htmlInvestment
+              : htmlYouNeedToBeRegisteredToInvest
+            : isPresaleClosed
+            ? htmlInvestmentIsClosed
+            : null}
 
-          {isPresaleClosed && !cancelled && liquidityAdded && (
-            <>
-              <div className="item">
-                Your Tokens
-                <div className="item-text">
-                  <div className="item-text-bold">{investments.amountTokens}</div>
-                  <div className="item-text-gradient">{tokenSymbol}</div>
-                </div>
-                {/*<div className="item-count">$13,780,000 USD</div>*/}
-                <div className="button-border">
-                  <div
-                    className="button"
-                    role="button"
-                    tabIndex={0}
-                    onClick={handleClaimTokens}
-                    onKeyDown={() => {}}
-                  >
-                    <div className="gradient-button-text">Claim Token</div>
-                  </div>
-                </div>
-              </div>
-            </>
-          )}
+          {isPresaleClosed && !cancelled && liquidityAdded ? htmlClaimTokens : null}
         </div>
       </div>
 
