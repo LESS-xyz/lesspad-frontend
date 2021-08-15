@@ -160,7 +160,7 @@ const Pool: React.FC = () => {
     }
   }, [chainType]);
 
-  const getInfo = async () => {
+  const getInfo = useCallback(async () => {
     try {
       let newInfo;
       if (isCertified) {
@@ -174,7 +174,7 @@ const Pool: React.FC = () => {
     } catch (e) {
       console.error('PagePool getInfo:', e);
     }
-  };
+  }, [ContractPresaleCertified, ContractPresalePublic, address, isCertified]);
 
   const getMyVote = useCallback(async () => {
     try {
@@ -223,36 +223,39 @@ const Pool: React.FC = () => {
     }
   }, [userAddress, web3]);
 
-  const vote = async (yes: boolean) => {
-    try {
-      const resultLoginToBackend = await loginToBackend();
-      if (!resultLoginToBackend.success) throw new Error('Not logged to backend');
-      const { key }: any = resultLoginToBackend.data;
-      const resultGetPoolSignature = await Backend.getVotingSignature({
-        token: key,
-        pool: address,
-      });
-      console.log('PagePool vote resultGetPoolSignature:', resultGetPoolSignature);
-      if (!resultGetPoolSignature.data) throw new Error('Cannot get pool signature');
-      const { date, signature, user_balance, stakedAmount } = resultGetPoolSignature.data;
-      const totalStakedAmountInEth = new BN(`${stakedAmount}`).toString(10);
-      const stakingAmountInEth = new BN(`${user_balance}`).toString(10);
-      const resultVote = await ContractPresalePublicWithMetamask.vote({
-        contractAddress: address,
-        stakingAmount: stakingAmountInEth,
-        userAddress,
-        date,
-        signature,
-        yes,
-        totalStakedAmount: totalStakedAmountInEth,
-      });
-      console.log('PagePool vote:', resultVote);
-      await getMyVote();
-      await getInfo();
-    } catch (e) {
-      console.error('PagePool vote:', e);
-    }
-  };
+  const vote = useCallback(
+    async (yes: boolean) => {
+      try {
+        const resultLoginToBackend = await loginToBackend();
+        if (!resultLoginToBackend.success) throw new Error('Not logged to backend');
+        const { key }: any = resultLoginToBackend.data;
+        const resultGetPoolSignature = await Backend.getVotingSignature({
+          token: key,
+          pool: address,
+        });
+        console.log('PagePool vote resultGetPoolSignature:', resultGetPoolSignature);
+        if (!resultGetPoolSignature.data) throw new Error('Cannot get pool signature');
+        const { date, signature, user_balance, stakedAmount } = resultGetPoolSignature.data;
+        const totalStakedAmountInEth = new BN(`${stakedAmount}`).toString(10);
+        const stakingAmountInEth = new BN(`${user_balance}`).toString(10);
+        const resultVote = await ContractPresalePublicWithMetamask.vote({
+          contractAddress: address,
+          stakingAmount: stakingAmountInEth,
+          userAddress,
+          date,
+          signature,
+          yes,
+          totalStakedAmount: totalStakedAmountInEth,
+        });
+        console.log('PagePool vote:', resultVote);
+        await getMyVote();
+        await getInfo();
+      } catch (e) {
+        console.error('PagePool vote:', e);
+      }
+    },
+    [ContractPresalePublicWithMetamask, address, getInfo, getMyVote, loginToBackend, userAddress],
+  );
 
   const invest = useCallback(async () => {
     try {
@@ -315,7 +318,7 @@ const Pool: React.FC = () => {
     }
   }, [userAddress, ContractPresalePublic, address]);
 
-  const register = async () => {
+  const register = useCallback(async () => {
     try {
       // login to backend
       const resultGetMetamaskMessage = await Backend.getMetamaskMessage();
@@ -371,18 +374,18 @@ const Pool: React.FC = () => {
     } catch (e) {
       console.error('PagePool register:', e);
     }
-  };
+  }, [ContractPresalePublicWithMetamask, ContractStaking, address, userAddress, toggleModal, web3]);
 
-  const getDecimals = async () => {
+  const getDecimals = useCallback(async () => {
     try {
       const resultLessDecimals = await ContractLessToken.decimals();
       setLessDecimals(resultLessDecimals);
     } catch (e) {
       console.error(e);
     }
-  };
+  }, [ContractLessToken]);
 
-  const getTier = React.useCallback(async () => {
+  const getTier = useCallback(async () => {
     try {
       const userTier = await ContractStaking.getUserTier({ userAddress });
       setTier(userTier);
@@ -405,15 +408,18 @@ const Pool: React.FC = () => {
     }
   }, [address, info]);
 
-  const handleVote = async (yes: boolean) => {
-    try {
-      await vote(yes);
-    } catch (e) {
-      console.error('PagePool handleVote:', e);
-    }
-  };
+  const handleVote = useCallback(
+    async (yes: boolean) => {
+      try {
+        await vote(yes);
+      } catch (e) {
+        console.error('PagePool handleVote:', e);
+      }
+    },
+    [vote],
+  );
 
-  const handleClaimTokens = async () => {
+  const handleClaimTokens = useCallback(async () => {
     try {
       const resultClaimTokens = await ContractPresalePublicWithMetamask.claimTokens({
         userAddress,
@@ -423,9 +429,9 @@ const Pool: React.FC = () => {
     } catch (e) {
       console.error('PagePool handleVote:', e);
     }
-  };
+  }, [ContractPresalePublicWithMetamask, userAddress, address]);
 
-  const handleInvest = async () => {
+  const handleInvest = useCallback(async () => {
     try {
       toggleModal({
         open: true,
@@ -455,7 +461,7 @@ const Pool: React.FC = () => {
     } catch (e) {
       console.error('PagePool handleInvest:', e);
     }
-  };
+  }, [toggleModal, amountToInvest, invest]);
 
   useEffect(() => {
     if (!address) history.push('/');
@@ -498,8 +504,7 @@ const Pool: React.FC = () => {
     if (!ContractPresaleCertified) return;
     if (isCertified === undefined) return;
     getInfo();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ContractPresalePublic, ContractPresaleCertified, isCertified]);
+  }, [ContractPresalePublic, ContractPresaleCertified, isCertified, getInfo]);
 
   useEffect(() => {
     if (!ContractLessToken) return;
@@ -507,8 +512,13 @@ const Pool: React.FC = () => {
     if (!ContractPresaleCertified) return;
     if (isCertified === undefined) return;
     getDecimals();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ContractPresalePublic, ContractPresaleCertified, isCertified]);
+  }, [
+    ContractPresalePublic,
+    ContractPresaleCertified,
+    ContractLessToken,
+    getDecimals,
+    isCertified,
+  ]);
 
   useEffect(() => {
     if (!ContractPresalePublic) return;
