@@ -1,6 +1,7 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useDispatch, useSelector } from 'react-redux';
+import { BigNumber as BN } from 'bignumber.js/bignumber';
 
 import maxImg from '../../assets/img/icons/max.svg';
 import Button from '../../components/Button/index';
@@ -55,8 +56,19 @@ const StakingPage: React.FC = () => {
 
   const isStakeLessValue = debouncedStakeLessValue !== '';
   const isStakeLPValue = debouncedStakeLpValue !== '';
-  const isLessAllowed = lessAllowance >= +debouncedStakeLessValue;
-  const isLpAllowed = lpAllowance >= +debouncedStakeLpValue;
+
+  const isLessAllowed = useMemo(() => {
+    const pow = new BN(10).pow(lessDecimals);
+    const allowanceInEth = new BN(lessAllowance).div(pow).toString(10);
+    console.log('StakingPage isLessAllowed:', allowanceInEth);
+    return +allowanceInEth >= +debouncedStakeLessValue;
+  }, [lessAllowance, lessDecimals, debouncedStakeLessValue]);
+  const isLpAllowed = useMemo(() => {
+    const pow = new BN(10).pow(lpDecimals);
+    const allowanceInEth = new BN(lpAllowance).div(pow).toString(10);
+    console.log('StakingPage isLpAllowed:', allowanceInEth);
+    return +allowanceInEth >= +debouncedStakeLpValue;
+  }, [lpAllowance, lpDecimals, debouncedStakeLpValue]);
 
   const stakingContractAddress = config.addresses[config.isMainnetOrTestnet][chainType].Staking;
 
