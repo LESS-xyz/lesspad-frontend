@@ -86,22 +86,29 @@ const PageVoting: React.FC = () => {
     }
   };
 
+  const compareOpenVotingTime = (a, b) => {
+    return b.openVotingTime - a.openVotingTime;
+  };
   const filterTable = async () => {
     if (pools && pools.length !== 0) {
       try {
-        const presalesInfoNew = pools.filter((item: any) => {
-          const { address = '', description = '', title = '', openVotingTime = 0 } = item;
-          const now = dayjs().valueOf();
-          const isVoting = now > openVotingTime && now < openVotingTime + votingTime * 1000;
-          if (!isVoting) return false;
-          if (search && search !== '') {
-            const isAddressInSearch = address.toLowerCase().includes(search.toLowerCase());
-            const isTitleInSearch = title.toLowerCase().includes(search.toLowerCase());
-            const isDescriptionInSearch = description.toLowerCase().includes(search.toLowerCase());
-            if (!isAddressInSearch && !isTitleInSearch && !isDescriptionInSearch) return false;
-          }
-          return true;
-        });
+        const presalesInfoNew = pools
+          .filter((item: any) => {
+            const { address = '', description = '', title = '', openVotingTime = 0 } = item;
+            const now = dayjs().valueOf();
+            const isVoting = now > openVotingTime && now < openVotingTime + votingTime * 1000;
+            if (!isVoting) return false;
+            if (search && search !== '') {
+              const isAddressInSearch = address.toLowerCase().includes(search.toLowerCase());
+              const isTitleInSearch = title.toLowerCase().includes(search.toLowerCase());
+              const isDescriptionInSearch = description
+                .toLowerCase()
+                .includes(search.toLowerCase());
+              if (!isAddressInSearch && !isTitleInSearch && !isDescriptionInSearch) return false;
+            }
+            return true;
+          })
+          .sort(compareOpenVotingTime);
         const presalesAddressesFilteredNew = presalesInfoNew.map((item: any) => item.address);
         setPresalesAddressesFiltered(presalesAddressesFilteredNew);
       } catch (e) {

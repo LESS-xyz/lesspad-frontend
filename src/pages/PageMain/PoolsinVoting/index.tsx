@@ -11,7 +11,7 @@ import Table from '../../PageVoting/Table';
 import s from './PoolsInVoting.module.scss';
 
 const PoolsiInVoting: React.FC = () => {
-  const { ContractLessLibrary, ContractPresalePublic } = useContractsContext();
+  const { ContractLessLibrary } = useContractsContext();
   //
   const [presalesAddressesFiltered, setPresalesAddressesFiltered] = useState<any[]>([]);
   const [votingTime, setVotingTime] = useState<number>();
@@ -26,7 +26,7 @@ const PoolsiInVoting: React.FC = () => {
   const setLibrary = React.useCallback((params) => dispatch(libraryActions.setLibrary(params)), [
     dispatch,
   ]);
-  const [info, setInfo] = useState<any[]>([]);
+  // const [info, setInfo] = useState<any[]>([]);
 
   const getVotingTime = async () => {
     try {
@@ -38,6 +38,9 @@ const PoolsiInVoting: React.FC = () => {
     }
   };
 
+  const compareOpenVotingTime = (a, b) => {
+    return b.openVotingTime - a.openVotingTime;
+  };
   const filterTable = async () => {
     // const info = pools.map(async (pool: any) => {
     //   const newInfo = await getInfo(pool.address);
@@ -45,16 +48,18 @@ const PoolsiInVoting: React.FC = () => {
     // });
     //
     // console.log('only public presales', info);
-    if (info && info.length !== 0) {
+    if (pools && pools.length !== 0) {
       try {
-        const presalesInfoNew = info.filter((item: any) => {
-          const { openTimeVoting = 0 } = item;
-          const now = dayjs().valueOf();
-          const isVotingEnded = now > openTimeVoting + (votingTime ?? 0) * 1000;
-          // console.log(`${address} ended`, isVotingEnded);
-          if (isVotingEnded) return false;
-          return true;
-        });
+        const presalesInfoNew = pools
+          .filter((item: any) => {
+            const { openVotingTime = 0 } = item;
+            const now = dayjs().valueOf();
+            const isVotingEnded = now > openVotingTime + (votingTime ?? 0) * 1000;
+            // console.log(`${address} ended`, isVotingEnded);
+            if (isVotingEnded) return false;
+            return true;
+          })
+          .sort(compareOpenVotingTime);
         const presalesAddressesFilteredNew = presalesInfoNew.map((item: any) => item.address);
         setPresalesAddressesFiltered(presalesAddressesFilteredNew);
       } catch (e) {
@@ -98,16 +103,16 @@ const PoolsiInVoting: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ContractLessLibrary]);
 
-  useEffect(() => {
-    for (let i = 0, newInfo: any[] = []; i < pools.length; i += 1) {
-      if (!pools[i].isCertified) {
-        ContractPresalePublic.getInfo({ contractAddress: pools[i].address }).then((data) => {
-          newInfo.push({ ...data, address: pools[i].address });
-          if (i === pools.length - 1) setInfo(newInfo);
-        });
+  /*  useEffect(() => {
+      for (let i = 0, newInfo: any[] = []; i < pools.length; i += 1) {
+        if (!pools[i].isCertified) {
+          ContractPresalePublic.getInfo({ contractAddress: pools[i].address }).then((data) => {
+            newInfo.push({ ...data, address: pools[i].address });
+            if (i === pools.length - 1) setInfo(newInfo);
+          });
+        }
       }
-    }
-  }, [ContractPresalePublic, pools]);
+    }, [ContractPresalePublic, pools]); */
 
   useEffect(() => {
     if (!ContractLessLibrary) return;
@@ -117,11 +122,10 @@ const PoolsiInVoting: React.FC = () => {
   }, [ContractLessLibrary]);
 
   useEffect(() => {
-    // if (!pools || !pools.length) return;
-    if (!info || !info.length) return;
+    if (!pools || !pools.length) return;
     filterTable();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [info, info.length]);
+  }, [pools, pools.length]);
 
   return (
     <section className={s.block}>

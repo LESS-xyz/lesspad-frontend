@@ -39,7 +39,7 @@ const AllPoolsPage: React.FC = () => {
     setCountOfPages(count);
   }, [poolsFiltered.length]);
 
-  const handleChangePage = (p: number) => setPage(p);
+  const handleChangePage = useCallback((p: number) => setPage(p), []);
 
   const getVotingTime = async () => {
     try {
@@ -50,6 +50,9 @@ const AllPoolsPage: React.FC = () => {
       console.error('TableRow getVotingTime:', e);
     }
   };
+  const compareOpenVotingTime = (a, b) => {
+    return b.openVotingTime - a.openVotingTime;
+  };
   const filterData = async () => {
     // const info = pools.map(async (pool: any) => {
     //   const newInfo = await getInfo(pool.address);
@@ -59,37 +62,41 @@ const AllPoolsPage: React.FC = () => {
     // console.log('only public presales', info);
     if (pools && pools.length !== 0) {
       try {
-        const poolsInfoNew = pools.filter((item: any) => {
-          const {
-            address = '',
-            isCertified,
-            description = '',
-            title = '',
-            openVotingTime = 0,
-          } = item;
-          let presaleStatus = '';
-          const now = dayjs().valueOf();
-          if (isCertified) {
-            // if (openTimePresale > now) presaleStatus = 'Not opened';
-            // if (openTimePresale < now) presaleStatus = 'Opened';
-            // if (closeTimePresale < now) presaleStatus = 'Closed';
-          } else {
-            // if (openTimePresale > now) presaleStatus = 'Not opened';
-            // if (openTimePresale < now) presaleStatus = 'Opened';
-            if (openVotingTime < now) presaleStatus = 'In voting';
-            // if (openVotingTime + votingTime * 1000 < now) presaleStatus = 'Voting ended';
-            if (openVotingTime + votingTime * 1000 < now) presaleStatus = 'Ended';
-          }
-          if (currentOption && currentOption !== 'All' && currentOption !== presaleStatus)
-            return false;
-          if (search && search !== '') {
-            const isAddressInSearch = address.toLowerCase().includes(search.toLowerCase());
-            const isTitleInSearch = title.toLowerCase().includes(search.toLowerCase());
-            const isDescriptionInSearch = description.toLowerCase().includes(search.toLowerCase());
-            if (!isAddressInSearch && !isTitleInSearch && !isDescriptionInSearch) return false;
-          }
-          return true;
-        });
+        const poolsInfoNew = pools
+          .filter((item: any) => {
+            const {
+              address = '',
+              isCertified,
+              description = '',
+              title = '',
+              openVotingTime = 0,
+            } = item;
+            let presaleStatus = '';
+            const now = dayjs().valueOf();
+            if (isCertified) {
+              // if (openTimePresale > now) presaleStatus = 'Not opened';
+              // if (openTimePresale < now) presaleStatus = 'Opened';
+              // if (closeTimePresale < now) presaleStatus = 'Closed';
+            } else {
+              // if (openTimePresale > now) presaleStatus = 'Not opened';
+              // if (openTimePresale < now) presaleStatus = 'Opened';
+              if (openVotingTime < now) presaleStatus = 'In voting';
+              // if (openVotingTime + votingTime * 1000 < now) presaleStatus = 'Voting ended';
+              if (openVotingTime + votingTime * 1000 < now) presaleStatus = 'Ended';
+            }
+            if (currentOption && currentOption !== 'All' && currentOption !== presaleStatus)
+              return false;
+            if (search && search !== '') {
+              const isAddressInSearch = address.toLowerCase().includes(search.toLowerCase());
+              const isTitleInSearch = title.toLowerCase().includes(search.toLowerCase());
+              const isDescriptionInSearch = description
+                .toLowerCase()
+                .includes(search.toLowerCase());
+              if (!isAddressInSearch && !isTitleInSearch && !isDescriptionInSearch) return false;
+            }
+            return true;
+          })
+          .sort(compareOpenVotingTime);
         // const poolsAddressesFilteredNew = poolsInfoNew.map((item: any) => item.address);
         setPoolsFiltered(poolsInfoNew);
       } catch (e) {

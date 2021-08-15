@@ -14,16 +14,21 @@ const FeaturedProject: React.FC = () => {
   const { pools } = useSelector(({ pool }: any) => pool);
   const [presalesFiltered, setPresalesFiltered] = useState<any[]>([]);
 
+  const compareOpenVotingTime = (a, b) => {
+    return b.openVotingTime - a.openVotingTime;
+  };
   const filterProjects = async () => {
     if (pools && pools.length !== 0) {
       try {
-        const presalesInfoNew = pools.filter((item: any) => {
-          const { openVotingTime = 0 } = item;
-          const now = dayjs().valueOf();
-          const isFeatured = now < openVotingTime;
-          if (!isFeatured) return false;
-          return true;
-        });
+        const presalesInfoNew = pools
+          .filter((item: any) => {
+            const { openVotingTime = 0 } = item;
+            const now = dayjs().valueOf();
+            const isFeatured = now < openVotingTime;
+            if (!isFeatured) return false;
+            return true;
+          })
+          .sort(compareOpenVotingTime);
         // const presalesAddressesFilteredNew = presalesInfoNew.map((item: any) => item.address);
         setPresalesFiltered(presalesInfoNew);
       } catch (e) {
