@@ -1,4 +1,5 @@
 import React from 'react';
+import { v4 as uuid } from 'uuid';
 
 import binanceLogo from '../../../assets/img/sections/about-page/binance-logo.svg';
 import ethereumLogo from '../../../assets/img/sections/about-page/ethereum-logo.svg';
@@ -20,7 +21,7 @@ const PoweredBy: React.FC<IPoweredByProps> = ({ className, withTitle }) => {
           {withTitle && <div className={s.title}>Powered By</div>}
           <div className={s.logos}>
             {logos.map((logo) => (
-              <div className={s.logo}>
+              <div className={s.logo} key={uuid()}>
                 <img src={logo} alt="logo" />
               </div>
             ))}

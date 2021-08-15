@@ -1,4 +1,5 @@
 import React from 'react';
+import { v4 as uuid } from 'uuid';
 
 import s from './FeaturedAlumni.module.scss';
 
@@ -25,7 +26,7 @@ const FeaturedAlumni: React.FC<IFeaturedAlumniProps> = ({ logos, title }) => {
           <div className={s.title}>{title}</div>
           <div className={s.logos}>
             {logos.map((logo) => (
-              <LogoBlock img={logo} />
+              <LogoBlock key={uuid()} img={logo} />
             ))}
           </div>
         </div>

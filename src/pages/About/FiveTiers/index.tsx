@@ -1,4 +1,5 @@
 import React from 'react';
+import { v4 as uuid } from 'uuid';
 
 import tier1 from '../../../assets/img/sections/about-page/tier-1.svg';
 import tier2 from '../../../assets/img/sections/about-page/tier-2.svg';
@@ -102,7 +103,7 @@ const Tiers: React.FC = () => {
               </div>
             </div>
             {tiersData.map((tier) => (
-              <TierCard {...tier} />
+              <TierCard key={uuid()} {...tier} />
             ))}
           </div>
           <div className={s.info}>

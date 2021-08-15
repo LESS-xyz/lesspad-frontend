@@ -36,38 +36,32 @@ export default class ContractPresaleFactoryService {
     this.contractAbi = abisOfNetType[chainType][this.contractName];
   }
 
-  public createPresalePublic = async (props: TypeGetInfoProps) => {
-    try {
-      const {
-        userAddress,
-        presaleInfo,
-        presalePancakeSwapInfo,
-        presaleStringInfo,
-        usdtToEthFee,
-      } = props;
-      const presaleStringInfoFormatted = presaleStringInfo.map((item: string, ii: number) => {
-        const hex = this.web3.utils.toHex(item);
-        const zeros = new Array(66 - hex.length).fill('0').join('');
-        if (ii <= 4) return hex + zeros;
-        return item;
+  public createPresalePublic = (props: TypeGetInfoProps) => {
+    const {
+      userAddress,
+      presaleInfo,
+      presalePancakeSwapInfo,
+      presaleStringInfo,
+      usdtToEthFee,
+    } = props;
+    const presaleStringInfoFormatted = presaleStringInfo.map((item: string, ii: number) => {
+      const hex = this.web3.utils.toHex(item);
+      const zeros = new Array(66 - hex.length).fill('0').join('');
+      if (ii <= 4) return hex + zeros;
+      return item;
+    });
+    console.log('ContractPresaleFactoryService createPresalePublic:', {
+      usdtToEthFee,
+      userAddress,
+      presaleStringInfoFormatted,
+    });
+    const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
+    // const value = this.web3.utils.toHex(usdToEthFee);
+    return contract.methods
+      .createPresale(presaleInfo, presalePancakeSwapInfo, presaleStringInfoFormatted)
+      .send({
+        from: userAddress,
+        value: usdtToEthFee,
       });
-      console.log('ContractPresaleFactoryService createPresalePublic:', {
-        usdtToEthFee,
-        userAddress,
-        presaleStringInfoFormatted,
-      });
-      const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
-      // const value = this.web3.utils.toHex(usdToEthFee);
-      const result = await contract.methods
-        .createPresale(presaleInfo, presalePancakeSwapInfo, presaleStringInfoFormatted)
-        .send({
-          from: userAddress,
-          value: usdtToEthFee,
-        });
-      return result;
-    } catch (e) {
-      console.error('ContractPresaleFactoryService createPresalePublic:', e);
-      return null;
-    }
   };
 }
