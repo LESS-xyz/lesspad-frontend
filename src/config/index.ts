@@ -129,14 +129,14 @@ export default {
     },
     testnet: {
       'Ethereum': {
-        Calculations: '0x83FD12f0293cdB3888884A3e43f98dE1a62d0DAA',
+        Calculations: '0x77B3c4aB7F724868e8dE9d8bCcb5c2af6ED665Cf',
         LessToken: '0x87feef975fd65f32A0836f910Fd13d9Cf4553690',
         LPToken: '0x4fe142c6cbd294ef96dbba8a837cde3035850a97',
         Staking: '0xE4D00cA4eceFB3bEE229FFf97ffF3de3bBAD4B4B',
-        LessLibrary: '0x6F014371E0a467309D1250b0696680B68Df4Ba18',
-        PresaleFactory: '0xBECcc9862187024e4CCf2896204D23b096FC79e6',
+        LessLibrary: '0xDB1513A8562Dd0B485b029045a4682221a488f6b',
+        PresaleFactory: '0xc3E269eca4Ccc172b799c2CB80BB367965D9D130',
         PresaleFactoryCertified: '0x30457a87c85b4fcf4127e1d07f64035493e52940',
-        // PresalePublic: '0x4c1739f9f729a2c9c2fccb0a70aaf57926b223b2',
+        // PresalePublic: '0x4453Dc4B13b29A227fb3eE3E41Dd590410e1729b',
       },
       'Binance-Smart-Chain': {
         // todo
