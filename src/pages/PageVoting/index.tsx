@@ -1,6 +1,7 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useDispatch, useSelector } from 'react-redux';
+import dayjs from 'dayjs';
 
 import Button from '../../components/Button';
 // import logo1 from '../../assets/img/sections/logos/logo1.png';
@@ -51,6 +52,7 @@ const PageVoting: React.FC = () => {
   //
   const [search, setSearch] = useState<string>('');
   const [presalesAddressesFiltered, setPresalesAddressesFiltered] = useState<any[]>([]);
+  const [votingTime, setVotingTime] = useState<number>();
 
   const { pools } = useSelector(({ pool }: any) => pool);
   const { minVoterBalance } = useSelector(({ library }: any) => library);
@@ -72,20 +74,19 @@ const PageVoting: React.FC = () => {
   //   }
   //   return null;
   // };
-  const [info, setInfo] = useState<any[]>();
+  const [info, setInfo] = useState<any[]>([]);
 
-  useEffect(() => {
-    for (let i = 0, newInfo: any[] = []; i < pools.length; i += 1) {
-      if (!pools[i].isCertified) {
-        ContractPresalePublic.getInfo({ contractAddress: pools[i].address }).then((data) => {
-          newInfo.push({ ...data, address: pools[i].address });
-        });
-        setInfo(newInfo);
-      }
+  const getVotingTime = async () => {
+    try {
+      const newInfo = await ContractLessLibrary.getVotingTime();
+      console.log('TokenCard getVotingTime:', newInfo);
+      setVotingTime(+newInfo);
+    } catch (e) {
+      console.error('TableRow getVotingTime:', e);
     }
-  }, [ContractPresalePublic, pools]);
-  //
-  const filterTable = useCallback(async () => {
+  };
+
+  const filterTable = async () => {
     // const info = pools.map(async (pool: any) => {
     //   const newInfo = await getInfo(pool.address);
     //   return newInfo;
@@ -96,15 +97,16 @@ const PageVoting: React.FC = () => {
       try {
         const presalesInfoNew = info.filter((item: any) => {
           const { address = '', description = '' } = item;
-          const { saleTitle = '', closeTimeVoting = 0 } = item;
+          const { saleTitle = '', openTimeVoting = 0 } = item;
+          const now = dayjs().valueOf();
+          const isVotingEnded = now > openTimeVoting + (votingTime ?? 0) * 1000;
+          // console.log(`${address} ended`, isVotingEnded);
+          if (isVotingEnded) return false;
           if (search && search !== '') {
             const isAddressInSearch = address.toLowerCase().includes(search.toLowerCase());
             const isTitleInSearch = saleTitle.toLowerCase().includes(search.toLowerCase());
             const isDescriptionInSearch = description.toLowerCase().includes(search.toLowerCase());
-            const isVotingEnded = Date.now() > closeTimeVoting;
-            if (!isAddressInSearch && !isTitleInSearch && !isDescriptionInSearch && isVotingEnded)
-              return false;
-            return true;
+            if (!isAddressInSearch && !isTitleInSearch && !isDescriptionInSearch) return false;
           }
           return true;
         });
@@ -114,7 +116,7 @@ const PageVoting: React.FC = () => {
         console.error(e);
       }
     }
-  }, [info, search]);
+  };
 
   const getMinVoterBalance = async () => {
     try {
@@ -147,17 +149,34 @@ const PageVoting: React.FC = () => {
 
   useEffect(() => {
     if (!ContractLessLibrary) return;
+    getVotingTime();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ContractLessLibrary]);
+
+  useEffect(() => {
+    for (let i = 0, newInfo: any[] = []; i < pools.length; i += 1) {
+      if (!pools[i].isCertified) {
+        ContractPresalePublic.getInfo({ contractAddress: pools[i].address }).then((data) => {
+          newInfo.push({ ...data, address: pools[i].address });
+          if (i === pools.length - 1) setInfo(newInfo);
+        });
+      }
+    }
+  }, [ContractPresalePublic, pools]);
+
+  useEffect(() => {
+    if (!ContractLessLibrary) return;
     // console.log('PageVoting pools:', pools)
     getMinVoterBalance();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ContractLessLibrary]);
 
   useEffect(() => {
-    if (!pools || !pools.length) return;
-    setPresalesAddressesFiltered(pools.map((item: any) => item.address));
+    // if (!pools || !pools.length) return;
     if (!info || !info.length) return;
     filterTable();
-  }, [pools, search, info, filterTable]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search, info, info.length]);
   return (
     <div className={s.page}>
       <Helmet>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
+import { BigNumber as BN } from 'bignumber.js/bignumber';
 import useMedia from 'use-media';
 
 import thumbUpGreen from '../../../assets/img/icons/thumb-up-green.svg';
@@ -12,6 +13,7 @@ import { modalActions } from '../../../redux/actions';
 import { BackendService } from '../../../services/Backend';
 import { addHttps } from '../../../utils/prettifiers';
 
+//
 import s from './Table.module.scss';
 
 const Backend = new BackendService();
@@ -49,11 +51,14 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
   const {
     ContractPresalePublic,
     ContractPresaleCertified,
+    ContractPresalePublicWithMetamask,
     ContractLessLibrary,
   } = useContractsContext();
+  const history = useHistory();
 
   const [info, setInfo] = useState<any>();
   const [votingTime, setVotingTime] = useState<number>();
+  // const [registerResult, setRegisterResult] = useState<any>();
 
   const { address: userAddress } = useSelector(({ user }: any) => user);
   const { chainType } = useSelector(({ wallet }: any) => wallet);
@@ -92,12 +97,51 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
     }
   };
 
+  const loginToBackend = async () => {
+    try {
+      const resultGetMetamaskMessage = await Backend.getMetamaskMessage();
+      console.log('PageVote loginToBackend resultGetMetamaskMessage:', resultGetMetamaskMessage);
+      if (!resultGetMetamaskMessage.data) throw new Error('getMetamaskMessage unsuccesful');
+      const msg = resultGetMetamaskMessage.data;
+      const signedMsg = await web3.signMessage({ userAddress, message: msg });
+      console.log('PageVote loginToBackend signedMsg:', signedMsg);
+      if (!signedMsg) throw new Error('signMessage unsuccesful');
+      const resultMetamaskLogin = await Backend.metamaskLogin({
+        address: userAddress,
+        msg,
+        signedMsg,
+      });
+      console.log('PageVote loginToBackend resultMetamaskLogin:', resultMetamaskLogin);
+      if (!resultMetamaskLogin.data) throw new Error('metamaskLogin unsuccesful');
+      const { key } = resultMetamaskLogin.data;
+      return { success: true, data: { key } };
+    } catch (e) {
+      console.error('PageVote vote:', e);
+      return { success: false, data: null };
+    }
+  };
   const vote = async (yes: boolean) => {
     try {
-      const resultVote = await ContractPresalePublic.vote({
-        userAddress,
+      const resultLoginToBackend = await loginToBackend();
+      if (!resultLoginToBackend.success) throw new Error('Not logged to backend');
+      const { key }: any = resultLoginToBackend.data;
+      const resultGetPoolSignature = await Backend.getVotingSignature({
+        token: key,
+        pool: address,
+      });
+      console.log('PageVote vote resultGetPoolSignature:', resultGetPoolSignature);
+      if (!resultGetPoolSignature.data) throw new Error('Cannot get pool signature');
+      const { date, signature, user_balance, stakedAmount } = resultGetPoolSignature.data;
+      const totalStakedAmountInEth = new BN(`${stakedAmount}`).toString(10);
+      const stakingAmountInEth = new BN(`${user_balance}`).toString(10);
+      const resultVote = await ContractPresalePublicWithMetamask.vote({
         contractAddress: address,
+        stakingAmount: stakingAmountInEth,
+        userAddress,
+        date,
+        signature,
         yes,
+        totalStakedAmount: totalStakedAmountInEth,
       });
       let message = 'Voting succeded';
       if (!resultVote) {
@@ -115,67 +159,73 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
       console.error('TableRow vote:', e);
     }
   };
-
-  const register = async () => {
-    try {
-      // login to backend
-      let tokenAmount;
-      let date;
-      let tier;
-      let signature;
-      const resultGetMetamaskMessage = await Backend.getMetamaskMessage();
-      console.log('TableRow resultGetMetamaskMessage:', resultGetMetamaskMessage);
-      if (resultGetMetamaskMessage.data) {
-        const msg = resultGetMetamaskMessage.data;
-        const signedMsg = await web3.signMessage({ userAddress, message: msg });
-        console.log('TableRow signedMsg:', signedMsg);
-        if (signedMsg) {
-          const resultMetamaskLogin = await Backend.metamaskLogin({
-            address: userAddress,
-            msg,
-            signedMsg,
-          });
-          console.log('TableRow resultMetamaskLogin:', resultMetamaskLogin);
-          if (!resultMetamaskLogin.data) return;
-          const { key: token } = resultMetamaskLogin.data;
-          const resultGetWhitelistSignature = await Backend.getWhitelistSignature({
-            token,
-            pool: address,
-          });
-          console.log('TableRow resultGetWhitelistSignature:', resultGetWhitelistSignature);
-          if (!resultGetWhitelistSignature.data) return;
-          tokenAmount = resultGetWhitelistSignature.data.user_balance;
-          signature = resultGetWhitelistSignature.data.signature;
-          const resultGetTierSignature = await Backend.getTierSignature({
-            token,
-            presale: address,
-          });
-          console.log('TableRow resultGetTierSignature:', resultGetTierSignature);
-          if (!resultGetTierSignature.data) return;
-          date = resultGetTierSignature.data.date;
-          tier = resultGetTierSignature.data.type_tier;
-          const resultRegister = await ContractPresalePublic.register({
-            userAddress,
-            tokenAmount,
-            signature,
-            tier,
-            timestamp: date,
-          });
-          console.log('TableRow resultRegister:', resultRegister);
-        }
-      }
-    } catch (e) {
-      console.error('TableRow register:', e);
-    }
+  const handleGetIn = () => {
+    history.push(`/pool/${address}`);
   };
 
-  const handleRegister = async () => {
-    try {
-      await register();
-    } catch (e) {
-      console.error('TableRow handleRegister:', e);
-    }
-  };
+  /* const register = async () => {
+     try {
+       // login to backend
+       let tokenAmount;
+       let date;
+       let tier;
+       let signature;
+       let stakedAmount;
+       const resultGetMetamaskMessage = await Backend.getMetamaskMessage();
+       console.log('TableRow resultGetMetamaskMessage:', resultGetMetamaskMessage);
+       if (resultGetMetamaskMessage.data) {
+         const msg = resultGetMetamaskMessage.data;
+         const signedMsg = await web3.signMessage({ userAddress, message: msg });
+         console.log('TableRow signedMsg:', signedMsg);
+         if (signedMsg) {
+           const resultMetamaskLogin = await Backend.metamaskLogin({
+             address: userAddress,
+             msg,
+             signedMsg,
+           });
+           console.log('TableRow resultMetamaskLogin:', resultMetamaskLogin);
+           if (!resultMetamaskLogin.data) return;
+           const { key: token } = resultMetamaskLogin.data;
+           const resultGetWhitelistSignature = await Backend.getWhitelistSignature({
+             token,
+             pool: address,
+           });
+           console.log('TableRow resultGetWhitelistSignature:', resultGetWhitelistSignature);
+           if (!resultGetWhitelistSignature.data) return;
+           tokenAmount = resultGetWhitelistSignature.data.user_balance;
+           signature = resultGetWhitelistSignature.data.signature;
+           stakedAmount = resultGetWhitelistSignature.data.stakedAmount;
+           const resultGetTierSignature = await Backend.getTierSignature({
+             token,
+             presale: address,
+           });
+           console.log('TableRow resultGetTierSignature:', resultGetTierSignature);
+           if (!resultGetTierSignature.data) return;
+           date = resultGetTierSignature.data.date;
+           tier = resultGetTierSignature.data.type_tier;
+           const resultRegister = await ContractPresalePublic.register({
+             userAddress,
+             tokenAmount,
+             signature,
+             tier,
+             timestamp: date,
+           });
+           //
+           console.log('TableRow resultRegister:', resultRegister);
+         }
+       }
+     } catch (e) {
+       console.error('TableRow register:', e);
+     }
+   };
+
+   const handleRegister = async () => {
+     try {
+       await register();
+     } catch (e) {
+       console.error('TableRow handleRegister:', e);
+     }
+   }; */
 
   useEffect(() => {
     if (!address) return;
@@ -294,7 +344,7 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
               className={`${s.button} ${index % 2 === 1 && s.buttonDarkBg}`}
               role="button"
               tabIndex={0}
-              onClick={handleRegister}
+              onClick={handleGetIn}
               onKeyDown={() => {}}
             >
               <div className="gradient-button-text">Get in presale</div>

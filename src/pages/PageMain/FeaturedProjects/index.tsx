@@ -11,7 +11,6 @@ import s from './FeaturedProjects.module.scss';
 
 const FeaturedProject: React.FC = () => {
   const { pools } = useSelector(({ pool }: any) => pool);
-
   return (
     <section className={s.page}>
       <div className={s.container}>
