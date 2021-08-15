@@ -700,7 +700,7 @@ const Pool: React.FC = () => {
     [yesVotes, minVotingCompletion],
   );
   if (+votingCompletion > 100) votingCompletion = '100';
-  const isVotingCompleted = +votingCompletion > +minVotingCompletion;
+  const isVotingSuccessful = +votingCompletion === 100 && +yesVotes > +noVotes;
 
   const tokensSoldInNativeCurrency = useMemo(
     () => (beginingAmount - tokensForSaleLeft) * tokenPrice,
@@ -1202,14 +1202,14 @@ const Pool: React.FC = () => {
           {isBeforeRegistrationTime && myVote ? htmlRegistrationWillStart : null}
 
           {isRegistrationTime
-            ? isVotingCompleted
+            ? isVotingSuccessful
               ? isUserRegister
                 ? htmlYouAreRegistered
                 : htmlRegistration
               : htmlVotingIsNotSuccessful
             : null}
 
-          {isInvestmentTime && isInvestStart && isVotingCompleted
+          {isInvestmentTime && isInvestStart && isVotingSuccessful
             ? isUserRegister
               ? htmlInvestment
               : htmlYouNeedToBeRegisteredToInvest
