@@ -14,7 +14,7 @@ const PoolsiInVoting: React.FC = () => {
   const { ContractLessLibrary } = useContractsContext();
   //
   const [presalesAddressesFiltered, setPresalesAddressesFiltered] = useState<any[]>([]);
-  const [votingTime, setVotingTime] = useState<number>();
+  const [votingTime, setVotingTime] = useState<number>(0);
 
   const { pools } = useSelector(({ pool }: any) => pool);
   const { minVoterBalance } = useSelector(({ library }: any) => library);
@@ -54,9 +54,9 @@ const PoolsiInVoting: React.FC = () => {
           .filter((item: any) => {
             const { openVotingTime = 0 } = item;
             const now = dayjs().valueOf();
-            const isVotingEnded = now > openVotingTime + (votingTime ?? 0) * 1000;
+            const isVoting = now > openVotingTime && now < openVotingTime + votingTime * 1000;
             // console.log(`${address} ended`, isVotingEnded);
-            if (isVotingEnded) return false;
+            if (!isVoting) return false;
             return true;
           })
           .sort(compareOpenVotingTime);
