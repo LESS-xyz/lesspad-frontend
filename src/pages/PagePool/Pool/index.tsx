@@ -713,7 +713,7 @@ const Pool: React.FC = () => {
     [yesVotes, minVotingCompletion],
   );
   if (+votingCompletion > 100) votingCompletion = '100';
-  const isVotingSuccessful = +votingCompletion === 100 && +yesVotes > +noVotes;
+  const isVotingSuccessful = +votingCompletion === 100 && +yesVotes >= +noVotes;
 
   const hardCapInTokens = useMemo(() => {
     const result = new BN(hardCap).dividedBy(tokenPrice);
