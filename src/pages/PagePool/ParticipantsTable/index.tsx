@@ -84,7 +84,7 @@ const ParticipantsTable: React.FC<IParticipantsTable> = (props) => {
   const itemsOnPage = 12;
   let countOfPages = +(data.length / itemsOnPage).toFixed();
   const moduloOfPages = data.length % itemsOnPage;
-  if (moduloOfPages > 0) countOfPages += 1;
+  if (moduloOfPages > 0 && data.length > itemsOnPage) countOfPages += 1;
 
   const isPawns = activeTier === 'pawns';
   const isBishops = activeTier === 'bishops';
