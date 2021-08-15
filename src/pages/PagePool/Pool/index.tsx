@@ -1,6 +1,6 @@
 import { setInterval } from 'timers';
 
-import React, { memo, useCallback, useEffect, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
@@ -60,9 +60,10 @@ const Pool: React.FC = () => {
     ContractStaking,
   } = useContractsContext();
 
-  const [info, setInfo] = useState<any>();
+  const [info, setInfo] = useState<any>({});
+
   const [isCertified, setIsCertified] = useState<boolean>();
-  const [chainInfo, setChainInfo] = useState<any>();
+  const [chainInfo, setChainInfo] = useState<any>({});
   const [tier, setTier] = React.useState<string>('');
 
   // const [logo, setLogo] = React.useState<string>(projectLogo);
@@ -555,8 +556,6 @@ const Pool: React.FC = () => {
     }
   }, [getUserRegister, ContractPresalePublic, address, userAddress]);
 
-  if (!info) return null; // todo: show loader
-
   const {
     // #additional info
     tokenSymbol,
@@ -591,7 +590,7 @@ const Pool: React.FC = () => {
     // todo: native token
     approved,
     beginingAmount,
-    // cancelled,
+    cancelled,
     liquidityAdded,
     participants,
     raisedAmount,
@@ -599,34 +598,41 @@ const Pool: React.FC = () => {
     noVotes,
     lastTotalStakedAmount,
   } = info;
-  console.log('Pool info:', info);
 
   const isBeforeVotimgTime = openTimeVoting > NOW;
   const isVotingTime = openTimeVoting <= NOW && closeTimeVoting > NOW;
   const isBeforeRegistrationTime =
     openTimeVoting <= NOW && openTimePresale - REGISTRATION_TIME > NOW;
   const isRegistrationTime = openTimePresale - REGISTRATION_TIME <= NOW && openTimePresale > NOW;
-  const isInvestmentTime = openTimePresale <= NOW;
+  const isInvestmentTime = openTimePresale <= NOW && closeTimePresale > NOW;
   const isOpened = openTimePresale <= NOW;
   const isPresaleClosed = closeTimePresale <= NOW;
-
-  console.log('Pool minVotingCompletion:', { lastTotalStakedAmount, yesVotes });
-  const minVotingCompletion = new BN(lastTotalStakedAmount).multipliedBy(new BN(0.1));
-  let votingCompletion = new BN(yesVotes)
-    .div(minVotingCompletion)
-    .multipliedBy(new BN(100))
-    .toString(10);
-  if (+votingCompletion > 100) votingCompletion = '100';
 
   const isEthereum = chainType === 'Ethereum';
   const isBinanceSmartChain = chainType === 'Binance-Smart-Chain';
 
   const exchange = isEthereum ? 'Uniswap' : isBinanceSmartChain ? 'PancakeSwap' : 'SushiSwap';
 
-  const tokensSoldInNativeCurrency = (beginingAmount - tokensForSaleLeft) * tokenPrice;
-  const hardCapInNativeCurrency = hardCap * tokenPrice;
-  const percentOfTokensSold = ((beginingAmount - tokensForSaleLeft) / beginingAmount) * 100;
-  const percentOfSoftCap = (softCap / hardCap) * 100;
+  const minVotingCompletion = useMemo(
+    () => new BN(lastTotalStakedAmount).multipliedBy(new BN(0.1)),
+    [lastTotalStakedAmount],
+  );
+  let votingCompletion = useMemo(
+    () => new BN(yesVotes).div(minVotingCompletion).multipliedBy(new BN(100)).toString(10),
+    [yesVotes, minVotingCompletion],
+  );
+  if (+votingCompletion > 100) votingCompletion = '100';
+
+  const tokensSoldInNativeCurrency = useMemo(
+    () => (beginingAmount - tokensForSaleLeft) * tokenPrice,
+    [beginingAmount, tokensForSaleLeft, tokenPrice],
+  );
+  const hardCapInNativeCurrency = useMemo(() => hardCap * tokenPrice, [hardCap, tokenPrice]);
+  const percentOfTokensSold = useMemo(
+    () => ((beginingAmount - tokensForSaleLeft) / beginingAmount) * 100,
+    [beginingAmount, tokensForSaleLeft],
+  );
+  const percentOfSoftCap = useMemo(() => (softCap / hardCap) * 100, [softCap, hardCap]);
 
   const currency = chainSymbols[chainType];
   const explorer = explorers[chainType];
@@ -745,7 +751,7 @@ const Pool: React.FC = () => {
     <div className="container">
       <Helmet>
         <meta charSet="utf-8" />
-        <title>{saleTitle} | Lesspad</title>
+        <title>{saleTitle || 'Pool'} | Lesspad</title>
         <meta name="description" content={`Presale Pool. ${saleTitle}. ${description}`} />
       </Helmet>
 
@@ -807,7 +813,7 @@ const Pool: React.FC = () => {
 
         <div className="grow-info">
           <div className="grow-min">
-            {percentOfTokensSold}% (Min {percentOfSoftCap}%)
+            {prettyNumber(percentOfTokensSold.toString())}% (Min {percentOfSoftCap}%)
           </div>
           <div className="grow-max">
             {tokensSoldInNativeCurrency} / {hardCapInNativeCurrency} {currency}
@@ -1024,9 +1030,16 @@ const Pool: React.FC = () => {
                 <div className="item-text">You need to be registered on presale to invest</div>
               </div>
             )
-          ) : null}
+          ) : (
+            <div className="item">
+              <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
+                Investment
+              </div>
+              <div className="item-text">Is closed</div>
+            </div>
+          )}
 
-          {isPresaleClosed && liquidityAdded && (
+          {isPresaleClosed && !cancelled && liquidityAdded && (
             <>
               <div className="item">
                 Your Tokens
