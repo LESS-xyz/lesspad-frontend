@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { v4 as uuid } from 'uuid';
 
 import arrow from '../../assets/img/icons/arrow-gradient-fill.svg';
 
@@ -30,6 +31,7 @@ const Selector: React.FC<ISelectorProps> = ({ defaultOption, othersOptions, fn }
         <>
           {otherOptions.map((option) => (
             <div
+              key={uuid()}
               role="button"
               tabIndex={-1}
               onKeyDown={() => setIsOpen(false)}

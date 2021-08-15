@@ -7,6 +7,7 @@ import { useHistory, useParams } from 'react-router-dom';
 // import axios from 'axios';
 import { BigNumber as BN } from 'bignumber.js/bignumber';
 import dayjs from 'dayjs';
+import { v4 as uuid } from 'uuid';
 
 // import projectLogo from '../../../assets/img/icons/project-logo.svg';
 import bnbLogo from '../../../assets/img/icons/bnb-logo.svg';
@@ -1110,7 +1111,7 @@ const Pool: React.FC = () => {
       <div className="box">
         <div className="row row-items">
           {row1.map((item, i) => (
-            <div className={`${'item'} ${i % 2 !== 0 && 'cell'}`}>
+            <div key={uuid()} className={`${'item'} ${i % 2 !== 0 && 'cell'}`}>
               {item.header}
               {item.gradient ? (
                 <div className="gradient-text">{item.value}</div>
@@ -1125,7 +1126,7 @@ const Pool: React.FC = () => {
         </div>
         <div className="row row-items">
           {row2.map((item, i) => (
-            <div className={`${'item'} ${i % 2 !== 0 && 'cell'}`}>
+            <div key={uuid()} className={`${'item'} ${i % 2 !== 0 && 'cell'}`}>
               {item.header}
               {item.gradient ? (
                 <div className="gradient-text">{item.value}</div>
@@ -1140,7 +1141,7 @@ const Pool: React.FC = () => {
         </div>
         <div className="row row-items">
           {row3.map((item, i) => (
-            <div className={`${'item'} ${i % 2 !== 0 && 'cell'}`}>
+            <div key={uuid()} className={`${'item'} ${i % 2 !== 0 && 'cell'}`}>
               {item.header}
               {item.gradient ? (
                 <div className="gradient-text">{item.value}</div>
@@ -1229,7 +1230,13 @@ const Pool: React.FC = () => {
       <div className="box">
         <div className="box-links">
           {links.map((item) => (
-            <a href={item.link} className="box-links-link" target="_blank" rel="noreferrer">
+            <a
+              key={uuid()}
+              href={item.link}
+              className="box-links-link"
+              target="_blank"
+              rel="noreferrer"
+            >
               <div className="box-links-link-content">
                 <div className="box-links-link-content-header">{item.header}</div>
                 <div>{item.value}</div>
@@ -1244,6 +1251,7 @@ const Pool: React.FC = () => {
             <div className="box-links-list-links">
               {linksIcons.map((item) => (
                 <a
+                  key={uuid()}
                   href={addHttps(item.link)}
                   className="box-links-list-links-item"
                   target="_blank"

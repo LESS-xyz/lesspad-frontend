@@ -1,4 +1,5 @@
 import React, { memo, useCallback, useEffect, useState } from 'react';
+import { v4 as uuid } from 'uuid';
 
 import Pagination from '../../../components/Pagination/index';
 import { BackendService } from '../../../services/Backend';
@@ -235,7 +236,9 @@ const ParticipantsTable: React.FC<IParticipantsTable> = (props) => {
               <div className={s.table_body_adresses__title}>Participants</div>
               {participantsFiltered.length ? (
                 participantsFiltered.map((participant) => (
-                  <div className={s.participant}>{participant}</div>
+                  <div key={uuid()} className={s.participant}>
+                    {participant}
+                  </div>
                 ))
               ) : (
                 <div>No data</div>
@@ -250,7 +253,7 @@ const ParticipantsTable: React.FC<IParticipantsTable> = (props) => {
                 </div>
                 {winnersFiltered.length ? (
                   winnersFiltered.map((winner) => (
-                    <div className={`${s.participant} ${s.winner}`}>
+                    <div key={uuid()} className={`${s.participant} ${s.winner}`}>
                       <span>{winner}</span>
                     </div>
                   ))

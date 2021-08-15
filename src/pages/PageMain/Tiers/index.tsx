@@ -1,4 +1,5 @@
 import React from 'react';
+import { v4 as uuid } from 'uuid';
 
 import tierBishop from '../../../assets/img/sections/home/tiers/bishop.svg';
 import tierKing from '../../../assets/img/sections/home/tiers/king.svg';
@@ -49,7 +50,7 @@ const Tier: React.FC<ITierProps> = ({ tierCount, title, text }) => (
       <div className={s.tier_title}>{title}</div>
       <div className={s.tier_text}>
         {text.map((p) => (
-          <p>{p}</p>
+          <p key={uuid()}>{p}</p>
         ))}
       </div>
     </div>
@@ -73,7 +74,7 @@ const Tiers: React.FC = () => {
         </div>
         <div className={s.tiers_body}>
           {tiersData.map((tier, index) => (
-            <Tier tierCount={index + 1} {...tier} />
+            <Tier key={uuid()} tierCount={index + 1} {...tier} />
           ))}
         </div>
         <div className={s.tiers_subtext}>
