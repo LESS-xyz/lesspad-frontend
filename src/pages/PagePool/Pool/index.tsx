@@ -452,6 +452,8 @@ const Pool: React.FC = () => {
       if (!tier) return;
       const { openTimePresale, closeTimePresale } = info;
       // console.log('PagePool getTierTime:', tier);
+      if (openTimePresale === '0') return;
+      if (closeTimePresale === '0') return;
       const isInvestmentTime = +openTimePresale <= NOW && +closeTimePresale > NOW;
       const tierTimeNew = +openTimePresale + TIER_TIME * (5 - +tier);
       const isMyTierTimeNew = isInvestmentTime && tierTimeNew <= NOW;
@@ -722,18 +724,18 @@ const Pool: React.FC = () => {
 
   const tokensSold = useMemo(() => {
     const tokensSoldNew = new BN(beginingAmount).minus(tokensForSaleLeft);
-    const pow = new BN(10).pow(tokenDecimals);
-    const result = tokensSoldNew.div(pow);
-    return result.toString(10);
-  }, [beginingAmount, tokensForSaleLeft, tokenDecimals]);
+    // const pow = new BN(10).pow(tokenDecimals);
+    // const result = tokensSoldNew.div(pow);
+    return tokensSoldNew.toString(10);
+  }, [beginingAmount, tokensForSaleLeft]);
 
   const tokensSoldInNativeCurrency = useMemo(() => {
     const tokensSoldNew = new BN(beginingAmount).minus(tokensForSaleLeft);
     const tokenPriceBN = new BN(tokenPrice);
-    const pow = new BN(10).pow(tokenDecimals);
-    const result = tokensSoldNew.div(pow).multipliedBy(tokenPriceBN);
+    // const pow = new BN(10).pow(tokenDecimals);
+    const result = tokensSoldNew.multipliedBy(tokenPriceBN);
     return result.toString(10);
-  }, [beginingAmount, tokensForSaleLeft, tokenPrice, tokenDecimals]);
+  }, [beginingAmount, tokensForSaleLeft, tokenPrice]);
 
   const percentOfTokensSold = useMemo(() => {
     const minus = new BN(beginingAmount).minus(tokensForSaleLeft);
