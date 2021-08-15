@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
+import { BigNumber as BN } from 'bignumber.js/bignumber';
 import useMedia from 'use-media';
 
 import thumbUpGreen from '../../../assets/img/icons/thumb-up-green.svg';
@@ -13,7 +14,6 @@ import { modalActions } from '../../../redux/actions';
 import { BackendService } from '../../../services/Backend';
 import { addHttps } from '../../../utils/prettifiers';
 
-//
 import s from './Table.module.scss';
 
 const Backend = new BackendService();
