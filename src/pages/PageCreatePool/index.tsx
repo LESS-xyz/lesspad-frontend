@@ -77,6 +77,7 @@ const CreatePoolPage: React.FC = () => {
   const defaultCloseTime = defaultOpenTime + TIER_TIME * 5; // todo
   const defaultLiquidityAllocationTime = defaultCloseTime + DAY; // todo
 
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [lessDecimals, setLessDecimals] = useState<number>(0);
   const [lpDecimals, setLpDecimals] = useState<number>(0);
 
@@ -488,6 +489,7 @@ const CreatePoolPage: React.FC = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     try {
       event.preventDefault();
+      setIsLoading(true);
       if (!isPublic) {
         toggleModal({
           open: true,
@@ -720,6 +722,8 @@ const CreatePoolPage: React.FC = () => {
       }
     } catch (e) {
       console.error('PageCreatePool handleSubmit:', e);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -1077,8 +1081,8 @@ const CreatePoolPage: React.FC = () => {
               />
 
               <div className={s.button}>
-                <button type="submit" className={s.button_submit}>
-                  Next
+                <button type="submit" className={isLoading ? s.button_loading : s.button_submit}>
+                  {isLoading ? 'Loading...' : 'Next'}
                 </button>
               </div>
             </form>
