@@ -177,6 +177,7 @@ const Pool: React.FC = () => {
 
   const getTokenDecimals = useCallback(async () => {
     try {
+      if (!info) return;
       const { token } = info;
       const resultTokenDecimals = await ContractERC20.decimals({ contractAddress: token });
       setTokenDecimals(resultTokenDecimals);
@@ -1222,19 +1223,27 @@ const Pool: React.FC = () => {
             ? isVotingSuccessful
               ? isUserRegister
                 ? htmlYouAreRegistered
-                : htmlRegistration
+                : !isUserCreator
+                ? htmlRegistration
+                : null
               : htmlVotingIsNotSuccessful
             : null}
 
           {isInvestmentTime && isInvestStart && isVotingSuccessful
             ? isUserRegister
-              ? htmlInvestment
+              ? !isUserCreator
+                ? htmlInvestment
+                : null
               : htmlYouNeedToBeRegisteredToInvest
             : isPresaleClosed
             ? htmlInvestmentIsClosed
             : null}
 
-          {isPresaleClosed && !cancelled && liquidityAdded ? htmlClaimTokens : null}
+          {isPresaleClosed && !cancelled && liquidityAdded
+            ? !isUserCreator
+              ? htmlClaimTokens
+              : null
+            : null}
 
           {isUserCreator
             ? isPresaleClosed
