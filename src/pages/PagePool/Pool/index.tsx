@@ -715,19 +715,24 @@ const Pool: React.FC = () => {
   if (+votingCompletion > 100) votingCompletion = '100';
   const isVotingSuccessful = +votingCompletion === 100 && +yesVotes > +noVotes;
 
+  const hardCapInTokens = useMemo(() => {
+    const result = new BN(hardCap).dividedBy(tokenPrice);
+    return result.toString(10);
+  }, [hardCap, tokenPrice]);
+
   const tokensSold = useMemo(() => {
     const tokensSoldNew = new BN(beginingAmount).minus(tokensForSaleLeft);
     const pow = new BN(10).pow(tokenDecimals);
-    const result = tokensSoldNew.div(pow).toString(10);
-    return result;
+    const result = tokensSoldNew.div(pow);
+    return result.toString(10);
   }, [beginingAmount, tokensForSaleLeft, tokenDecimals]);
 
   const tokensSoldInNativeCurrency = useMemo(() => {
     const tokensSoldNew = new BN(beginingAmount).minus(tokensForSaleLeft);
     const tokenPriceBN = new BN(tokenPrice);
     const pow = new BN(10).pow(tokenDecimals);
-    const result = tokensSoldNew.div(pow).multipliedBy(tokenPriceBN).toString(10);
-    return result;
+    const result = tokensSoldNew.div(pow).multipliedBy(tokenPriceBN);
+    return result.toString(10);
   }, [beginingAmount, tokensForSaleLeft, tokenPrice, tokenDecimals]);
 
   const percentOfTokensSold = useMemo(() => {
@@ -1123,7 +1128,7 @@ const Pool: React.FC = () => {
             {prettyNumber(percentOfTokensSold.toString())}% (Min {percentOfSoftCap}%)
           </div>
           <div className="grow-max">
-            {tokensSold} / {hardCap} {tokenSymbol}
+            {tokensSold} / {hardCapInTokens} {tokenSymbol}
           </div>
         </div>
       </div>
