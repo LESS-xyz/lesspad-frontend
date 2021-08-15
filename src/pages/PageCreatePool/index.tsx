@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import { BigNumber as BN } from 'bignumber.js/bignumber';
 
 import Button from '../../components/Button';
@@ -59,6 +60,7 @@ const validationGt0 = [
 
 const CreatePoolPage: React.FC = () => {
   const { web3 } = useWeb3ConnectorContext();
+  const history = useHistory();
   const {
     ContractERC20,
     ContractCalculations,
@@ -497,6 +499,7 @@ const CreatePoolPage: React.FC = () => {
         </div>
       ),
     });
+    history.push('/pools');
   };
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     try {
