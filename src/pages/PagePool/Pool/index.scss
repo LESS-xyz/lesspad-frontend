@@ -260,6 +260,7 @@
     }
 
     .row {
+      width: 100%;
       display: flex;
       justify-content: center;
       @include b(tablet) {
@@ -292,15 +293,15 @@
         }
       }
       .item:only-child {
-        width: 220px;
-        @include flex(column, normal, center, nowrap);
+        width: 100%;
+        @include flex(column, center, center, nowrap);
       }
 
       .item {
         margin: 30px 0;
         padding: 10px 30px 10px;
 
-        @include flex(column, normal, space-between);
+        @include flex(column, normal, normal);
 
         width: 100%;
 
@@ -327,8 +328,8 @@
         }
 
         &-text {
+          text-align: center;
           margin: 14px 0 8px;
-          padding-right: 60px;
 
           display: flex;
           flex-direction: row;

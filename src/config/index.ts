@@ -128,12 +128,12 @@ export default {
     },
     testnet: {
       'Ethereum': {
-        Calculations: '0xC397e294EbbB1f91ae7F6B27cB2642c26Be7F5EA',
+        Calculations: '0x83FD12f0293cdB3888884A3e43f98dE1a62d0DAA',
         LessToken: '0x87feef975fd65f32A0836f910Fd13d9Cf4553690',
         LPToken: '0x4fe142c6cbd294ef96dbba8a837cde3035850a97',
         Staking: '0xE4D00cA4eceFB3bEE229FFf97ffF3de3bBAD4B4B',
-        LessLibrary: '0x74Ffc063f448680a9518cE93F8dAfCf78f8f23C6',
-        PresaleFactory: '0xc2758e5728f8b86BeA38684359f0BD8E0F848312',
+        LessLibrary: '0x6F014371E0a467309D1250b0696680B68Df4Ba18',
+        PresaleFactory: '0x109f9786d43EdDFa640663BD27153805F22737Ad',
         PresaleFactoryCertified: '0x30457a87c85b4fcf4127e1d07f64035493e52940',
         // PresalePublic: '0x4c1739f9f729a2c9c2fccb0a70aaf57926b223b2',
       },

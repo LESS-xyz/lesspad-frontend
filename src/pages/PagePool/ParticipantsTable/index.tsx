@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 
 import Pagination from '../../../components/Pagination/index';
 import { BackendService } from '../../../services/Backend';
@@ -263,4 +263,4 @@ const ParticipantsTable: React.FC<IParticipantsTable> = (props) => {
   );
 };
 
-export default ParticipantsTable;
+export default memo(ParticipantsTable);

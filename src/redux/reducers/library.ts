@@ -1,6 +1,10 @@
 const initialState = {
   minVoterBalance: '',
   minCreatorStakedBalance: '',
+  lessDecimals: '',
+  lpDecimals: '',
+  stakedLess: '',
+  stakedLp: '',
 };
 
 export default (state = initialState, params: any) => {
