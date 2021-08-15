@@ -331,4 +331,16 @@ export default class ContractPresalePublicService {
       return null;
     }
   };
+
+  public cancelPresale = async (props: TypeClaimTokensProps): Promise<any> => {
+    try {
+      const { userAddress, contractAddress } = props;
+      // console.log('ContractPresalePublicService cancelPresale:', props);
+      const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
+      return await contract.methods.cancelPresale().send({ from: userAddress });
+    } catch (e) {
+      console.error('ContractPresalePublicService cancelPresale:', e);
+      return null;
+    }
+  };
 }

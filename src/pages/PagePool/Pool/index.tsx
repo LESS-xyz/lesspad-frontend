@@ -476,6 +476,18 @@ const Pool: React.FC = () => {
     }
   }, [address, info]);
 
+  const cancelPresale = useCallback(async () => {
+    try {
+      const resultCancelPresale = await ContractPresalePublicWithMetamask.cancelPresale({
+        userAddress,
+        contractAddress: address,
+      });
+      console.log('PagePool cancelPresale:', resultCancelPresale);
+    } catch (e) {
+      console.error(e);
+    }
+  }, [ContractPresalePublicWithMetamask, address, userAddress]);
+
   const handleVote = useCallback(
     async (yes: boolean) => {
       try {
@@ -684,7 +696,7 @@ const Pool: React.FC = () => {
   const isOpened = openTimePresale <= NOW;
   const isPresaleClosed = closeTimePresale <= NOW;
 
-  const isUserCreator = userAddress ? creator.toLowerCase() !== userAddress.toLowerCase() : false;
+  const isUserCreator = userAddress ? creator.toLowerCase() === userAddress.toLowerCase() : false;
 
   const isEthereum = chainType === 'Ethereum';
   const isBinanceSmartChain = chainType === 'Binance-Smart-Chain';
@@ -719,6 +731,8 @@ const Pool: React.FC = () => {
   const percentOfSoftCap = useMemo(() => {
     return new BN(softCap).div(hardCap).multipliedBy(new BN(100)).toString(10);
   }, [softCap, hardCap]);
+
+  const isPresaleSuccessful = +percentOfSoftCap >= 100;
 
   const currency = chainSymbols[chainType];
   const explorer = explorers[chainType];
@@ -1033,6 +1047,25 @@ const Pool: React.FC = () => {
     </>
   );
 
+  const htmlClosePresale = (
+    <>
+      <div className="item">
+        Presale is not successful
+        <div className="button-border">
+          <div
+            className="button"
+            role="button"
+            tabIndex={0}
+            onClick={cancelPresale}
+            onKeyDown={() => {}}
+          >
+            <div className="gradient-button-text">Close presale</div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+
   return (
     <div className="container">
       <Helmet>
@@ -1197,7 +1230,7 @@ const Pool: React.FC = () => {
         <div className="row">
           {isBeforeVotimgTime && htmlVotingWillStart}
 
-          {!isCertified && isVotingTime && isUserCreator && (!myVote ? htmlVoting : htmlYouVoted)}
+          {!isCertified && isVotingTime && !isUserCreator && (!myVote ? htmlVoting : htmlYouVoted)}
 
           {isBeforeRegistrationTime && myVote ? htmlRegistrationWillStart : null}
 
@@ -1218,6 +1251,16 @@ const Pool: React.FC = () => {
             : null}
 
           {isPresaleClosed && !cancelled && liquidityAdded ? htmlClaimTokens : null}
+
+          {isUserCreator
+            ? isPresaleClosed
+              ? cancelled
+                ? htmlClosePresale
+                : isPresaleSuccessful
+                ? null
+                : htmlClosePresale
+              : null
+            : null}
         </div>
       </div>
 
