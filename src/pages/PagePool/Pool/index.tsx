@@ -31,7 +31,7 @@ import ParticipantsTable from '../ParticipantsTable';
 
 import './index.scss';
 
-const { chainSymbols, explorers, NOW, REGISTRATION_TIME }: any = config;
+const { chainSymbols, explorers, NOW, REGISTRATION_TIME, TIER_TIME }: any = config;
 const Backend = new BackendService();
 
 const chainsInfo: any = [
@@ -87,10 +87,6 @@ const defaultInfo = {
   noVotes: '0',
   lastTotalStakedAmount: '0',
 };
-//
-// const InputAmountToInvest: React.FC = () => {
-// //
-// }
 
 const Pool: React.FC = () => {
   const { address }: any = useParams();
@@ -111,6 +107,7 @@ const Pool: React.FC = () => {
   const [isCertified, setIsCertified] = useState<boolean>();
   const [chainInfo, setChainInfo] = useState<any>({});
   const [tier, setTier] = React.useState<string>('');
+  const [isMyTierTime, setIsMyTierTime] = React.useState<boolean>(false);
 
   // const [logo, setLogo] = React.useState<string>(projectLogo);
 
@@ -127,6 +124,7 @@ const Pool: React.FC = () => {
 
   const [timeBeforeVoting, setTimeBeforeVoting] = useState<string>('');
   const [timeBeforeRegistration, setTimeBeforeRegistration] = useState<string>('');
+  const [timeBeforeMyTier, setTimeBeforeMyTier] = React.useState<string>('');
 
   const { pools } = useSelector(({ pool }: any) => pool);
   const { chainType } = useSelector(({ wallet }: any) => wallet);
@@ -447,6 +445,23 @@ const Pool: React.FC = () => {
     }
   }, [ContractStaking, userAddress]);
 
+  const getTierTime = useCallback(async () => {
+    try {
+      if (!info) return;
+      if (!tier) return;
+      const { openTimePresale, closeTimePresale } = info;
+      console.log('PagePool getTierTime:', tier);
+      const isInvestmentTime = +openTimePresale <= NOW && +closeTimePresale > NOW;
+      const tierTimeNew = +openTimePresale + TIER_TIME * (+tier - 1);
+      const isMyTierTimeNew = isInvestmentTime && tierTimeNew <= NOW;
+      const timeBeforeMyTierNew = dayjs(tierTimeNew).fromNow();
+      setIsMyTierTime(isMyTierTimeNew);
+      setTimeBeforeMyTier(timeBeforeMyTierNew);
+    } catch (e) {
+      console.error(e);
+    }
+  }, [tier, info]);
+
   const getPoolStatus = useCallback(async () => {
     try {
       const { closeTimeVoting } = info;
@@ -593,6 +608,14 @@ const Pool: React.FC = () => {
       getTier();
     }
   }, [getTier, userAddress, ContractStaking]);
+
+  useEffect(() => {
+    getTierTime();
+    const interval = setInterval(() => {
+      getTierTime();
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [getTierTime]);
 
   useEffect(() => {
     if (!info) return () => {};
@@ -931,12 +954,37 @@ const Pool: React.FC = () => {
       {/*Your Investment*/}
       <div className="container-header">Your Investment</div>
 
-      <div className="container-presale-status">
-        <div className="container-presale-status-inner">
-          <div className="gradient-header">Voting will start</div>
-          <div className="presale-status-text">{timeBeforeVoting}</div>
+      {isBeforeVotimgTime ? (
+        <div className="container-presale-status">
+          <div className="container-presale-status-inner">
+            <div className="gradient-header">Voting will start</div>
+            <div className="presale-status-text">{timeBeforeVoting}</div>
+          </div>
         </div>
-      </div>
+      ) : isVotingTime ? (
+        <div className="container-presale-status">
+          <div className="container-presale-status-inner">
+            <div className="gradient-header">Voting started</div>
+            <div className="presale-status-text">{timeBeforeVoting}</div>
+          </div>
+        </div>
+      ) : null}
+
+      {isBeforeRegistrationTime ? (
+        <div className="container-presale-status">
+          <div className="container-presale-status-inner">
+            <div className="gradient-header">Registration will start</div>
+            <div className="presale-status-text">{timeBeforeRegistration}</div>
+          </div>
+        </div>
+      ) : isRegistrationTime ? (
+        <div className="container-presale-status">
+          <div className="container-presale-status-inner">
+            <div className="gradient-header">Registration started</div>
+            <div className="presale-status-text">{timeBeforeVoting}</div>
+          </div>
+        </div>
+      ) : null}
 
       <div className="box box-bg">
         <div className="row">
@@ -1048,43 +1096,43 @@ const Pool: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                <div className="item">
-                  Buy Tokens
-                  <div className="item-text">
-                    <div className="item-text-bold">
-                      1 {tokenSymbol} = {tokenPrice} {currency}
+                {isMyTierTime ? (
+                  <div className="item">
+                    Buy Tokens
+                    <div className="item-text">
+                      <div className="item-text-bold">
+                        1 {tokenSymbol} = {tokenPrice} {currency}
+                      </div>
+                    </div>
+                    <p>Please, enter amount to invest (in ether)</p>
+                    <Input
+                      title=""
+                      value={amountToInvest}
+                      onChange={setAmountToInvest}
+                      style={{ marginBottom: 10 }}
+                    />
+                    <div className="button-border" style={{ margin: '5px 0' }}>
+                      <div
+                        className="button"
+                        role="button"
+                        tabIndex={0}
+                        onClick={invest}
+                        onKeyDown={() => {}}
+                      >
+                        <div className="gradient-button-text">Invest</div>
+                      </div>
                     </div>
                   </div>
-                  <p>Please, enter amount to invest (in ether)</p>
-                  <Input
-                    title=""
-                    value={amountToInvest}
-                    onChange={setAmountToInvest}
-                    style={{ marginBottom: 10 }}
-                  />
-                  <div className="button-border" style={{ margin: '5px 0' }}>
-                    <div
-                      className="button"
-                      role="button"
-                      tabIndex={0}
-                      onClick={invest}
-                      onKeyDown={() => {}}
-                    >
-                      <div className="gradient-button-text">Invest</div>
+                ) : (
+                  <div className="item">
+                    Buy Tokens
+                    <div className="item-text">
+                      <div className="item-text-bold">
+                        Your tier invest time starts {timeBeforeMyTier}
+                      </div>
                     </div>
                   </div>
-                  {/*<div className="button-border">*/}
-                  {/*  <div*/}
-                  {/*    className="button"*/}
-                  {/*    role="button"*/}
-                  {/*    tabIndex={0}*/}
-                  {/*    onClick={handleInvest}*/}
-                  {/*    onKeyDown={() => {}}*/}
-                  {/*  >*/}
-                  {/*    <div className="gradient-button-text">Invest</div>*/}
-                  {/*  </div>*/}
-                  {/*</div>*/}
-                </div>
+                )}
               </>
             ) : (
               <div className="item">
