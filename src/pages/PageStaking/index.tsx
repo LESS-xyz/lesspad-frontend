@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useDispatch, useSelector } from 'react-redux';
 
-// import { BigNumber as BN } from 'bignumber.js/bignumber';
 import maxImg from '../../assets/img/icons/max.svg';
 import Button from '../../components/Button/index';
 import YourTier from '../../components/YourTier/index';
@@ -16,29 +15,6 @@ import { prettyNumber } from '../../utils/prettifiers';
 import Table from './Table';
 
 import s from './Staking.module.scss';
-
-// const tiers = [
-//   {
-//     tier: 'pawn',
-//     minStake: 1000,
-//   },
-//   {
-//     tier: 'bishop',
-//     minStake: 5000,
-//   },
-//   {
-//     tier: 'rook',
-//     minStake: 20000,
-//   },
-//   {
-//     tier: 'queen',
-//     minStake: 50000,
-//   },
-//   {
-//     tier: 'king',
-//     minStake: 200000,
-//   },
-// ];
 
 const StakingPage: React.FC = () => {
   const { ContractStaking, ContractLessToken, ContractLPToken } = useContractsContext();
@@ -60,13 +36,8 @@ const StakingPage: React.FC = () => {
   const [lessAllowance, setLessAllowance] = useState<number>(0);
   const [lpAllowance, setLpAllowance] = useState<number>(0);
 
-  // const [unstakeLessValue, setUnstakeLessValue] = useState<string>('');
-  // const [unstakeLPValue, setUnstakeLPValue] = useState<string>('');
-
   const [lessRewards, setLessRewards] = useState<string>('0.000');
   const [lpRewards, setLpRewards] = useState<string>('0.000');
-  // const [rewardLessValue, setRewardLessValue] = useState<string>('');
-  // const [rewardLPValue, setRewardLPValue] = useState<string>('');
 
   const [tier, setTier] = useState<string>('');
 
@@ -89,7 +60,7 @@ const StakingPage: React.FC = () => {
 
   const stakingContractAddress = config.addresses[config.isMainnetOrTestnet][chainType].Staking;
 
-  const getDecimals = async () => {
+  const getDecimals = useCallback(async () => {
     try {
       const resultLessDecimals = await ContractLessToken.decimals();
       setLessDecimals(resultLessDecimals);
@@ -98,37 +69,37 @@ const StakingPage: React.FC = () => {
     } catch (e) {
       console.error(e);
     }
-  };
+  }, [ContractLessToken, ContractLPToken]);
 
-  const getAllowances = async () => {
+  const getAllowances = useCallback(async () => {
     try {
       const resultLessAllowance = await ContractLessToken.allowance({
         userAddress,
         spender: stakingContractAddress,
       });
       setLessAllowance(resultLessAllowance);
-      console.log('StakingPage getAllowances:', resultLessAllowance);
+      console.log('StakingPage getAllowances:', { resultLessAllowance });
       const resultLpAllowance = await ContractLPToken.allowance({
         userAddress,
         spender: stakingContractAddress,
       });
       setLpAllowance(resultLpAllowance);
-      console.log('StakingPage getAllowances:', resultLpAllowance);
+      console.log('StakingPage getAllowances:', { resultLpAllowance });
     } catch (e) {
       console.error(e);
     }
-  };
+  }, [ContractLessToken, ContractLPToken, stakingContractAddress, userAddress]);
 
-  const getTier = async () => {
+  const getTier = useCallback(async () => {
     try {
       const userTier = await ContractStaking.getUserTier({ userAddress });
       setTier(userTier);
     } catch (e) {
       console.error(e);
     }
-  };
+  }, [ContractStaking, userAddress]);
 
-  const getLessTokenBalance = async () => {
+  const getLessTokenBalance = useCallback(async () => {
     try {
       const result = await ContractLessToken.balanceOf({ userAddress });
       setBalanceLessToken(result);
@@ -136,9 +107,9 @@ const StakingPage: React.FC = () => {
     } catch (e) {
       console.error(e);
     }
-  };
+  }, [ContractLessToken, userAddress]);
 
-  const getLPTokenBalance = async () => {
+  const getLPTokenBalance = useCallback(async () => {
     try {
       const result = await ContractLPToken.balanceOf({ userAddress });
       setBalanceLPToken(result);
@@ -146,9 +117,9 @@ const StakingPage: React.FC = () => {
     } catch (e) {
       console.error(e);
     }
-  };
+  }, [ContractLPToken, userAddress]);
 
-  const getStakedLess = async () => {
+  const getStakedLess = useCallback(async () => {
     try {
       const result = await ContractStaking.getLessBalanceByAddress({ userAddress });
       const resultInEth = convertFromWei(result, lessDecimals);
@@ -157,9 +128,9 @@ const StakingPage: React.FC = () => {
     } catch (e) {
       console.error(e);
     }
-  };
+  }, [ContractStaking, userAddress, lessDecimals]);
 
-  const getStakedLP = async () => {
+  const getStakedLP = useCallback(async () => {
     try {
       const result = await ContractStaking.getLpBalanceByAddress({ userAddress });
       const resultInEth = convertFromWei(result, lpDecimals);
@@ -168,9 +139,9 @@ const StakingPage: React.FC = () => {
     } catch (e) {
       console.error(e);
     }
-  };
+  }, [ContractStaking, userAddress, lpDecimals]);
 
-  const getUserStakeIds = async () => {
+  const getUserStakeIds = useCallback(async () => {
     try {
       const resultGetUserStakeIds = await ContractStaking.getUserStakeIds({ userAddress });
       console.log('StakingPage getUserStakeIds:', resultGetUserStakeIds);
@@ -178,18 +149,18 @@ const StakingPage: React.FC = () => {
     } catch (e) {
       console.error(e);
     }
-  };
+  }, [ContractStaking, userAddress]);
 
-  const getAmountOfUsersStakes = async () => {
+  const getAmountOfUsersStakes = useCallback(async () => {
     try {
       const amountOfUsersStakes = await ContractStaking.getAmountOfUsersStakes({ userAddress });
       console.log('StakingPage amountOfUsersStakes:', amountOfUsersStakes);
     } catch (e) {
       console.error(e);
     }
-  };
+  }, [ContractStaking, userAddress]);
 
-  const getLessRewards = async () => {
+  const getLessRewards = useCallback(async () => {
     try {
       const result = await ContractStaking.getLessRewards({ userAddress });
       setLessRewards(result);
@@ -197,9 +168,9 @@ const StakingPage: React.FC = () => {
     } catch (e) {
       console.error(e);
     }
-  };
+  }, [ContractStaking, userAddress]);
 
-  const getLpRewards = async () => {
+  const getLpRewards = useCallback(async () => {
     try {
       const result = await ContractStaking.getLpRewards({ userAddress });
       setLpRewards(result);
@@ -207,7 +178,7 @@ const StakingPage: React.FC = () => {
     } catch (e) {
       console.error(e);
     }
-  };
+  }, [ContractStaking, userAddress]);
 
   const checkLessValue = () => {
     try {
@@ -410,35 +381,7 @@ const StakingPage: React.FC = () => {
       setIsStakeWaiting(false);
       console.error('StakingPage stake:', e);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   };
-
-  // const unstake = async () => {
-  //   try {
-  //     const unstakeLessValueBN = convertToWei(unstakeLessValue, lessDecimals);
-  //     const rewardLessValueBN = convertToWei(rewardLessValue, lessDecimals);
-  //     console.log('StakingPage unstake unstakeLessValueBN:', unstakeLessValueBN);
-  //
-  //     const unstakeLpValueBN = convertToWei(unstakeLPValue, lpDecimals);
-  //     const rewardLPValueBN = convertToWei(rewardLPValue, lpDecimals);
-  //     console.log('StakingPage unstake unstakeLPValueBN:', unstakeLpValueBN);
-  //
-  //     const result = await ContractStaking.unstake({
-  //       userAddress,
-  //       lpAmount: unstakeLessValueBN,
-  //       lessAmount: unstakeLpValueBN,
-  //       lessRewards: rewardLessValueBN,
-  //       lpRewards: rewardLPValueBN,
-  //     });
-  //     if (result) {
-  //       getLessTokenBalance();
-  //       getLPTokenBalance();
-  //     }
-  //     console.log('StakingPage unstake:', result);
-  //   } catch (e) {
-  //     console.error('StakingPage unstake:', e);
-  //   }
-  // };
 
   const handleChangeStakeLessValue = (e) => {
     const value = e.target.value.replace(/[^\d.,]/g, '').replace(/,/g, '.');
@@ -460,27 +403,11 @@ const StakingPage: React.FC = () => {
     setStakeLPValue(balanceLPToken);
   };
 
-  // const handleSetMaxLessUnstake = () => {
-  //   setUnstakeLessValue(stakedLess);
-  // };
-  //
-  // const handleSetMaxLPUnstake = () => {
-  //   setUnstakeLPValue(stakedLP);
-  // };
-  //
-  // const handleSetMaxLessReward = () => {
-  //   setRewardLessValue(lessRewards);
-  // };
-  //
-  // const handleSetMaxLPReward = () => {
-  //   setRewardLPValue(lpRewards);
-  // };
-
   const onUnstake = () => {
     getUserStakeIds();
   };
 
-  const getAllInfo = () => {
+  const getAllInfo = useCallback(() => {
     getTier();
     getLPTokenBalance();
     getLessTokenBalance();
@@ -489,42 +416,48 @@ const StakingPage: React.FC = () => {
     getAmountOfUsersStakes();
     getLessRewards();
     getLpRewards();
-  };
+  }, [
+    getTier,
+    getLPTokenBalance,
+    getLessTokenBalance,
+    getStakedLess,
+    getStakedLP,
+    getAmountOfUsersStakes,
+    getLessRewards,
+    getLpRewards,
+  ]);
 
   useEffect(() => {
     if (!userAddress) return;
     if (!ContractStaking) return;
     getUserStakeIds();
     getDecimals();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ContractStaking, userAddress]);
+  }, [ContractStaking, userAddress, getUserStakeIds, getDecimals]);
 
   useEffect(() => {
     if (!userAddress) return;
     if (!ContractLessToken) return;
     if (!ContractLPToken) return;
     getAllowances();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     ContractLessToken,
     ContractLPToken,
     userAddress,
     debouncedStakeLessValue,
     debouncedStakeLpValue,
+    getAllowances,
   ]);
 
   useEffect(() => {
-    if (!userAddress) return;
-    if (!lessDecimals) return;
-    if (!lpDecimals) return;
+    if (!userAddress) return () => {};
+    if (!lessDecimals) return () => {};
+    if (!lpDecimals) return () => {};
     const interval = setInterval(() => {
       getAllInfo();
     }, 20000);
     getAllInfo();
-    // eslint-disable-next-line consistent-return
     return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lessDecimals, lpDecimals, userAddress]);
+  }, [lessDecimals, lpDecimals, userAddress, getAllInfo]);
 
   return (
     <div className={s.page}>
