@@ -72,6 +72,7 @@
 
 .button {
   @include flex(row, center, center);
+
   &_submit {
     padding: 16px 80px;
     background: var(--gradient);
@@ -82,6 +83,7 @@
     color: #fff;
     margin: 0 auto;
   }
+
   &_loading {
     padding: 16px 80px;
     background: var(--gradient);
@@ -96,7 +98,7 @@
 }
 
 .messageContainer {
-  @include flex(row, center);
+  @include flex(row, center, center);
   height: 100%;
 }
 

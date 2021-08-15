@@ -485,7 +485,19 @@ const CreatePoolPage: React.FC = () => {
       return null;
     }
   };
-
+  const handleTransactionHash = (txHash: string) => {
+    toggleModal({
+      open: true,
+      text: (
+        <div className={s.messageContainer}>
+          <p>Transaction submitted</p>
+          <div className={s.messageContainerButtons}>
+            <Button href={`${config.explorers[chainType]}/tx/${txHash}`}>View on etherscan</Button>
+          </div>
+        </div>
+      ),
+    });
+  };
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     try {
       event.preventDefault();
@@ -679,14 +691,19 @@ const CreatePoolPage: React.FC = () => {
           presaleStringInfo,
           usdtToEthFee,
         });
-        const resultCreatePresalePublic = await ContractPresaleFactory.createPresalePublic({
+        ContractPresaleFactory.createPresalePublic({
           userAddress,
           presaleInfo,
           presalePancakeSwapInfo,
           presaleStringInfo,
           usdtToEthFee,
-        });
-        console.log('CreatePool handleSubmit', resultCreatePresalePublic);
+        })
+          .on('transactionHash', (txHash: string) => {
+            handleTransactionHash(txHash);
+          })
+          .then((resultCreatePresalePublic) => {
+            console.log('CreatePool handleSubmit', resultCreatePresalePublic);
+          });
       } else {
         // const nativeTokenAddress = // todo: get from library contract?
         const whiteListArray1 = splitWhitelist(whitelist1);
@@ -712,13 +729,18 @@ const CreatePoolPage: React.FC = () => {
           presaleStringInfo,
           certifiedAddition,
         });
-        const resultCreatePresalePublic = await ContractPresaleFactory.createPresalePublic({
+        ContractPresaleFactory.createPresalePublic({
           userAddress,
           presaleInfo,
           presalePancakeSwapInfo,
           presaleStringInfo,
-        });
-        console.log('CreatePool handleSubmit', resultCreatePresalePublic);
+        })
+          .on('transactionHash', (txHash: string) => {
+            handleTransactionHash(txHash);
+          })
+          .then((resultCreatePresalePublic) =>
+            console.log('CreatePool handleSubmit', resultCreatePresalePublic),
+          );
       }
     } catch (e) {
       console.error('PageCreatePool handleSubmit:', e);
