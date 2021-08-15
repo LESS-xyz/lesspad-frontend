@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
 import { BigNumber as BN } from 'bignumber.js/bignumber';
@@ -6,6 +6,7 @@ import useMedia from 'use-media';
 
 import thumbUpGreen from '../../../assets/img/icons/thumb-up-green.svg';
 import thumbUpRed from '../../../assets/img/icons/thumb-up-red.svg';
+import logo2 from '../../../assets/img/sections/token-card/logo-2.png';
 import Pagination from '../../../components/Pagination';
 import { useContractsContext } from '../../../contexts/ContractsContext';
 import { useWeb3ConnectorContext } from '../../../contexts/Web3Connector';
@@ -58,6 +59,7 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
 
   const [info, setInfo] = useState<any>();
   const [votingTime, setVotingTime] = useState<number>();
+  const [myVote, setMyVote] = useState<number>();
   // const [registerResult, setRegisterResult] = useState<any>();
 
   const { address: userAddress } = useSelector(({ user }: any) => user);
@@ -74,6 +76,14 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
   const isBinanceSmartChain = chainType === 'Binance-Smart-Chain';
   const currency = isEthereum ? 'ETH' : isBinanceSmartChain ? 'BNB' : 'MATIC';
 
+  const getMyVote = useCallback(async () => {
+    try {
+      const resultVote = await ContractPresalePublic.getMyVote(address, userAddress);
+      setMyVote(+resultVote);
+    } catch (e) {
+      console.error(e);
+    }
+  }, [address, userAddress, ContractPresalePublic]);
   const getInfo = async () => {
     try {
       const newInfo = await ContractPresalePublic.getInfo({ contractAddress: address });
@@ -118,50 +128,6 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
     } catch (e) {
       console.error('PageVote vote:', e);
       return { success: false, data: null };
-    }
-  };
-  const vote = async (yes: boolean) => {
-    try {
-      const resultLoginToBackend = await loginToBackend();
-      if (!resultLoginToBackend.success) throw new Error('Not logged to backend');
-      const { key }: any = resultLoginToBackend.data;
-      const resultGetPoolSignature = await Backend.getVotingSignature({
-        token: key,
-        pool: address,
-      });
-      console.log('PageVote vote resultGetPoolSignature:', resultGetPoolSignature);
-      if (!resultGetPoolSignature.data) throw new Error('Cannot get pool signature');
-      const {
-        date,
-        signature,
-        user_balance: stakingAmount,
-        stakedAmount: totalStakedAmount,
-      } = resultGetPoolSignature.data;
-      // const totalStakedAmountInEth = new BN(`${stakedAmount}`).toString(10);
-      // const stakingAmountInEth = new BN(`${user_balance}`).toString(10);
-      const resultVote = await ContractPresalePublicWithMetamask.vote({
-        contractAddress: address,
-        stakingAmount,
-        userAddress,
-        date,
-        signature,
-        yes,
-        totalStakedAmount,
-      });
-      let message = 'Voting succeded';
-      if (!resultVote) {
-        message = 'Voting not succeded';
-      }
-      toggleModal({
-        open: true,
-        text: (
-          <div className={s.messageContainer}>
-            <div>{message}</div>
-          </div>
-        ),
-      });
-    } catch (e) {
-      console.error('TableRow vote:', e);
     }
   };
   const handleGetIn = () => {
@@ -240,6 +206,11 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
   }, [ContractPresalePublic, address]);
 
   useEffect(() => {
+    if (ContractPresalePublicWithMetamask && userAddress && address) {
+      getMyVote();
+    }
+  }, [getMyVote, ContractPresalePublicWithMetamask, userAddress, address]);
+  useEffect(() => {
     if (!ContractLessLibrary) return;
     getVotingTime();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -251,6 +222,7 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
   if (!info) return null; // todo
 
   const {
+    creator,
     hardCap,
     softCap,
     saleTitle,
@@ -272,12 +244,75 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
   const isYesVotesMore = yesVotes > noVotes;
   const isVotingEnded = Date.now() > openVotingTime + votingTime; // todo: check work
 
+  const showModal = () => {
+    let message = 'Owner cannot vote on self presale';
+    if (myVote) message = 'You already voted';
+    try {
+      toggleModal({
+        open: true,
+        text: <div className={s.messageContainer}>{message}</div>,
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+  const vote = async (yes: boolean) => {
+    if (myVote || creator === userAddress) {
+      showModal();
+      return;
+    }
+    try {
+      const resultLoginToBackend = await loginToBackend();
+      if (!resultLoginToBackend.success) throw new Error('Not logged to backend');
+      const { key }: any = resultLoginToBackend.data;
+      const resultGetPoolSignature = await Backend.getVotingSignature({
+        token: key,
+        pool: address,
+      });
+      console.log('PageVote vote resultGetPoolSignature:', resultGetPoolSignature);
+      if (!resultGetPoolSignature.data) throw new Error('Cannot get pool signature');
+      const {
+        date,
+        signature,
+        user_balance: stakingAmount,
+        stakedAmount: totalStakedAmount,
+      } = resultGetPoolSignature.data;
+      // const totalStakedAmountInEth = new BN(`${stakedAmount}`).toString(10);
+      // const stakingAmountInEth = new BN(`${user_balance}`).toString(10);
+      const resultVote = await ContractPresalePublicWithMetamask.vote({
+        contractAddress: address,
+        stakingAmount,
+        userAddress,
+        date,
+        signature,
+        yes,
+        totalStakedAmount,
+      });
+      let message = '';
+      if (resultVote) {
+        message = 'Voting succeded';
+        setMyVote(1);
+      } else message = 'Voting not succeded';
+      await getMyVote();
+      await getInfo();
+      toggleModal({
+        open: true,
+        text: (
+          <div className={s.messageContainer}>
+            <div>{message}</div>
+          </div>
+        ),
+      });
+    } catch (e) {
+      console.error('TableRow vote:', e);
+    }
+  };
   return (
     <div className={`${s.row} ${index % 2 === 1 && s.filled}`}>
       {isMobile ? (
         <Link className={`${s.row_cell} ${s.title}`} to={`/pool/${address}`}>
           <div className={`${s.img}`}>
-            <img src={addHttps(linkLogo)} alt="logo" />
+            <img src={linkLogo ? addHttps(linkLogo) : logo2} alt="logo" />
           </div>
           <div className={`${s.name}`}>
             <div>{saleTitle || 'Name'}</div>
@@ -286,7 +321,7 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
       ) : (
         <>
           <Link className={`${s.row_cell} ${s.img}`} to={`/pool/${address}`}>
-            {linkLogo ? <img src={addHttps(linkLogo)} alt="logo" /> : null}
+            <img src={linkLogo ? addHttps(linkLogo) : logo2} alt="logo" />
           </Link>
           <Link className={`${s.row_cell} ${s.name}`} to={`/pool/${address}`}>
             <div>{saleTitle || 'Name'}</div>
