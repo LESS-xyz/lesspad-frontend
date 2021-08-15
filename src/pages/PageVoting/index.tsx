@@ -87,20 +87,13 @@ const PageVoting: React.FC = () => {
   };
 
   const filterTable = async () => {
-    // const info = pools.map(async (pool: any) => {
-    //   const newInfo = await getInfo(pool.address);
-    //   return newInfo;
-    // });
-    //
-    // console.log('only public presales', info);
     if (info && info.length !== 0) {
       try {
         const presalesInfoNew = info.filter((item: any) => {
           const { address = '', description = '', saleTitle = '', openTimeVoting = 0 } = item;
           const now = dayjs().valueOf();
-          const isVotingEnded = now > openTimeVoting + (votingTime ?? 0) * 1000;
-          // console.log(`${address} ended`, isVotingEnded);
-          if (isVotingEnded) return false;
+          const isVoting = now > openTimeVoting && now < openTimeVoting + (votingTime ?? 0) * 1000;
+          if (!isVoting) return false;
           if (search && search !== '') {
             const isAddressInSearch = address.toLowerCase().includes(search.toLowerCase());
             const isTitleInSearch = saleTitle.toLowerCase().includes(search.toLowerCase());
