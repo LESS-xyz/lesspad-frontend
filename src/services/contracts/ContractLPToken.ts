@@ -82,9 +82,10 @@ export default class ContractLPToken {
     }
   };
 
-  public approve = async ({ userAddress, spender, amount }: TypeStakeProps): Promise<any> => {
+  public approve = async (props: TypeStakeProps): Promise<any> => {
     try {
-      // console.log('ContractPresalePublicService getInfo:', this.contractAbi, this.contractAddress)
+      const { userAddress, spender, amount } = props;
+      console.log('ContractLPToken approve:', props);
       return await this.contract.methods.approve(spender, amount).send({ from: userAddress });
     } catch (e) {
       console.error('ContractLPToken approve:', e);
