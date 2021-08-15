@@ -1031,12 +1031,14 @@ const Pool: React.FC = () => {
               </div>
             )
           ) : (
-            <div className="item">
-              <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
-                Investment
+            isPresaleClosed && (
+              <div className="item">
+                <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
+                  Investment
+                </div>
+                <div className="item-text">Is closed</div>
               </div>
-              <div className="item-text">Is closed</div>
-            </div>
+            )
           )}
 
           {isPresaleClosed && !cancelled && liquidityAdded && (
