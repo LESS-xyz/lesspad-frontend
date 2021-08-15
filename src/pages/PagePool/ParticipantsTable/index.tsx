@@ -93,8 +93,9 @@ const ParticipantsTable: React.FC<IParticipantsTable> = (props) => {
       const resultGetTiersAndWinners = await Backend.getTiersAndWinners({
         pool: poolAddress,
       });
-      console.log('PagePool getTiersAndWinners:', resultGetTiersAndWinners);
-      if (!resultGetTiersAndWinners.data) throw new Error('Participants and winners error');
+      console.log('ParticipantsTable getTiersAndWinners:', resultGetTiersAndWinners);
+      if (!resultGetTiersAndWinners.data)
+        throw new Error('ParticipantsTable getTiersAndWinners Backend error');
       const { participants: newParticipants, winners: newWinners } = resultGetTiersAndWinners.data;
       const {
         tier_1: pawns,
@@ -121,7 +122,7 @@ const ParticipantsTable: React.FC<IParticipantsTable> = (props) => {
       setParticipants(newParticipantsFormatted);
       setWinners(newWinnersFormatted);
     } catch (e) {
-      console.error(e);
+      console.error('ParticipantsTable:', e);
     }
   }, [poolAddress]);
 
@@ -140,7 +141,7 @@ const ParticipantsTable: React.FC<IParticipantsTable> = (props) => {
       setWinnersFiltered(newParticipantsFiltered);
       setParticipantsFiltered(newWinnersFiltered);
     } catch (e) {
-      console.error(e);
+      console.error('ParticipantsTable:', e);
     }
   }, [activeTier, page, participants, winners]);
 

@@ -16,10 +16,10 @@ const SHOW_FORM_VALUES = true;
 const INFURA_KEY = 'bf1db577e6bb42bf93893e1ea5dd1630';
 
 const NOW = Date.now(); // todo
-// const DAY = 1000 * 60 * 60 * 24;
-const DAY = 1000 * 60 * 10; // todo
+const DAY = 1000 * 60 * 5; // todo
 const TIER_TIME = IS_PRODUCTION ? 1000 * 60 * 60 : 1000 * 60 * 5; // todo:
-const REGISTRATION_TIME = IS_PRODUCTION ? DAY : 1000 * 60 * 10; // todo:
+const VOTING_TIME = IS_PRODUCTION ? DAY * 3 : DAY; // todo:
+const REGISTRATION_TIME = DAY; // todo:
 
 export default {
   IS_PRODUCTION,
@@ -29,6 +29,7 @@ export default {
   NOW,
   DAY,
   TIER_TIME,
+  VOTING_TIME,
   REGISTRATION_TIME,
   version: IS_PRODUCTION ? 'Mainnet beta' : IS_TESTING_ON_ROPSTEN ? 'Ropsten beta' : 'Kovan beta',
   isMainnetOrTestnet: IS_PRODUCTION ? 'mainnet' : 'testnet',
@@ -133,7 +134,7 @@ export default {
         LPToken: '0x4fe142c6cbd294ef96dbba8a837cde3035850a97',
         Staking: '0xE4D00cA4eceFB3bEE229FFf97ffF3de3bBAD4B4B',
         LessLibrary: '0x6F014371E0a467309D1250b0696680B68Df4Ba18',
-        PresaleFactory: '0x109f9786d43EdDFa640663BD27153805F22737Ad',
+        PresaleFactory: '0xBECcc9862187024e4CCf2896204D23b096FC79e6',
         PresaleFactoryCertified: '0x30457a87c85b4fcf4127e1d07f64035493e52940',
         // PresalePublic: '0x4c1739f9f729a2c9c2fccb0a70aaf57926b223b2',
       },
