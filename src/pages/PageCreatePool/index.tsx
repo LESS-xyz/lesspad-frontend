@@ -18,7 +18,7 @@ import { prettyNumber } from '../../utils/prettifiers';
 import s from './CreatePool.module.scss';
 
 const Backend = new BackendService();
-const { SHOW_FORM_VALUES, NOW, DAY, TIER_TIME } = config;
+const { SHOW_FORM_VALUES, NOW, DAY, TIER_TIME, VOTING_TIME } = config;
 
 const checkIfExists = (value: any) => value;
 const checkPercentage = (value: number) => value >= 0 && value <= 100;
@@ -71,7 +71,7 @@ const CreatePoolPage: React.FC = () => {
 
   const min5 = 1000 * 60 * 5;
   const defaultOpenVotingTime = NOW + min5; // todo: next block time
-  const votingDuration = DAY; // todo
+  const votingDuration = VOTING_TIME; // todo
   const registerDuration = DAY; // todo
   const defaultOpenTime = defaultOpenVotingTime + votingDuration + registerDuration; // todo
   const defaultCloseTime = defaultOpenTime + TIER_TIME * 5; // todo
@@ -88,19 +88,19 @@ const CreatePoolPage: React.FC = () => {
   const [tokenAddress, setTokenAddress] = useState<string>(
     SHOW_FORM_VALUES ? '0x3561A02e1192B89e2415724f43521f898e867013' : '',
   );
-  const [tokenPrice, setTokenPrice] = useState<string>(SHOW_FORM_VALUES ? '1' : '');
+  const [tokenPrice, setTokenPrice] = useState<string>(SHOW_FORM_VALUES ? '0.001' : '');
   // инпуты для Public type
-  const [softCap, setSoftCap] = useState<string>(SHOW_FORM_VALUES ? '1' : '');
-  const [hardCap, setHardCap] = useState<string>(SHOW_FORM_VALUES ? '2' : '');
+  const [softCap, setSoftCap] = useState<string>(SHOW_FORM_VALUES ? '0.1' : '');
+  const [hardCap, setHardCap] = useState<string>(SHOW_FORM_VALUES ? '0.2' : '');
   const [openVotingTime, setOpenVotingTime] = useState<number>(defaultOpenVotingTime);
   const [openTime, setOpenTime] = useState<number>(defaultOpenTime);
   const [closeTime, setCloseTime] = useState<number>(defaultCloseTime);
   const [liquidityPercentageAllocation, setLiquidityPercentageAllocation] = useState<string>(
-    SHOW_FORM_VALUES ? '1' : '',
+    SHOW_FORM_VALUES ? '10' : '',
   );
-  const [listingPrice, setListingPrice] = useState<string>(SHOW_FORM_VALUES ? '1' : '');
+  const [listingPrice, setListingPrice] = useState<string>(SHOW_FORM_VALUES ? '0.001' : '');
   const [lpTokensLockDurationInDays, setLpTokensLockDurationInDays] = useState(
-    SHOW_FORM_VALUES ? '30' : '',
+    SHOW_FORM_VALUES ? '31' : '',
   );
   const [vestingPercent, setVestingPercent] = useState<string>(SHOW_FORM_VALUES ? '0' : '');
   const [liquidityAllocationTime, setLiquidityAllocationTime] = useState<number>(
