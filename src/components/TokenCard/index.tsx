@@ -41,7 +41,7 @@ const chainsInfo: any = [
 const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
   const {
     address,
-    // logo,
+    logo,
     // daysTillOpen,
     // name,
     // subtitle,
@@ -161,7 +161,7 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
     <div className={s.card}>
       <Link to={`/pool/${address}`} className={s.card_header}>
         <div className={s.card_header__logo}>
-          <img src={addHttps(linkLogo)} alt="token-logo" />
+          <img src={linkLogo ? addHttps(linkLogo) : logo} alt="token-logo" />
         </div>
         <div className={s.card_header__info}>
           {/*<div className={s.card_header__info_days}>*/}
