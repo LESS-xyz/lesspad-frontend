@@ -196,6 +196,13 @@ export default [
     type: 'function',
   },
   {
+    inputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    name: 'poolPercentages',
+    outputs: [{ internalType: 'uint8', name: '', type: 'uint8' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
     inputs: [],
     name: 'refundLpTokens',
     outputs: [],
@@ -257,6 +264,13 @@ export default [
     name: 'setUniswapInfo',
     outputs: [],
     stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    name: 'stakingTiers',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
     type: 'function',
   },
   {
