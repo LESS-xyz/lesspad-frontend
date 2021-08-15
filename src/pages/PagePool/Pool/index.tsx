@@ -1220,47 +1220,52 @@ const Pool: React.FC = () => {
         </div>
       ) : null}
 
-      <div className="box box-bg">
-        <div className="row">
-          {!isCertified && isVotingTime && !isUserCreator && (!myVote ? htmlVoting : htmlYouVoted)}
+      {openTimePresale !== '0' ? (
+        <div className="box box-bg">
+          <div className="row">
+            {!isCertified &&
+              isVotingTime &&
+              !isUserCreator &&
+              (!myVote ? htmlVoting : htmlYouVoted)}
 
-          {isRegistrationTime
-            ? isVotingSuccessful
+            {isRegistrationTime
+              ? isVotingSuccessful
+                ? isUserRegister
+                  ? htmlYouAreRegistered
+                  : !isUserCreator
+                  ? htmlRegistration
+                  : null
+                : htmlVotingIsNotSuccessful
+              : null}
+
+            {isInvestmentTime && isInvestStart && isVotingSuccessful
               ? isUserRegister
-                ? htmlYouAreRegistered
-                : !isUserCreator
-                ? htmlRegistration
-                : null
-              : htmlVotingIsNotSuccessful
-            : null}
+                ? !isUserCreator
+                  ? htmlInvestment
+                  : null
+                : htmlYouNeedToBeRegisteredToInvest
+              : isPresaleClosed
+              ? htmlInvestmentIsClosed
+              : null}
 
-          {isInvestmentTime && isInvestStart && isVotingSuccessful
-            ? isUserRegister
+            {isPresaleClosed && !cancelled && liquidityAdded
               ? !isUserCreator
-                ? htmlInvestment
+                ? htmlClaimTokens
                 : null
-              : htmlYouNeedToBeRegisteredToInvest
-            : isPresaleClosed
-            ? htmlInvestmentIsClosed
-            : null}
+              : null}
 
-          {isPresaleClosed && !cancelled && liquidityAdded
-            ? !isUserCreator
-              ? htmlClaimTokens
-              : null
-            : null}
-
-          {isUserCreator
-            ? isPresaleClosed
-              ? cancelled
-                ? htmlClosePresale
-                : isPresaleSuccessful
-                ? null
-                : htmlClosePresale
-              : null
-            : null}
+            {isUserCreator
+              ? isPresaleClosed
+                ? cancelled
+                  ? htmlClosePresale
+                  : isPresaleSuccessful
+                  ? null
+                  : htmlClosePresale
+                : null
+              : null}
+          </div>
         </div>
-      </div>
+      ) : null}
 
       {/*Participants*/}
       <ParticipantsTable poolAddress={address} />
