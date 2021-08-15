@@ -117,7 +117,7 @@ export default class ContractLessLibraryService {
           description,
           isCertified,
           address: presaleAddress,
-          title,
+          title: this.web3.utils.hexToString(title),
         };
       });
       return arrForSearchFormatted;
