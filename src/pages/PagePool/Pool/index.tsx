@@ -212,7 +212,7 @@ const Pool: React.FC = () => {
 
   const stakedLessAndLp = useMemo(() => {
     if (!lessPerLp) return 0;
-    return stakedLess + stakedLp * lessPerLp;
+    return +stakedLess + +stakedLp * +lessPerLp;
   }, [stakedLess, stakedLp, lessPerLp]);
 
   const minVotingCompletion = useMemo(
@@ -939,7 +939,7 @@ const Pool: React.FC = () => {
         Voting
       </div>
       <div className="item-text">
-        <div className="item-text-bold">{prettyNumber(stakedLessAndLp)}</div>
+        <div className="item-text-bold">{prettyNumber(stakedLessAndLp.toString())}</div>
         <div className="item-text-gradient">LESS</div>
       </div>
       <div className="button-border" style={{ marginBottom: 5 }}>

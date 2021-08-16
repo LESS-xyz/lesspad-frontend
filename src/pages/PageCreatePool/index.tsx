@@ -355,7 +355,7 @@ const CreatePoolPage: React.FC = () => {
 
   const checkStakingBalance = useCallback(async () => {
     try {
-      const stakedSum = +stakedLess + +stakedLp * lessPerLp;
+      const stakedSum = +stakedLess + +stakedLp * +lessPerLp;
       const minCreatorStakedBalanceInLp = minCreatorStakedBalance / lessPerLp;
       if (stakedSum < minCreatorStakedBalance)
         toggleModal({
@@ -450,6 +450,7 @@ const CreatePoolPage: React.FC = () => {
       return null;
     }
   };
+
   const handleTransactionHash = (txHash: string) => {
     toggleModal({
       open: true,
@@ -464,6 +465,7 @@ const CreatePoolPage: React.FC = () => {
     });
     history.push('/pools');
   };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     try {
       event.preventDefault();
