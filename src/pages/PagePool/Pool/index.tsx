@@ -129,11 +129,11 @@ const Pool: React.FC = () => {
   const [isInvestStart, setInvestStart] = useState<boolean>(false);
   const [isUserRegister, setUserRegister] = useState<boolean>(false);
 
+  const [currentTier, setCurrentTier] = useState<number>(0);
   const [
     percentageOfTokensSoldInCurrentTier,
     setPercentageOfTokensSoldInCurrentTier,
   ] = useState<number>(0);
-  const [currentTier, setCurrentTier] = useState<number>(0);
 
   const [timeBeforeVoting, setTimeBeforeVoting] = useState<string>('');
   const [timeBeforeRegistration, setTimeBeforeRegistration] = useState<string>('');
@@ -191,6 +191,8 @@ const Pool: React.FC = () => {
     noVotes,
     lastTotalStakedAmount,
   } = info;
+
+  const [tokensShouldBeSold, setTokensShouldBeSold] = useState<number>(hardCap);
 
   const isBeforeVotimgTime = openTimeVoting > NOW;
   const isVotingTime = openTimeVoting <= NOW && closeTimeVoting > NOW;
@@ -585,16 +587,18 @@ const Pool: React.FC = () => {
       }
       setCurrentTier(currentTierNew);
       // tokens should be sold in current tier
-      let tokensShouldBeSold = 0;
+      let tokensShouldBeSoldNew = +hardCapInTokens;
       if (currentTierNew) {
-        tokensShouldBeSold = (+hardCap * percentagesShouldBeSold[currentTierNew - 1]) / 100;
+        tokensShouldBeSoldNew =
+          (+hardCapInTokens * percentagesShouldBeSold[currentTierNew - 1]) / 100;
       }
-      const percentageOfTokensSoldInCurrentTierNew = (+tokensSold / +tokensShouldBeSold) * 100;
+      const percentageOfTokensSoldInCurrentTierNew = (+tokensSold / +tokensShouldBeSoldNew) * 100;
       setPercentageOfTokensSoldInCurrentTier(percentageOfTokensSoldInCurrentTierNew);
+      setTokensShouldBeSold(tokensShouldBeSoldNew);
       console.log('PagePool getTierTime:', {
         currentTierNew,
         hardCap,
-        tokensShouldBeSold,
+        tokensShouldBeSoldNew,
         tokensSold,
         percentagesShouldBeSold,
         percentageOfTokensSoldInCurrentTier,
@@ -611,6 +615,7 @@ const Pool: React.FC = () => {
     openTimePresale,
     closeTimePresale,
     isInvestmentTime,
+    hardCapInTokens,
   ]);
   console.log('Pool currentTier:', currentTier);
 
@@ -1222,7 +1227,7 @@ const Pool: React.FC = () => {
             {!Number.isNaN(+percentOfSoftCap) ? percentOfSoftCap : 0}%)
           </div>
           <div className="grow-max">
-            {tokensSold || 0} / {prettyNumber(hardCapInTokens) || 0} {tokenSymbol}
+            {tokensSold || 0} / {prettyNumber(tokensShouldBeSold.toString()) || 0} {tokenSymbol}
           </div>
         </div>
       </div>
