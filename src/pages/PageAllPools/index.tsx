@@ -27,7 +27,6 @@ const AllPoolsPage: React.FC = () => {
   const [countOfPages, setCountOfPages] = useState<number>(1);
 
   const { pools } = useSelector(({ pool }: any) => pool);
-  console.log('AllPoolsPage pools:', pools);
 
   const isMobile = useMedia({ maxWidth: 768 });
 
@@ -41,7 +40,7 @@ const AllPoolsPage: React.FC = () => {
 
   const handleChangePage = useCallback((p: number) => setPage(p), []);
 
-  const getVotingTime = async () => {
+  const getVotingTime = useCallback(async () => {
     try {
       const newInfo = await ContractLessLibrary.getVotingTime();
       console.log('TokenCard getVotingTime:', newInfo);
@@ -49,11 +48,11 @@ const AllPoolsPage: React.FC = () => {
     } catch (e) {
       console.error('TableRow getVotingTime:', e);
     }
-  };
-  const compareOpenVotingTime = (a, b) => {
-    return b.openVotingTime - a.openVotingTime;
-  };
-  const filterData = async () => {
+  }, [ContractLessLibrary]);
+
+  const compareOpenVotingTime = (a, b) => b.openVotingTime - a.openVotingTime;
+
+  const filterData = useCallback(async () => {
     // const info = pools.map(async (pool: any) => {
     //   const newInfo = await getInfo(pool.address);
     //   return newInfo;
@@ -103,7 +102,8 @@ const AllPoolsPage: React.FC = () => {
         console.error(e);
       }
     }
-  };
+  }, [currentOption, pools, search, votingTime]);
+
   /*  useEffect(() => {
       for (let i = 0, newInfo: any[] = []; i < pools.length; i += 1) {
         if (!pools[i].isCertified) {
@@ -118,16 +118,17 @@ const AllPoolsPage: React.FC = () => {
   useEffect(() => {
     if (!ContractLessLibrary) return;
     getVotingTime();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ContractLessLibrary]);
+  }, [ContractLessLibrary, getVotingTime]);
+
   useEffect(() => {
     if (!pools || !pools.length) return;
     filterData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, pools, pools.length, currentOption]);
+  }, [search, pools, pools.length, currentOption, filterData]);
+
   useEffect(() => {
     setPagesCount();
   }, [poolsFiltered.length, setPagesCount]);
+
   return (
     <section className={s.page}>
       <Helmet>

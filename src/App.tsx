@@ -94,9 +94,13 @@ export const App: React.FC = memo(() => {
   }, [ContractStaking, setLibrary, lpDecimals, userAddress]);
 
   useEffect(() => {
+    if (!getArrForSearch) return;
     if (!ContractLessLibrary) return;
+    if (!ContractStaking) return;
+    if (!ContractLessToken) return;
+    if (!ContractLPToken) return;
     getArrForSearch();
-  }, [ContractLessLibrary, getArrForSearch]);
+  }, [ContractLessLibrary, ContractStaking, ContractLessToken, ContractLPToken, getArrForSearch]);
 
   useEffect(() => {
     if (!ContractLessToken) return;

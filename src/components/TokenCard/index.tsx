@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import dayjs from 'dayjs';
@@ -63,12 +63,12 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
 
   const { chainType } = useSelector(({ wallet }: any) => wallet);
 
-  const getChainInfo = () => {
+  const getChainInfo = useCallback(() => {
     const chainInfoNew = chainsInfo.filter((item: any) => item.key === chainType);
     setChainInfo(chainInfoNew[0]);
-  };
+  }, [chainType]);
 
-  const getInfo = async () => {
+  const getInfo = useCallback(async () => {
     try {
       let newInfo;
       if (isCertified) {
@@ -82,19 +82,20 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
     } catch (e) {
       console.error('TokenCard getInfo:', e);
     }
-  };
+  }, [ContractPresaleCertified, ContractPresalePublic, address, isCertified]);
 
   useEffect(() => {
     if (!chainType) return;
     getChainInfo();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chainType]);
+  }, [chainType, getChainInfo]);
 
   useEffect(() => {
+    if (!address) return;
+    if (!chainType) return;
     if (!ContractPresalePublic) return;
+    if (!ContractPresaleCertified) return;
     getInfo();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ContractPresalePublic]);
+  }, [ContractPresalePublic, ContractPresaleCertified, getInfo, address, chainType]);
 
   if (!address) return null; // todo: show loader
   if (!info) return null; // todo: show loader
