@@ -1262,10 +1262,11 @@ const Pool: React.FC = () => {
           <div className="row">
             {!isCertified &&
               isVotingTime &&
+              timeBeforeVoting &&
               !isUserCreator &&
               (!myVote ? htmlVoting : htmlYouVoted)}
 
-            {isRegistrationTime
+            {isRegistrationTime && timeBeforeRegistration
               ? isVotingSuccessful
                 ? isUserRegister
                   ? htmlYouAreRegistered
@@ -1275,7 +1276,7 @@ const Pool: React.FC = () => {
                 : htmlVotingIsNotSuccessful
               : null}
 
-            {isInvestmentTime && isInvestStart && isVotingSuccessful
+            {isInvestmentTime && isInvestStart && isVotingSuccessful && timeBeforeMyTier
               ? isUserRegister
                 ? !isUserCreator
                   ? htmlInvestment
