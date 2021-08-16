@@ -382,7 +382,7 @@ export default class ContractStakingService {
 
   public getLessPerLp = async (): Promise<any> => {
     try {
-      const result = await this.contract.methods.getLessPerLp().call();
+      const result = await this.contract.methods.lessPerLp().call();
       return result;
     } catch (e) {
       console.error('ContractStakingService getLessPerLp:', e);
