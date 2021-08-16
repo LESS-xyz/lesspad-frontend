@@ -83,7 +83,7 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
       console.error(e);
     }
   }, [address, userAddress, ContractPresalePublic]);
-  const getInfo = async () => {
+  const getInfo = useCallback(async () => {
     try {
       const newInfo = await ContractPresalePublic.getInfo({ contractAddress: address });
       console.log('TokenCard getInfo public:', newInfo);
@@ -94,9 +94,9 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
       console.log('TokenCard getInfo certified:', newInfo);
       if (newInfo) setInfo(newInfo);
     }
-  };
+  }, [ContractPresaleCertified, ContractPresalePublic, address]);
 
-  const getVotingTime = async () => {
+  const getVotingTime = useCallback(async () => {
     try {
       const newInfo = await ContractLessLibrary.getVotingTime();
       console.log('TokenCard getVotingTime:', newInfo);
@@ -104,7 +104,7 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
     } catch (e) {
       console.error('TableRow getVotingTime:', e);
     }
-  };
+  }, [ContractLessLibrary]);
 
   const loginToBackend = async () => {
     try {
@@ -201,8 +201,7 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
     if (!address) return;
     if (!ContractPresalePublic) return;
     getInfo();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ContractPresalePublic, address]);
+  }, [ContractPresalePublic, address, getInfo]);
 
   useEffect(() => {
     if (ContractPresalePublicWithMetamask && userAddress && address) {
@@ -212,8 +211,7 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
   useEffect(() => {
     if (!ContractLessLibrary) return;
     getVotingTime();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ContractLessLibrary]);
+  }, [ContractLessLibrary, getVotingTime]);
 
   // console.log('TableRow:', address, info);
 
@@ -425,7 +423,7 @@ const Table: React.FC<ITableProps> = (props) => {
     setPage(p);
   };
 
-  const filterData = () => {
+  const filterData = useCallback(() => {
     try {
       const newData = data.filter((item: any, index: number) => {
         if (index < page * itemsOnPage || index >= (page + 1) * itemsOnPage) return false;
@@ -436,12 +434,11 @@ const Table: React.FC<ITableProps> = (props) => {
     } catch (e) {
       console.error(e);
     }
-  };
+  }, [data, page]);
 
   useEffect(() => {
     filterData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, data]);
+  }, [page, data, filterData]);
 
   if (!data) return null;
   return (
