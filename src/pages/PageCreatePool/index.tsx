@@ -19,7 +19,7 @@ import { prettyNumber } from '../../utils/prettifiers';
 import s from './CreatePool.module.scss';
 
 const Backend = new BackendService();
-const { SHOW_FORM_VALUES, NOW, DAY, TIER_TIME, VOTING_TIME } = config;
+const { SHOW_FORM_VALUES, NOW, DAY, VOTING_TIME } = config;
 
 const checkIfExists = (value: any) => value;
 const checkPercentage = (value: number) => value >= 0 && value <= 100;
@@ -70,13 +70,14 @@ const CreatePoolPage: React.FC = () => {
     ContractLessLibrary,
   } = useContractsContext();
 
-  const min5 = 1000 * 60 * 5;
-  const defaultOpenVotingTime = NOW + min5; // todo: next block time
+  const MIN5 = 1000 * 60 * 10;
+  const HOUR = 1000 * 60 * 60;
+  const defaultOpenVotingTime = NOW + MIN5; // todo: next block time
   const votingDuration = VOTING_TIME; // todo
   const registerDuration = DAY; // todo
   const defaultOpenTime = defaultOpenVotingTime + votingDuration + registerDuration; // todo
-  const defaultCloseTime = defaultOpenTime + TIER_TIME * 5; // todo
-  const defaultLiquidityAllocationTime = defaultCloseTime + DAY; // todo
+  const defaultCloseTime = defaultOpenTime + DAY; // todo
+  const defaultLiquidityAllocationTime = defaultCloseTime + HOUR; // todo
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -305,8 +306,7 @@ const CreatePoolPage: React.FC = () => {
     // todo block timestamp
     const isOpenVotingTimeMoreThanBlockTimestamp = openTime > Date.now();
     // todo add getVotingTime from contract, check ms/s
-    const isOpenVotingTimePlus24HLessThanOpenTime =
-      openVotingTime + 600 * 1000 + 86400 * 1000 < openTime;
+    const isOpenVotingTimePlus24HLessThanOpenTime = openVotingTime + VOTING_TIME < openTime;
     const isOpenTimeLessThanCloseTime = openTime < closeTime;
     const isCloseTimeLessThanLiquidityAllocationTime = closeTime < liquidityAllocationTime;
     // messages

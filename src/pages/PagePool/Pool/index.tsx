@@ -193,6 +193,7 @@ const Pool: React.FC = () => {
   } = info;
 
   const [tokensShouldBeSold, setTokensShouldBeSold] = useState<number>(hardCap);
+  console.log('Pool:', { percentageOfTokensSoldInCurrentTier, tokensShouldBeSold });
 
   const isBeforeVotimgTime = openTimeVoting > NOW;
   const isVotingTime = openTimeVoting <= NOW && closeTimeVoting > NOW;
@@ -601,13 +602,12 @@ const Pool: React.FC = () => {
         tokensShouldBeSoldNew,
         tokensSold,
         percentagesShouldBeSold,
-        percentageOfTokensSoldInCurrentTier,
+        percentageOfTokensSoldInCurrentTierNew,
       });
     } catch (e) {
       console.error(e);
     }
   }, [
-    percentageOfTokensSoldInCurrentTier,
     hardCap,
     tokensSold,
     tier,
@@ -1216,18 +1216,18 @@ const Pool: React.FC = () => {
           <div className="grow-scale-progress">
             <div
               className="grow-scale-progress-value"
-              style={{ width: `${percentageOfTokensSoldInCurrentTier}%` }}
+              style={{ width: `${percentOfTokensSold}%` }}
             />
           </div>
         </div>
 
         <div className="grow-info">
           <div className="grow-min">
-            {prettyNumber(percentageOfTokensSoldInCurrentTier.toString()) || 0}% (Min{' '}
+            {prettyNumber(percentOfTokensSold.toString()) || 0}% (Min{' '}
             {!Number.isNaN(+percentOfSoftCap) ? percentOfSoftCap : 0}%)
           </div>
           <div className="grow-max">
-            {tokensSold || 0} / {prettyNumber(tokensShouldBeSold.toString()) || 0} {tokenSymbol}
+            {tokensSold || 0} / {prettyNumber(hardCapInTokens) || 0} {tokenSymbol}
           </div>
         </div>
       </div>
