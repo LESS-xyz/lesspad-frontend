@@ -31,7 +31,14 @@ import ParticipantsTable from '../ParticipantsTable';
 
 import './index.scss';
 
-const { chainSymbols, explorers, NOW, REGISTRATION_TIME, TIER_TIME }: any = config;
+const {
+  chainSymbols,
+  explorers,
+  NOW,
+  REGISTRATION_TIME,
+  TIER_TIME,
+  TIER_PERCENTAGES,
+}: any = config;
 const Backend = new BackendService();
 
 const chainsInfo: any = [
@@ -118,9 +125,15 @@ const Pool: React.FC = () => {
   const [investments, setInvestments] = useState<any>({ amountEth: 0, amountTokens: 0 });
   const [amountToInvest, setAmountToInvest] = useState<string>('');
   const [myVote, setMyVote] = useState<number>(0);
+
   const [isInvestStart, setInvestStart] = useState<boolean>(false);
   const [isUserRegister, setUserRegister] = useState<boolean>(false);
-  // console.log('Pool isUserRegister:', isUserRegister);
+
+  const [
+    percentageOfTokensSoldInCurrentTier,
+    setPercentageOfTokensSoldInCurrentTier,
+  ] = useState<number>(0);
+  const [currentTier, setCurrentTier] = useState<number>(0);
 
   const [timeBeforeVoting, setTimeBeforeVoting] = useState<string>('');
   const [timeBeforeRegistration, setTimeBeforeRegistration] = useState<string>('');
@@ -244,17 +257,6 @@ const Pool: React.FC = () => {
 
   const currency = chainSymbols[chainType];
   const explorer = explorers[chainType];
-
-  // const getDecimals = async () => {
-  //   try {
-  //     // const resultLessDecimals = await ContractLessToken.decimals();
-  //     // setLessDecimals(resultLessDecimals);
-  //     // const resultLpDecimals = await ContractLPToken.decimals();
-  //     // setLpDecimals(resultLpDecimals);
-  //   } catch (e) {
-  //     console.error(e);
-  //   }
-  // };
 
   // const getImage = useCallback(async () => {
   //   try {
@@ -553,11 +555,10 @@ const Pool: React.FC = () => {
     }
   }, [ContractStaking, userAddress]);
 
-  const getTierTime = useCallback(async () => {
+  const getTierTime = useCallback(() => {
     try {
       if (!info) return;
       if (!tier) return;
-      // console.log('PagePool getTierTime:', tier);
       if (openTimePresale === '0') return;
       if (closeTimePresale === '0') return;
       const tierTimeNew = +openTimePresale + TIER_TIME * (5 - +tier);
@@ -565,10 +566,53 @@ const Pool: React.FC = () => {
       const timeBeforeMyTierNew = dayjs(tierTimeNew).fromNow();
       setIsMyTierTime(isMyTierTimeNew);
       setTimeBeforeMyTier(timeBeforeMyTierNew);
+      // percentage should be sold in current tier
+      const percentagesShouldBeSold: any = [];
+      TIER_PERCENTAGES.map((percentage, i) => {
+        percentagesShouldBeSold[i] = TIER_PERCENTAGES.reduce((percentages, percent, ir) => {
+          return ir <= i ? percentages + percent : percentages;
+        });
+        return null;
+      });
+      // current tier 5 >>> 1
+      let currentTierNew = 0;
+      for (let i = 1; i <= 5; i += 1) {
+        const tierTimeStart = +openTimePresale + TIER_TIME * (5 - i);
+        const tierTimeEnd = +openTimePresale + TIER_TIME * (5 - i + 1);
+        if (tierTimeStart <= NOW && tierTimeEnd > NOW) {
+          currentTierNew = i;
+        }
+      }
+      setCurrentTier(currentTierNew);
+      // tokens should be sold in current tier
+      let tokensShouldBeSold = 0;
+      if (currentTierNew) {
+        tokensShouldBeSold = (+hardCap * percentagesShouldBeSold[currentTierNew - 1]) / 100;
+      }
+      const percentageOfTokensSoldInCurrentTierNew = (+tokensSold / +tokensShouldBeSold) * 100;
+      setPercentageOfTokensSoldInCurrentTier(percentageOfTokensSoldInCurrentTierNew);
+      console.log('PagePool getTierTime:', {
+        currentTierNew,
+        hardCap,
+        tokensShouldBeSold,
+        tokensSold,
+        percentagesShouldBeSold,
+        percentageOfTokensSoldInCurrentTier,
+      });
     } catch (e) {
       console.error(e);
     }
-  }, [tier, info, openTimePresale, closeTimePresale, isInvestmentTime]);
+  }, [
+    percentageOfTokensSoldInCurrentTier,
+    hardCap,
+    tokensSold,
+    tier,
+    info,
+    openTimePresale,
+    closeTimePresale,
+    isInvestmentTime,
+  ]);
+  console.log('Pool currentTier:', currentTier);
 
   const getPoolStatus = useCallback(async () => {
     try {
@@ -1167,14 +1211,14 @@ const Pool: React.FC = () => {
           <div className="grow-scale-progress">
             <div
               className="grow-scale-progress-value"
-              style={{ width: `${percentOfTokensSold}%` }}
+              style={{ width: `${percentageOfTokensSoldInCurrentTier}%` }}
             />
           </div>
         </div>
 
         <div className="grow-info">
           <div className="grow-min">
-            {prettyNumber(percentOfTokensSold.toString()) || 0}% (Min{' '}
+            {prettyNumber(percentageOfTokensSoldInCurrentTier.toString()) || 0}% (Min{' '}
             {!Number.isNaN(+percentOfSoftCap) ? percentOfSoftCap : 0}%)
           </div>
           <div className="grow-max">

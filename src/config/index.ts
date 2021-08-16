@@ -20,6 +20,7 @@ const DAY = 1000 * 60 * 5; // todo
 const TIER_TIME = IS_PRODUCTION ? 1000 * 60 * 60 : 1000 * 60 * 5; // todo:
 const VOTING_TIME = IS_PRODUCTION ? DAY * 3 : DAY; // todo:
 const REGISTRATION_TIME = DAY; // todo:
+const TIER_PERCENTAGES = [30, 20, 15, 25, 10];
 
 export default {
   IS_PRODUCTION,
@@ -31,6 +32,7 @@ export default {
   TIER_TIME,
   VOTING_TIME,
   REGISTRATION_TIME,
+  TIER_PERCENTAGES,
   version: IS_PRODUCTION ? 'Mainnet beta' : IS_TESTING_ON_ROPSTEN ? 'Ropsten beta' : 'Kovan beta',
   isMainnetOrTestnet: IS_PRODUCTION ? 'mainnet' : 'testnet',
   netType: IS_PRODUCTION ? 'mainnet' : IS_TESTING_ON_ROPSTEN ? 'ropsten' : 'kovan',
