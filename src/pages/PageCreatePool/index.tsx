@@ -111,7 +111,11 @@ const CreatePoolPage: React.FC = () => {
   const [whitelist5, setWhitelist5] = useState<string>('');
   const [nativeToken, setNativeToken] = useState<string>('WETH');
   // links
-  const [linkLogo, setLinkLogo] = useState<string>('');
+  const [linkLogo, setLinkLogo] = useState<string>(
+    SHOW_FORM_VALUES
+      ? 'https://www.meme-arsenal.com/memes/2433145282c497c718a8859894466452.jpg'
+      : '',
+  );
   const [linkWebsite, setLinkWebsite] = useState<string>('');
   const [linkTelegram, setLinkTelegram] = useState<string>('');
   const [linkGithub, setLinkGithub] = useState<string>('');
