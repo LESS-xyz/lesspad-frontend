@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
@@ -66,7 +66,6 @@ const CreatePoolPage: React.FC = () => {
     ContractCalculations,
     ContractPresaleFactory,
     ContractLessToken,
-    ContractLPToken,
     ContractStaking,
     ContractLessLibrary,
   } = useContractsContext();
@@ -80,8 +79,6 @@ const CreatePoolPage: React.FC = () => {
   const defaultLiquidityAllocationTime = defaultCloseTime + DAY; // todo
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [lessDecimals, setLessDecimals] = useState<number>(0);
-  const [lpDecimals, setLpDecimals] = useState<number>(0);
 
   const [saleTitle, setSaleTitle] = useState<string>(SHOW_FORM_VALUES ? 'Title' : '');
   const [description, setDescription] = useState<string>(SHOW_FORM_VALUES ? 'Description' : '');
@@ -143,17 +140,12 @@ const CreatePoolPage: React.FC = () => {
   const { stakedLess, stakedLp, lessPerLp } = useSelector(({ library }: any) => library);
 
   const dispatch = useDispatch();
-  const toggleModal = React.useCallback((params) => dispatch(modalActions.toggleModal(params)), [
+  const toggleModal = useCallback((params) => dispatch(modalActions.toggleModal(params)), [
     dispatch,
   ]);
-  const setLibrary = React.useCallback((params) => dispatch(libraryActions.setLibrary(params)), [
+  const setLibrary = useCallback((params) => dispatch(libraryActions.setLibrary(params)), [
     dispatch,
   ]);
-
-  // const minInvest = new BN(10).pow(new BN(10)).toString(10); // todo
-  // const maxInvest = new BN(10).pow(new BN(20)).toString(10); // todo
-  // const presaleType = isPublic ? 1 : 0;
-  // const whitelistArray = whitelist ? whitelist.split(',') : [];
 
   const splitWhitelist = (data: string) => {
     try {
@@ -163,17 +155,6 @@ const CreatePoolPage: React.FC = () => {
     } catch (e) {
       console.error(e);
       return [];
-    }
-  };
-
-  const getDecimals = async () => {
-    try {
-      const resultLessDecimals = await ContractLessToken.decimals();
-      setLessDecimals(resultLessDecimals);
-      const resultLpDecimals = await ContractLPToken.decimals();
-      setLpDecimals(resultLpDecimals);
-    } catch (e) {
-      console.error(e);
     }
   };
 
@@ -359,7 +340,16 @@ const CreatePoolPage: React.FC = () => {
     return true;
   };
 
-  const checkStakingBalance = async () => {
+  const handleGoToStaking = useCallback(async () => {
+    try {
+      history.push('/staking');
+      toggleModal({ open: false });
+    } catch (e) {
+      console.error(e);
+    }
+  }, [toggleModal, history]);
+
+  const checkStakingBalance = useCallback(async () => {
     try {
       const stakedSum = +stakedLess + +stakedLp * lessPerLp;
       const minCreatorStakedBalanceInLp = minCreatorStakedBalance / lessPerLp;
@@ -374,7 +364,7 @@ const CreatePoolPage: React.FC = () => {
               </p>
               <p>Your staking balance is: {stakedSum} ($LESS + ETH-LESS LP)</p>
               <div className={s.messageContainerButtons}>
-                <Button to="/staking">Go to Staking</Button>
+                <Button onClick={handleGoToStaking}>Go to Staking</Button>
               </div>
             </div>
           ),
@@ -384,7 +374,7 @@ const CreatePoolPage: React.FC = () => {
       console.error('CreatePool checkStakingBalance:', e);
       return false;
     }
-  };
+  }, [stakedLess, stakedLp, lessPerLp, toggleModal, minCreatorStakedBalance, handleGoToStaking]);
 
   const approveLess = async () => {
     try {
@@ -747,7 +737,6 @@ const CreatePoolPage: React.FC = () => {
     if (!ContractLessToken) return;
     if (!ContractLessLibrary) return;
     if (!ContractStaking) return;
-    getDecimals();
     getMinCreatorStakedBalance();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ContractStaking, userAddress]);
@@ -791,22 +780,13 @@ const CreatePoolPage: React.FC = () => {
   }, [softCap, hardCap]);
 
   useEffect(() => {
-    if (!ContractLessToken) return;
-    if (!ContractLessLibrary) return;
-    if (!ContractStaking) return;
-    if (!userAddress) return;
-    if (!lpDecimals) return;
-    if (!lessDecimals) return;
+    if (!stakedLess) return;
+    if (!stakedLp) return;
+    if (!lessPerLp) return;
+    if (!toggleModal) return;
+    if (!minCreatorStakedBalance) return;
     checkStakingBalance();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    ContractLessToken,
-    ContractLessLibrary,
-    ContractStaking,
-    userAddress,
-    lpDecimals,
-    lessDecimals,
-  ]);
+  }, [stakedLess, stakedLp, lessPerLp, toggleModal, minCreatorStakedBalance, checkStakingBalance]);
 
   return (
     <section className={s.page}>
