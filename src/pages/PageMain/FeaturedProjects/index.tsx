@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import dayjs from 'dayjs';
@@ -17,7 +17,7 @@ const FeaturedProject: React.FC = () => {
   const compareOpenVotingTime = (a, b) => {
     return b.openVotingTime - a.openVotingTime;
   };
-  const filterProjects = async () => {
+  const filterProjects = useCallback(async () => {
     if (pools && pools.length !== 0) {
       try {
         const presalesInfoNew = pools
@@ -35,13 +35,12 @@ const FeaturedProject: React.FC = () => {
         console.error(e);
       }
     }
-  };
+  }, [pools]);
 
   useEffect(() => {
     if (!pools || !pools.length) return;
     filterProjects();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pools, pools.length]);
+  }, [filterProjects, pools, pools.length]);
   return (
     <section className={s.page}>
       <div className={s.container}>
