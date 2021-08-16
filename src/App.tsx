@@ -61,6 +61,16 @@ export const App: React.FC = memo(() => {
     }
   }, [ContractLessToken, ContractLPToken, setLibrary]);
 
+  const getLessPerLp = useCallback(async () => {
+    try {
+      const lessPerLp = await ContractStaking.getLessPerLp();
+      if (lessPerLp) setLibrary({ lessPerLp });
+      console.log('App getLessPerLp:', lessPerLp);
+    } catch (e) {
+      console.error('App getLessPerLp:', e);
+    }
+  }, [ContractStaking, setLibrary]);
+
   const getStakedLess = useCallback(async () => {
     try {
       const result = await ContractStaking.getLessBalanceByAddress({ userAddress });
@@ -93,6 +103,11 @@ export const App: React.FC = memo(() => {
     if (!ContractLPToken) return;
     getDecimals();
   }, [ContractLessToken, ContractLPToken, getDecimals]);
+
+  useEffect(() => {
+    if (!ContractStaking) return;
+    getLessPerLp();
+  }, [ContractStaking, getLessPerLp]);
 
   useEffect(() => {
     if (!userAddress) return;

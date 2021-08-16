@@ -108,7 +108,7 @@ const Pool: React.FC = () => {
   const [isCertified, setIsCertified] = useState<boolean>();
   const [chainInfo, setChainInfo] = useState<any>({});
   const [tier, setTier] = React.useState<string>('');
-  const [isMyTierTime, setIsMyTierTime] = React.useState<boolean>(false);
+  const [isMyTierTime, setIsMyTierTime] = useState<boolean>(false);
 
   // const [logo, setLogo] = React.useState<string>(projectLogo);
 
@@ -125,17 +125,126 @@ const Pool: React.FC = () => {
 
   const [timeBeforeVoting, setTimeBeforeVoting] = useState<string>('');
   const [timeBeforeRegistration, setTimeBeforeRegistration] = useState<string>('');
-  const [timeBeforeMyTier, setTimeBeforeMyTier] = React.useState<string>('');
+  const [timeBeforeMyTier, setTimeBeforeMyTier] = useState<string>('');
 
   const { pools } = useSelector(({ pool }: any) => pool);
   const { chainType } = useSelector(({ wallet }: any) => wallet);
   const { address: userAddress } = useSelector(({ user }: any) => user);
-  const { stakedLess } = useSelector(({ library }: any) => library);
+  const { stakedLess, stakedLp, lessPerLp } = useSelector(({ library }: any) => library);
 
   const dispatch = useDispatch();
-  const toggleModal = React.useCallback((params) => dispatch(modalActions.toggleModal(params)), [
+  const toggleModal = useCallback((params) => dispatch(modalActions.toggleModal(params)), [
     dispatch,
   ]);
+
+  const {
+    // #additional info
+    tokenSymbol,
+    // #general info
+    creator,
+    token,
+    tokenPrice,
+    softCap,
+    hardCap,
+    tokensForSaleLeft,
+    // tokensForLiquidityLeft,
+    openTimePresale,
+    closeTimePresale,
+    openTimeVoting,
+    closeTimeVoting,
+    // collectedFee,
+    // #string info
+    saleTitle,
+    linkTelegram,
+    linkGithub,
+    linkTwitter,
+    linkWebsite,
+    linkLogo,
+    description,
+    // whitepaper,
+    // #uniswap info
+    listingPrice,
+    lpTokensLockDurationInDays,
+    liquidityPercentageAllocation,
+    liquidityAllocationTime,
+    // unlockTime,
+    // todo: native token
+    approved,
+    beginingAmount,
+    cancelled,
+    liquidityAdded,
+    participants,
+    // raisedAmount,
+    yesVotes,
+    noVotes,
+    lastTotalStakedAmount,
+  } = info;
+
+  const isBeforeVotimgTime = openTimeVoting > NOW;
+  const isVotingTime = openTimeVoting <= NOW && closeTimeVoting > NOW;
+  const isBeforeRegistrationTime =
+    openTimeVoting <= NOW && openTimePresale - REGISTRATION_TIME > NOW;
+  const isRegistrationTime = openTimePresale - REGISTRATION_TIME <= NOW && openTimePresale > NOW;
+  const isInvestmentTime = openTimePresale <= NOW && closeTimePresale > NOW;
+  const isOpened = openTimePresale <= NOW;
+  const isPresaleClosed = closeTimePresale <= NOW;
+
+  const isUserCreator = userAddress ? creator.toLowerCase() === userAddress.toLowerCase() : false;
+
+  const isEthereum = chainType === 'Ethereum';
+  const isBinanceSmartChain = chainType === 'Binance-Smart-Chain';
+
+  const exchange = isEthereum ? 'Uniswap' : isBinanceSmartChain ? 'PancakeSwap' : 'SushiSwap';
+
+  const stakedLessAndLp = useMemo(() => {
+    if (!lessPerLp) return 0;
+    return stakedLess + stakedLp * lessPerLp;
+  }, [stakedLess, stakedLp, lessPerLp]);
+
+  const minVotingCompletion = useMemo(
+    () => new BN(lastTotalStakedAmount).multipliedBy(new BN(0.1)),
+    [lastTotalStakedAmount],
+  );
+  let votingCompletion = useMemo(
+    () => new BN(yesVotes).div(minVotingCompletion).multipliedBy(new BN(100)).toString(10),
+    [yesVotes, minVotingCompletion],
+  );
+  if (+votingCompletion > 100) votingCompletion = '100';
+  const isVotingSuccessful = +votingCompletion === 100 && +yesVotes >= +noVotes;
+
+  const hardCapInTokens = useMemo(() => {
+    const result = new BN(hardCap).dividedBy(tokenPrice);
+    return result.toString(10);
+  }, [hardCap, tokenPrice]);
+
+  const tokensSold = useMemo(() => {
+    const tokensSoldNew = new BN(beginingAmount).minus(tokensForSaleLeft);
+    // const pow = new BN(10).pow(tokenDecimals);
+    // const result = tokensSoldNew.div(pow);
+    return tokensSoldNew.toString(10);
+  }, [beginingAmount, tokensForSaleLeft]);
+
+  const tokensSoldInNativeCurrency = useMemo(() => {
+    const tokensSoldNew = new BN(beginingAmount).minus(tokensForSaleLeft);
+    const tokenPriceBN = new BN(tokenPrice);
+    // const pow = new BN(10).pow(tokenDecimals);
+    const result = tokensSoldNew.multipliedBy(tokenPriceBN);
+    return result.toString(10);
+  }, [beginingAmount, tokensForSaleLeft, tokenPrice]);
+
+  const percentOfTokensSold = useMemo(() => {
+    const minus = new BN(beginingAmount).minus(tokensForSaleLeft);
+    return minus.div(beginingAmount).multipliedBy(new BN(100)).toString(10);
+  }, [beginingAmount, tokensForSaleLeft]);
+
+  const percentOfSoftCap = useMemo(() => {
+    return new BN(softCap).div(hardCap).multipliedBy(new BN(100)).toString(10);
+  }, [softCap, hardCap]);
+
+  const isPresaleSuccessful = +percentOfSoftCap >= 100;
+
+  const currency = chainSymbols[chainType];
+  const explorer = explorers[chainType];
 
   // const getDecimals = async () => {
   //   try {
@@ -163,7 +272,6 @@ const Pool: React.FC = () => {
 
   const updateTimerBeforeVoting = useCallback(() => {
     try {
-      const { openTimeVoting, openTimePresale } = info;
       if (openTimeVoting === '0') return;
       if (openTimePresale === '0') return;
       const newTimeBeforeVoting = dayjs(openTimeVoting).fromNow();
@@ -174,18 +282,17 @@ const Pool: React.FC = () => {
     } catch (e) {
       console.error(e);
     }
-  }, [info]);
+  }, [openTimeVoting, openTimePresale]);
 
   const getTokenDecimals = useCallback(async () => {
     try {
       if (!info) return;
-      const { token } = info;
       const resultTokenDecimals = await ContractERC20.decimals({ contractAddress: token });
       setTokenDecimals(resultTokenDecimals);
     } catch (e) {
       console.error(e);
     }
-  }, [info, ContractERC20]);
+  }, [info, ContractERC20, token]);
 
   const getIsCertified = useCallback(
     (presaleAddress: string) => {
@@ -390,9 +497,9 @@ const Pool: React.FC = () => {
       });
       console.log('PagePool resultMetamaskLogin:', resultMetamaskLogin);
       if (!resultMetamaskLogin.data) throw new Error('PagePool: metamaskLogin unsuccesful');
-      const { key: token } = resultMetamaskLogin.data;
+      const { key } = resultMetamaskLogin.data;
       const resultGetWhitelistSignature = await Backend.getWhitelistSignature({
-        token,
+        token: key,
         pool: address,
       });
       console.log('PagePool resultGetWhitelistSignature:', resultGetWhitelistSignature);
@@ -451,11 +558,9 @@ const Pool: React.FC = () => {
     try {
       if (!info) return;
       if (!tier) return;
-      const { openTimePresale, closeTimePresale } = info;
       // console.log('PagePool getTierTime:', tier);
       if (openTimePresale === '0') return;
       if (closeTimePresale === '0') return;
-      const isInvestmentTime = +openTimePresale <= NOW && +closeTimePresale > NOW;
       const tierTimeNew = +openTimePresale + TIER_TIME * (5 - +tier);
       const isMyTierTimeNew = isInvestmentTime && tierTimeNew <= NOW;
       const timeBeforeMyTierNew = dayjs(tierTimeNew).fromNow();
@@ -464,12 +569,10 @@ const Pool: React.FC = () => {
     } catch (e) {
       console.error(e);
     }
-  }, [tier, info]);
+  }, [tier, info, openTimePresale, closeTimePresale, isInvestmentTime]);
 
   const getPoolStatus = useCallback(async () => {
     try {
-      const { closeTimeVoting } = info;
-      console.log('Pool getPoolStatus:', info);
       if (closeTimeVoting < NOW) {
         const { data } = await Backend.getPoolStatus(address);
         console.log('Pool getPoolStatus:', data);
@@ -478,7 +581,7 @@ const Pool: React.FC = () => {
     } catch (e) {
       console.error(e);
     }
-  }, [address, info]);
+  }, [address, closeTimeVoting]);
 
   const cancelPresale = useCallback(async () => {
     try {
@@ -660,110 +763,6 @@ const Pool: React.FC = () => {
     }
   }, [getUserRegister, ContractPresalePublic, address, userAddress]);
 
-  const {
-    // #additional info
-    tokenSymbol,
-    // #general info
-    creator,
-    token,
-    tokenPrice,
-    softCap,
-    hardCap,
-    tokensForSaleLeft,
-    // tokensForLiquidityLeft,
-    openTimePresale,
-    closeTimePresale,
-    openTimeVoting,
-    closeTimeVoting,
-    // collectedFee,
-    // #string info
-    saleTitle,
-    linkTelegram,
-    linkGithub,
-    linkTwitter,
-    linkWebsite,
-    linkLogo,
-    description,
-    // whitepaper,
-    // #uniswap info
-    listingPrice,
-    lpTokensLockDurationInDays,
-    liquidityPercentageAllocation,
-    liquidityAllocationTime,
-    // unlockTime,
-    // todo: native token
-    approved,
-    beginingAmount,
-    cancelled,
-    liquidityAdded,
-    participants,
-    // raisedAmount,
-    yesVotes,
-    noVotes,
-    lastTotalStakedAmount,
-  } = info;
-
-  const isBeforeVotimgTime = openTimeVoting > NOW;
-  const isVotingTime = openTimeVoting <= NOW && closeTimeVoting > NOW;
-  const isBeforeRegistrationTime =
-    openTimeVoting <= NOW && openTimePresale - REGISTRATION_TIME > NOW;
-  const isRegistrationTime = openTimePresale - REGISTRATION_TIME <= NOW && openTimePresale > NOW;
-  const isInvestmentTime = openTimePresale <= NOW && closeTimePresale > NOW;
-  const isOpened = openTimePresale <= NOW;
-  const isPresaleClosed = closeTimePresale <= NOW;
-
-  const isUserCreator = userAddress ? creator.toLowerCase() === userAddress.toLowerCase() : false;
-
-  const isEthereum = chainType === 'Ethereum';
-  const isBinanceSmartChain = chainType === 'Binance-Smart-Chain';
-
-  const exchange = isEthereum ? 'Uniswap' : isBinanceSmartChain ? 'PancakeSwap' : 'SushiSwap';
-
-  const minVotingCompletion = useMemo(
-    () => new BN(lastTotalStakedAmount).multipliedBy(new BN(0.1)),
-    [lastTotalStakedAmount],
-  );
-  let votingCompletion = useMemo(
-    () => new BN(yesVotes).div(minVotingCompletion).multipliedBy(new BN(100)).toString(10),
-    [yesVotes, minVotingCompletion],
-  );
-  if (+votingCompletion > 100) votingCompletion = '100';
-  const isVotingSuccessful = +votingCompletion === 100 && +yesVotes >= +noVotes;
-
-  const hardCapInTokens = useMemo(() => {
-    const result = new BN(hardCap).dividedBy(tokenPrice);
-    return result.toString(10);
-  }, [hardCap, tokenPrice]);
-
-  const tokensSold = useMemo(() => {
-    const tokensSoldNew = new BN(beginingAmount).minus(tokensForSaleLeft);
-    // const pow = new BN(10).pow(tokenDecimals);
-    // const result = tokensSoldNew.div(pow);
-    return tokensSoldNew.toString(10);
-  }, [beginingAmount, tokensForSaleLeft]);
-
-  const tokensSoldInNativeCurrency = useMemo(() => {
-    const tokensSoldNew = new BN(beginingAmount).minus(tokensForSaleLeft);
-    const tokenPriceBN = new BN(tokenPrice);
-    // const pow = new BN(10).pow(tokenDecimals);
-    const result = tokensSoldNew.multipliedBy(tokenPriceBN);
-    return result.toString(10);
-  }, [beginingAmount, tokensForSaleLeft, tokenPrice]);
-
-  const percentOfTokensSold = useMemo(() => {
-    const minus = new BN(beginingAmount).minus(tokensForSaleLeft);
-    return minus.div(beginingAmount).multipliedBy(new BN(100)).toString(10);
-  }, [beginingAmount, tokensForSaleLeft]);
-
-  const percentOfSoftCap = useMemo(() => {
-    return new BN(softCap).div(hardCap).multipliedBy(new BN(100)).toString(10);
-  }, [softCap, hardCap]);
-
-  const isPresaleSuccessful = +percentOfSoftCap >= 100;
-
-  const currency = chainSymbols[chainType];
-  const explorer = explorers[chainType];
-
   const row1 = [
     {
       header: 'Softcap',
@@ -892,7 +891,7 @@ const Pool: React.FC = () => {
         Voting
       </div>
       <div className="item-text">
-        <div className="item-text-bold">{stakedLess}</div>
+        <div className="item-text-bold">{prettyNumber(stakedLessAndLp)}</div>
         <div className="item-text-gradient">LESS</div>
       </div>
       <div className="button-border" style={{ marginBottom: 5 }}>

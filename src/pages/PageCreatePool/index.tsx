@@ -83,9 +83,6 @@ const CreatePoolPage: React.FC = () => {
   const [lessDecimals, setLessDecimals] = useState<number>(0);
   const [lpDecimals, setLpDecimals] = useState<number>(0);
 
-  const [stakedLess, setStakedLess] = useState<string>('0.000');
-  const [stakedLP, setStakedLP] = useState<string>('0.000');
-
   const [saleTitle, setSaleTitle] = useState<string>(SHOW_FORM_VALUES ? 'Title' : '');
   const [description, setDescription] = useState<string>(SHOW_FORM_VALUES ? 'Description' : '');
   const [tokenAddress, setTokenAddress] = useState<string>(
@@ -143,6 +140,7 @@ const CreatePoolPage: React.FC = () => {
   const { chainType } = useSelector(({ wallet }: any) => wallet);
   const { address: userAddress } = useSelector(({ user }: any) => user);
   const { minCreatorStakedBalance } = useSelector(({ library }: any) => library);
+  const { stakedLess, stakedLp, lessPerLp } = useSelector(({ library }: any) => library);
 
   const dispatch = useDispatch();
   const toggleModal = React.useCallback((params) => dispatch(modalActions.toggleModal(params)), [
@@ -361,32 +359,10 @@ const CreatePoolPage: React.FC = () => {
     return true;
   };
 
-  const getStakedLess = async () => {
-    try {
-      const result = await ContractStaking.getLessBalanceByAddress({ userAddress });
-      const resultInEth = convertFromWei(result, lessDecimals);
-      if (resultInEth) setStakedLess(resultInEth);
-      console.log('PageCreatePool getStakedLess:', resultInEth);
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  const getStakedLp = async () => {
-    try {
-      const result = await ContractStaking.getLpBalanceByAddress({ userAddress });
-      const resultInEth = convertFromWei(result, lpDecimals);
-      if (resultInEth) setStakedLP(resultInEth);
-      console.log('PageCreatePool getStakedLP:', resultInEth);
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
   const checkStakingBalance = async () => {
     try {
-      const stakedSum = +stakedLess + +stakedLP * 300;
-      const minCreatorStakedBalanceInLp = minCreatorStakedBalance / 300;
+      const stakedSum = +stakedLess + +stakedLp * lessPerLp;
+      const minCreatorStakedBalanceInLp = minCreatorStakedBalance / lessPerLp;
       if (stakedSum < minCreatorStakedBalance)
         toggleModal({
           open: true,
@@ -773,8 +749,6 @@ const CreatePoolPage: React.FC = () => {
     if (!ContractStaking) return;
     getDecimals();
     getMinCreatorStakedBalance();
-    getStakedLess();
-    getStakedLp();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ContractStaking, userAddress]);
 
