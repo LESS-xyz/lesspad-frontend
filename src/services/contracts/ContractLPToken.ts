@@ -73,9 +73,9 @@ export default class ContractLPToken {
     try {
       // console.log('ContractPresalePublicService getInfo:', this.contractAbi, this.contractAddress)
       const result = await this.contract.methods.allowance(userAddress, spender).call();
-      const decimals = await this.decimals();
-      const resultInEth = convertFromWei(result, decimals);
-      return resultInEth;
+      // const decimals = await this.decimals();
+      // const resultInEth = convertFromWei(result, decimals);
+      return result;
     } catch (e) {
       console.error('ContractLPToken allowance:', e);
       return null;

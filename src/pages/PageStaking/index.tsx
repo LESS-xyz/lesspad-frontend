@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useDispatch, useSelector } from 'react-redux';
+import { BigNumber as BN } from 'bignumber.js/bignumber';
 
 import maxImg from '../../assets/img/icons/max.svg';
 import Button from '../../components/Button/index';
@@ -56,15 +57,14 @@ const StakingPage: React.FC = () => {
   const isStakeLessValue = debouncedStakeLessValue !== '';
   const isStakeLPValue = debouncedStakeLpValue !== '';
 
-  // const powLess = new BN(10).pow(lessDecimals);
-  // const allowanceLessInEth = new BN(lessAllowance).div(powLess).toString(10);
-  // console.log('StakingPage isLessAllowed:', allowanceLessInEth);
-  const isLessAllowed = +lessAllowance >= +debouncedStakeLessValue;
+  const powLess = new BN(10).pow(lessDecimals);
+  const allowanceLessInEth = new BN(lessAllowance).div(powLess).toString(10);
+  const isLessAllowed = +allowanceLessInEth >= +debouncedStakeLessValue;
   //
-  // const powLp = new BN(10).pow(lpDecimals);
-  // const allowanceLpInEth = new BN(lpAllowance).div(powLp).toString(10);
-  // console.log('StakingPage isLpAllowed:', allowanceLpInEth);
-  const isLpAllowed = +lpAllowance >= +debouncedStakeLpValue;
+  const powLp = new BN(10).pow(lpDecimals);
+  const allowanceLpInEth = new BN(lpAllowance).div(powLp).toString(10);
+  const isLpAllowed = +allowanceLpInEth >= +debouncedStakeLpValue;
+  console.log('StakingPage:', { allowanceLessInEth, allowanceLpInEth, isLessAllowed, isLpAllowed });
 
   // const isLessAllowed = useMemo(() => {
   //   const pow = new BN(10).pow(lessDecimals);
