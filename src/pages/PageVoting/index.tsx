@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useDispatch, useSelector } from 'react-redux';
 import dayjs from 'dayjs';
@@ -76,7 +76,7 @@ const PageVoting: React.FC = () => {
   // };
   // const [info, setInfo] = useState<any[]>([]);
 
-  const getVotingTime = async () => {
+  const getVotingTime = useCallback(async () => {
     try {
       const newInfo = await ContractLessLibrary.getVotingTime();
       console.log('TokenCard getVotingTime:', newInfo);
@@ -84,12 +84,12 @@ const PageVoting: React.FC = () => {
     } catch (e) {
       console.error('TableRow getVotingTime:', e);
     }
-  };
+  }, [ContractLessLibrary]);
 
   const compareOpenVotingTime = (a, b) => {
     return b.openVotingTime - a.openVotingTime;
   };
-  const filterTable = async () => {
+  const filterTable = useCallback(async () => {
     if (pools && pools.length !== 0) {
       try {
         const presalesInfoNew = pools
@@ -115,16 +115,16 @@ const PageVoting: React.FC = () => {
         console.error(e);
       }
     }
-  };
+  }, [pools, search, votingTime]);
 
-  const getMinVoterBalance = async () => {
+  const getMinVoterBalance = useCallback(async () => {
     try {
       const resultGetMinVoterBalance = await ContractLessLibrary.getMinVoterBalance();
       setLibrary({ minVoterBalance: resultGetMinVoterBalance });
     } catch (e) {
       console.error(e);
     }
-  };
+  }, [ContractLessLibrary, setLibrary]);
 
   const handleShowInfo = () => {
     try {
@@ -149,8 +149,7 @@ const PageVoting: React.FC = () => {
   useEffect(() => {
     if (!ContractLessLibrary) return;
     getVotingTime();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ContractLessLibrary]);
+  }, [ContractLessLibrary, getVotingTime]);
 
   /*  useEffect(() => {
       for (let i = 0, newInfo: any[] = []; i < pools.length; i += 1) {
@@ -167,14 +166,12 @@ const PageVoting: React.FC = () => {
     if (!ContractLessLibrary) return;
     // console.log('PageVoting pools:', pools)
     getMinVoterBalance();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ContractLessLibrary]);
+  }, [ContractLessLibrary, getMinVoterBalance]);
 
   useEffect(() => {
     if (!pools || !pools.length) return;
     filterTable();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, pools, pools.length]);
+  }, [search, pools, pools.length, filterTable]);
   return (
     <div className={s.page}>
       <Helmet>
