@@ -431,23 +431,16 @@ const CreatePoolPage: React.FC = () => {
     }
   };
 
-  // const subscribeEvent = async (type: string) => {
-  //   try {
-  //     await web3.subscribe(type, console.log);
-  //     return true;
-  //   } catch (e) {
-  //     console.error('CreatePool subscribeEvent:', e);
-  //     return false;
-  //   }
-  // };
-
   const countAmountOfTokensToCreate = async () => {
     try {
       const decimals = await ContractERC20.decimals({ contractAddress: tokenAddress });
+      const hardCapInWei = convertToWei(hardCap, 18);
+      const tokenPriceInWei = convertToWei(tokenPrice, 18);
+      const listingPriceInWei = convertToWei(listingPrice, 18);
       const result = await ContractCalculations.countAmountOfTokens({
-        hardCap,
-        tokenPrice,
-        listingPrice,
+        hardCap: hardCapInWei,
+        tokenPrice: tokenPriceInWei,
+        listingPrice: listingPriceInWei,
         liquidityPercentageAllocation,
         decimals,
       });
@@ -605,8 +598,8 @@ const CreatePoolPage: React.FC = () => {
         userLessAndLpBalance,
       });
       const tokenPriceInWei = convertToWei(tokenPrice, 18); // todo: check 18
-      const hardCapInWei = convertToWei(hardCap, tokenDecimals);
-      const softCapInWei = convertToWei(softCap, tokenDecimals);
+      const hardCapInWei = convertToWei(hardCap, 18);
+      const softCapInWei = convertToWei(softCap, 18);
       const listingPriceInWei = convertToWei(listingPrice, 18); // todo: check 18
       const userLessAndLpBalanceFormatted = new BN(userLessAndLpBalance.toString()).toString(10);
       const poolPercentages = await ContractStaking.poolPercentages();
@@ -633,7 +626,6 @@ const CreatePoolPage: React.FC = () => {
         (openTime / 1000).toFixed(),
         (closeTime / 1000).toFixed(),
         userLessAndLpBalanceFormatted,
-        // hexToBytes(signature),
         signature,
         timestamp.toString(),
         poolPercentages,
@@ -646,6 +638,14 @@ const CreatePoolPage: React.FC = () => {
         (liquidityAllocationTime / 1000).toFixed(),
       ];
       // todo: add CertifiedAddition for certified presale, where nativeToken is
+      // bytes32 saleTitle;      // название
+      // bytes32 linkTelegram;   // ссылка телега
+      // bytes32 linkGithub;     // ссылка гит
+      // bytes32 linkTwitter;    // ссылка твиттер
+      // bytes32 linkWebsite;    // ссылка сайт
+      // string linkLogo;        // ссылка лого
+      // string description;     // описание
+      // string whitepaper;      // вайтпепер ссылка
       const presaleStringInfo = [
         saleTitle,
         linkTelegram,
@@ -664,7 +664,7 @@ const CreatePoolPage: React.FC = () => {
           presaleStringInfo,
           usdtToEthFee,
         });
-        ContractPresaleFactory.createPresalePublic({
+        await ContractPresaleFactory.createPresalePublic({
           userAddress,
           presaleInfo,
           presalePancakeSwapInfo,
@@ -702,7 +702,7 @@ const CreatePoolPage: React.FC = () => {
           presaleStringInfo,
           certifiedAddition,
         });
-        ContractPresaleFactory.createPresalePublic({
+        await ContractPresaleFactory.createPresalePublic({
           userAddress,
           presaleInfo,
           presalePancakeSwapInfo,

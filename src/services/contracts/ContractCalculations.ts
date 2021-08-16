@@ -62,6 +62,7 @@ export default class ContractCalculationsService {
   ): Promise<string | null> => {
     try {
       const { hardCap, tokenPrice, listingPrice, liquidityPercentageAllocation, decimals } = props;
+      console.log('ContractCalculationsService countAmountOfTokens:', props);
       const resultArray = await this.contract.methods
         .countAmountOfTokens(
           hardCap,
