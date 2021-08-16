@@ -301,7 +301,7 @@ const CreatePoolPage: React.FC = () => {
   };
 
   const validateTime = () => {
-    return true; // todo: remove!!!
+    // return true; // todo: remove!!!
     // checks
     // todo block timestamp
     const isOpenVotingTimeMoreThanBlockTimestamp = openTime > Date.now();
@@ -1026,43 +1026,43 @@ const CreatePoolPage: React.FC = () => {
                 onChange={setLinkLogo}
                 title="Link to logo"
                 placeholder="https://example.com/logo.png"
-                // error={errors.linkLogo}
-                // validations={validationIfExists}
+                error={errors.linkLogo}
+                validations={validationIfExists}
               />
               <Input
                 value={linkWebsite}
                 onChange={setLinkWebsite}
                 title="Link to Website"
-                // error={errors.linkWebsite}
-                // validations={validationIfExists}
+                error={errors.linkWebsite}
+                validations={validationIfExists}
               />
               <Input
                 value={linkTelegram}
                 onChange={setLinkTelegram}
                 title="Link to Telegram"
-                // error={errors.linkTelegram}
-                // validations={validationIfExists}
+                error={errors.linkTelegram}
+                validations={validationIfExists}
               />
               <Input
                 value={linkGithub}
                 onChange={setLinkGithub}
                 title="Link to Github"
-                // error={errors.linkGithub}
-                // validations={validationIfExists}
+                error={errors.linkGithub}
+                validations={validationIfExists}
               />
               <Input
                 value={linkTwitter}
                 onChange={setLinkTwitter}
                 title="Link to Twitter"
-                // error={errors.linkTwitter}
-                // validations={validationIfExists}
+                error={errors.linkTwitter}
+                validations={validationIfExists}
               />
               <Input
                 value={whitepaper}
                 onChange={setWhitepaper}
                 title="Whitepaper"
-                // error={errors.whitepaper}
-                // validations={validationIfExists}
+                error={errors.whitepaper}
+                validations={validationIfExists}
               />
 
               <div className={s.button}>
