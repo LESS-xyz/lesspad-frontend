@@ -194,12 +194,12 @@ const CreatePoolPage: React.FC = () => {
     listingPrice,
     liquidityPercentageAllocation,
     lpTokensLockDurationInDays,
-    // linkTelegram,
-    // linkGithub,
-    // linkTwitter,
-    // linkWebsite,
-    // linkLogo,
-    // whitepaper,
+    linkTelegram,
+    linkGithub,
+    linkTwitter,
+    linkWebsite,
+    linkLogo,
+    whitepaper,
   };
 
   const clearErrors = () => {
