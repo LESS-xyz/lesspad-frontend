@@ -4,12 +4,10 @@ import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
-// import axios from 'axios';
 import { BigNumber as BN } from 'bignumber.js/bignumber';
 import dayjs from 'dayjs';
 import { v4 as uuid } from 'uuid';
 
-// import projectLogo from '../../../assets/img/icons/project-logo.svg';
 import bnbLogo from '../../../assets/img/icons/bnb-logo.svg';
 import ethLogo from '../../../assets/img/icons/eth-logo.svg';
 import Github from '../../../assets/img/icons/gh-icon.svg';
@@ -19,6 +17,7 @@ import RegisterImg from '../../../assets/img/icons/register.svg';
 import Subscribe from '../../../assets/img/icons/subscribe.svg';
 import Telegram from '../../../assets/img/icons/tg-icon.svg';
 import Twitter from '../../../assets/img/icons/twitter-icon.svg';
+import projectLogo from '../../../assets/img/sections/token-card/logo-1.png';
 import Input from '../../../components/Input';
 import YourTier from '../../../components/YourTier/index';
 import config from '../../../config';
@@ -1076,7 +1075,9 @@ const Pool: React.FC = () => {
   const htmlClosePresale = (
     <>
       <div className="item">
-        Presale is not successful
+        <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
+          Close presale
+        </div>
         <div className="button-border">
           <div
             className="button"
@@ -1085,7 +1086,7 @@ const Pool: React.FC = () => {
             onClick={cancelPresale}
             onKeyDown={() => {}}
           >
-            <div className="gradient-button-text">Close presale</div>
+            <div className="gradient-button-text">Close</div>
           </div>
         </div>
       </div>
@@ -1104,7 +1105,7 @@ const Pool: React.FC = () => {
       <div className="preview">
         <div className="description">
           <div className="logo-center">
-            <img src={addHttps(linkLogo)} alt="token-logo" />
+            <img src={linkLogo ? addHttps(linkLogo) : projectLogo} alt="token-logo" />
           </div>
           <div className="description-info">
             <div className="description-info-header">
@@ -1132,7 +1133,7 @@ const Pool: React.FC = () => {
           </div>
           <div className="preview-info-date preview-info-date__text-opacity">
             Listing:{' '}
-            {liquidityAllocationTime
+            {+liquidityAllocationTime > 0
               ? dayjs(liquidityAllocationTime).format('MMMM DD, YYYY HH:mm A GMT')
               : 'soon'}
           </div>
@@ -1291,13 +1292,15 @@ const Pool: React.FC = () => {
                 : null
               : null}
 
+            {isUserCreator && !liquidityAdded ? htmlClosePresale : null}
+
             {isUserCreator
               ? isPresaleClosed
                 ? cancelled
-                  ? htmlClosePresale
+                  ? null
                   : isPresaleSuccessful
                   ? null
-                  : htmlClosePresale
+                  : null
                 : null
               : null}
 
