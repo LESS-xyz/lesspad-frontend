@@ -3,7 +3,7 @@ import Web3 from 'web3';
 
 import config from '../../config';
 import ERC20Abi from '../../data/abi/ERC20Abi';
-import { convertToWei } from '../../utils/ethereum';
+import { convertHexToString, convertToWei } from '../../utils/ethereum';
 
 type TypeConstructorProps = {
   web3Provider: any;
@@ -171,11 +171,11 @@ export default class ContractPresalePublicService {
         closeTimeVoting: closeTimeVoting * 1000,
         collectedFee,
         // string
-        saleTitle: this.web3.utils.hexToString(saleTitle),
-        linkTelegram: this.web3.utils.hexToString(linkTelegram),
-        linkGithub: this.web3.utils.hexToString(linkGithub),
-        linkTwitter: this.web3.utils.hexToString(linkTwitter),
-        linkWebsite: this.web3.utils.hexToString(linkWebsite),
+        saleTitle: convertHexToString(saleTitle),
+        linkTelegram: convertHexToString(linkTelegram),
+        linkGithub: convertHexToString(linkGithub),
+        linkTwitter: convertHexToString(linkTwitter),
+        linkWebsite: convertHexToString(linkWebsite),
         linkLogo,
         description,
         whitepaper,

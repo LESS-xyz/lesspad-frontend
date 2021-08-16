@@ -2,6 +2,7 @@ import { BigNumber as BN } from 'bignumber.js/bignumber';
 import Web3 from 'web3';
 
 import config from '../../config';
+import { convertHexToString } from '../../utils/ethereum';
 
 import ContractLessTokenService from './ContractLessToken';
 import ContractLpTokenService from './ContractLPToken';
@@ -108,16 +109,17 @@ export default class ContractLessLibraryService {
   public getArrForSearch = async () => {
     try {
       const arrForSearch = await this.contract.methods.getArrForSearch().call();
+      console.log('ContractLessLibraryService getArrForSearch:', arrForSearch);
       const arrForSearchFormatted = arrForSearch.map((item: any) => {
         let { description, title } = item;
         const { isCertified, presaleAddress, openVotingTime } = item;
-        if (description === '') description = '0x';
-        if (title === '') title = '0x';
+        if (description === '') description = '0x0';
+        if (title === '') title = '0x0';
         return {
           description,
           isCertified,
           address: presaleAddress,
-          title: this.web3.utils.hexToString(title),
+          title: convertHexToString(title),
           openVotingTime: +openVotingTime * 1000,
         };
       });
