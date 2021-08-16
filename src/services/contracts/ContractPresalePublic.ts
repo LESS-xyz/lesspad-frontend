@@ -3,6 +3,7 @@ import Web3 from 'web3';
 
 import config from '../../config';
 import ERC20Abi from '../../data/abi/ERC20Abi';
+import { convertToWei } from '../../utils/ethereum';
 
 type TypeConstructorProps = {
   web3Provider: any;
@@ -53,6 +54,11 @@ type TypeInvestmentsProps = {
   userAddress: string;
   contractAddress: string;
   tokenDecimals: number;
+};
+
+type TypeInvestmentsEthProps = {
+  userAddress: string;
+  contractAddress: string;
 };
 
 export default class ContractPresalePublicService {
@@ -298,6 +304,22 @@ export default class ContractPresalePublicService {
     }
   };
 
+  public investmentsEth = async (props: TypeInvestmentsEthProps): Promise<any> => {
+    try {
+      const { userAddress, contractAddress } = props;
+      // console.log('ContractPresalePublicService investments props:', props);
+      const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
+      const result = await contract.methods.investments(userAddress).call();
+      const { amountEth } = result;
+      const pow = new BN(10).pow(new BN(18));
+      const amountEthInEth = +new BN(amountEth).div(pow);
+      return amountEthInEth;
+    } catch (e) {
+      console.error('ContractPresalePublicService investmentsEth:', e);
+      return null;
+    }
+  };
+
   public register = async (props: TypeRegisterProps): Promise<any> => {
     try {
       const {
@@ -338,6 +360,22 @@ export default class ContractPresalePublicService {
       // console.log('ContractPresalePublicService cancelPresale:', props);
       const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
       return await contract.methods.cancelPresale().send({ from: userAddress });
+    } catch (e) {
+      console.error('ContractPresalePublicService cancelPresale:', e);
+      return null;
+    }
+  };
+
+  public withdrawInvestment = async (props: TypeClaimTokensProps): Promise<any> => {
+    try {
+      const { userAddress, contractAddress } = props;
+      // console.log('ContractPresalePublicService cancelPresale:', props);
+      const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
+      const amountEth = await this.investmentsEth({ userAddress, contractAddress });
+      const amountEthInWei = convertToWei(amountEth, 18);
+      return await contract.methods
+        .withdrawInvestment(userAddress, amountEthInWei)
+        .send({ from: userAddress });
     } catch (e) {
       console.error('ContractPresalePublicService cancelPresale:', e);
       return null;

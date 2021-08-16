@@ -511,7 +511,19 @@ const Pool: React.FC = () => {
       });
       console.log('PagePool resultClaimTokens:', resultClaimTokens);
     } catch (e) {
-      console.error('PagePool handleVote:', e);
+      console.error('PagePool resultClaimTokens:', e);
+    }
+  }, [ContractPresalePublicWithMetamask, userAddress, address]);
+
+  const withdrawInvestment = useCallback(async () => {
+    try {
+      const resultClaimTokens = await ContractPresalePublicWithMetamask.withdrawInvestment({
+        userAddress,
+        contractAddress: address,
+      });
+      console.log('PagePool withdrawInvestment:', resultClaimTokens);
+    } catch (e) {
+      console.error('PagePool withdrawInvestment:', e);
     }
   }, [ContractPresalePublicWithMetamask, userAddress, address]);
 
@@ -1040,6 +1052,28 @@ const Pool: React.FC = () => {
     </>
   );
 
+  const htmlWithdrawInvestment = (
+    <>
+      <div className="item">
+        <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
+          Withdraw
+        </div>
+        <div className="item-text">Presale is not successful</div>
+        <div className="button-border">
+          <div
+            className="button"
+            role="button"
+            tabIndex={0}
+            onClick={withdrawInvestment}
+            onKeyDown={() => {}}
+          >
+            <div className="gradient-button-text">Withdraw investment</div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+
   const htmlClosePresale = (
     <>
       <div className="item">
@@ -1265,6 +1299,14 @@ const Pool: React.FC = () => {
                   ? null
                   : htmlClosePresale
                 : null
+              : null}
+
+            {isPresaleClosed
+              ? cancelled
+                ? htmlWithdrawInvestment
+                : isPresaleSuccessful
+                ? null
+                : htmlWithdrawInvestment
               : null}
           </div>
         </div>
