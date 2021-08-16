@@ -1147,7 +1147,7 @@ const Pool: React.FC = () => {
         </div>
         <div className="grow-progress">
           <div>
-            {tokensSoldInNativeCurrency} {chainInfo.symbol} Raised
+            {tokensSoldInNativeCurrency || 0} {chainInfo.symbol} Raised
           </div>
           <div>{participants} Participants</div>
         </div>
@@ -1162,10 +1162,11 @@ const Pool: React.FC = () => {
 
         <div className="grow-info">
           <div className="grow-min">
-            {prettyNumber(percentOfTokensSold.toString())}% (Min {percentOfSoftCap}%)
+            {prettyNumber(percentOfTokensSold.toString()) || 0}% (Min{' '}
+            {!Number.isNaN(+percentOfSoftCap) ? percentOfSoftCap : 0}%)
           </div>
           <div className="grow-max">
-            {tokensSold} / {hardCapInTokens} {tokenSymbol}
+            {tokensSold || 0} / {prettyNumber(hardCapInTokens) || 0} {tokenSymbol}
           </div>
         </div>
       </div>
@@ -1252,7 +1253,7 @@ const Pool: React.FC = () => {
         <div className="container-presale-status">
           <div className="container-presale-status-inner">
             <div className="gradient-header">Registration started</div>
-            <div className="presale-status-text">{timeBeforeVoting}</div>
+            <div className="presale-status-text">{timeBeforeRegistration}</div>
           </div>
         </div>
       ) : null}
