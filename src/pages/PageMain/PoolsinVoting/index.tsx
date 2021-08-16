@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import dayjs from 'dayjs';
 
@@ -28,7 +28,7 @@ const PoolsiInVoting: React.FC = () => {
   ]);
   // const [info, setInfo] = useState<any[]>([]);
 
-  const getVotingTime = async () => {
+  const getVotingTime = useCallback(async () => {
     try {
       const newInfo = await ContractLessLibrary.getVotingTime();
       console.log('TokenCard getVotingTime:', newInfo);
@@ -36,18 +36,12 @@ const PoolsiInVoting: React.FC = () => {
     } catch (e) {
       console.error('TableRow getVotingTime:', e);
     }
-  };
+  }, [ContractLessLibrary]);
 
   const compareOpenVotingTime = (a, b) => {
     return b.openVotingTime - a.openVotingTime;
   };
-  const filterTable = async () => {
-    // const info = pools.map(async (pool: any) => {
-    //   const newInfo = await getInfo(pool.address);
-    //   return newInfo;
-    // });
-    //
-    // console.log('only public presales', info);
+  const filterTable = useCallback(async () => {
     if (pools && pools.length !== 0) {
       try {
         const presalesInfoNew = pools
@@ -66,16 +60,16 @@ const PoolsiInVoting: React.FC = () => {
         console.error(e);
       }
     }
-  };
+  }, [pools, votingTime]);
 
-  const getMinVoterBalance = async () => {
+  const getMinVoterBalance = useCallback(async () => {
     try {
       const resultGetMinVoterBalance = await ContractLessLibrary.getMinVoterBalance();
       setLibrary({ minVoterBalance: resultGetMinVoterBalance });
     } catch (e) {
       console.error(e);
     }
-  };
+  }, [ContractLessLibrary, setLibrary]);
 
   const handleShowInfo = () => {
     try {
@@ -100,8 +94,7 @@ const PoolsiInVoting: React.FC = () => {
   useEffect(() => {
     if (!ContractLessLibrary) return;
     getVotingTime();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ContractLessLibrary]);
+  }, [ContractLessLibrary, getVotingTime]);
 
   /*  useEffect(() => {
       for (let i = 0, newInfo: any[] = []; i < pools.length; i += 1) {
@@ -118,14 +111,12 @@ const PoolsiInVoting: React.FC = () => {
     if (!ContractLessLibrary) return;
     // console.log('PageVoting pools:', pools)
     getMinVoterBalance();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ContractLessLibrary]);
+  }, [ContractLessLibrary, getMinVoterBalance]);
 
   useEffect(() => {
     if (!pools || !pools.length) return;
     filterTable();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pools, pools.length]);
+  }, [filterTable, pools, pools.length]);
 
   return (
     <section className={s.block}>
