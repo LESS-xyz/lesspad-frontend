@@ -240,7 +240,7 @@ const Pool: React.FC = () => {
     return new BN(softCap).div(hardCap).multipliedBy(new BN(100)).toString(10);
   }, [softCap, hardCap]);
 
-  const isPresaleSuccessful = +percentOfSoftCap >= 100;
+  const isPresaleSuccessful = +percentOfTokensSold >= 100;
 
   const currency = chainSymbols[chainType];
   const explorer = explorers[chainType];
@@ -972,7 +972,9 @@ const Pool: React.FC = () => {
   const htmlInvestment = (
     <>
       <div className="item">
-        Your {currency} Investment
+        <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
+          Your {currency} Investment
+        </div>
         <div className="item-text">
           <div className="item-text-bold">
             {investments.amountEth} {currency}
@@ -981,7 +983,9 @@ const Pool: React.FC = () => {
       </div>
       {isMyTierTime ? (
         <div className="item">
-          Buy Tokens
+          <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
+            Buy tokens
+          </div>
           <div className="item-text">
             <div className="item-text-bold">
               1 {tokenSymbol} = {tokenPrice} {currency}
@@ -1008,7 +1012,9 @@ const Pool: React.FC = () => {
         </div>
       ) : (
         <div className="item">
-          Buy Tokens
+          <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
+            Buy tokens
+          </div>
           <div className="item-text">
             <div className="item-text-bold">Your tier invest time starts {timeBeforeMyTier}</div>
           </div>
@@ -1029,7 +1035,9 @@ const Pool: React.FC = () => {
   const htmlClaimTokens = (
     <>
       <div className="item">
-        Your Tokens
+        <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
+          Your tokens
+        </div>
         <div className="item-text">
           <div className="item-text-bold">{investments.amountTokens}</div>
           <div className="item-text-gradient">{tokenSymbol}</div>
@@ -1092,6 +1100,10 @@ const Pool: React.FC = () => {
       </div>
     </>
   );
+
+  const showHtmlClaimTokens = isPresaleClosed && !cancelled && liquidityAdded && !isUserCreator;
+  const showHtmlClosePresale = isUserCreator && !liquidityAdded;
+  const showHtmlWithdrawInvestment = isPresaleClosed && (cancelled || !isPresaleSuccessful);
 
   return (
     <div className="container">
@@ -1287,31 +1299,9 @@ const Pool: React.FC = () => {
               ? htmlInvestmentIsClosed
               : null}
 
-            {isPresaleClosed && !cancelled && liquidityAdded
-              ? !isUserCreator
-                ? htmlClaimTokens
-                : null
-              : null}
-
-            {isUserCreator && !liquidityAdded ? htmlClosePresale : null}
-
-            {isUserCreator
-              ? isPresaleClosed
-                ? cancelled
-                  ? null
-                  : isPresaleSuccessful
-                  ? null
-                  : null
-                : null
-              : null}
-
-            {isPresaleClosed
-              ? cancelled
-                ? htmlWithdrawInvestment
-                : isPresaleSuccessful
-                ? null
-                : htmlWithdrawInvestment
-              : null}
+            {showHtmlClaimTokens && htmlClaimTokens}
+            {showHtmlClosePresale && htmlClosePresale}
+            {showHtmlWithdrawInvestment && htmlWithdrawInvestment}
           </div>
         </div>
       ) : null}
