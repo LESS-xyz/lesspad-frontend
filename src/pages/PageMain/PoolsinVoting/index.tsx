@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import dayjs from 'dayjs';
 
 import Button from '../../../components/Button';
+import config from '../../../config';
 import { useContractsContext } from '../../../contexts/ContractsContext';
 import { libraryActions, modalActions } from '../../../redux/actions';
 import { prettyNumber } from '../../../utils/prettifiers';
@@ -10,14 +10,17 @@ import Table from '../../PageVoting/Table';
 
 import s from './PoolsInVoting.module.scss';
 
+const { NOW } = config;
+
 const PoolsiInVoting: React.FC = () => {
   const { ContractLessLibrary } = useContractsContext();
-  //
+
   const [presalesAddressesFiltered, setPresalesAddressesFiltered] = useState<any[]>([]);
   const [votingTime, setVotingTime] = useState<number>(0);
 
   const { pools } = useSelector(({ pool }: any) => pool);
   const { minVoterBalance } = useSelector(({ library }: any) => library);
+  const { lessPerLp } = useSelector(({ library }: any) => library);
 
   const dispatch = useDispatch();
   const toggleModal = React.useCallback((params) => dispatch(modalActions.toggleModal(params)), [
@@ -26,7 +29,6 @@ const PoolsiInVoting: React.FC = () => {
   const setLibrary = React.useCallback((params) => dispatch(libraryActions.setLibrary(params)), [
     dispatch,
   ]);
-  // const [info, setInfo] = useState<any[]>([]);
 
   const getVotingTime = useCallback(async () => {
     try {
@@ -47,8 +49,8 @@ const PoolsiInVoting: React.FC = () => {
         const presalesInfoNew = pools
           .filter((item: any) => {
             const { openVotingTime = 0 } = item;
-            const now = dayjs().valueOf();
-            const isVoting = now > openVotingTime && now < openVotingTime + votingTime * 1000;
+            if (!openVotingTime) return false;
+            const isVoting = NOW > openVotingTime && NOW < openVotingTime + votingTime * 1000;
             // console.log(`${address} ended`, isVotingEnded);
             if (!isVoting) return false;
             return true;
@@ -78,8 +80,8 @@ const PoolsiInVoting: React.FC = () => {
         text: (
           <div className={s.messageContainer}>
             You need at least {minVoterBalance} $LESS or{' '}
-            {prettyNumber((+minVoterBalance / 300).toString())} ETH-LESS LP in stake to be able to
-            vote
+            {prettyNumber((+minVoterBalance / lessPerLp).toString())} ETH-LESS LP in stake to be
+            able to vote
             <div className={s.messageContainerButtons}>
               <Button to="/staking">Go to Staking</Button>
             </div>
@@ -123,28 +125,6 @@ const PoolsiInVoting: React.FC = () => {
       <div className={s.container}>
         <div className={s.inner}>
           <div className={s.title}>Pools in Voting</div>
-          {/* <div className={s.cards}>
-            {pools.slice(0, 3).map((item: any) => {
-              const { address = '', title = '', isCertified } = item;
-              const props: ITokenCardProps = {
-                address,
-                logo: logo1,
-                daysTillOpen: 3,
-                name: title,
-                subtitle: 'Participant',
-                website: 'https://github.com/',
-                telegram: 'https://t.me/durov',
-                whitePaper: 'https://bitcoin.org/ru/bitcoin-paper',
-                blockchainLogo: bnbLogo,
-                chain: 'BNB',
-                type: 'public',
-                fundingToken: 'BNB',
-                status: 'not opened',
-                isCertified,
-              };
-              return <TokenCard key={uuid()} {...props} />;
-            })}
-          </div> */}
           <div className={s.subtitle}>
             <span role="button" tabIndex={0} onClick={handleShowInfo} onKeyDown={() => {}}>
               Info

@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useSelector } from 'react-redux';
-import dayjs from 'dayjs';
 import useMedia from 'use-media';
 import { v4 as uuid } from 'uuid';
 
@@ -9,9 +8,12 @@ import Pagination from '../../components/Pagination/index';
 import Search from '../../components/Search/index';
 import Selector from '../../components/Selector/index';
 import TokenCard, { ITokenCardProps } from '../../components/TokenCard/index';
+import config from '../../config';
 import { useContractsContext } from '../../contexts/ContractsContext';
 
 import s from './AllPools.module.scss';
+
+const { NOW } = config;
 
 const AllPoolsPage: React.FC = () => {
   const { ContractLessLibrary } = useContractsContext();
@@ -20,7 +22,6 @@ const AllPoolsPage: React.FC = () => {
   const [page, setPage] = useState<number>(0);
   const [votingTime, setVotingTime] = useState<number>(0);
 
-  // const [info, setInfo] = useState<any[]>([]);
   const [poolsFiltered, setPoolsFiltered] = useState<any[]>([]);
   const [countOfPages, setCountOfPages] = useState<number>(1);
 
@@ -29,12 +30,13 @@ const AllPoolsPage: React.FC = () => {
   const isMobile = useMedia({ maxWidth: 768 });
 
   const itemsOnPage = 6;
+
   const setPagesCount = useCallback(() => {
     let count = Math.floor(+(poolsFiltered.length / itemsOnPage));
     const moduloOfPages = poolsFiltered.length % itemsOnPage;
     if (moduloOfPages > 0 && poolsFiltered.length > itemsOnPage) count += 1;
     setCountOfPages(count);
-  }, [poolsFiltered.length]);
+  }, [poolsFiltered]);
 
   const handleChangePage = useCallback((p: number) => setPage(p), []);
 
@@ -69,7 +71,6 @@ const AllPoolsPage: React.FC = () => {
               openVotingTime = 0,
             } = item;
             let presaleStatus = '';
-            const now = dayjs().valueOf();
             if (isCertified) {
               // if (openTimePresale > now) presaleStatus = 'Not opened';
               // if (openTimePresale < now) presaleStatus = 'Opened';
@@ -77,9 +78,9 @@ const AllPoolsPage: React.FC = () => {
             } else {
               // if (openTimePresale > now) presaleStatus = 'Not opened';
               // if (openTimePresale < now) presaleStatus = 'Opened';
-              if (openVotingTime < now) presaleStatus = 'In voting';
+              if (openVotingTime < NOW) presaleStatus = 'In voting';
               // if (openVotingTime + votingTime * 1000 < now) presaleStatus = 'Voting ended';
-              if (openVotingTime + votingTime * 1000 < now) presaleStatus = 'Ended';
+              if (openVotingTime + votingTime * 1000 < NOW) presaleStatus = 'Ended';
             }
             if (currentOption && currentOption !== 'All' && currentOption !== presaleStatus)
               return false;
@@ -119,13 +120,15 @@ const AllPoolsPage: React.FC = () => {
   }, [ContractLessLibrary, getVotingTime]);
 
   useEffect(() => {
+    if (!votingTime) return;
     if (!pools || !pools.length) return;
     filterData();
-  }, [search, pools, pools.length, currentOption, filterData]);
+  }, [search, pools, pools.length, currentOption, filterData, votingTime]);
 
   useEffect(() => {
+    if (!poolsFiltered || !poolsFiltered.length) return;
     setPagesCount();
-  }, [poolsFiltered.length, setPagesCount]);
+  }, [poolsFiltered, poolsFiltered.length, setPagesCount]);
 
   return (
     <section className={s.page}>

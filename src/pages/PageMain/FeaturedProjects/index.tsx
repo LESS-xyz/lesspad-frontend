@@ -1,33 +1,29 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import dayjs from 'dayjs';
 import { v4 as uuid } from 'uuid';
 
 import TokenCard, { ITokenCardProps } from '../../../components/TokenCard';
+import config from '../../../config';
 
 import s from './FeaturedProjects.module.scss';
 
+const { NOW } = config;
+
 const FeaturedProject: React.FC = () => {
   const { pools } = useSelector(({ pool }: any) => pool);
-  const [presalesFiltered, setPresalesFiltered] = useState<any[]>([]);
 
-  const compareOpenVotingTime = (a, b) => {
-    return b.openVotingTime - a.openVotingTime;
-  };
+  const [presalesFiltered, setPresalesFiltered] = useState<any[]>([]);
 
   const filterProjects = useCallback(async () => {
     if (pools && pools.length !== 0) {
       try {
-        const presalesInfoNew = pools
-          .filter((item: any) => {
-            const { openVotingTime = 0 } = item;
-            const now = dayjs().valueOf();
-            const isFeatured = now < openVotingTime;
-            if (!isFeatured) return false;
-            return true;
-          })
-          .sort(compareOpenVotingTime);
+        const presalesInfoNew = pools.filter((item: any) => {
+          const { openVotingTime = 0 } = item;
+          const isFeatured = NOW < openVotingTime;
+          if (!isFeatured) return false;
+          return true;
+        });
         // const presalesAddressesFilteredNew = presalesInfoNew.map((item: any) => item.address);
         setPresalesFiltered(presalesInfoNew);
       } catch (e) {

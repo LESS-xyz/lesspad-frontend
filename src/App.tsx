@@ -52,7 +52,8 @@ export const App: React.FC = memo(() => {
   const getArrForSearch = useCallback(async () => {
     try {
       const arrForSearch = await ContractLessLibrary.getArrForSearch();
-      if (arrForSearch) setPools(arrForSearch);
+      const compareOpenVotingTime = (a, b) => b.openVotingTime - a.openVotingTime;
+      if (arrForSearch) setPools(arrForSearch.sort(compareOpenVotingTime));
       console.log('App getArrForSearch:', arrForSearch);
     } catch (e) {
       console.error('App getArrForSearch:', e);
