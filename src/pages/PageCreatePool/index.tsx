@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
@@ -85,7 +85,7 @@ const CreatePoolPage: React.FC = () => {
   const TIME_TO_BLOCK = MINUTE * 10;
   const defaultOpenVotingTime = NOW + TIME_TO_BLOCK;
   const defaultOpenTime = defaultOpenVotingTime + VOTING_DURATION + REGISTRATION_DURATION;
-  const defaultCloseTime = defaultOpenTime + PRESALE_DURATION;
+  const defaultCloseTime = defaultOpenTime + PRESALE_DURATION + MINUTE;
   const defaultLiquidityAllocationTime = defaultCloseTime + LIQUIDITY_ALLOCATION_DURATION;
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -191,7 +191,27 @@ const CreatePoolPage: React.FC = () => {
     }
   };
 
-  const fieldsMustExist = {
+  const fieldsMustExist = useMemo(() => {
+    return {
+      saleTitle,
+      description,
+      tokenAddress,
+      tokenPrice,
+      softCap,
+      hardCap,
+      openTime,
+      closeTime,
+      listingPrice,
+      liquidityPercentageAllocation,
+      lpTokensLockDurationInDays,
+      linkTelegram,
+      linkGithub,
+      linkTwitter,
+      linkWebsite,
+      linkLogo,
+      whitepaper,
+    };
+  }, [
     saleTitle,
     description,
     tokenAddress,
@@ -209,9 +229,9 @@ const CreatePoolPage: React.FC = () => {
     linkWebsite,
     linkLogo,
     whitepaper,
-  };
+  ]);
 
-  const clearErrors = () => {
+  const clearErrors = useCallback(() => {
     try {
       const newErrors = {};
       const entries = Object.entries(fieldsMustExist);
@@ -221,11 +241,11 @@ const CreatePoolPage: React.FC = () => {
           newErrors[variableName] = variable && '';
         }
       }
-      setErrors({ ...errors, ...newErrors });
+      setErrors(newErrors);
     } catch (e) {
       console.error(e);
     }
-  };
+  }, [fieldsMustExist]);
 
   const validateFormForExistingValues = () => {
     try {
@@ -316,6 +336,7 @@ const CreatePoolPage: React.FC = () => {
     const isOpenVotingTimeMoreThanBlockTimestamp = openVotingTime > NOW + BLOCK_DURATION;
     const isOpenVotingTimePlus24HLessThanOpenTime = openVotingTime + VOTING_DURATION < openTime;
     const isOpenTimeLessThanCloseTime = openTime < closeTime;
+    const isCloseTimeGeqOpenTimePlusPresaleDuration = openTime + PRESALE_DURATION < closeTime;
     const isCloseTimeLessThanLiquidityAllocationTime = closeTime < liquidityAllocationTime;
     // messages
     const messageIsOpenVotingTimeMoreThanBlockTimestamp =
@@ -326,6 +347,9 @@ const CreatePoolPage: React.FC = () => {
       'Open time should be more than: open voting time + 3 days';
     const messageIsOpenTimeLessThanCloseTime =
       !isOpenTimeLessThanCloseTime && 'Open time should be less than close time';
+    const messageIsCloseTimeGeqOpenTimePlusPresaleDuration =
+      !isCloseTimeGeqOpenTimePlusPresaleDuration &&
+      'Close time should be more than: open time + presale duration';
     const messageIsCloseTimeLessThanLiquidityAllocationTime =
       !isCloseTimeLessThanLiquidityAllocationTime &&
       'Close time should be less than liquidity allocation time';
@@ -335,9 +359,13 @@ const CreatePoolPage: React.FC = () => {
         messageIsOpenVotingTimeMoreThanBlockTimestamp ||
         messageIsOpenVotingTimePlus24HLessThanOpenTime,
       openTime:
-        messageIsOpenTimeLessThanCloseTime || messageIsOpenVotingTimePlus24HLessThanOpenTime,
+        messageIsOpenTimeLessThanCloseTime ||
+        messageIsOpenVotingTimePlus24HLessThanOpenTime ||
+        messageIsCloseTimeGeqOpenTimePlusPresaleDuration,
       closeTime:
-        messageIsOpenTimeLessThanCloseTime || messageIsCloseTimeLessThanLiquidityAllocationTime,
+        messageIsOpenTimeLessThanCloseTime ||
+        messageIsCloseTimeLessThanLiquidityAllocationTime ||
+        messageIsCloseTimeGeqOpenTimePlusPresaleDuration,
       liquidityAllocationTime: messageIsCloseTimeLessThanLiquidityAllocationTime,
     };
     console.log(newErrors);
@@ -346,7 +374,9 @@ const CreatePoolPage: React.FC = () => {
     if (!isOpenVotingTimeMoreThanBlockTimestamp) return false;
     if (!isOpenVotingTimePlus24HLessThanOpenTime) return false;
     if (!isOpenTimeLessThanCloseTime) return false;
+    if (!isCloseTimeGeqOpenTimePlusPresaleDuration) return false;
     if (!isCloseTimeLessThanLiquidityAllocationTime) return false;
+    // certified
     if (!isPublic) {
       //
     }
@@ -764,8 +794,8 @@ const CreatePoolPage: React.FC = () => {
 
   useEffect(() => {
     clearErrors();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
+    clearErrors,
     saleTitle,
     description,
     tokenAddress,
