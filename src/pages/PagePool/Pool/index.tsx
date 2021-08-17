@@ -35,8 +35,8 @@ const {
   chainSymbols,
   explorers,
   NOW,
-  REGISTRATION_TIME,
-  TIER_TIME,
+  REGISTRATION_DURATION,
+  TIER_DURATION,
   TIER_PERCENTAGES,
 }: any = config;
 const Backend = new BackendService();
@@ -193,12 +193,14 @@ const Pool: React.FC = () => {
   } = info;
 
   const [tokensShouldBeSold, setTokensShouldBeSold] = useState<number>(hardCap);
+  console.log('Pool:', { percentageOfTokensSoldInCurrentTier, tokensShouldBeSold });
 
   const isBeforeVotimgTime = openTimeVoting > NOW;
   const isVotingTime = openTimeVoting <= NOW && closeTimeVoting > NOW;
   const isBeforeRegistrationTime =
-    openTimeVoting <= NOW && openTimePresale - REGISTRATION_TIME > NOW;
-  const isRegistrationTime = openTimePresale - REGISTRATION_TIME <= NOW && openTimePresale > NOW;
+    openTimeVoting <= NOW && openTimePresale - REGISTRATION_DURATION > NOW;
+  const isRegistrationTime =
+    openTimePresale - REGISTRATION_DURATION <= NOW && openTimePresale > NOW;
   const isInvestmentTime = openTimePresale <= NOW && closeTimePresale > NOW;
   const isOpened = openTimePresale <= NOW;
   const isPresaleClosed = closeTimePresale <= NOW;
@@ -279,7 +281,7 @@ const Pool: React.FC = () => {
       if (openTimePresale === '0') return;
       const newTimeBeforeVoting = dayjs(openTimeVoting).fromNow();
       setTimeBeforeVoting(newTimeBeforeVoting);
-      const openRegistrationTime = openTimePresale - REGISTRATION_TIME;
+      const openRegistrationTime = openTimePresale - REGISTRATION_DURATION;
       const newTimeBeforeRegistration = dayjs(openRegistrationTime).fromNow();
       setTimeBeforeRegistration(newTimeBeforeRegistration);
     } catch (e) {
@@ -563,7 +565,7 @@ const Pool: React.FC = () => {
       if (!tier) return;
       if (openTimePresale === '0') return;
       if (closeTimePresale === '0') return;
-      const tierTimeNew = +openTimePresale + TIER_TIME * (5 - +tier);
+      const tierTimeNew = +openTimePresale + TIER_DURATION * (5 - +tier);
       const isMyTierTimeNew = isInvestmentTime && tierTimeNew <= NOW;
       const timeBeforeMyTierNew = dayjs(tierTimeNew).fromNow();
       setIsMyTierTime(isMyTierTimeNew);
@@ -579,8 +581,8 @@ const Pool: React.FC = () => {
       // current tier 5 >>> 1
       let currentTierNew = 0;
       for (let i = 1; i <= 5; i += 1) {
-        const tierTimeStart = +openTimePresale + TIER_TIME * (5 - i);
-        const tierTimeEnd = +openTimePresale + TIER_TIME * (5 - i + 1);
+        const tierTimeStart = +openTimePresale + TIER_DURATION * (5 - i);
+        const tierTimeEnd = +openTimePresale + TIER_DURATION * (5 - i + 1);
         if (tierTimeStart <= NOW && tierTimeEnd > NOW) {
           currentTierNew = i;
         }
@@ -601,13 +603,12 @@ const Pool: React.FC = () => {
         tokensShouldBeSoldNew,
         tokensSold,
         percentagesShouldBeSold,
-        percentageOfTokensSoldInCurrentTier,
+        percentageOfTokensSoldInCurrentTierNew,
       });
     } catch (e) {
       console.error(e);
     }
   }, [
-    percentageOfTokensSoldInCurrentTier,
     hardCap,
     tokensSold,
     tier,
@@ -1216,18 +1217,18 @@ const Pool: React.FC = () => {
           <div className="grow-scale-progress">
             <div
               className="grow-scale-progress-value"
-              style={{ width: `${percentageOfTokensSoldInCurrentTier}%` }}
+              style={{ width: `${percentOfTokensSold}%` }}
             />
           </div>
         </div>
 
         <div className="grow-info">
           <div className="grow-min">
-            {prettyNumber(percentageOfTokensSoldInCurrentTier.toString()) || 0}% (Min{' '}
+            {prettyNumber(percentOfTokensSold.toString()) || 0}% (Min{' '}
             {!Number.isNaN(+percentOfSoftCap) ? percentOfSoftCap : 0}%)
           </div>
           <div className="grow-max">
-            {tokensSold || 0} / {prettyNumber(tokensShouldBeSold.toString()) || 0} {tokenSymbol}
+            {tokensSold || 0} / {prettyNumber(hardCapInTokens) || 0} {tokenSymbol}
           </div>
         </div>
       </div>
