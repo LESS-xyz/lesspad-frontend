@@ -20,10 +20,14 @@ import s from './CreatePool.module.scss';
 
 const Backend = new BackendService();
 const {
+  SHOW_CERTIFIED_PRESALE,
   SHOW_FORM_VALUES,
+  IS_FORM_EXISTING_VALUES_VALIDATION_ENABLED,
+  IS_FORM_TIME_VALIDATION_ENABLED,
   NOW,
-  PRESALE_DURATION,
+  BLOCK_DURATION,
   VOTING_DURATION,
+  PRESALE_DURATION,
   REGISTRATION_DURATION,
   LIQUIDITY_ALLOCATION_DURATION,
   MINUTE,
@@ -44,7 +48,7 @@ const messageGt0 = 'Value should be greater than 0';
 const validationIfExists = [
   {
     equation: checkIfExists,
-    message: messageEnterValue,
+    message: IS_FORM_EXISTING_VALUES_VALIDATION_ENABLED ? messageEnterValue : '',
   },
 ];
 const validationPercentage = [
@@ -225,6 +229,7 @@ const CreatePoolPage: React.FC = () => {
 
   const validateFormForExistingValues = () => {
     try {
+      if (!IS_FORM_EXISTING_VALUES_VALIDATION_ENABLED) return true;
       const newErrors = {};
       const entries = Object.entries(fieldsMustExist);
       for (let i = 0; i < entries.length; i += 1) {
@@ -306,11 +311,9 @@ const CreatePoolPage: React.FC = () => {
   }, [isPublic, tokenAddress, web3]);
 
   const validateTime = useCallback(() => {
-    // return true; // todo: remove!!!
+    if (!IS_FORM_TIME_VALIDATION_ENABLED) return true;
     // checks
-    // todo block timestamp
-    const isOpenVotingTimeMoreThanBlockTimestamp = openVotingTime > NOW;
-    // todo add getVotingTime from contract, check ms/s
+    const isOpenVotingTimeMoreThanBlockTimestamp = openVotingTime > NOW + BLOCK_DURATION;
     const isOpenVotingTimePlus24HLessThanOpenTime = openVotingTime + VOTING_DURATION < openTime;
     const isOpenTimeLessThanCloseTime = openTime < closeTime;
     const isCloseTimeLessThanLiquidityAllocationTime = closeTime < liquidityAllocationTime;
@@ -731,7 +734,7 @@ const CreatePoolPage: React.FC = () => {
   };
 
   useEffect(() => {
-    if (!isPublic) {
+    if (!isPublic && !SHOW_CERTIFIED_PRESALE) {
       toggleModal({
         open: true,
         text: (
@@ -741,8 +744,7 @@ const CreatePoolPage: React.FC = () => {
         ),
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPublic]);
+  }, [isPublic, toggleModal]);
 
   useEffect(() => {
     if (!userAddress) return;
