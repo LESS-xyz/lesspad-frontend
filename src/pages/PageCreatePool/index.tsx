@@ -19,7 +19,15 @@ import { prettyNumber } from '../../utils/prettifiers';
 import s from './CreatePool.module.scss';
 
 const Backend = new BackendService();
-const { SHOW_FORM_VALUES, NOW, DAY, VOTING_TIME } = config;
+const {
+  SHOW_FORM_VALUES,
+  NOW,
+  PRESALE_DURATION,
+  VOTING_DURATION,
+  REGISTRATION_DURATION,
+  LIQUIDITY_ALLOCATION_DURATION,
+  MINUTE,
+} = config;
 
 const checkIfExists = (value: any) => value;
 const checkPercentage = (value: number) => value >= 0 && value <= 100;
@@ -70,14 +78,11 @@ const CreatePoolPage: React.FC = () => {
     ContractLessLibrary,
   } = useContractsContext();
 
-  const MIN5 = 1000 * 60 * 10;
-  const HOUR = 1000 * 60 * 60;
-  const defaultOpenVotingTime = NOW + MIN5; // todo: next block time
-  const votingDuration = VOTING_TIME; // todo
-  const registerDuration = DAY; // todo
-  const defaultOpenTime = defaultOpenVotingTime + votingDuration + registerDuration; // todo
-  const defaultCloseTime = defaultOpenTime + DAY; // todo
-  const defaultLiquidityAllocationTime = defaultCloseTime + HOUR; // todo
+  const TIME_TO_BLOCK = MINUTE * 10;
+  const defaultOpenVotingTime = NOW + TIME_TO_BLOCK;
+  const defaultOpenTime = defaultOpenVotingTime + VOTING_DURATION + REGISTRATION_DURATION;
+  const defaultCloseTime = defaultOpenTime + PRESALE_DURATION;
+  const defaultLiquidityAllocationTime = defaultCloseTime + LIQUIDITY_ALLOCATION_DURATION;
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -279,7 +284,7 @@ const CreatePoolPage: React.FC = () => {
     }
   };
 
-  const validateAddresses = async () => {
+  const validateAddresses = useCallback(async () => {
     try {
       if (!web3) return false;
       const isTokenAddressValid = await web3.isAddress(tokenAddress);
@@ -288,7 +293,7 @@ const CreatePoolPage: React.FC = () => {
       const newErrors = {
         tokenAddress: messageIfEnterValue || messageIfAddressNotValid,
       };
-      setErrors({ ...errors, ...newErrors });
+      setErrors(newErrors);
       if (!isTokenAddressValid) return false;
       if (!isPublic) {
         //
@@ -298,15 +303,15 @@ const CreatePoolPage: React.FC = () => {
       console.error(e);
       return false;
     }
-  };
+  }, [isPublic, tokenAddress, web3]);
 
-  const validateTime = () => {
+  const validateTime = useCallback(() => {
     // return true; // todo: remove!!!
     // checks
     // todo block timestamp
-    const isOpenVotingTimeMoreThanBlockTimestamp = openTime > Date.now();
+    const isOpenVotingTimeMoreThanBlockTimestamp = openVotingTime > NOW;
     // todo add getVotingTime from contract, check ms/s
-    const isOpenVotingTimePlus24HLessThanOpenTime = openVotingTime + VOTING_TIME < openTime;
+    const isOpenVotingTimePlus24HLessThanOpenTime = openVotingTime + VOTING_DURATION < openTime;
     const isOpenTimeLessThanCloseTime = openTime < closeTime;
     const isCloseTimeLessThanLiquidityAllocationTime = closeTime < liquidityAllocationTime;
     // messages
@@ -315,7 +320,7 @@ const CreatePoolPage: React.FC = () => {
       'Open voting time should be more than last block time';
     const messageIsOpenVotingTimePlus24HLessThanOpenTime =
       !isOpenVotingTimePlus24HLessThanOpenTime &&
-      'Open time should be less or equal to: open voting time + voting time + 24H';
+      'Open time should be more than: open voting time + 3 days';
     const messageIsOpenTimeLessThanCloseTime =
       !isOpenTimeLessThanCloseTime && 'Open time should be less than close time';
     const messageIsCloseTimeLessThanLiquidityAllocationTime =
@@ -332,7 +337,8 @@ const CreatePoolPage: React.FC = () => {
         messageIsOpenTimeLessThanCloseTime || messageIsCloseTimeLessThanLiquidityAllocationTime,
       liquidityAllocationTime: messageIsCloseTimeLessThanLiquidityAllocationTime,
     };
-    setErrors({ ...errors, ...newErrors });
+    console.log(newErrors);
+    setErrors(newErrors);
     // returns
     if (!isOpenVotingTimeMoreThanBlockTimestamp) return false;
     if (!isOpenVotingTimePlus24HLessThanOpenTime) return false;
@@ -342,7 +348,7 @@ const CreatePoolPage: React.FC = () => {
       //
     }
     return true;
-  };
+  }, [openTime, closeTime, isPublic, liquidityAllocationTime, openVotingTime]);
 
   const handleGoToStaking = useCallback(async () => {
     try {
@@ -786,6 +792,19 @@ const CreatePoolPage: React.FC = () => {
   }, [softCap, hardCap]);
 
   useEffect(() => {
+    if (!tokenAddress) return;
+    validateAddresses();
+  }, [tokenAddress, validateAddresses]);
+
+  useEffect(() => {
+    if (!openVotingTime) return;
+    if (!openTime) return;
+    if (!closeTime) return;
+    if (!liquidityAllocationTime) return;
+    validateTime();
+  }, [openVotingTime, openTime, closeTime, liquidityAllocationTime, validateTime]);
+
+  useEffect(() => {
     if (!stakedLess) return;
     if (!stakedLp) return;
     if (!lessPerLp) return;
@@ -836,6 +855,7 @@ const CreatePoolPage: React.FC = () => {
                 placeholder="0x3561A02e...8e867013"
                 value={tokenAddress}
                 onChange={setTokenAddress}
+                delay={500}
                 error={errors.tokenAddress}
                 validations={validationIfExists}
               />

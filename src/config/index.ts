@@ -9,30 +9,42 @@ import PresalePublicAbi from '../data/abi/PresalePublicAbi';
 import StakingAbi from '../data/abi/StakingAbi';
 import UniswapRouterAbi from '../data/abi/UniswapRouterAbi';
 
-const IS_PRODUCTION = true;
+const IS_PRODUCTION = false;
 const IS_TESTING_ON_ROPSTEN = false;
-const SHOW_CONSOLE_LOGS = false;
+const SHOW_CONSOLE_LOGS = true;
 const SHOW_FORM_VALUES = false;
+
 const INFURA_KEY = 'bf1db577e6bb42bf93893e1ea5dd1630';
 
-const NOW = Date.now(); // todo
-const DAY = 1000 * 60 * 60 * 24; // todo
-const TIER_TIME = IS_PRODUCTION ? 1000 * 60 * 60 * 15 : 1000 * 60 * 5; // todo:
-const VOTING_TIME = IS_PRODUCTION ? DAY * 3 : DAY; // todo:
-const REGISTRATION_TIME = DAY; // todo:
-const TIER_PERCENTAGES = [30, 20, 15, 25, 10];
+const NOW = Date.now();
+const MINUTE = 1000 * 60;
+const HOUR = MINUTE * 60;
+const DAY = IS_PRODUCTION ? MINUTE * 60 * 24 : MINUTE * 5;
+const VOTING_DURATION = IS_PRODUCTION ? DAY * 3 : DAY;
+const REGISTRATION_DURATION = DAY;
+const TIER_DURATION = IS_PRODUCTION ? MINUTE * 60 * 15 : MINUTE * 5;
+const PRESALE_DURATION = TIER_DURATION * 5;
+const TIER_PERCENTAGES = [30, 20, 15, 25, 10]; // Tier 5 >>> Tier 1
+const LIQUIDITY_ALLOCATION_DURATION = IS_PRODUCTION ? HOUR : MINUTE * 10;
 
 export default {
   IS_PRODUCTION,
   IS_TESTING_ON_ROPSTEN,
   SHOW_CONSOLE_LOGS,
   SHOW_FORM_VALUES,
+  // time
   NOW,
   DAY,
-  TIER_TIME,
-  VOTING_TIME,
-  REGISTRATION_TIME,
+  HOUR,
+  MINUTE,
+  TIER_DURATION,
+  VOTING_DURATION,
+  REGISTRATION_DURATION,
+  PRESALE_DURATION,
+  LIQUIDITY_ALLOCATION_DURATION,
+  //
   TIER_PERCENTAGES,
+  //
   version: IS_PRODUCTION ? 'Mainnet beta' : IS_TESTING_ON_ROPSTEN ? 'Ropsten beta' : 'Kovan beta',
   isMainnetOrTestnet: IS_PRODUCTION ? 'mainnet' : 'testnet',
   netType: IS_PRODUCTION ? 'mainnet' : IS_TESTING_ON_ROPSTEN ? 'ropsten' : 'kovan',
@@ -112,7 +124,6 @@ export default {
   },
   addresses: {
     mainnet: {
-      // todo
       Ethereum: {
         Calculations: '0x3561A02e1192B89e2415724f43521f898e867013',
         LessToken: '0x62786eeacc9246b4018e0146cb7a3efeacd9459d',
@@ -122,16 +133,9 @@ export default {
         PresaleFactory: '0x2223af5287833BDC0c811Fb40AA37bE05401589c',
         // PresaleFactoryCertified: '0xB9733F217111A845A268d1D98EE91800907860e2',
       },
-      // 'Binance-Smart-Chain': {
-      //   LessToken: '0xa372d1d35041714092900B233934fB2D002755E2',
-      //   LessLibrary: '0x46589Ab934277E44A5060f3273761b86396d5429',
-      //   Staking: '0xF4Fa7Fd880Eb889B4829126d89C4F09304B73270',
-      //   PresaleFactory: '0xB9733F217111A845A268d1D98EE91800907860e2',
-      //   PresalePublic: '0xeA63Bfc235c1f70BE88287BCed13A42550C40DF3',
-      // },
     },
     testnet: {
-      'Ethereum': {
+      Ethereum: {
         Calculations: '0x9Cdb409D0bE7442f3398ec196988813C35Cc0b57',
         LessToken: '0x87feef975fd65f32A0836f910Fd13d9Cf4553690',
         LPToken: '0x4fe142c6cbd294ef96dbba8a837cde3035850a97',
@@ -139,15 +143,6 @@ export default {
         LessLibrary: '0xa78C93A963C7C1d786EFf8CFbf54f37E0E9c12E1',
         PresaleFactory: '0xa8FD2169DFf71c22cB011c07196728B9FB75C58f',
         PresaleFactoryCertified: '0x30457a87c85b4fcf4127e1d07f64035493e52940',
-        // PresalePublic: '0x4453Dc4B13b29A227fb3eE3E41Dd590410e1729b',
-      },
-      'Binance-Smart-Chain': {
-        // todo
-        // LessToken: '0xa372d1d35041714092900B233934fB2D002755E2',
-        // LessLibrary: '0x46589Ab934277E44A5060f3273761b86396d5429',
-        // Staking: '0xF4Fa7Fd880Eb889B4829126d89C4F09304B73270',
-        // PresaleFactory: '0xB9733F217111A845A268d1D98EE91800907860e2',
-        // PresalePublic: '0xeA63Bfc235c1f70BE88287BCed13A42550C40DF3',
       },
     },
   },
