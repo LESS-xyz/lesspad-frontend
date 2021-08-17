@@ -149,4 +149,14 @@ export default class ContractLessLibraryService {
       return null;
     }
   };
+
+  public owner = async () => {
+    try {
+      const result = await this.contract.methods.owner().call();
+      return result;
+    } catch (e) {
+      console.error('ContractLessLibraryService owner:', e);
+      return null;
+    }
+  };
 }

@@ -142,7 +142,7 @@ const Pool: React.FC = () => {
   const { pools } = useSelector(({ pool }: any) => pool);
   const { chainType } = useSelector(({ wallet }: any) => wallet);
   const { address: userAddress } = useSelector(({ user }: any) => user);
-  const { stakedLess, stakedLp, lessPerLp } = useSelector(({ library }: any) => library);
+  const { owner, stakedLess, stakedLp, lessPerLp } = useSelector(({ library }: any) => library);
 
   const dispatch = useDispatch();
   const toggleModal = useCallback((params) => dispatch(modalActions.toggleModal(params)), [
@@ -206,6 +206,7 @@ const Pool: React.FC = () => {
   const isPresaleClosed = closeTimePresale <= NOW;
 
   const isUserCreator = userAddress ? creator.toLowerCase() === userAddress.toLowerCase() : false;
+  const isUserOwner = userAddress ? owner.toLowerCase() === userAddress.toLowerCase() : false;
 
   const isEthereum = chainType === 'Ethereum';
   const isBinanceSmartChain = chainType === 'Binance-Smart-Chain';
@@ -1152,7 +1153,10 @@ const Pool: React.FC = () => {
   );
 
   const showHtmlClaimTokens = isPresaleClosed && !cancelled && liquidityAdded && !isUserCreator;
-  const showHtmlClosePresale = isUserCreator && !liquidityAdded;
+  // админ ДОЛЖЕН иметь кнопку для отмены ЛЮБОГО пресейла (и своего, и не своего) в любой момент: будь то голосование, инвестирование, регистрация... но до заливки ликвидности
+  const showHtmlClosePresaleByOwner = isUserOwner && !liquidityAdded;
+  // Создатель может отменять ТОЛЬКО свой пресейл и ТОЛЬКО после инвеста, если не набран софткап
+  const showHtmlClosePresale = isUserCreator && isPresaleClosed && !isPresaleSuccessful;
   const showHtmlWithdrawInvestment = isPresaleClosed && (cancelled || !isPresaleSuccessful);
 
   return (
@@ -1350,7 +1354,7 @@ const Pool: React.FC = () => {
               : null}
 
             {showHtmlClaimTokens && htmlClaimTokens}
-            {showHtmlClosePresale && htmlClosePresale}
+            {(showHtmlClosePresale || showHtmlClosePresaleByOwner) && htmlClosePresale}
             {showHtmlWithdrawInvestment && htmlWithdrawInvestment}
           </div>
         </div>

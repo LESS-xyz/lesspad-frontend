@@ -39,6 +39,16 @@ export const App: React.FC = memo(() => {
   const { address: userAddress } = useSelector(({ user }: any) => user);
   const { lessDecimals, lpDecimals } = useSelector(({ library }: any) => library);
 
+  const getOwner = useCallback(async () => {
+    try {
+      const owner = await ContractLessLibrary.owner();
+      if (owner) setLibrary({ owner });
+      console.log('App getOwner:', owner);
+    } catch (e) {
+      console.error('App getOwner:', e);
+    }
+  }, [ContractLessLibrary, setLibrary]);
+
   const getArrForSearch = useCallback(async () => {
     try {
       const arrForSearch = await ContractLessLibrary.getArrForSearch();
@@ -92,6 +102,15 @@ export const App: React.FC = memo(() => {
       console.error('App getStakedLp:', e);
     }
   }, [ContractStaking, setLibrary, lpDecimals, userAddress]);
+
+  useEffect(() => {
+    if (!getOwner) return;
+    if (!ContractLessLibrary) return;
+    if (!ContractStaking) return;
+    if (!ContractLessToken) return;
+    if (!ContractLPToken) return;
+    getOwner();
+  }, [ContractLessLibrary, ContractStaking, ContractLessToken, ContractLPToken, getOwner]);
 
   useEffect(() => {
     if (!getArrForSearch) return;
