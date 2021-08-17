@@ -366,6 +366,18 @@ export default class ContractPresalePublicService {
     }
   };
 
+  public collectFee = async (props: TypeClaimTokensProps): Promise<any> => {
+    try {
+      const { userAddress, contractAddress } = props;
+      // console.log('ContractPresalePublicService collectFee:', props);
+      const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
+      return await contract.methods.collectFee().send({ from: userAddress });
+    } catch (e) {
+      console.error('ContractPresalePublicService collectFee:', e);
+      return null;
+    }
+  };
+
   public withdrawInvestment = async (props: TypeClaimTokensProps): Promise<any> => {
     try {
       const { userAddress, contractAddress } = props;

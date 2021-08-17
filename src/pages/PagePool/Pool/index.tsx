@@ -142,7 +142,7 @@ const Pool: React.FC = () => {
   const { pools } = useSelector(({ pool }: any) => pool);
   const { chainType } = useSelector(({ wallet }: any) => wallet);
   const { address: userAddress } = useSelector(({ user }: any) => user);
-  const { owner, stakedLess, stakedLp, lessPerLp } = useSelector(({ library }: any) => library);
+  const { stakedLess, stakedLp, lessPerLp } = useSelector(({ library }: any) => library);
 
   const dispatch = useDispatch();
   const toggleModal = useCallback((params) => dispatch(modalActions.toggleModal(params)), [
@@ -206,7 +206,7 @@ const Pool: React.FC = () => {
   const isPresaleClosed = closeTimePresale <= NOW;
 
   const isUserCreator = userAddress ? creator.toLowerCase() === userAddress.toLowerCase() : false;
-  const isUserOwner = userAddress ? owner.toLowerCase() === userAddress.toLowerCase() : false;
+  // const isUserOwner = userAddress ? owner.toLowerCase() === userAddress.toLowerCase() : false;
 
   const isEthereum = chainType === 'Ethereum';
   const isBinanceSmartChain = chainType === 'Binance-Smart-Chain';
@@ -645,6 +645,18 @@ const Pool: React.FC = () => {
     }
   }, [ContractPresalePublicWithMetamask, address, userAddress]);
 
+  const collectFee = useCallback(async () => {
+    try {
+      const resultCancelPresale = await ContractPresalePublicWithMetamask.collectFee({
+        userAddress,
+        contractAddress: address,
+      });
+      console.log('PagePool collectFee:', resultCancelPresale);
+    } catch (e) {
+      console.error(e);
+    }
+  }, [ContractPresalePublicWithMetamask, address, userAddress]);
+
   const handleVote = useCallback(
     async (yes: boolean) => {
       try {
@@ -926,15 +938,6 @@ const Pool: React.FC = () => {
     { image: Github, link: linkGithub },
   ];
 
-  const htmlYouVoted = (
-    <div className="item">
-      <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
-        Voting
-      </div>
-      <div className="item-text">You voted</div>
-    </div>
-  );
-
   const htmlVoting = (
     <div className="item">
       <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
@@ -969,6 +972,15 @@ const Pool: React.FC = () => {
     </div>
   );
 
+  const htmlYouVoted = (
+    <div className="item">
+      <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
+        Voting
+      </div>
+      <div className="item-text">You voted</div>
+    </div>
+  );
+
   const htmlVotingIsNotSuccessful = (
     <div className="item">
       <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
@@ -976,6 +988,28 @@ const Pool: React.FC = () => {
       </div>
       <div className="item-text">
         <div className="item-text-bold">is not successful</div>
+      </div>
+    </div>
+  );
+
+  const htmlVotingIsNotSuccessfulForCreator = (
+    <div className="item">
+      <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
+        Voting
+      </div>
+      <div className="item-text">
+        <div className="item-text-bold">is not successful</div>
+      </div>
+      <div className="button-border">
+        <div
+          className="button"
+          role="button"
+          tabIndex={0}
+          onClick={collectFee}
+          onKeyDown={() => {}}
+        >
+          <div className="gradient-button-text">Collect fee</div>
+        </div>
       </div>
     </div>
   );
@@ -1152,12 +1186,47 @@ const Pool: React.FC = () => {
     </>
   );
 
-  const showHtmlClaimTokens = isPresaleClosed && !cancelled && liquidityAdded && !isUserCreator;
-  // админ ДОЛЖЕН иметь кнопку для отмены ЛЮБОГО пресейла (и своего, и не своего) в любой момент: будь то голосование, инвестирование, регистрация... но до заливки ликвидности
-  const showHtmlClosePresaleByOwner = isUserOwner && !liquidityAdded;
+  const showHtmlVoting =
+    !isCertified && isVotingTime && timeBeforeVoting && !isUserCreator && !myVote;
+  const showHtmlYouVoted =
+    !isCertified && isVotingTime && timeBeforeVoting && !isUserCreator && myVote;
+  const showHtmlVotingIsNotSuccessful =
+    isRegistrationTime && timeBeforeRegistration && !isVotingSuccessful;
+  const showHtmlVotingIsNotSuccessfulForCreator =
+    isUserCreator &&
+    (isRegistrationTime || isInvestmentTime || isPresaleClosed) &&
+    !isVotingSuccessful;
+  const showHtmlRegistration =
+    !isUserCreator &&
+    isRegistrationTime &&
+    timeBeforeRegistration &&
+    isVotingSuccessful &&
+    !isUserRegister;
+  const showHtmlYouAreRegistered =
+    !isUserCreator &&
+    isRegistrationTime &&
+    timeBeforeRegistration &&
+    isVotingSuccessful &&
+    isUserRegister;
+  const showHtmlYouNeedToBeRegisteredToInvest =
+    !isUserCreator &&
+    isInvestmentTime &&
+    isInvestStart &&
+    isVotingSuccessful &&
+    timeBeforeMyTier &&
+    !isUserRegister;
+  const showHtmlInvestment =
+    !isUserCreator && isInvestmentTime && isInvestStart && isVotingSuccessful && isUserRegister;
+  const showHtmlInvestmentIsClosed =
+    isInvestmentTime && isInvestStart && isVotingSuccessful && isUserRegister && isPresaleClosed;
+  const showHtmlClaimTokens = !isUserCreator && isPresaleClosed && !cancelled && liquidityAdded;
+  // Cancel presale админом платформы может использоваться в любой момент.
+  //   Овнером пресейла он может использоваться в случае, если не набран софткап.
+  //   В случае  ненабора голосов используется метод collect fee для того чтоб овнер пресейла мог вывести не только бабло в токенах, но и свои 1000$
   // Создатель может отменять ТОЛЬКО свой пресейл и ТОЛЬКО после инвеста, если не набран софткап
   const showHtmlClosePresale = isUserCreator && isPresaleClosed && !isPresaleSuccessful;
-  const showHtmlWithdrawInvestment = isPresaleClosed && (cancelled || !isPresaleSuccessful);
+  const showHtmlWithdrawInvestment =
+    !isUserCreator && isPresaleClosed && (cancelled || !isPresaleSuccessful);
 
   return (
     <div className="container">
@@ -1327,34 +1396,17 @@ const Pool: React.FC = () => {
       {openTimePresale !== '0' ? (
         <div className="box box-bg">
           <div className="row">
-            {!isCertified &&
-              isVotingTime &&
-              timeBeforeVoting &&
-              !isUserCreator &&
-              (!myVote ? htmlVoting : htmlYouVoted)}
-
-            {isRegistrationTime && timeBeforeRegistration
-              ? isVotingSuccessful
-                ? isUserRegister
-                  ? htmlYouAreRegistered
-                  : !isUserCreator
-                  ? htmlRegistration
-                  : null
-                : htmlVotingIsNotSuccessful
-              : null}
-
-            {isInvestmentTime && isInvestStart && isVotingSuccessful && timeBeforeMyTier
-              ? isUserRegister
-                ? !isUserCreator
-                  ? htmlInvestment
-                  : null
-                : htmlYouNeedToBeRegisteredToInvest
-              : isPresaleClosed
-              ? htmlInvestmentIsClosed
-              : null}
-
+            {showHtmlVoting && htmlVoting}
+            {showHtmlYouVoted && htmlYouVoted}
+            {showHtmlVotingIsNotSuccessful && htmlVotingIsNotSuccessful}
+            {showHtmlVotingIsNotSuccessfulForCreator && htmlVotingIsNotSuccessfulForCreator}
+            {showHtmlRegistration && htmlRegistration}
+            {showHtmlYouAreRegistered && htmlYouAreRegistered}
+            {showHtmlYouNeedToBeRegisteredToInvest && htmlYouNeedToBeRegisteredToInvest}
+            {showHtmlInvestment && htmlInvestment}
+            {showHtmlInvestmentIsClosed && htmlInvestmentIsClosed}
             {showHtmlClaimTokens && htmlClaimTokens}
-            {(showHtmlClosePresale || showHtmlClosePresaleByOwner) && htmlClosePresale}
+            {showHtmlClosePresale && htmlClosePresale}
             {showHtmlWithdrawInvestment && htmlWithdrawInvestment}
           </div>
         </div>
