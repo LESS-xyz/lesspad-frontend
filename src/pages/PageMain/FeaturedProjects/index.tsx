@@ -4,12 +4,10 @@ import { Link } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { v4 as uuid } from 'uuid';
 
-import bnbLogo from '../../../assets/img/icons/bnb-logo.svg';
-import logo1 from '../../../assets/img/sections/token-card/logo-1.png';
 import TokenCard, { ITokenCardProps } from '../../../components/TokenCard';
 
 import s from './FeaturedProjects.module.scss';
-//
+
 const FeaturedProject: React.FC = () => {
   const { pools } = useSelector(({ pool }: any) => pool);
   const [presalesFiltered, setPresalesFiltered] = useState<any[]>([]);
@@ -17,6 +15,7 @@ const FeaturedProject: React.FC = () => {
   const compareOpenVotingTime = (a, b) => {
     return b.openVotingTime - a.openVotingTime;
   };
+
   const filterProjects = useCallback(async () => {
     if (pools && pools.length !== 0) {
       try {
@@ -41,6 +40,7 @@ const FeaturedProject: React.FC = () => {
     if (!pools || !pools.length) return;
     filterProjects();
   }, [filterProjects, pools, pools.length]);
+
   return (
     <section className={s.page}>
       <div className={s.container}>
@@ -49,21 +49,9 @@ const FeaturedProject: React.FC = () => {
           <div className={s.cards}>
             {presalesFiltered
               .map((item: any) => {
-                const { address = '', title = '', isCertified } = item;
+                const { address = '', isCertified } = item;
                 const props: ITokenCardProps = {
                   address,
-                  logo: logo1,
-                  daysTillOpen: 3,
-                  name: title,
-                  subtitle: 'Participant',
-                  website: 'https://github.com/',
-                  telegram: 'https://t.me/durov',
-                  whitePaper: 'https://bitcoin.org/ru/bitcoin-paper',
-                  blockchainLogo: bnbLogo,
-                  chain: 'BNB',
-                  type: 'public',
-                  fundingToken: 'BNB',
-                  status: 'not opened',
                   isCertified,
                 };
                 return <TokenCard key={uuid()} {...props} />;

@@ -5,8 +5,6 @@ import dayjs from 'dayjs';
 import useMedia from 'use-media';
 import { v4 as uuid } from 'uuid';
 
-import bnbLogo from '../../assets/img/icons/bnb-logo.svg';
-import logo1 from '../../assets/img/sections/token-card/logo-1.png';
 import Pagination from '../../components/Pagination/index';
 import Search from '../../components/Search/index';
 import Selector from '../../components/Selector/index';
@@ -163,39 +161,29 @@ Fundraising Capital"
               />
             </div>
           </div>
-          <div className={s.cards}>
-            {poolsFiltered.map((item: any, ii: number) => {
-              const { address = '', /* title = '', description = '', */ isCertified } = item;
-              // todo: fix pagination
-              if (ii < page * itemsOnPage || ii >= (page + 1) * itemsOnPage) return null;
-              /*
-              if (search) {
-                const isAddressInSearch = address.toLowerCase().includes(search.toLowerCase());
-                const isTitleInSearch = title.toLowerCase().includes(search.toLowerCase());
-                const isDescriptionInSearch = description
-                  .toLowerCase()
-                  .includes(search.toLowerCase());
-                if (!isAddressInSearch && !isTitleInSearch && !isDescriptionInSearch) return null;
-              }*/
-              const props: ITokenCardProps = {
-                address,
-                logo: logo1,
-                daysTillOpen: 3,
-                name: 'XOLO Finance',
-                subtitle: 'Participant',
-                website: 'https://github.com/',
-                telegram: 'https://t.me/durov',
-                whitePaper: 'https://bitcoin.org/ru/bitcoin-paper',
-                blockchainLogo: bnbLogo,
-                chain: 'BNB',
-                type: 'public',
-                fundingToken: 'BNB',
-                status: 'all',
-                isCertified,
-              };
-              return <TokenCard key={uuid()} {...props} />;
-            })}
-          </div>
+          {poolsFiltered?.length ? (
+            <div className={s.cards}>
+              {poolsFiltered.map((item: any, ii: number) => {
+                const { address = '', /* title = '', description = '', */ isCertified } = item;
+                if (ii < page * itemsOnPage || ii >= (page + 1) * itemsOnPage) return null;
+                // if (search) {
+                //   const isAddressInSearch = address.toLowerCase().includes(search.toLowerCase());
+                //   const isTitleInSearch = title.toLowerCase().includes(search.toLowerCase());
+                //   const isDescriptionInSearch = description
+                //     .toLowerCase()
+                //     .includes(search.toLowerCase());
+                //   if (!isAddressInSearch && !isTitleInSearch && !isDescriptionInSearch) return null;
+                // }
+                const props: ITokenCardProps = {
+                  address,
+                  isCertified,
+                };
+                return <TokenCard key={uuid()} {...props} />;
+              })}
+            </div>
+          ) : (
+            <div className={s.status}>Loading...</div>
+          )}
           <div className={s.pagination}>
             <Pagination countOfPages={countOfPages} onChange={handleChangePage} />
           </div>

@@ -2,6 +2,12 @@
 @import '../../styles/mixins/grid.scss';
 @import '../../styles/mixins/gradient-text.scss';
 
+.cardLoading {
+  background: linear-gradient(90deg, #040404 0%, #1c0e40 100%);
+  height: 360px;
+  @include flex(row, center, center, nowrap);
+}
+
 .card {
   background: linear-gradient(90deg, #040404 0%, #1c0e40 100%);
 

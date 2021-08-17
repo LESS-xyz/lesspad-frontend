@@ -76,3 +76,9 @@
   @include flex(row, center, center);
   margin: 50px 0 0 0;
 }
+
+.status {
+  @include flex(row, center, center);
+  width: 100%;
+  margin: 50px 0;
+}

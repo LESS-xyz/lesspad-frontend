@@ -7,6 +7,8 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import bnbLogo from '../../assets/img/icons/bnb-logo.svg';
 import ethLogo from '../../assets/img/icons/eth-logo.svg';
 import maticLogo from '../../assets/img/icons/matic-logo.svg';
+import projectLogo from '../../assets/img/sections/token-card/logo-1.png';
+import config from '../../config';
 import { useContractsContext } from '../../contexts/ContractsContext';
 import { addHttps } from '../../utils/prettifiers';
 
@@ -14,20 +16,52 @@ import s from './TokenCard.module.scss';
 
 dayjs.extend(relativeTime);
 
+const { NOW } = config;
+
+const defaultInfo = {
+  // #additional info
+  tokenSymbol: '...',
+  // #general info
+  creator: '...',
+  token: '...',
+  tokenPrice: '0',
+  softCap: '0',
+  hardCap: '0',
+  tokensForSaleLeft: '0',
+  tokensForLiquidityLeft: '0',
+  openTimePresale: '0',
+  closeTimePresale: '0',
+  openTimeVoting: '0',
+  closeTimeVoting: '0',
+  collectedFee: '0',
+  // #string info
+  saleTitle: '...',
+  linkTelegram: '...',
+  linkGithub: '...',
+  linkTwitter: '...',
+  linkWebsite: '...',
+  linkLogo: '...',
+  description: '...',
+  whitepaper: '...',
+  // #uniswap info
+  listingPrice: '0',
+  lpTokensLockDurationInDays: '0',
+  liquidityPercentageAllocation: '0',
+  liquidityAllocationTime: '0',
+  // #additional
+  approved: false,
+  beginingAmount: '0',
+  cancelled: false,
+  liquidityAdded: '0',
+  participants: '',
+  raisedAmount: '0',
+  yesVotes: '0',
+  noVotes: '0',
+  lastTotalStakedAmount: '0',
+};
+
 export interface ITokenCardProps {
   address: string;
-  logo: string;
-  daysTillOpen: number;
-  name: string;
-  subtitle: string;
-  website: string;
-  telegram: string;
-  whitePaper: string;
-  blockchainLogo: string;
-  chain: string;
-  type: 'public' | 'certified';
-  fundingToken: string;
-  status: 'ended' | 'in voting' | 'not opened' | 'all';
   isCertified: boolean;
   statusChoosenInFilter?: string;
 }
@@ -39,66 +73,14 @@ const chainsInfo: any = [
 ];
 
 const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
-  const {
-    address,
-    logo,
-    // daysTillOpen,
-    // name,
-    // subtitle,
-    // website,
-    // telegram,
-    // whitePaper,
-    // blockchainLogo,
-    // chain,
-    // type,
-    // fundingToken,
-    // status,
-    isCertified,
-    statusChoosenInFilter,
-  } = props;
+  const { address, isCertified, statusChoosenInFilter } = props;
   const { ContractPresalePublic, ContractPresaleCertified } = useContractsContext();
 
-  const [info, setInfo] = useState<any>();
-  const [chainInfo, setChainInfo] = useState<any>();
+  const [info, setInfo] = useState<any>(defaultInfo);
+  const [chainInfo, setChainInfo] = useState<any>({});
+  const [loading, setLoading] = useState<boolean>(true);
 
   const { chainType } = useSelector(({ wallet }: any) => wallet);
-
-  const getChainInfo = useCallback(() => {
-    const chainInfoNew = chainsInfo.filter((item: any) => item.key === chainType);
-    setChainInfo(chainInfoNew[0]);
-  }, [chainType]);
-
-  const getInfo = useCallback(async () => {
-    try {
-      let newInfo;
-      if (isCertified) {
-        newInfo = await ContractPresaleCertified.getInfo({ contractAddress: address });
-        console.log('TokenCard getInfo certified:', newInfo);
-      } else {
-        newInfo = await ContractPresalePublic.getInfo({ contractAddress: address });
-        console.log('TokenCard getInfo public:', newInfo);
-      }
-      if (newInfo) setInfo(newInfo);
-    } catch (e) {
-      console.error('TokenCard getInfo:', e);
-    }
-  }, [ContractPresaleCertified, ContractPresalePublic, address, isCertified]);
-
-  useEffect(() => {
-    if (!chainType) return;
-    getChainInfo();
-  }, [chainType, getChainInfo]);
-
-  useEffect(() => {
-    if (!address) return;
-    if (!chainType) return;
-    if (!ContractPresalePublic) return;
-    if (!ContractPresaleCertified) return;
-    getInfo();
-  }, [ContractPresalePublic, ContractPresaleCertified, getInfo, address, chainType]);
-
-  if (!address) return null; // todo: show loader
-  if (!info) return null; // todo: show loader
 
   const {
     // #additional info
@@ -135,20 +117,58 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
 
   const presaleType = isCertified ? 'Certified' : 'Public';
 
-  const now = Date.now();
   let presaleStatus = '';
   if (isCertified) {
-    if (openTimePresale > now) presaleStatus = 'Not opened';
-    if (openTimePresale < now) presaleStatus = 'Opened';
-    if (closeTimePresale < now) presaleStatus = 'Closed';
+    if (openTimePresale > NOW) presaleStatus = 'Not opened';
+    if (openTimePresale < NOW) presaleStatus = 'Opened';
+    if (closeTimePresale < NOW) presaleStatus = 'Closed';
   } else {
-    if (openTimePresale > now) presaleStatus = 'Not opened';
-    if (openTimePresale < now) presaleStatus = 'Opened';
-    if (openTimeVoting < now) presaleStatus = 'In voting';
-    if (closeTimeVoting < now) presaleStatus = 'Voting ended';
-    if (closeTimePresale < now) presaleStatus = 'Ended';
+    if (openTimePresale > NOW) presaleStatus = 'Not opened';
+    if (openTimePresale < NOW) presaleStatus = 'Opened';
+    if (openTimeVoting < NOW) presaleStatus = 'In voting';
+    if (closeTimeVoting < NOW) presaleStatus = 'Voting ended';
+    if (closeTimePresale < NOW) presaleStatus = 'Ended';
   }
-  const isOpened = openTimePresale < now;
+  const isOpened = openTimePresale < NOW;
+
+  const getChainInfo = useCallback(() => {
+    const chainInfoNew = chainsInfo.filter((item: any) => item.key === chainType);
+    setChainInfo(chainInfoNew[0]);
+  }, [chainType]);
+
+  const getInfo = useCallback(async () => {
+    try {
+      if (!address) return;
+      if (!chainType) return;
+      if (!ContractPresalePublic) return;
+      if (!ContractPresaleCertified) return;
+      let newInfo;
+      if (isCertified) {
+        newInfo = await ContractPresaleCertified.getInfo({ contractAddress: address });
+        console.log('TokenCard getInfo certified:', newInfo);
+      } else {
+        newInfo = await ContractPresalePublic.getInfo({ contractAddress: address });
+        console.log('TokenCard getInfo public:', newInfo);
+      }
+      if (newInfo) setInfo(newInfo);
+      setLoading(false);
+    } catch (e) {
+      console.error('TokenCard getInfo:', e);
+    }
+  }, [ContractPresaleCertified, ContractPresalePublic, address, isCertified, chainType]);
+
+  useEffect(() => {
+    if (!chainType) return;
+    getChainInfo();
+  }, [chainType, getChainInfo]);
+
+  useEffect(() => {
+    if (!address) return;
+    if (!chainType) return;
+    if (!ContractPresalePublic) return;
+    if (!ContractPresaleCertified) return;
+    getInfo();
+  }, [ContractPresalePublic, ContractPresaleCertified, getInfo, address, chainType]);
 
   if (
     statusChoosenInFilter &&
@@ -156,21 +176,20 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
     statusChoosenInFilter !== presaleStatus
   )
     return null;
+
+  if (loading) return <div className={s.cardLoading}>Loading...</div>;
+
   return (
     <div className={s.card}>
       <Link to={`/pool/${address}`} className={s.card_header}>
         <div className={s.card_header__logo}>
-          <img src={linkLogo ? addHttps(linkLogo) : logo} alt="token-logo" />
+          <img src={linkLogo ? addHttps(linkLogo) : projectLogo} alt="token-logo" />
         </div>
         <div className={s.card_header__info}>
-          {/*<div className={s.card_header__info_days}>*/}
-          {/*  opens in {daysTillOpen} {daysTillOpen > 1 ? 'days' : 'day'}*/}
-          {/*</div>*/}
           <div className={s.card_header__info_days}>
             {isOpened ? 'opened' : 'opens'} {dayjs(openTimePresale).fromNow()}
           </div>
           <div className={s.card_header__info_name}>{saleTitle}</div>
-          {/*<div className={s.card_header__info_subtitle}>{subtitle}</div>*/}
         </div>
       </Link>
       <div className={s.card_links}>
