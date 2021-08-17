@@ -23,6 +23,7 @@ const AllPoolsPage: React.FC = () => {
   const [votingTime, setVotingTime] = useState<number>(0);
 
   const [poolsFiltered, setPoolsFiltered] = useState<any[]>([]);
+  const [poolsFilteredByPage, setPoolsFilteredByPage] = useState<any[]>([]);
   const [countOfPages, setCountOfPages] = useState<number>(1);
 
   const { pools } = useSelector(({ pool }: any) => pool);
@@ -43,76 +44,68 @@ const AllPoolsPage: React.FC = () => {
   const getVotingTime = useCallback(async () => {
     try {
       const newInfo = await ContractLessLibrary.getVotingTime();
-      console.log('TokenCard getVotingTime:', newInfo);
+      console.log('PageAllPools getVotingTime:', newInfo);
       setVotingTime(+newInfo);
     } catch (e) {
-      console.error('TableRow getVotingTime:', e);
+      console.error('PageAllPools getVotingTime:', e);
     }
   }, [ContractLessLibrary]);
 
-  const compareOpenVotingTime = (a, b) => b.openVotingTime - a.openVotingTime;
-
   const filterData = useCallback(async () => {
-    // const info = pools.map(async (pool: any) => {
-    //   const newInfo = await getInfo(pool.address);
-    //   return newInfo;
-    // });
-    //
-    // console.log('only public presales', info);
-    if (pools && pools.length !== 0) {
-      try {
-        const poolsInfoNew = pools
-          .filter((item: any) => {
-            const {
-              address = '',
-              isCertified,
-              description = '',
-              title = '',
-              openVotingTime = 0,
-            } = item;
-            let presaleStatus = '';
-            if (isCertified) {
-              // if (openTimePresale > now) presaleStatus = 'Not opened';
-              // if (openTimePresale < now) presaleStatus = 'Opened';
-              // if (closeTimePresale < now) presaleStatus = 'Closed';
-            } else {
-              // if (openTimePresale > now) presaleStatus = 'Not opened';
-              // if (openTimePresale < now) presaleStatus = 'Opened';
-              if (openVotingTime < NOW) presaleStatus = 'In voting';
-              // if (openVotingTime + votingTime * 1000 < now) presaleStatus = 'Voting ended';
-              if (openVotingTime + votingTime * 1000 < NOW) presaleStatus = 'Ended';
-            }
-            if (currentOption && currentOption !== 'All' && currentOption !== presaleStatus)
-              return false;
-            if (search && search !== '') {
-              const isAddressInSearch = address.toLowerCase().includes(search.toLowerCase());
-              const isTitleInSearch = title.toLowerCase().includes(search.toLowerCase());
-              const isDescriptionInSearch = description
-                .toLowerCase()
-                .includes(search.toLowerCase());
-              if (!isAddressInSearch && !isTitleInSearch && !isDescriptionInSearch) return false;
-            }
-            return true;
-          })
-          .sort(compareOpenVotingTime);
-        // const poolsAddressesFilteredNew = poolsInfoNew.map((item: any) => item.address);
-        setPoolsFiltered(poolsInfoNew);
-      } catch (e) {
-        console.error(e);
-      }
+    try {
+      const compareOpenVotingTime = (a, b) => b.openVotingTime - a.openVotingTime;
+      const poolsInfoNew = pools
+        .filter((item: any) => {
+          const {
+            address = '',
+            isCertified,
+            description = '',
+            title = '',
+            openVotingTime = 0,
+          } = item;
+          let presaleStatus = '';
+          if (isCertified) {
+            // if (openTimePresale > now) presaleStatus = 'Not opened';
+            // if (openTimePresale < now) presaleStatus = 'Opened';
+            // if (closeTimePresale < now) presaleStatus = 'Closed';
+          } else {
+            // if (openTimePresale > now) presaleStatus = 'Not opened';
+            // if (openTimePresale < now) presaleStatus = 'Opened';
+            if (openVotingTime < NOW && openVotingTime + votingTime * 1000 >= NOW)
+              presaleStatus = 'In voting';
+            // if (openVotingTime + votingTime * 1000 < now) presaleStatus = 'Voting ended';
+            if (openVotingTime + votingTime * 1000 < NOW) presaleStatus = 'Ended';
+          }
+          if (currentOption && currentOption !== 'All' && currentOption !== presaleStatus)
+            return false;
+          if (search && search !== '') {
+            const isAddressInSearch = address.toLowerCase().includes(search.toLowerCase());
+            const isTitleInSearch = title.toLowerCase().includes(search.toLowerCase());
+            const isDescriptionInSearch = description.toLowerCase().includes(search.toLowerCase());
+            if (!isAddressInSearch && !isTitleInSearch && !isDescriptionInSearch) return false;
+          }
+          return true;
+        })
+        .sort(compareOpenVotingTime);
+      console.log('PageAllPools filterData:', poolsInfoNew);
+      setPoolsFiltered([...poolsInfoNew]);
+    } catch (e) {
+      console.error(e);
     }
   }, [currentOption, pools, search, votingTime]);
 
-  /*  useEffect(() => {
-      for (let i = 0, newInfo: any[] = []; i < pools.length; i += 1) {
-        if (!pools[i].isCertified) {
-          ContractPresalePublic.getInfo({ contractAddress: pools[i].address }).then((data) => {
-            newInfo.push({ ...data, isCertified: pools[i].isCertified, address: pools[i].address });
-            if (i === pools.length - 1) setInfo(newInfo);
-          });
-        }
-      }
-    }, [ContractPresalePublic, pools]); */
+  const filterDataByPage = useCallback(async () => {
+    try {
+      const poolsInfoNew = poolsFiltered.filter((item: any, ii: number) => {
+        if (ii < page * itemsOnPage || ii >= (page + 1) * itemsOnPage) return false;
+        return true;
+      });
+      console.log('PageAllPools filterDataByPage:', poolsInfoNew);
+      setPoolsFilteredByPage([...poolsInfoNew]);
+    } catch (e) {
+      console.error(e);
+    }
+  }, [page, poolsFiltered]);
 
   useEffect(() => {
     if (!ContractLessLibrary) return;
@@ -120,10 +113,16 @@ const AllPoolsPage: React.FC = () => {
   }, [ContractLessLibrary, getVotingTime]);
 
   useEffect(() => {
+    if (!ContractLessLibrary) return;
     if (!votingTime) return;
     if (!pools || !pools.length) return;
     filterData();
-  }, [search, pools, pools.length, currentOption, filterData, votingTime]);
+  }, [ContractLessLibrary, search, pools, pools.length, currentOption, filterData, votingTime]);
+
+  useEffect(() => {
+    if (!poolsFiltered) return;
+    filterDataByPage();
+  }, [filterDataByPage, page, poolsFiltered]);
 
   useEffect(() => {
     if (!poolsFiltered || !poolsFiltered.length) return;
@@ -164,19 +163,11 @@ Fundraising Capital"
               />
             </div>
           </div>
-          {poolsFiltered?.length ? (
+
+          {poolsFilteredByPage?.length ? (
             <div className={s.cards}>
-              {poolsFiltered.map((item: any, ii: number) => {
-                const { address = '', /* title = '', description = '', */ isCertified } = item;
-                if (ii < page * itemsOnPage || ii >= (page + 1) * itemsOnPage) return null;
-                // if (search) {
-                //   const isAddressInSearch = address.toLowerCase().includes(search.toLowerCase());
-                //   const isTitleInSearch = title.toLowerCase().includes(search.toLowerCase());
-                //   const isDescriptionInSearch = description
-                //     .toLowerCase()
-                //     .includes(search.toLowerCase());
-                //   if (!isAddressInSearch && !isTitleInSearch && !isDescriptionInSearch) return null;
-                // }
+              {poolsFilteredByPage.map((item: any) => {
+                const { address = '', isCertified } = item;
                 const props: ITokenCardProps = {
                   address,
                   isCertified,
@@ -185,8 +176,9 @@ Fundraising Capital"
               })}
             </div>
           ) : (
-            <div className={s.status}>Loading...</div>
+            <div className={s.status}>No data</div>
           )}
+
           <div className={s.pagination}>
             <Pagination countOfPages={countOfPages} onChange={handleChangePage} />
           </div>

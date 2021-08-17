@@ -83,6 +83,7 @@ const TableRow: React.FC<ITableRowProps> = (props) => {
       console.error(e);
     }
   }, [address, userAddress, ContractPresalePublic]);
+
   const getInfo = useCallback(async () => {
     try {
       const newInfo = await ContractPresalePublic.getInfo({ contractAddress: address });
