@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import dayjs from 'dayjs';
@@ -260,4 +260,4 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
   );
 };
 
-export default TokenCard;
+export default memo(TokenCard);

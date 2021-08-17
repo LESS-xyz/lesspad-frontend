@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import Button from '../../../components/Button';
@@ -139,4 +139,4 @@ const PoolsiInVoting: React.FC = () => {
   );
 };
 
-export default PoolsiInVoting;
+export default memo(PoolsiInVoting);

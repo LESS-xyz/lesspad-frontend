@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useSelector } from 'react-redux';
 import useMedia from 'use-media';
@@ -196,4 +196,4 @@ Fundraising Capital"
   );
 };
 
-export default AllPoolsPage;
+export default memo(AllPoolsPage);

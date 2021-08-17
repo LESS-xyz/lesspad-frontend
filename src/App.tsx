@@ -107,20 +107,14 @@ export const App: React.FC = memo(() => {
   useEffect(() => {
     if (!getOwner) return;
     if (!ContractLessLibrary) return;
-    if (!ContractStaking) return;
-    if (!ContractLessToken) return;
-    if (!ContractLPToken) return;
     getOwner();
   }, [ContractLessLibrary, ContractStaking, ContractLessToken, ContractLPToken, getOwner]);
 
   useEffect(() => {
     if (!getArrForSearch) return;
     if (!ContractLessLibrary) return;
-    if (!ContractStaking) return;
-    if (!ContractLessToken) return;
-    if (!ContractLPToken) return;
     getArrForSearch();
-  }, [ContractLessLibrary, ContractStaking, ContractLessToken, ContractLPToken, getArrForSearch]);
+  }, [ContractLessLibrary, getArrForSearch]);
 
   useEffect(() => {
     if (!ContractLessToken) return;

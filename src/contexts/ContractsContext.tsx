@@ -8,9 +8,7 @@ import ContractERC20Service from '../services/contracts/ContractERC20';
 import ContractLessLibraryService from '../services/contracts/ContractLessLibrary';
 import ContractLessTokenService from '../services/contracts/ContractLessToken';
 import ContractLPTokenService from '../services/contracts/ContractLPToken';
-/*eslint-disable*/
 import ContractPresaleCertifiedService from '../services/contracts/ContractPresaleCertified';
-/*eslint-enable*/
 import ContractPresaleFactoryService from '../services/contracts/ContractPresaleFactory';
 import ContractPresaleFactoryCertifiedService from '../services/contracts/ContractPresaleFactoryCertified';
 import ContractPresalePublicService from '../services/contracts/ContractPresalePublic';
@@ -131,21 +129,14 @@ const ContractsContext: React.FC = ({ children }) => {
   useEffect(() => {
     if (!chainType) return;
     initRpc();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chainType, web3, userAddress]);
+  }, [chainType, web3, userAddress, initRpc]);
 
   useEffect(() => {
     if (!chainType) return;
     if (!userAddress) return;
     if (!web3) return;
     initMetamask();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chainType, web3, userAddress]);
-
-  useEffect(() => {
-    // console.log('value:', { ...contractsOnRpc, ...contractsOnMetamask });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contractsOnRpc, contractsOnMetamask]);
+  }, [chainType, web3, userAddress, initMetamask]);
 
   return (
     <contractsContext.Provider value={{ ...contractsOnRpc, ...contractsOnMetamask }}>
