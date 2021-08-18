@@ -60,7 +60,6 @@ export default class ContractPresaleFactoryService {
         presaleStringInfoFormatted,
       });
       const contract = new this.web3.eth.Contract(this.contractAbi, this.contractAddress);
-      // const value = this.web3.utils.toHex(usdToEthFee);
       return contract.methods
         .createPresale(presaleInfo, presalePancakeSwapInfo, presaleStringInfoFormatted)
         .send({

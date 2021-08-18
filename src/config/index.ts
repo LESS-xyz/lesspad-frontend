@@ -12,10 +12,11 @@ import UniswapRouterAbi from '../data/abi/UniswapRouterAbi';
 const IS_PRODUCTION = false;
 const IS_TESTING_ON_ROPSTEN = false;
 const SHOW_CONSOLE_LOGS = true;
-const SHOW_FORM_VALUES = false;
+const SHOW_FORM_VALUES = true;
+const SHOW_FORM_VALUES_MINE = false;
 const SHOW_CERTIFIED_PRESALE = true;
-const IS_FORM_EXISTING_VALUES_VALIDATION_ENABLED = true;
-const IS_FORM_TIME_VALIDATION_ENABLED = true;
+const IS_FORM_EXISTING_VALUES_VALIDATION_ENABLED = false;
+const IS_FORM_TIME_VALIDATION_ENABLED = false;
 
 const INFURA_KEY = 'bf1db577e6bb42bf93893e1ea5dd1630';
 
@@ -24,12 +25,20 @@ const MINUTE = 1000 * 60;
 const HOUR = MINUTE * 60;
 const DAY = IS_PRODUCTION ? MINUTE * 60 * 24 : MINUTE * 5;
 const BLOCK_DURATION = IS_PRODUCTION ? MINUTE * 10 : MINUTE * 5;
-// todo add getVotingTime from contract, check ms/s
-const VOTING_DURATION = IS_PRODUCTION ? DAY * 3 : DAY;
+
+// time
+const VOTING_DURATION = IS_PRODUCTION ? DAY * 3 : DAY; // todo add getVotingTime from contract, check ms/s
 const REGISTRATION_DURATION = DAY;
 const TIER_DURATION = IS_PRODUCTION ? MINUTE * 60 * 15 : MINUTE * 5;
 const PRESALE_DURATION = TIER_DURATION * 5;
 const LIQUIDITY_ALLOCATION_DURATION = IS_PRODUCTION ? HOUR : MINUTE * 10;
+// time certified
+const APPROVE_DURATION_ON_CERTIFIED = DAY;
+const REGISTRATION_DURATION_ON_CERTIFIED = DAY; // на приватном регистрации нет, там сразу есть вайтлист
+const TIER_DURATION_ON_CERTIFIED = IS_PRODUCTION ? MINUTE * 60 * 15 : MINUTE * 5;
+const PRESALE_DURATION_ON_CERTIFIED = TIER_DURATION * 5;
+const PRESALE_DURATION_ON_CERTIFIED_PRIVATE = DAY;
+const LIQUIDITY_ALLOCATION_DURATION_ON_CERTIFIED = IS_PRODUCTION ? HOUR : MINUTE * 10;
 
 const TIER_PERCENTAGES = [30, 20, 15, 25, 10]; // Tier 5 >>> Tier 1
 
@@ -38,6 +47,7 @@ export default {
   IS_TESTING_ON_ROPSTEN,
   SHOW_CONSOLE_LOGS,
   SHOW_FORM_VALUES,
+  SHOW_FORM_VALUES_MINE,
   SHOW_CERTIFIED_PRESALE,
   IS_FORM_EXISTING_VALUES_VALIDATION_ENABLED,
   IS_FORM_TIME_VALIDATION_ENABLED,
@@ -52,6 +62,13 @@ export default {
   REGISTRATION_DURATION,
   PRESALE_DURATION,
   LIQUIDITY_ALLOCATION_DURATION,
+  //
+  APPROVE_DURATION_ON_CERTIFIED,
+  REGISTRATION_DURATION_ON_CERTIFIED,
+  TIER_DURATION_ON_CERTIFIED,
+  PRESALE_DURATION_ON_CERTIFIED,
+  PRESALE_DURATION_ON_CERTIFIED_PRIVATE,
+  LIQUIDITY_ALLOCATION_DURATION_ON_CERTIFIED,
   //
   TIER_PERCENTAGES,
   //
@@ -132,6 +149,42 @@ export default {
       },
     },
   },
+  CERTIFIED_PRESALE_CURRENCIES: {
+    mainnet: {
+      'Ethereum': {
+        ETH: '0x0000000000000000000000000000000000000000',
+        USDT: '0xdac17f958d2ee523a2206206994597c13d831ec7',
+        USDC: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+      },
+      'Binance-Smart-Chain': {
+        BNB: '',
+        BUSD: '',
+      },
+      'Matic': {
+        MATIC: '',
+        WETH: '',
+        USDC: '',
+        QUICK: '',
+      },
+    },
+    testnet: {
+      'Ethereum': {
+        ETH: '0x0000000000000000000000000000000000000000',
+        USDT: '0x07de306FF27a2B630B1141956844eB1552B956B5',
+        USDC: '0xb7a4F3E9097C08dA09517b5aB877F7a917224ede',
+      },
+      'Binance-Smart-Chain': {
+        BNB: '',
+        BUSD: '',
+      },
+      'Matic': {
+        MATIC: '',
+        WETH: '',
+        USDC: '',
+        QUICK: '',
+      },
+    },
+  },
   addresses: {
     mainnet: {
       Ethereum: {
@@ -141,7 +194,7 @@ export default {
         LessLibrary: '0x8ea0A4FC09cb381E18CE58673250ad47b6bED9cA',
         Staking: '0xE751ffdC2a684EEbcaB9Dc95fEe05c083F963Bf1',
         PresaleFactory: '0x2223af5287833BDC0c811Fb40AA37bE05401589c',
-        // PresaleFactoryCertified: '0xB9733F217111A845A268d1D98EE91800907860e2',
+        PresaleFactoryCertified: '',
       },
     },
     testnet: {
@@ -152,7 +205,7 @@ export default {
         Staking: '0xE4D00cA4eceFB3bEE229FFf97ffF3de3bBAD4B4B',
         LessLibrary: '0xa78C93A963C7C1d786EFf8CFbf54f37E0E9c12E1',
         PresaleFactory: '0xa8FD2169DFf71c22cB011c07196728B9FB75C58f',
-        PresaleFactoryCertified: '0x30457a87c85b4fcf4127e1d07f64035493e52940',
+        PresaleFactoryCertified: '0xf2a7cab10ab9ebed3b1f5bf12780ebc6a0ca34d7',
       },
     },
   },

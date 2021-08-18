@@ -1,9 +1,6 @@
 export default [
   {
-    inputs: [
-      { internalType: 'address', name: '_bscsInfoAddress', type: 'address' },
-      { internalType: 'address', name: '_bscsToken', type: 'address' },
-    ],
+    inputs: [{ internalType: 'address', name: '_bscsInfoAddress', type: 'address' }],
     stateMutability: 'nonpayable',
     type: 'constructor',
   },
@@ -50,6 +47,8 @@ export default [
           { internalType: 'uint256', name: '_tokenAmount', type: 'uint256' },
           { internalType: 'bytes', name: '_signature', type: 'bytes' },
           { internalType: 'uint256', name: '_timestamp', type: 'uint256' },
+          { internalType: 'uint8[4]', name: 'poolPercentages', type: 'uint8[4]' },
+          { internalType: 'uint256[5]', name: 'stakingTiers', type: 'uint256[5]' },
         ],
         internalType: 'struct PresaleFactoryCertified.PresaleInfo',
         name: '_info',
@@ -97,13 +96,6 @@ export default [
     name: 'createPresaleCertified',
     outputs: [{ internalType: 'uint256', name: 'presaleId', type: 'uint256' }],
     stateMutability: 'payable',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'lessToken',
-    outputs: [{ internalType: 'contract ERC20', name: '', type: 'address' }],
-    stateMutability: 'view',
     type: 'function',
   },
   {
