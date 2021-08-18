@@ -23,6 +23,7 @@ const {
   isMainnetOrTestnet,
   SHOW_CERTIFIED_PRESALE,
   SHOW_FORM_VALUES,
+  SHOW_FORM_VALUES_MINE,
   IS_FORM_EXISTING_VALUES_VALIDATION_ENABLED,
   IS_FORM_TIME_VALIDATION_ENABLED,
   NOW,
@@ -48,65 +49,6 @@ const messageMin30Days = 'Minimum 30 days';
 const messageAddressIsNotValid = 'Address is not valid';
 const messageSoftCapLessThanHardCap = 'Softcap should be less than hardcap';
 const messageGt0 = 'Value should be greater than 0';
-
-const createPresaleCertifiedInputs = [
-  {
-    components: [
-      { internalType: 'address', name: 'tokenAddress', type: 'address' },
-      { internalType: 'uint256', name: 'tokenPriceInWei', type: 'uint256' },
-      { internalType: 'uint256', name: 'hardCapInWei', type: 'uint256' },
-      { internalType: 'uint256', name: 'softCapInWei', type: 'uint256' },
-      { internalType: 'uint256', name: 'openTime', type: 'uint256' },
-      { internalType: 'uint256', name: 'closeTime', type: 'uint256' },
-      { internalType: 'uint256', name: '_tokenAmount', type: 'uint256' },
-      { internalType: 'bytes', name: '_signature', type: 'bytes' },
-      { internalType: 'uint256', name: '_timestamp', type: 'uint256' },
-      { internalType: 'uint8[4]', name: 'poolPercentages', type: 'uint8[4]' },
-      { internalType: 'uint256[5]', name: 'stakingTiers', type: 'uint256[5]' },
-    ],
-    internalType: 'struct PresaleFactoryCertified.PresaleInfo',
-    name: '_info',
-    type: 'tuple',
-  },
-  {
-    components: [
-      { internalType: 'bool', name: 'liquidity', type: 'bool' },
-      { internalType: 'bool', name: 'automatically', type: 'bool' },
-      { internalType: 'uint8', name: 'vesting', type: 'uint8' },
-      { internalType: 'address[]', name: 'whitelist', type: 'address[]' },
-      { internalType: 'address', name: 'nativeToken', type: 'address' },
-    ],
-    internalType: 'struct PresaleFactoryCertified.CertifiedAddition',
-    name: '_addition',
-    type: 'tuple',
-  },
-  {
-    components: [
-      { internalType: 'uint256', name: 'listingPriceInWei', type: 'uint256' },
-      { internalType: 'uint256', name: 'lpTokensLockDurationInDays', type: 'uint256' },
-      { internalType: 'uint8', name: 'liquidityPercentageAllocation', type: 'uint8' },
-      { internalType: 'uint256', name: 'liquidityAllocationTime', type: 'uint256' },
-    ],
-    internalType: 'struct PresaleFactoryCertified.PresalePancakeSwapInfo',
-    name: '_cakeInfo',
-    type: 'tuple',
-  },
-  {
-    components: [
-      { internalType: 'bytes32', name: 'saleTitle', type: 'bytes32' },
-      { internalType: 'bytes32', name: 'linkTelegram', type: 'bytes32' },
-      { internalType: 'bytes32', name: 'linkGithub', type: 'bytes32' },
-      { internalType: 'bytes32', name: 'linkTwitter', type: 'bytes32' },
-      { internalType: 'bytes32', name: 'linkWebsite', type: 'bytes32' },
-      { internalType: 'string', name: 'linkLogo', type: 'string' },
-      { internalType: 'string', name: 'description', type: 'string' },
-      { internalType: 'string', name: 'whitepaper', type: 'string' },
-    ],
-    internalType: 'struct PresaleFactoryCertified.PresaleStringInfo',
-    name: '_stringInfo',
-    type: 'tuple',
-  },
-];
 
 const validationIfExists = [
   {
@@ -169,9 +111,13 @@ const CreatePoolPage: React.FC = () => {
   const [saleTitle, setSaleTitle] = useState<string>(SHOW_FORM_VALUES ? 'Title' : '');
   const [description, setDescription] = useState<string>(SHOW_FORM_VALUES ? 'Description' : '');
   const [tokenAddress, setTokenAddress] = useState<string>(
-    SHOW_FORM_VALUES ? '0x3561A02e1192B89e2415724f43521f898e867013' : '',
+    SHOW_FORM_VALUES
+      ? SHOW_FORM_VALUES_MINE
+        ? '0x3561A02e1192B89e2415724f43521f898e867013'
+        : '0x7118afa5c6cbab828f0d9a529c62e89d282df9e4'
+      : '',
   );
-  const [tokenPrice, setTokenPrice] = useState<string>(SHOW_FORM_VALUES ? '0.001' : '');
+  const [tokenPrice, setTokenPrice] = useState<string>(SHOW_FORM_VALUES ? '0.0001' : '');
   // инпуты для Public type
   const [softCap, setSoftCap] = useState<string>(SHOW_FORM_VALUES ? '0.1' : '');
   const [hardCap, setHardCap] = useState<string>(SHOW_FORM_VALUES ? '0.2' : '');
@@ -181,9 +127,9 @@ const CreatePoolPage: React.FC = () => {
   const [liquidityPercentageAllocation, setLiquidityPercentageAllocation] = useState<string>(
     SHOW_FORM_VALUES ? '10' : '',
   );
-  const [listingPrice, setListingPrice] = useState<string>(SHOW_FORM_VALUES ? '0.001' : '');
+  const [listingPrice, setListingPrice] = useState<string>(SHOW_FORM_VALUES ? '0.0002' : '');
   const [lpTokensLockDurationInDays, setLpTokensLockDurationInDays] = useState(
-    SHOW_FORM_VALUES ? '31' : '',
+    SHOW_FORM_VALUES ? '30' : '',
   );
   const [vestingPercent, setVestingPercent] = useState<string>(SHOW_FORM_VALUES ? '0' : '');
   const [liquidityAllocationTime, setLiquidityAllocationTime] = useState<number>(
@@ -909,19 +855,6 @@ const CreatePoolPage: React.FC = () => {
           poolPercentages,
           stakingTiers,
         ];
-        // const presaleInfoCertified = {
-        //   tokenAddress,
-        //   tokenPriceInWei,
-        //   hardCapInWei,
-        //   softCapInWei,
-        //   openTime: (openTime / 1000).toFixed(),
-        //   closeTime: (openTime / 1000).toFixed(),
-        //   _tokenAmount: userLessAndLpBalanceFormatted,
-        //   _signature: signature,
-        //   _timestamp: timestamp.toString(),
-        //   poolPercentages,
-        //   stakingTiers,
-        // };
         // bool liquidity; - с ликвидностью / без
         // bool automatically; - если с ликвидностью, то через бэк, либо ручками
         // uint8 vesting; - процент вестинга
@@ -936,15 +869,7 @@ const CreatePoolPage: React.FC = () => {
           whiteListArray,
           nativeTokenAddress,
         ];
-        // const certifiedAddition = {
-        //   liquidity: isLiquidity,
-        //   automatically: isAutomatically,
-        //   vesting: vestingPercent,
-        //   whitelist: whiteListArray,
-        //   nativeToken: nativeTokenAddress,
-        // };
         console.log('CreatePool handleSubmit:', {
-          createPresaleCertifiedInputs,
           nativeTokenSymbol,
           nativeTokensAddresses,
           presaleInfoCertified,
