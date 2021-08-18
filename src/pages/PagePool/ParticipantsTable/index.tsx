@@ -10,54 +10,13 @@ const Backend = new BackendService();
 
 type Tiers = 'pawns' | 'bishops' | 'rooks' | 'queens' | 'kings';
 
-// пример даты для отрисовки
-// const participationDataExample = {
-//   pawns: [
-//     'x788787987879879879879798',
-//     'x788787987879879879879798',
-//     'x788787987879879879879798',
-//     'x788787987879879879879798',
-//     'x788787987879879879879798',
-//   ],
-//   bishops: [
-//     'xdfsd4f5sdfdfds',
-//     'xdfsd4f5sdfdfds',
-//     'xdfsd4f5sdfdfds',
-//     'xdfsd4f5sdfdfds',
-//     'xdfsd4f5sdfdfds',
-//   ],
-//   rooks: [
-//     'xdsssssssssdffsdfds',
-//     'xdsssssssssdffsdfds',
-//     'xdsssssssssdffsdfds',
-//     'xdsssssssssdffsdfds',
-//     'xdsssssssssdffsdfds',
-//   ],
-//   queens: [
-//     'x54fsdfdsdsf312dsf',
-//     'x54fsdfdsdsf312dsf',
-//     'x54fsdfdsdsf312dsf',
-//     'x54fsdfdsdsf312dsf',
-//     'x54fsdfdsdsf312dsf',
-//   ],
-//   kings: [
-//     'xfdsfdsfdsfdsfdssfd',
-//     'xfdsfdsfdsfdsfdssfd',
-//     'xfdsfdsfdsfdsfdssfd',
-//     'xfdsfdsfdsfdsfdssfd',
-//     'xfdsfdsfdsfdsfdssfd',
-//   ],
-// };
-
-// пример даты для отрисовки
-// const winnersExample = ['x445466646446545', 'x445466646446545', 'x445466646446545'];
-
 interface IParticipantsTable {
   poolAddress: string;
+  isCertified: boolean;
 }
 
 const ParticipantsTable: React.FC<IParticipantsTable> = (props) => {
-  const { poolAddress } = props;
+  const { poolAddress, isCertified } = props;
   const [activeTier, setActiveTier] = useState<Tiers>('pawns');
 
   const [page, setPage] = useState<number>(0);
@@ -246,7 +205,7 @@ const ParticipantsTable: React.FC<IParticipantsTable> = (props) => {
             </div>
 
             {/*Winners*/}
-            {(isPawns || isBishops) && (
+            {!isCertified && (isPawns || isBishops) && (
               <div className={s.table_body_adresses__right}>
                 <div className={`${s.table_body_adresses__title} ${s.winner}`}>
                   <span>Lottery winners</span>

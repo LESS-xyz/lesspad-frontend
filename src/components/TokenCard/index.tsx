@@ -81,6 +81,7 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
   const [loading, setLoading] = useState<boolean>(true);
 
   const { chainType } = useSelector(({ wallet }: any) => wallet);
+  // const { address: userAddress } = useSelector(({ user }: any) => user);
 
   const {
     // #additional info
@@ -107,12 +108,17 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
     linkLogo,
     // description,
     whitepaper,
-    // #uniswap info
+    // ### uniswap info
     listingPrice,
     // lpTokensLockDurationInDays,
     liquidityPercentageAllocation,
     // liquidityAllocationTime,
     // unlockTime,
+    // ### certifiedAddition
+    // liquidity,
+    // automatically,
+    // vesting,
+    // nativeToken,
   } = info;
 
   const presaleType = isCertified ? 'Certified' : 'Public';

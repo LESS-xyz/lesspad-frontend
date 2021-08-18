@@ -39,6 +39,11 @@ const AllPoolsPage: React.FC = () => {
     setCountOfPages(count);
   }, [poolsFiltered]);
 
+  const handleChangeFilter = useCallback((value: string) => {
+    setCurrentOption(value);
+    setPage(0);
+  }, []);
+
   const handleChangePage = useCallback((p: number) => setPage(p), []);
 
   const getVotingTime = useCallback(async () => {
@@ -55,6 +60,7 @@ const AllPoolsPage: React.FC = () => {
     try {
       const compareOpenVotingTime = (a, b) => b.openVotingTime - a.openVotingTime;
       const poolsInfoNew = pools
+        .reverse()
         .filter((item: any) => {
           const {
             address = '',
@@ -65,6 +71,7 @@ const AllPoolsPage: React.FC = () => {
           } = item;
           let presaleStatus = '';
           if (isCertified) {
+            presaleStatus = 'Certified';
             // if (openTimePresale > now) presaleStatus = 'Not opened';
             // if (openTimePresale < now) presaleStatus = 'Opened';
             // if (closeTimePresale < now) presaleStatus = 'Closed';
@@ -157,9 +164,9 @@ Fundraising Capital"
             </div>
             <div className={s.selector}>
               <Selector
-                fn={setCurrentOption}
+                fn={handleChangeFilter}
                 defaultOption="All"
-                othersOptions={['Ended', 'In voting', 'Not opened']}
+                othersOptions={['Ended', 'In voting', 'Not opened', 'Certified']}
               />
             </div>
           </div>

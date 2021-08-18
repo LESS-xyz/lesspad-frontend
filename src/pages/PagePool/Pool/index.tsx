@@ -560,6 +560,7 @@ const Pool: React.FC = () => {
     }
   }, [ContractStaking, userAddress]);
 
+  // todo: fix, and for certified
   const getTierTime = useCallback(() => {
     try {
       if (!info) return;
@@ -902,8 +903,12 @@ const Pool: React.FC = () => {
       less: false,
     },
     {
-      header: 'Voting completion',
-      value: lastTotalStakedAmount === '0' ? '0%' : `${prettyNumber(votingCompletion)}%`,
+      header: !isCertified ? 'Voting completion' : '',
+      value: !isCertified
+        ? lastTotalStakedAmount === '0'
+          ? '0%'
+          : `${prettyNumber(votingCompletion)}%`
+        : '',
       gradient: +votingCompletion === 100,
       less: false,
     },
@@ -1193,22 +1198,27 @@ const Pool: React.FC = () => {
   const showHtmlVotingIsNotSuccessful =
     isRegistrationTime && timeBeforeRegistration && !isVotingSuccessful;
   const showHtmlVotingIsNotSuccessfulForCreator =
+    !isCertified &&
     isUserCreator &&
     (isRegistrationTime || isInvestmentTime || isPresaleClosed) &&
     !isVotingSuccessful;
+
   const showHtmlRegistration =
+    !isCertified &&
     !isUserCreator &&
     isRegistrationTime &&
     timeBeforeRegistration &&
     isVotingSuccessful &&
     !isUserRegister;
   const showHtmlYouAreRegistered =
+    !isCertified &&
     !isUserCreator &&
     isRegistrationTime &&
     timeBeforeRegistration &&
     isVotingSuccessful &&
     isUserRegister;
   const showHtmlYouNeedToBeRegisteredToInvest =
+    !isCertified &&
     !isUserCreator &&
     isInvestmentTime &&
     isInvestStart &&
@@ -1216,17 +1226,78 @@ const Pool: React.FC = () => {
     timeBeforeMyTier &&
     !isUserRegister;
   const showHtmlInvestment =
-    !isUserCreator && isInvestmentTime && isInvestStart && isVotingSuccessful && isUserRegister;
+    !isCertified &&
+    !isUserCreator &&
+    isInvestmentTime &&
+    isInvestStart &&
+    isVotingSuccessful &&
+    isUserRegister;
   const showHtmlInvestmentIsClosed =
-    isInvestmentTime && isInvestStart && isVotingSuccessful && isUserRegister && isPresaleClosed;
+    !isCertified &&
+    isInvestmentTime &&
+    isInvestStart &&
+    isVotingSuccessful &&
+    isUserRegister &&
+    isPresaleClosed;
   const showHtmlClaimTokens = !isUserCreator && isPresaleClosed && !cancelled && liquidityAdded;
   // Cancel presale админом платформы может использоваться в любой момент.
   //   Овнером пресейла он может использоваться в случае, если не набран софткап.
   //   В случае  ненабора голосов используется метод collect fee для того чтоб овнер пресейла мог вывести не только бабло в токенах, но и свои 1000$
   // Создатель может отменять ТОЛЬКО свой пресейл и ТОЛЬКО после инвеста, если не набран софткап
-  const showHtmlClosePresale = isUserCreator && isPresaleClosed && !isPresaleSuccessful;
+  const showHtmlClosePresale =
+    !isCertified && isUserCreator && isPresaleClosed && !isPresaleSuccessful;
   const showHtmlWithdrawInvestment =
-    !isUserCreator && isPresaleClosed && (cancelled || !isPresaleSuccessful);
+    !isCertified && !isUserCreator && isPresaleClosed && (cancelled || !isPresaleSuccessful);
+
+  const showHtmlRegistrationOnCertified =
+    isCertified &&
+    !isUserCreator &&
+    isRegistrationTime &&
+    timeBeforeRegistration &&
+    approved &&
+    !isUserRegister;
+  const showHtmlYouAreRegisteredOnCertified =
+    isCertified &&
+    !isUserCreator &&
+    isRegistrationTime &&
+    timeBeforeRegistration &&
+    approved &&
+    isUserRegister;
+  const showHtmlYouNeedToBeRegisteredToInvestOnCertified =
+    isCertified &&
+    !isUserCreator &&
+    isInvestmentTime &&
+    isInvestStart &&
+    approved &&
+    timeBeforeMyTier &&
+    !isUserRegister;
+  const showHtmlInvestmentOnCertified =
+    isCertified &&
+    !isUserCreator &&
+    isInvestmentTime &&
+    isInvestStart &&
+    approved &&
+    isUserRegister;
+  const showHtmlInvestmentIsClosedOnCertified =
+    isCertified &&
+    isInvestmentTime &&
+    isInvestStart &&
+    approved &&
+    isUserRegister &&
+    isPresaleClosed;
+  const showHtmlClaimTokensOnCertified =
+    isCertified && !isUserCreator && isPresaleClosed && !cancelled && liquidityAdded;
+  // Cancel presale админом платформы может использоваться в любой момент.
+  //   Овнером пресейла он может использоваться в случае, если не набран софткап.
+  //   В случае  ненабора голосов используется метод collect fee для того чтоб овнер пресейла мог вывести не только бабло в токенах, но и свои 1000$
+  // Создатель может отменять ТОЛЬКО свой пресейл и ТОЛЬКО после инвеста, если не набран софткап
+  const showHtmlClosePresaleOnCertified =
+    isCertified && isUserCreator && isPresaleClosed && !isPresaleSuccessful;
+  const showHtmlWithdrawInvestmentOnCertified =
+    isCertified &&
+    !isUserCreator &&
+    isPresaleClosed &&
+    (cancelled || !isPresaleSuccessful || !approved);
 
   return (
     <div className="container">
@@ -1408,12 +1479,21 @@ const Pool: React.FC = () => {
             {showHtmlClaimTokens && htmlClaimTokens}
             {showHtmlClosePresale && htmlClosePresale}
             {showHtmlWithdrawInvestment && htmlWithdrawInvestment}
+            {/*Certified*/}
+            {showHtmlRegistrationOnCertified && htmlRegistration}
+            {showHtmlYouAreRegisteredOnCertified && htmlYouAreRegistered}
+            {showHtmlYouNeedToBeRegisteredToInvestOnCertified && htmlYouNeedToBeRegisteredToInvest}
+            {showHtmlInvestmentOnCertified && htmlInvestment}
+            {showHtmlInvestmentIsClosedOnCertified && htmlInvestmentIsClosed}
+            {showHtmlClaimTokensOnCertified && htmlClaimTokens}
+            {showHtmlClosePresaleOnCertified && htmlClosePresale}
+            {showHtmlWithdrawInvestmentOnCertified && htmlWithdrawInvestment}
           </div>
         </div>
       ) : null}
 
       {/*Participants*/}
-      <ParticipantsTable poolAddress={address} />
+      <ParticipantsTable poolAddress={address} isCertified={isCertified || true} />
 
       {/*Important Links*/}
       <div className="container-header">Important Links</div>
@@ -1455,10 +1535,14 @@ const Pool: React.FC = () => {
         </div>
       </div>
 
-      <div className="container-header">Audit</div>
-      <div className="box box-bg">
-        <div className="box-text">{approved ? 'Audited' : 'Not audited yet.'}</div>
-      </div>
+      {isCertified && (
+        <>
+          <div className="container-header">Audit</div>
+          <div className="box box-bg">
+            <div className="box-text">{approved ? 'Audited' : 'Not audited yet.'}</div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
