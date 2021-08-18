@@ -20,7 +20,7 @@ import s from './CreatePool.module.scss';
 
 const Backend = new BackendService();
 const {
-  isMainnetOrTestnet,
+  IS_MAINNET_OR_TESTNET,
   SHOW_CERTIFIED_PRESALE,
   SHOW_FORM_VALUES,
   SHOW_FORM_VALUES_MINE,
@@ -42,6 +42,7 @@ const checkIfExists = (value: any) => value;
 const checkPercentage = (value: number) => value >= 0 && value <= 100;
 const checkDuration = (value: number) => value >= 30;
 const checkGt0 = (value: number) => value > 0;
+const checkMaxStringLengthIs32 = (value: string) => value.length <= 32;
 
 const messageEnterValue = 'Enter value';
 const messagePercentValue = 'Percent value should be between 0 and 100';
@@ -49,6 +50,7 @@ const messageMin30Days = 'Minimum 30 days';
 const messageAddressIsNotValid = 'Address is not valid';
 const messageSoftCapLessThanHardCap = 'Softcap should be less than hardcap';
 const messageGt0 = 'Value should be greater than 0';
+const messageMaxStringLengthIs32 = 'Maximum length is 32';
 
 const validationIfExists = [
   {
@@ -74,6 +76,12 @@ const validationGt0 = [
     message: messageGt0,
   },
 ];
+const validationMaxStringLengthIs32 = [
+  {
+    equation: checkMaxStringLengthIs32,
+    message: messageMaxStringLengthIs32,
+  },
+];
 
 const CreatePoolPage: React.FC = () => {
   const { web3 } = useWeb3ConnectorContext();
@@ -93,9 +101,10 @@ const CreatePoolPage: React.FC = () => {
   const { minCreatorStakedBalance } = useSelector(({ library }: any) => library);
   const { stakedLess, stakedLp, lessPerLp } = useSelector(({ library }: any) => library);
 
-  const nativeTokensAddresses = CERTIFIED_PRESALE_CURRENCIES[isMainnetOrTestnet][chainType] || {};
+  const nativeTokensAddresses =
+    CERTIFIED_PRESALE_CURRENCIES[IS_MAINNET_OR_TESTNET][chainType] || {};
   const nativeTokensSymbols = Object.keys(
-    CERTIFIED_PRESALE_CURRENCIES[isMainnetOrTestnet][chainType] || {},
+    CERTIFIED_PRESALE_CURRENCIES[IS_MAINNET_OR_TESTNET][chainType] || {},
   );
 
   const defaultNativeTokenSymbol = nativeTokensSymbols[0] || '';
@@ -273,7 +282,7 @@ const CreatePoolPage: React.FC = () => {
     }
   }, [fieldsMustExist]);
 
-  const validateFormForExistingValues = () => {
+  const validateFormForExistingValues = useCallback(() => {
     try {
       if (!IS_FORM_EXISTING_VALUES_VALIDATION_ENABLED) return true;
       const newErrors = {};
@@ -282,7 +291,7 @@ const CreatePoolPage: React.FC = () => {
         const [variableName, variable] = entries[i];
         newErrors[variableName] = !checkIfExists(variable) && messageEnterValue;
       }
-      setErrors({ ...errors, ...newErrors });
+      setErrors(newErrors);
       for (let i = 0; i < entries.length; i += 1) {
         const [, variable] = entries[i];
         if (!variable) return false;
@@ -292,9 +301,9 @@ const CreatePoolPage: React.FC = () => {
       console.error(e);
       return false;
     }
-  };
+  }, [fieldsMustExist]);
 
-  const validateSoftCapAndHardCap = () => {
+  const validateSoftCapAndHardCap = useCallback(() => {
     try {
       const isSoftCapLessThanHardCap = +softCap < +hardCap;
       const messageIfIsSoftCapLessThanHardCap =
@@ -303,16 +312,16 @@ const CreatePoolPage: React.FC = () => {
         softCap: messageIfIsSoftCapLessThanHardCap,
         hardCap: messageIfIsSoftCapLessThanHardCap,
       };
-      setErrors({ ...errors, ...newErrors });
+      setErrors(newErrors);
       if (!isSoftCapLessThanHardCap) return false;
       return true;
     } catch (e) {
       console.error(e);
       return false;
     }
-  };
+  }, [hardCap, softCap]);
 
-  const validateFormValues = () => {
+  const validateFormValues = useCallback(() => {
     try {
       const isSoftCapLessThan0 = +softCap < 0;
       const isHardCapLessThan0 = +hardCap < 0;
@@ -325,15 +334,30 @@ const CreatePoolPage: React.FC = () => {
         softCap: messageIfIsSoftCapLessThanHardCap || messageIfIsSoftCapLessThan0,
         hardCap: messageIfIsSoftCapLessThanHardCap || messageIfIsHardCapLessThan0,
       };
-      setErrors({ ...errors, ...newErrors });
+      setErrors(newErrors);
       if (!checkPercentage(+liquidityPercentageAllocation)) return false;
       if (!checkDuration(+lpTokensLockDurationInDays)) return false;
+      if (!checkMaxStringLengthIs32(saleTitle)) return false;
+      if (!checkMaxStringLengthIs32(linkTelegram)) return false;
+      if (!checkMaxStringLengthIs32(linkGithub)) return false;
+      if (!checkMaxStringLengthIs32(linkTwitter)) return false;
+      if (!checkMaxStringLengthIs32(linkWebsite)) return false;
       return true;
     } catch (e) {
       console.error(e);
       return false;
     }
-  };
+  }, [
+    hardCap,
+    softCap,
+    liquidityPercentageAllocation,
+    lpTokensLockDurationInDays,
+    saleTitle,
+    linkTelegram,
+    linkGithub,
+    linkTwitter,
+    linkWebsite,
+  ]);
 
   const validateAddresses = useCallback(async () => {
     try {
@@ -525,9 +549,9 @@ const CreatePoolPage: React.FC = () => {
     try {
       const totalSupply = await ContractLessToken.totalSupply();
       const { addresses }: any = config;
-      const spenderPublic = addresses[config.isMainnetOrTestnet][chainType].PresaleFactory;
+      const spenderPublic = addresses[config.IS_MAINNET_OR_TESTNET][chainType].PresaleFactory;
       const spenderCertified =
-        addresses[config.isMainnetOrTestnet][chainType].PresaleFactoryCertified;
+        addresses[config.IS_MAINNET_OR_TESTNET][chainType].PresaleFactoryCertified;
       const spender = isPublic ? spenderPublic : spenderCertified;
       const allowance = await ContractLessToken.allowance({ userAddress, spender });
       console.log('CreatePool approveLess:', { totalSupply, spender, allowance });
@@ -551,9 +575,9 @@ const CreatePoolPage: React.FC = () => {
     try {
       const totalSupply = await ContractERC20.totalSupply({ contractAddress: tokenAddress });
       const { addresses }: any = config;
-      const spenderPublic = addresses[config.isMainnetOrTestnet][chainType].PresaleFactory;
+      const spenderPublic = addresses[config.IS_MAINNET_OR_TESTNET][chainType].PresaleFactory;
       const spenderCertified =
-        addresses[config.isMainnetOrTestnet][chainType].PresaleFactoryCertified;
+        addresses[config.IS_MAINNET_OR_TESTNET][chainType].PresaleFactoryCertified;
       const spender = isPublic ? spenderPublic : spenderCertified;
       const allowance = await ContractERC20.allowance({
         contractAddress: tokenAddress,
@@ -605,7 +629,7 @@ const CreatePoolPage: React.FC = () => {
         <div className={s.messageContainer}>
           <p>Transaction submitted</p>
           <div className={s.messageContainerButtons}>
-            <Button href={`${config.explorers[chainType]}/tx/${txHash}`}>View on etherscan</Button>
+            <Button href={`${config.EXPLORERS[chainType]}/tx/${txHash}`}>View on etherscan</Button>
           </div>
         </div>
       ),
@@ -1011,7 +1035,7 @@ const CreatePoolPage: React.FC = () => {
                 value={saleTitle}
                 onChange={setSaleTitle}
                 error={errors.saleTitle}
-                validations={validationIfExists}
+                validations={[...validationIfExists, ...validationMaxStringLengthIs32]}
               />
               <Input
                 title="Description"
@@ -1188,11 +1212,6 @@ const CreatePoolPage: React.FC = () => {
                   options={nativeTokensSymbols.map((symbol: string) => {
                     return { key: symbol, text: symbol };
                   })}
-                  // options={[
-                  //   { key: 'WETH', text: 'WETH' },
-                  //   { key: 'USDT', text: 'USDT' },
-                  //   { key: 'USDC', text: 'USDC' },
-                  // ]}
                 />
               )}
 
@@ -1209,28 +1228,28 @@ const CreatePoolPage: React.FC = () => {
                 onChange={setLinkWebsite}
                 title="Link to Website"
                 error={errors.linkWebsite}
-                validations={validationIfExists}
+                validations={[...validationIfExists, ...validationMaxStringLengthIs32]}
               />
               <Input
                 value={linkTelegram}
                 onChange={setLinkTelegram}
                 title="Link to Telegram"
                 error={errors.linkTelegram}
-                validations={validationIfExists}
+                validations={[...validationIfExists, ...validationMaxStringLengthIs32]}
               />
               <Input
                 value={linkGithub}
                 onChange={setLinkGithub}
                 title="Link to Github"
                 error={errors.linkGithub}
-                validations={validationIfExists}
+                validations={[...validationIfExists, ...validationMaxStringLengthIs32]}
               />
               <Input
                 value={linkTwitter}
                 onChange={setLinkTwitter}
                 title="Link to Twitter"
                 error={errors.linkTwitter}
-                validations={validationIfExists}
+                validations={[...validationIfExists, ...validationMaxStringLengthIs32]}
               />
               <Input
                 value={whitepaper}

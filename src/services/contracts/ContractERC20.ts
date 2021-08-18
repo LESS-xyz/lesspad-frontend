@@ -24,10 +24,10 @@ export default class ContractERC20 {
     this.contractName = 'ERC20';
 
     const { web3Provider, chainType } = props;
-    const { isMainnetOrTestnet, abis }: any = config;
+    const { IS_MAINNET_OR_TESTNET, abis }: any = config;
     this.web3 = new Web3(web3Provider);
 
-    const abisOfNetType = abis[isMainnetOrTestnet];
+    const abisOfNetType = abis[IS_MAINNET_OR_TESTNET];
     this.contractAbi = abisOfNetType[chainType][this.contractName];
   }
 

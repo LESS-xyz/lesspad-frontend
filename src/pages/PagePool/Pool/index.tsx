@@ -32,8 +32,8 @@ import ParticipantsTable from '../ParticipantsTable';
 import './index.scss';
 
 const {
-  chainSymbols,
-  explorers,
+  CHAIN_SYMBOLS,
+  EXPLORERS,
   NOW,
   REGISTRATION_DURATION,
   TIER_DURATION,
@@ -116,10 +116,9 @@ const Pool: React.FC = () => {
   const [tier, setTier] = React.useState<string>('');
   const [isMyTierTime, setIsMyTierTime] = useState<boolean>(false);
 
-  // const [logo, setLogo] = React.useState<string>(projectLogo);
+  const [logo, setLogo] = React.useState<string>(projectLogo);
 
   const [lessDecimals, setLessDecimals] = useState<number>();
-  // const [lpDecimals, setLpDecimals] = useState<number>();
   const [tokenDecimals, setTokenDecimals] = useState<number>(0);
 
   const [investments, setInvestments] = useState<any>({ amountEth: 0, amountTokens: 0 });
@@ -260,21 +259,26 @@ const Pool: React.FC = () => {
 
   const isPresaleSuccessful = +percentOfTokensSold >= 100;
 
-  const currency = chainSymbols[chainType];
-  const explorer = explorers[chainType];
+  const currency = CHAIN_SYMBOLS[chainType];
+  const explorer = EXPLORERS[chainType];
 
-  // const getImage = useCallback(async () => {
-  //   try {
-  //     const { linkLogo } = info;
-  //     const result = await axios.get(linkLogo);
-  //     console.log('Pool getImage:', result);
-  //     if (!result.data) return;
-  //     setLogo(result.data);
-  //     return;
-  //   } catch (e) {
-  //     console.error('Pool getImage:', e);
-  //   }
-  // }, [info]);
+  const getImage = useCallback(async () => {
+    try {
+      const checkImage = (path: string) =>
+        new Promise((resolve) => {
+          const img = new Image();
+          img.onload = () => resolve(linkLogo);
+          img.onerror = () => resolve(projectLogo);
+          img.src = path;
+        });
+      const src: any = await checkImage(linkLogo);
+      setLogo(src);
+      return;
+    } catch (e) {
+      console.error('Pool getImage:', e);
+      setLogo(projectLogo);
+    }
+  }, [linkLogo]);
 
   const updateTimerBeforeVoting = useCallback(() => {
     try {
@@ -560,6 +564,7 @@ const Pool: React.FC = () => {
     }
   }, [ContractStaking, userAddress]);
 
+  // todo: fix, and for certified
   const getTierTime = useCallback(() => {
     try {
       if (!info) return;
@@ -728,10 +733,10 @@ const Pool: React.FC = () => {
     if (!address) history.push('/');
   }, [address, history]);
 
-  // useEffect(() => {
-  //   if (!info) return () => {};
-  //   getImage();
-  // }, [info, getImage]);
+  useEffect(() => {
+    if (!info) return;
+    getImage();
+  }, [info, getImage]);
 
   useEffect(() => {
     if (!info) return () => {};
@@ -902,8 +907,12 @@ const Pool: React.FC = () => {
       less: false,
     },
     {
-      header: 'Voting completion',
-      value: lastTotalStakedAmount === '0' ? '0%' : `${prettyNumber(votingCompletion)}%`,
+      header: !isCertified ? 'Voting completion' : '',
+      value: !isCertified
+        ? lastTotalStakedAmount === '0'
+          ? '0%'
+          : `${prettyNumber(votingCompletion)}%`
+        : '',
       gradient: +votingCompletion === 100,
       less: false,
     },
@@ -913,7 +922,7 @@ const Pool: React.FC = () => {
     {
       header: 'Token Contract Address',
       value: token,
-      link: `${explorers[chainType]}/token/${token}`,
+      link: `${EXPLORERS[chainType]}/token/${token}`,
     },
     // {
     //   header: 'PancakeSwap Address',
@@ -922,12 +931,12 @@ const Pool: React.FC = () => {
     // {
     //   header: 'Locked Liquidity Address',
     //   value: '0x0e7b582003de0E541548cF02a1F00725Df6E6E6f',
-    //   link: `${explorers[chainType]}/token/${token}`,
+    //   link: `${EXPLORERS[chainType]}/token/${token}`,
     // },
     {
       header: 'Presale Contract Address',
       value: address,
-      link: `${explorers[chainType]}/address/${address}`,
+      link: `${EXPLORERS[chainType]}/address/${address}`,
     },
   ];
 
@@ -1193,22 +1202,27 @@ const Pool: React.FC = () => {
   const showHtmlVotingIsNotSuccessful =
     isRegistrationTime && timeBeforeRegistration && !isVotingSuccessful;
   const showHtmlVotingIsNotSuccessfulForCreator =
+    !isCertified &&
     isUserCreator &&
     (isRegistrationTime || isInvestmentTime || isPresaleClosed) &&
     !isVotingSuccessful;
+
   const showHtmlRegistration =
+    !isCertified &&
     !isUserCreator &&
     isRegistrationTime &&
     timeBeforeRegistration &&
     isVotingSuccessful &&
     !isUserRegister;
   const showHtmlYouAreRegistered =
+    !isCertified &&
     !isUserCreator &&
     isRegistrationTime &&
     timeBeforeRegistration &&
     isVotingSuccessful &&
     isUserRegister;
   const showHtmlYouNeedToBeRegisteredToInvest =
+    !isCertified &&
     !isUserCreator &&
     isInvestmentTime &&
     isInvestStart &&
@@ -1216,17 +1230,78 @@ const Pool: React.FC = () => {
     timeBeforeMyTier &&
     !isUserRegister;
   const showHtmlInvestment =
-    !isUserCreator && isInvestmentTime && isInvestStart && isVotingSuccessful && isUserRegister;
+    !isCertified &&
+    !isUserCreator &&
+    isInvestmentTime &&
+    isInvestStart &&
+    isVotingSuccessful &&
+    isUserRegister;
   const showHtmlInvestmentIsClosed =
-    isInvestmentTime && isInvestStart && isVotingSuccessful && isUserRegister && isPresaleClosed;
+    !isCertified &&
+    isInvestmentTime &&
+    isInvestStart &&
+    isVotingSuccessful &&
+    isUserRegister &&
+    isPresaleClosed;
   const showHtmlClaimTokens = !isUserCreator && isPresaleClosed && !cancelled && liquidityAdded;
   // Cancel presale админом платформы может использоваться в любой момент.
   //   Овнером пресейла он может использоваться в случае, если не набран софткап.
   //   В случае  ненабора голосов используется метод collect fee для того чтоб овнер пресейла мог вывести не только бабло в токенах, но и свои 1000$
   // Создатель может отменять ТОЛЬКО свой пресейл и ТОЛЬКО после инвеста, если не набран софткап
-  const showHtmlClosePresale = isUserCreator && isPresaleClosed && !isPresaleSuccessful;
+  const showHtmlClosePresale =
+    !isCertified && isUserCreator && isPresaleClosed && !isPresaleSuccessful;
   const showHtmlWithdrawInvestment =
-    !isUserCreator && isPresaleClosed && (cancelled || !isPresaleSuccessful);
+    !isCertified && !isUserCreator && isPresaleClosed && (cancelled || !isPresaleSuccessful);
+
+  const showHtmlRegistrationOnCertified =
+    isCertified &&
+    !isUserCreator &&
+    isRegistrationTime &&
+    timeBeforeRegistration &&
+    approved &&
+    !isUserRegister;
+  const showHtmlYouAreRegisteredOnCertified =
+    isCertified &&
+    !isUserCreator &&
+    isRegistrationTime &&
+    timeBeforeRegistration &&
+    approved &&
+    isUserRegister;
+  const showHtmlYouNeedToBeRegisteredToInvestOnCertified =
+    isCertified &&
+    !isUserCreator &&
+    isInvestmentTime &&
+    isInvestStart &&
+    approved &&
+    timeBeforeMyTier &&
+    !isUserRegister;
+  const showHtmlInvestmentOnCertified =
+    isCertified &&
+    !isUserCreator &&
+    isInvestmentTime &&
+    isInvestStart &&
+    approved &&
+    isUserRegister;
+  const showHtmlInvestmentIsClosedOnCertified =
+    isCertified &&
+    isInvestmentTime &&
+    isInvestStart &&
+    approved &&
+    isUserRegister &&
+    isPresaleClosed;
+  const showHtmlClaimTokensOnCertified =
+    isCertified && !isUserCreator && isPresaleClosed && !cancelled && liquidityAdded;
+  // Cancel presale админом платформы может использоваться в любой момент.
+  //   Овнером пресейла он может использоваться в случае, если не набран софткап.
+  //   В случае  ненабора голосов используется метод collect fee для того чтоб овнер пресейла мог вывести не только бабло в токенах, но и свои 1000$
+  // Создатель может отменять ТОЛЬКО свой пресейл и ТОЛЬКО после инвеста, если не набран софткап
+  const showHtmlClosePresaleOnCertified =
+    isCertified && isUserCreator && isPresaleClosed && !isPresaleSuccessful;
+  const showHtmlWithdrawInvestmentOnCertified =
+    isCertified &&
+    !isUserCreator &&
+    isPresaleClosed &&
+    (cancelled || !isPresaleSuccessful || !approved);
 
   return (
     <div className="container">
@@ -1240,7 +1315,7 @@ const Pool: React.FC = () => {
       <div className="preview">
         <div className="description">
           <div className="logo-center">
-            <img src={linkLogo ? addHttps(linkLogo) : projectLogo} alt="token-logo" />
+            <img src={logo || projectLogo} alt="token-logo" />
           </div>
           <div className="description-info">
             <div className="description-info-header">
@@ -1408,12 +1483,21 @@ const Pool: React.FC = () => {
             {showHtmlClaimTokens && htmlClaimTokens}
             {showHtmlClosePresale && htmlClosePresale}
             {showHtmlWithdrawInvestment && htmlWithdrawInvestment}
+            {/*Certified*/}
+            {showHtmlRegistrationOnCertified && htmlRegistration}
+            {showHtmlYouAreRegisteredOnCertified && htmlYouAreRegistered}
+            {showHtmlYouNeedToBeRegisteredToInvestOnCertified && htmlYouNeedToBeRegisteredToInvest}
+            {showHtmlInvestmentOnCertified && htmlInvestment}
+            {showHtmlInvestmentIsClosedOnCertified && htmlInvestmentIsClosed}
+            {showHtmlClaimTokensOnCertified && htmlClaimTokens}
+            {showHtmlClosePresaleOnCertified && htmlClosePresale}
+            {showHtmlWithdrawInvestmentOnCertified && htmlWithdrawInvestment}
           </div>
         </div>
       ) : null}
 
       {/*Participants*/}
-      <ParticipantsTable poolAddress={address} />
+      <ParticipantsTable poolAddress={address} isCertified={isCertified || true} />
 
       {/*Important Links*/}
       <div className="container-header">Important Links</div>
@@ -1455,10 +1539,14 @@ const Pool: React.FC = () => {
         </div>
       </div>
 
-      <div className="container-header">Audit</div>
-      <div className="box box-bg">
-        <div className="box-text">{approved ? 'Audited' : 'Not audited yet.'}</div>
-      </div>
+      {isCertified && (
+        <>
+          <div className="container-header">Audit</div>
+          <div className="box box-bg">
+            <div className="box-text">{approved ? 'Audited' : 'Not audited yet.'}</div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

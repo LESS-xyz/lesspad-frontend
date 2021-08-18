@@ -72,10 +72,10 @@ export default {
   //
   TIER_PERCENTAGES,
   //
-  version: IS_PRODUCTION ? 'Mainnet beta' : IS_TESTING_ON_ROPSTEN ? 'Ropsten beta' : 'Kovan beta',
-  isMainnetOrTestnet: IS_PRODUCTION ? 'mainnet' : 'testnet',
-  netType: IS_PRODUCTION ? 'mainnet' : IS_TESTING_ON_ROPSTEN ? 'ropsten' : 'kovan',
-  links: {
+  VERSION: IS_PRODUCTION ? 'Mainnet beta' : IS_TESTING_ON_ROPSTEN ? 'Ropsten beta' : 'Kovan beta',
+  IS_MAINNET_OR_TESTNET: IS_PRODUCTION ? 'mainnet' : 'testnet',
+  NET_TYPE: IS_PRODUCTION ? 'mainnet' : IS_TESTING_ON_ROPSTEN ? 'ropsten' : 'kovan',
+  LINKS: {
     twitter: 'https://twitter.com/',
     telegram: 'https://t.me/',
     medium: 'https://medium.com/',
@@ -85,35 +85,30 @@ export default {
     email: 'support@mail.com',
     policy: '',
   },
-  apis: {
-    'backend': 'https://lesspad.rocknblock.io/api/v1',
-    '0x': IS_PRODUCTION
-      ? 'https://api.0x.org'
-      : IS_TESTING_ON_ROPSTEN
-      ? 'https://ropsten.api.0x.org/'
-      : 'https://kovan.api.0x.org/',
+  APIS: {
+    backend: 'https://lesspad.rocknblock.io/api/v1',
   },
-  keys: {
+  KEYS: {
     infura: INFURA_KEY,
   },
-  rpc: {
+  RPC: {
     'Ethereum': IS_PRODUCTION
       ? `https://mainnet.infura.io/v3/${INFURA_KEY}`
       : `https://kovan.infura.io/v3/${INFURA_KEY}`,
     'Binance-Smart-Chain': `https://bsc-dataseed.binance.org`,
     'Matic': `https://polygon-mainnet.infura.io/v3/${INFURA_KEY}`,
   },
-  chainSymbols: {
+  CHAIN_SYMBOLS: {
     'Ethereum': 'ETH',
     'Binance-Smart-Chain': 'BNB',
     'Matic': 'MATIC',
   },
-  explorers: {
+  EXPLORERS: {
     'Ethereum': IS_PRODUCTION ? 'https://etherscan.io' : 'https://kovan.etherscan.io',
     'Binance-Smart-Chain': 'https://bscscan.io',
     'Matic': 'https://polygonscan.com',
   },
-  chainIds: {
+  CHAIN_IDS: {
     mainnet: {
       'Ethereum': {
         name: 'Ethereum',

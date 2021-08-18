@@ -30,9 +30,9 @@ export default class ContractPresaleCertifiedService {
 
   constructor(props: TypeConstructorProps) {
     const { web3Provider, chainType } = props;
-    const { addresses, isMainnetOrTestnet, abis }: any = config;
-    const addressesOfNetType = addresses[isMainnetOrTestnet];
-    const abisOfNetType = abis[isMainnetOrTestnet];
+    const { addresses, IS_MAINNET_OR_TESTNET, abis }: any = config;
+    const addressesOfNetType = addresses[IS_MAINNET_OR_TESTNET];
+    const abisOfNetType = abis[IS_MAINNET_OR_TESTNET];
     this.web3 = new Web3(web3Provider);
     // this.web3.eth.handleRevert = true;
     this.contractName = 'PresaleCertified';
@@ -52,13 +52,14 @@ export default class ContractPresaleCertifiedService {
       const uniswapInfo = await contract.methods.uniswapInfo().call();
       const stringInfo = await contract.methods.stringInfo().call();
       const intermediate = await contract.methods.intermediate().call();
+      const certifiedAddition = await contract.methods.certifiedAddition().call();
       // const certifiedAddition = await contract.methods.certifiedAddition().call();
       console.log('ContractPresaleCertifiedService getInfo:', {
         generalInfo,
         uniswapInfo,
         stringInfo,
         intermediate,
-        // certifiedAddition,
+        certifiedAddition,
       });
       const contractToken = new this.web3.eth.Contract(ERC20Abi, generalInfo.token);
       const decimals = await contractToken.methods.decimals().call();
@@ -100,6 +101,7 @@ export default class ContractPresaleCertifiedService {
         participants,
         raisedAmount,
       } = intermediate;
+      const { liquidity, automatically, vesting, nativeToken } = certifiedAddition;
       // format
       const pow = new BN(10).pow(new BN(decimals));
       const tokenPrice = +new BN(tokenPriceInWei).div(pow);
@@ -109,7 +111,7 @@ export default class ContractPresaleCertifiedService {
       const tokensForLiquidityLeftInEth = +new BN(tokensForLiquidityLeft).div(pow);
       const listingPriceInEth = +new BN(listingPriceInWei).div(pow);
       const beginingAmountInEth = +new BN(beginingAmount).div(pow);
-      const raisedAmountInEth = +new BN(raisedAmount).div(pow); // todo: decimals of native token
+      const raisedAmountInEth = +new BN(raisedAmount).div(pow);
 
       return {
         // general
@@ -136,7 +138,7 @@ export default class ContractPresaleCertifiedService {
         // uniswap
         listingPrice: listingPriceInEth,
         lpTokensLockDurationInDays,
-        liquidityPercentageAllocation, // todo: in percent or in 0.01?
+        liquidityPercentageAllocation,
         liquidityAllocationTime: liquidityAllocationTime * 1000,
         unlockTime,
         // intermediate
@@ -146,6 +148,11 @@ export default class ContractPresaleCertifiedService {
         liquidityAdded,
         participants,
         raisedAmount: raisedAmountInEth,
+        // certifiedAddition
+        liquidity,
+        automatically,
+        vesting,
+        nativeToken,
       };
     } catch (e) {
       console.error('ContractPresaleCertifiedService getInfo:', e);

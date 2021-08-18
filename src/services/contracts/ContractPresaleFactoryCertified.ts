@@ -1,5 +1,4 @@
 // import BigNumber from 'bignumber.js/bignumber';
-// import { ethers } from 'ethers';
 import Web3 from 'web3';
 
 import config from '../../config';
@@ -31,9 +30,9 @@ export default class ContractPresaleFactoryCertifiedService {
 
   constructor(props: TypeConstructorProps) {
     const { web3Provider, chainType } = props;
-    const { addresses, isMainnetOrTestnet, abis }: any = config;
-    const addressesOfNetType = addresses[isMainnetOrTestnet];
-    const abisOfNetType = abis[isMainnetOrTestnet];
+    const { addresses, IS_MAINNET_OR_TESTNET, abis }: any = config;
+    const addressesOfNetType = addresses[IS_MAINNET_OR_TESTNET];
+    const abisOfNetType = abis[IS_MAINNET_OR_TESTNET];
     this.contractName = 'PresaleFactoryCertified';
     this.web3 = new Web3(web3Provider);
     this.web3Provider = web3Provider;
@@ -76,20 +75,6 @@ export default class ContractPresaleFactoryCertifiedService {
           from: userAddress,
           value: usdtToEthFee,
         });
-      // const provider = new ethers.providers.JsonRpcProvider(this.web3Provider).getSigner(
-      //   userAddress,
-      // );
-      // const contract = new ethers.Contract(this.contractAddress, this.contractAbi, provider);
-      // return contract.createPresaleCertified(
-      //   presaleInfo,
-      //   certifiedAddition,
-      //   presalePancakeSwapInfo,
-      //   presaleStringInfoFormatted,
-      //   {
-      //     from: userAddress,
-      //     value: usdtToEthFee,
-      //   },
-      // );
     } catch (e) {
       console.error('ContractPresaleFactoryCertified createPresaleCertified:', e);
       return null;

@@ -27,9 +27,9 @@ export default class ContractPresaleFactoryService {
 
   constructor(props: TypeConstructorProps) {
     const { web3Provider, chainType } = props;
-    const { addresses, isMainnetOrTestnet, abis }: any = config;
-    const addressesOfNetType = addresses[isMainnetOrTestnet];
-    const abisOfNetType = abis[isMainnetOrTestnet];
+    const { addresses, IS_MAINNET_OR_TESTNET, abis }: any = config;
+    const addressesOfNetType = addresses[IS_MAINNET_OR_TESTNET];
+    const abisOfNetType = abis[IS_MAINNET_OR_TESTNET];
     this.web3 = new Web3(web3Provider);
     this.contractName = 'PresaleFactory';
     this.contractAddress = addressesOfNetType[chainType][this.contractName];

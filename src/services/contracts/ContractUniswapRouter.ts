@@ -19,8 +19,8 @@ export default class ContractUniswapRouterService {
 
   constructor(props: TypeConstructorProps) {
     const { web3Provider, chainType, contractAddress } = props;
-    const { isMainnetOrTestnet, abis }: any = config;
-    const abisOfNetType = abis[isMainnetOrTestnet];
+    const { IS_MAINNET_OR_TESTNET, abis }: any = config;
+    const abisOfNetType = abis[IS_MAINNET_OR_TESTNET];
     this.web3 = new Web3(web3Provider);
     this.contractName = 'UniswapRouter';
     this.contractAddress = contractAddress;

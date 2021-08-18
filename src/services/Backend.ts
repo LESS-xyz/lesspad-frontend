@@ -2,7 +2,7 @@ import axios from 'axios';
 
 import config from '../config';
 
-const { apis }: any = config;
+const { APIS }: any = config;
 
 type TypeMetamaskLoginProps = {
   address: string;
@@ -65,7 +65,7 @@ export class BackendService {
   private axios: any;
 
   constructor() {
-    this.axios = axios.create({ baseURL: apis.backend });
+    this.axios = axios.create({ baseURL: APIS.backend });
   }
 
   getMetamaskMessage = async () => {

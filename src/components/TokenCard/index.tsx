@@ -77,10 +77,12 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
   const { ContractPresalePublic, ContractPresaleCertified } = useContractsContext();
 
   const [info, setInfo] = useState<any>(defaultInfo);
+  const [logo, setLogo] = useState<string>('');
   const [chainInfo, setChainInfo] = useState<any>({});
   const [loading, setLoading] = useState<boolean>(true);
 
   const { chainType } = useSelector(({ wallet }: any) => wallet);
+  // const { address: userAddress } = useSelector(({ user }: any) => user);
 
   const {
     // #additional info
@@ -107,12 +109,17 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
     linkLogo,
     // description,
     whitepaper,
-    // #uniswap info
+    // ### uniswap info
     listingPrice,
     // lpTokensLockDurationInDays,
     liquidityPercentageAllocation,
     // liquidityAllocationTime,
     // unlockTime,
+    // ### certifiedAddition
+    // liquidity,
+    // automatically,
+    // vesting,
+    // nativeToken,
   } = info;
 
   const presaleType = isCertified ? 'Certified' : 'Public';
@@ -130,6 +137,24 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
     if (closeTimePresale < NOW) presaleStatus = 'Ended';
   }
   const isOpened = openTimePresale < NOW;
+
+  const getImage = useCallback(async () => {
+    try {
+      const checkImage = (path: string) =>
+        new Promise((resolve) => {
+          const img = new Image();
+          img.onload = () => resolve(linkLogo);
+          img.onerror = () => resolve(projectLogo);
+          img.src = path;
+        });
+      const src: any = await checkImage(linkLogo);
+      setLogo(src);
+      return;
+    } catch (e) {
+      console.error('Pool getImage:', e);
+      setLogo(projectLogo);
+    }
+  }, [linkLogo]);
 
   const getChainInfo = useCallback(() => {
     const chainInfoNew = chainsInfo.filter((item: any) => item.key === chainType);
@@ -158,6 +183,11 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
   }, [ContractPresaleCertified, ContractPresalePublic, address, isCertified, chainType]);
 
   useEffect(() => {
+    if (!info) return;
+    getImage();
+  }, [info, getImage]);
+
+  useEffect(() => {
     if (!chainType) return;
     getChainInfo();
   }, [chainType, getChainInfo]);
@@ -183,7 +213,7 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
     <div className={s.card}>
       <Link to={`/pool/${address}`} className={s.card_header}>
         <div className={s.card_header__logo}>
-          <img src={linkLogo ? addHttps(linkLogo) : projectLogo} alt="token-logo" />
+          <img src={logo || projectLogo} alt="token-logo" />
         </div>
         <div className={s.card_header__info}>
           <div className={s.card_header__info_days}>

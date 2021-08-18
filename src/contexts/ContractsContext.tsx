@@ -43,7 +43,7 @@ const ContractsContext: React.FC = ({ children }) => {
 
   const initRpc: any = useCallback(async () => {
     try {
-      const rpcProvider = new Web3(new Web3.providers.HttpProvider(config.rpc[chainType]));
+      const rpcProvider = new Web3(new Web3.providers.HttpProvider(config.RPC[chainType]));
       const ContractLessLibrary = new ContractLessLibraryService({
         web3Provider: rpcProvider,
         chainType,

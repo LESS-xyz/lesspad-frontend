@@ -44,8 +44,8 @@ export default class Web3Service {
   }
 
   public checkNetwork = async () => {
-    const { chainIds } = config;
-    const chainIdsByType: any = chainIds[config.IS_PRODUCTION ? 'mainnet' : 'testnet'];
+    const { CHAIN_IDS } = config;
+    const chainIdsByType: any = CHAIN_IDS[config.IS_PRODUCTION ? 'mainnet' : 'testnet'];
     const usedNet = chainIdsByType[this.chainType].id;
     const netVersion = this.provider.chainId;
     const neededNetName = chainIdsByType[this.chainType].name;
