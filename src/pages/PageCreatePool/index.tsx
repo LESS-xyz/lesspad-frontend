@@ -20,6 +20,7 @@ import s from './CreatePool.module.scss';
 
 const Backend = new BackendService();
 const {
+  isMainnetOrTestnet,
   SHOW_CERTIFIED_PRESALE,
   SHOW_FORM_VALUES,
   IS_FORM_EXISTING_VALUES_VALIDATION_ENABLED,
@@ -31,6 +32,7 @@ const {
   REGISTRATION_DURATION,
   LIQUIDITY_ALLOCATION_DURATION,
   MINUTE,
+  CERTIFIED_PRESALE_CURRENCIES,
 } = config;
 
 const checkIfExists = (value: any) => value;
@@ -82,6 +84,18 @@ const CreatePoolPage: React.FC = () => {
     ContractLessLibrary,
   } = useContractsContext();
 
+  const { chainType } = useSelector(({ wallet }: any) => wallet);
+  const { address: userAddress } = useSelector(({ user }: any) => user);
+  const { minCreatorStakedBalance } = useSelector(({ library }: any) => library);
+  const { stakedLess, stakedLp, lessPerLp } = useSelector(({ library }: any) => library);
+
+  // const nativeTokensAddresses = CERTIFIED_PRESALE_CURRENCIES[chainType];
+  const nativeTokensSymbols = Object.keys(
+    CERTIFIED_PRESALE_CURRENCIES[isMainnetOrTestnet][chainType] || {},
+  );
+
+  const defaultNativeToken = nativeTokensSymbols[0] || '';
+
   const TIME_TO_BLOCK = MINUTE * 10;
   const defaultOpenVotingTime = NOW + TIME_TO_BLOCK;
   const defaultOpenTime = defaultOpenVotingTime + VOTING_DURATION + REGISTRATION_DURATION;
@@ -119,7 +133,7 @@ const CreatePoolPage: React.FC = () => {
   const [whitelist3, setWhitelist3] = useState<string>('');
   const [whitelist4, setWhitelist4] = useState<string>('');
   const [whitelist5, setWhitelist5] = useState<string>('');
-  const [nativeToken, setNativeToken] = useState<string>('WETH');
+  const [nativeToken, setNativeToken] = useState<string>(defaultNativeToken);
   // links
   const [linkLogo, setLinkLogo] = useState<string>(
     SHOW_FORM_VALUES
@@ -132,7 +146,7 @@ const CreatePoolPage: React.FC = () => {
   const [linkTwitter, setLinkTwitter] = useState<string>('');
   const [whitepaper, setWhitepaper] = useState<string>('');
   // чекбоксы
-  const [presaleType, setPresaleType] = useState<string>('Public');
+  const [presaleType, setPresaleType] = useState<string>('Certified');
   const [liquidity, setLiquidity] = useState<string>('Liquidity');
   const [automatically, setAutomatically] = useState<string>('Automatically');
   const [vesting, setVesting] = useState<string>('Vesting');
@@ -147,11 +161,6 @@ const CreatePoolPage: React.FC = () => {
   const isAutomatically = automatically === 'Automatically';
   const isVesting = vesting === 'Vesting';
   const isWhiteListed = whiteListed === 'Whitelist';
-
-  const { chainType } = useSelector(({ wallet }: any) => wallet);
-  const { address: userAddress } = useSelector(({ user }: any) => user);
-  const { minCreatorStakedBalance } = useSelector(({ library }: any) => library);
-  const { stakedLess, stakedLp, lessPerLp } = useSelector(({ library }: any) => library);
 
   const dispatch = useDispatch();
   const toggleModal = useCallback((params) => dispatch(modalActions.toggleModal(params)), [
@@ -985,7 +994,7 @@ const CreatePoolPage: React.FC = () => {
                   />
                   {!isPublic && (
                     <Checkbox
-                      name="Automatically / Not Automatically"
+                      name="Liquidity allocation Automatically / Not Automatically"
                       value={automatically}
                       onChange={setAutomatically}
                       options={[
@@ -1065,11 +1074,14 @@ const CreatePoolPage: React.FC = () => {
                   name="Native token"
                   value={nativeToken}
                   onChange={setNativeToken}
-                  options={[
-                    { key: 'WETH', text: 'WETH' },
-                    { key: 'USDT', text: 'USDT' },
-                    { key: 'USDC', text: 'USDC' },
-                  ]}
+                  options={nativeTokensSymbols.map((symbol: string) => {
+                    return { key: symbol, text: symbol };
+                  })}
+                  // options={[
+                  //   { key: 'WETH', text: 'WETH' },
+                  //   { key: 'USDT', text: 'USDT' },
+                  //   { key: 'USDC', text: 'USDC' },
+                  // ]}
                 />
               )}
 
