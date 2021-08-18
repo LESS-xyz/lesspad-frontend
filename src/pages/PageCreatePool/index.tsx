@@ -20,7 +20,7 @@ import s from './CreatePool.module.scss';
 
 const Backend = new BackendService();
 const {
-  isMainnetOrTestnet,
+  IS_MAINNET_OR_TESTNET,
   SHOW_CERTIFIED_PRESALE,
   SHOW_FORM_VALUES,
   SHOW_FORM_VALUES_MINE,
@@ -101,9 +101,10 @@ const CreatePoolPage: React.FC = () => {
   const { minCreatorStakedBalance } = useSelector(({ library }: any) => library);
   const { stakedLess, stakedLp, lessPerLp } = useSelector(({ library }: any) => library);
 
-  const nativeTokensAddresses = CERTIFIED_PRESALE_CURRENCIES[isMainnetOrTestnet][chainType] || {};
+  const nativeTokensAddresses =
+    CERTIFIED_PRESALE_CURRENCIES[IS_MAINNET_OR_TESTNET][chainType] || {};
   const nativeTokensSymbols = Object.keys(
-    CERTIFIED_PRESALE_CURRENCIES[isMainnetOrTestnet][chainType] || {},
+    CERTIFIED_PRESALE_CURRENCIES[IS_MAINNET_OR_TESTNET][chainType] || {},
   );
 
   const defaultNativeTokenSymbol = nativeTokensSymbols[0] || '';
@@ -548,9 +549,9 @@ const CreatePoolPage: React.FC = () => {
     try {
       const totalSupply = await ContractLessToken.totalSupply();
       const { addresses }: any = config;
-      const spenderPublic = addresses[config.isMainnetOrTestnet][chainType].PresaleFactory;
+      const spenderPublic = addresses[config.IS_MAINNET_OR_TESTNET][chainType].PresaleFactory;
       const spenderCertified =
-        addresses[config.isMainnetOrTestnet][chainType].PresaleFactoryCertified;
+        addresses[config.IS_MAINNET_OR_TESTNET][chainType].PresaleFactoryCertified;
       const spender = isPublic ? spenderPublic : spenderCertified;
       const allowance = await ContractLessToken.allowance({ userAddress, spender });
       console.log('CreatePool approveLess:', { totalSupply, spender, allowance });
@@ -574,9 +575,9 @@ const CreatePoolPage: React.FC = () => {
     try {
       const totalSupply = await ContractERC20.totalSupply({ contractAddress: tokenAddress });
       const { addresses }: any = config;
-      const spenderPublic = addresses[config.isMainnetOrTestnet][chainType].PresaleFactory;
+      const spenderPublic = addresses[config.IS_MAINNET_OR_TESTNET][chainType].PresaleFactory;
       const spenderCertified =
-        addresses[config.isMainnetOrTestnet][chainType].PresaleFactoryCertified;
+        addresses[config.IS_MAINNET_OR_TESTNET][chainType].PresaleFactoryCertified;
       const spender = isPublic ? spenderPublic : spenderCertified;
       const allowance = await ContractERC20.allowance({
         contractAddress: tokenAddress,
@@ -628,7 +629,7 @@ const CreatePoolPage: React.FC = () => {
         <div className={s.messageContainer}>
           <p>Transaction submitted</p>
           <div className={s.messageContainerButtons}>
-            <Button href={`${config.explorers[chainType]}/tx/${txHash}`}>View on etherscan</Button>
+            <Button href={`${config.EXPLORERS[chainType]}/tx/${txHash}`}>View on etherscan</Button>
           </div>
         </div>
       ),

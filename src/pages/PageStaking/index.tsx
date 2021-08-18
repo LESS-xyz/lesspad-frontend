@@ -79,7 +79,7 @@ const StakingPage: React.FC = () => {
   //   return +allowanceInEth >= +debouncedStakeLpValue;
   // }, [lpAllowance, lpDecimals, debouncedStakeLpValue]);
 
-  const stakingContractAddress = config.addresses[config.isMainnetOrTestnet][chainType].Staking;
+  const stakingContractAddress = config.addresses[config.IS_MAINNET_OR_TESTNET][chainType].Staking;
 
   const getDecimals = useCallback(async () => {
     try {

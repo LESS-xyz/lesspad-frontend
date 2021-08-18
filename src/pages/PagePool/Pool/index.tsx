@@ -32,8 +32,8 @@ import ParticipantsTable from '../ParticipantsTable';
 import './index.scss';
 
 const {
-  chainSymbols,
-  explorers,
+  CHAIN_SYMBOLS,
+  EXPLORERS,
   NOW,
   REGISTRATION_DURATION,
   TIER_DURATION,
@@ -260,8 +260,8 @@ const Pool: React.FC = () => {
 
   const isPresaleSuccessful = +percentOfTokensSold >= 100;
 
-  const currency = chainSymbols[chainType];
-  const explorer = explorers[chainType];
+  const currency = CHAIN_SYMBOLS[chainType];
+  const explorer = EXPLORERS[chainType];
 
   // const getImage = useCallback(async () => {
   //   try {
@@ -913,7 +913,7 @@ const Pool: React.FC = () => {
     {
       header: 'Token Contract Address',
       value: token,
-      link: `${explorers[chainType]}/token/${token}`,
+      link: `${EXPLORERS[chainType]}/token/${token}`,
     },
     // {
     //   header: 'PancakeSwap Address',
@@ -922,12 +922,12 @@ const Pool: React.FC = () => {
     // {
     //   header: 'Locked Liquidity Address',
     //   value: '0x0e7b582003de0E541548cF02a1F00725Df6E6E6f',
-    //   link: `${explorers[chainType]}/token/${token}`,
+    //   link: `${EXPLORERS[chainType]}/token/${token}`,
     // },
     {
       header: 'Presale Contract Address',
       value: address,
-      link: `${explorers[chainType]}/address/${address}`,
+      link: `${EXPLORERS[chainType]}/address/${address}`,
     },
   ];
 
