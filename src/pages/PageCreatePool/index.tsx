@@ -33,6 +33,8 @@ const {
   LIQUIDITY_ALLOCATION_DURATION,
   MINUTE,
   CERTIFIED_PRESALE_CURRENCIES,
+  APPROVE_DURATION_ON_CERTIFIED,
+  PRESALE_DURATION_ON_CERTIFIED,
 } = config;
 
 const checkIfExists = (value: any) => value;
@@ -46,6 +48,65 @@ const messageMin30Days = 'Minimum 30 days';
 const messageAddressIsNotValid = 'Address is not valid';
 const messageSoftCapLessThanHardCap = 'Softcap should be less than hardcap';
 const messageGt0 = 'Value should be greater than 0';
+
+const createPresaleCertifiedInputs = [
+  {
+    components: [
+      { internalType: 'address', name: 'tokenAddress', type: 'address' },
+      { internalType: 'uint256', name: 'tokenPriceInWei', type: 'uint256' },
+      { internalType: 'uint256', name: 'hardCapInWei', type: 'uint256' },
+      { internalType: 'uint256', name: 'softCapInWei', type: 'uint256' },
+      { internalType: 'uint256', name: 'openTime', type: 'uint256' },
+      { internalType: 'uint256', name: 'closeTime', type: 'uint256' },
+      { internalType: 'uint256', name: '_tokenAmount', type: 'uint256' },
+      { internalType: 'bytes', name: '_signature', type: 'bytes' },
+      { internalType: 'uint256', name: '_timestamp', type: 'uint256' },
+      { internalType: 'uint8[4]', name: 'poolPercentages', type: 'uint8[4]' },
+      { internalType: 'uint256[5]', name: 'stakingTiers', type: 'uint256[5]' },
+    ],
+    internalType: 'struct PresaleFactoryCertified.PresaleInfo',
+    name: '_info',
+    type: 'tuple',
+  },
+  {
+    components: [
+      { internalType: 'bool', name: 'liquidity', type: 'bool' },
+      { internalType: 'bool', name: 'automatically', type: 'bool' },
+      { internalType: 'uint8', name: 'vesting', type: 'uint8' },
+      { internalType: 'address[]', name: 'whitelist', type: 'address[]' },
+      { internalType: 'address', name: 'nativeToken', type: 'address' },
+    ],
+    internalType: 'struct PresaleFactoryCertified.CertifiedAddition',
+    name: '_addition',
+    type: 'tuple',
+  },
+  {
+    components: [
+      { internalType: 'uint256', name: 'listingPriceInWei', type: 'uint256' },
+      { internalType: 'uint256', name: 'lpTokensLockDurationInDays', type: 'uint256' },
+      { internalType: 'uint8', name: 'liquidityPercentageAllocation', type: 'uint8' },
+      { internalType: 'uint256', name: 'liquidityAllocationTime', type: 'uint256' },
+    ],
+    internalType: 'struct PresaleFactoryCertified.PresalePancakeSwapInfo',
+    name: '_cakeInfo',
+    type: 'tuple',
+  },
+  {
+    components: [
+      { internalType: 'bytes32', name: 'saleTitle', type: 'bytes32' },
+      { internalType: 'bytes32', name: 'linkTelegram', type: 'bytes32' },
+      { internalType: 'bytes32', name: 'linkGithub', type: 'bytes32' },
+      { internalType: 'bytes32', name: 'linkTwitter', type: 'bytes32' },
+      { internalType: 'bytes32', name: 'linkWebsite', type: 'bytes32' },
+      { internalType: 'string', name: 'linkLogo', type: 'string' },
+      { internalType: 'string', name: 'description', type: 'string' },
+      { internalType: 'string', name: 'whitepaper', type: 'string' },
+    ],
+    internalType: 'struct PresaleFactoryCertified.PresaleStringInfo',
+    name: '_stringInfo',
+    type: 'tuple',
+  },
+];
 
 const validationIfExists = [
   {
@@ -79,6 +140,7 @@ const CreatePoolPage: React.FC = () => {
     ContractERC20,
     ContractCalculations,
     ContractPresaleFactory,
+    ContractPresaleFactoryCertified,
     ContractLessToken,
     ContractStaking,
     ContractLessLibrary,
@@ -89,12 +151,12 @@ const CreatePoolPage: React.FC = () => {
   const { minCreatorStakedBalance } = useSelector(({ library }: any) => library);
   const { stakedLess, stakedLp, lessPerLp } = useSelector(({ library }: any) => library);
 
-  // const nativeTokensAddresses = CERTIFIED_PRESALE_CURRENCIES[chainType];
+  const nativeTokensAddresses = CERTIFIED_PRESALE_CURRENCIES[isMainnetOrTestnet][chainType] || {};
   const nativeTokensSymbols = Object.keys(
     CERTIFIED_PRESALE_CURRENCIES[isMainnetOrTestnet][chainType] || {},
   );
 
-  const defaultNativeToken = nativeTokensSymbols[0] || '';
+  const defaultNativeTokenSymbol = nativeTokensSymbols[0] || '';
 
   const TIME_TO_BLOCK = MINUTE * 10;
   const defaultOpenVotingTime = NOW + TIME_TO_BLOCK;
@@ -128,23 +190,29 @@ const CreatePoolPage: React.FC = () => {
     defaultLiquidityAllocationTime,
   );
   // инпут для Certified type
-  const [whitelist1, setWhitelist1] = useState<string>('');
-  const [whitelist2, setWhitelist2] = useState<string>('');
-  const [whitelist3, setWhitelist3] = useState<string>('');
-  const [whitelist4, setWhitelist4] = useState<string>('');
-  const [whitelist5, setWhitelist5] = useState<string>('');
-  const [nativeToken, setNativeToken] = useState<string>(defaultNativeToken);
+  const [whitelist, setWhitelist] = useState<string>('');
+  const [nativeTokenSymbol, setNativeTokenSymbol] = useState<string>(defaultNativeTokenSymbol);
   // links
   const [linkLogo, setLinkLogo] = useState<string>(
     SHOW_FORM_VALUES
       ? 'https://www.meme-arsenal.com/memes/2433145282c497c718a8859894466452.jpg'
       : '',
   );
-  const [linkWebsite, setLinkWebsite] = useState<string>('');
-  const [linkTelegram, setLinkTelegram] = useState<string>('');
-  const [linkGithub, setLinkGithub] = useState<string>('');
-  const [linkTwitter, setLinkTwitter] = useState<string>('');
-  const [whitepaper, setWhitepaper] = useState<string>('');
+  const [linkWebsite, setLinkWebsite] = useState<string>(
+    SHOW_FORM_VALUES ? 'https://www.meme-arsenal.com' : '',
+  );
+  const [linkTelegram, setLinkTelegram] = useState<string>(
+    SHOW_FORM_VALUES ? 'https://www.meme-arsenal.com' : '',
+  );
+  const [linkGithub, setLinkGithub] = useState<string>(
+    SHOW_FORM_VALUES ? 'https://www.meme-arsenal.com' : '',
+  );
+  const [linkTwitter, setLinkTwitter] = useState<string>(
+    SHOW_FORM_VALUES ? 'https://www.meme-arsenal.com' : '',
+  );
+  const [whitepaper, setWhitepaper] = useState<string>(
+    SHOW_FORM_VALUES ? 'https://www.meme-arsenal.com' : '',
+  );
   // чекбоксы
   const [presaleType, setPresaleType] = useState<string>('Certified');
   const [liquidity, setLiquidity] = useState<string>('Liquidity');
@@ -161,6 +229,7 @@ const CreatePoolPage: React.FC = () => {
   const isAutomatically = automatically === 'Automatically';
   const isVesting = vesting === 'Vesting';
   const isWhiteListed = whiteListed === 'Whitelist';
+  const isPrivate = isWhiteListed;
 
   const dispatch = useDispatch();
   const toggleModal = useCallback((params) => dispatch(modalActions.toggleModal(params)), [
@@ -173,7 +242,9 @@ const CreatePoolPage: React.FC = () => {
   const splitWhitelist = (data: string) => {
     try {
       const whitelistArray = data.split(',');
-      const newWhitelistArray = whitelistArray.map((item: string) => item.trim());
+      const newWhitelistArray = whitelistArray
+        .map((item: string) => item.trim())
+        .filter((item: string) => item !== '');
       return newWhitelistArray;
     } catch (e) {
       console.error(e);
@@ -345,7 +416,7 @@ const CreatePoolPage: React.FC = () => {
     const isOpenVotingTimeMoreThanBlockTimestamp = openVotingTime > NOW + BLOCK_DURATION;
     const isOpenVotingTimePlus24HLessThanOpenTime = openVotingTime + VOTING_DURATION < openTime;
     const isOpenTimeLessThanCloseTime = openTime < closeTime;
-    const isCloseTimeGeqOpenTimePlusPresaleDuration = openTime + PRESALE_DURATION < closeTime;
+    const isCloseTimeGEQOpenTimePlusPresaleDuration = openTime + PRESALE_DURATION < closeTime;
     const isCloseTimeLessThanLiquidityAllocationTime = closeTime < liquidityAllocationTime;
     // messages
     const messageIsOpenVotingTimeMoreThanBlockTimestamp =
@@ -357,7 +428,7 @@ const CreatePoolPage: React.FC = () => {
     const messageIsOpenTimeLessThanCloseTime =
       !isOpenTimeLessThanCloseTime && 'Open time should be less than close time';
     const messageIsCloseTimeGeqOpenTimePlusPresaleDuration =
-      !isCloseTimeGeqOpenTimePlusPresaleDuration &&
+      !isCloseTimeGEQOpenTimePlusPresaleDuration &&
       'Close time should be more than: open time + presale duration';
     const messageIsCloseTimeLessThanLiquidityAllocationTime =
       !isCloseTimeLessThanLiquidityAllocationTime &&
@@ -377,20 +448,96 @@ const CreatePoolPage: React.FC = () => {
         messageIsCloseTimeGeqOpenTimePlusPresaleDuration,
       liquidityAllocationTime: messageIsCloseTimeLessThanLiquidityAllocationTime,
     };
-    console.log(newErrors);
     setErrors(newErrors);
-    // returns
     if (!isOpenVotingTimeMoreThanBlockTimestamp) return false;
     if (!isOpenVotingTimePlus24HLessThanOpenTime) return false;
     if (!isOpenTimeLessThanCloseTime) return false;
-    if (!isCloseTimeGeqOpenTimePlusPresaleDuration) return false;
+    if (!isCloseTimeGEQOpenTimePlusPresaleDuration) return false;
     if (!isCloseTimeLessThanLiquidityAllocationTime) return false;
-    // certified
-    if (!isPublic) {
-      //
-    }
     return true;
-  }, [openTime, closeTime, isPublic, liquidityAllocationTime, openVotingTime]);
+  }, [openTime, closeTime, liquidityAllocationTime, openVotingTime]);
+
+  const validateTimeCertified = useCallback(() => {
+    if (!IS_FORM_TIME_VALIDATION_ENABLED) return true;
+    // checks
+    const isOpenTimeLessThanCloseTime = openTime < closeTime;
+    const isCloseTimeGEQOpenTimePlusPresaleDuration =
+      openTime + PRESALE_DURATION_ON_CERTIFIED < closeTime;
+    const isCloseTimeLessThanLiquidityAllocationTime = closeTime < liquidityAllocationTime;
+    const isOpenTimeGTBlockTimePlusApprove = openTime > NOW + APPROVE_DURATION_ON_CERTIFIED;
+    // messages
+    const messageIsOpenTimeLessThanCloseTime =
+      !isOpenTimeLessThanCloseTime && 'Open time should be less than close time';
+    const messageIsCloseTimeGeqOpenTimePlusPresaleDuration =
+      !isCloseTimeGEQOpenTimePlusPresaleDuration &&
+      'Close time should be more than: open time + presale duration';
+    const messageIsCloseTimeLessThanLiquidityAllocationTime =
+      !isCloseTimeLessThanLiquidityAllocationTime &&
+      'Close time should be less than liquidity allocation time';
+    //
+    const messageIsOpenTimeGTBlockTimePlusApprove =
+      !isOpenTimeGTBlockTimePlusApprove &&
+      'Open time should be greater than last block time + 1 day to approve';
+    // errors
+    const newErrors = {
+      openTime:
+        messageIsOpenTimeGTBlockTimePlusApprove ||
+        messageIsOpenTimeLessThanCloseTime ||
+        messageIsCloseTimeGeqOpenTimePlusPresaleDuration,
+      closeTime:
+        messageIsOpenTimeLessThanCloseTime ||
+        messageIsCloseTimeLessThanLiquidityAllocationTime ||
+        messageIsCloseTimeGeqOpenTimePlusPresaleDuration,
+      liquidityAllocationTime: messageIsCloseTimeLessThanLiquidityAllocationTime,
+    };
+    setErrors(newErrors);
+    if (!isOpenTimeGTBlockTimePlusApprove) return false;
+    if (!isOpenTimeLessThanCloseTime) return false;
+    if (!isCloseTimeGEQOpenTimePlusPresaleDuration) return false;
+    if (!isCloseTimeLessThanLiquidityAllocationTime) return false;
+    return true;
+  }, [openTime, closeTime, liquidityAllocationTime]);
+
+  const validateTimePrivate = useCallback(() => {
+    if (!IS_FORM_TIME_VALIDATION_ENABLED) return true;
+    // checks
+    const isOpenTimeLessThanCloseTime = openTime < closeTime;
+    const isCloseTimeGEQOpenTimePlusPresaleDuration =
+      openTime + PRESALE_DURATION_ON_CERTIFIED < closeTime;
+    const isCloseTimeLessThanLiquidityAllocationTime = closeTime < liquidityAllocationTime;
+    const isOpenTimeGTBlockTimePlusApprove = openTime > NOW + APPROVE_DURATION_ON_CERTIFIED;
+    // messages
+    const messageIsOpenTimeLessThanCloseTime =
+      !isOpenTimeLessThanCloseTime && 'Open time should be less than close time';
+    const messageIsCloseTimeGeqOpenTimePlusPresaleDuration =
+      !isCloseTimeGEQOpenTimePlusPresaleDuration &&
+      'Close time should be more than: open time + presale duration';
+    const messageIsCloseTimeLessThanLiquidityAllocationTime =
+      !isCloseTimeLessThanLiquidityAllocationTime &&
+      'Close time should be less than liquidity allocation time';
+    //
+    const messageIsOpenTimeGTBlockTimePlusApprove =
+      !isOpenTimeGTBlockTimePlusApprove &&
+      'Open time should be greater than last block time + 1 day to approve';
+    // errors
+    const newErrors = {
+      openTime:
+        messageIsOpenTimeGTBlockTimePlusApprove ||
+        messageIsOpenTimeLessThanCloseTime ||
+        messageIsCloseTimeGeqOpenTimePlusPresaleDuration,
+      closeTime:
+        messageIsOpenTimeLessThanCloseTime ||
+        messageIsCloseTimeLessThanLiquidityAllocationTime ||
+        messageIsCloseTimeGeqOpenTimePlusPresaleDuration,
+      liquidityAllocationTime: messageIsCloseTimeLessThanLiquidityAllocationTime,
+    };
+    setErrors(newErrors);
+    if (!isOpenTimeGTBlockTimePlusApprove) return false;
+    if (!isOpenTimeLessThanCloseTime) return false;
+    if (!isCloseTimeGEQOpenTimePlusPresaleDuration) return false;
+    if (!isCloseTimeLessThanLiquidityAllocationTime) return false;
+    return true;
+  }, [openTime, closeTime, liquidityAllocationTime]);
 
   const handleGoToStaking = useCallback(async () => {
     try {
@@ -432,7 +579,10 @@ const CreatePoolPage: React.FC = () => {
     try {
       const totalSupply = await ContractLessToken.totalSupply();
       const { addresses }: any = config;
-      const spender = addresses[config.isMainnetOrTestnet][chainType].PresaleFactory;
+      const spenderPublic = addresses[config.isMainnetOrTestnet][chainType].PresaleFactory;
+      const spenderCertified =
+        addresses[config.isMainnetOrTestnet][chainType].PresaleFactoryCertified;
+      const spender = isPublic ? spenderPublic : spenderCertified;
       const allowance = await ContractLessToken.allowance({ userAddress, spender });
       console.log('CreatePool approveLess:', { totalSupply, spender, allowance });
       if (allowance < totalSupply) {
@@ -455,7 +605,10 @@ const CreatePoolPage: React.FC = () => {
     try {
       const totalSupply = await ContractERC20.totalSupply({ contractAddress: tokenAddress });
       const { addresses }: any = config;
-      const spender = addresses[config.isMainnetOrTestnet][chainType].PresaleFactory;
+      const spenderPublic = addresses[config.isMainnetOrTestnet][chainType].PresaleFactory;
+      const spenderCertified =
+        addresses[config.isMainnetOrTestnet][chainType].PresaleFactoryCertified;
+      const spender = isPublic ? spenderPublic : spenderCertified;
       const allowance = await ContractERC20.allowance({
         contractAddress: tokenAddress,
         userAddress,
@@ -518,7 +671,7 @@ const CreatePoolPage: React.FC = () => {
     try {
       event.preventDefault();
       setIsLoading(true);
-      if (!isPublic) {
+      if (!isPublic && !SHOW_CERTIFIED_PRESALE) {
         toggleModal({
           open: true,
           text: (
@@ -592,7 +745,12 @@ const CreatePoolPage: React.FC = () => {
         });
         return;
       }
-      if (!validateTime()) {
+      const validateTimeResult = isPublic
+        ? validateTime()
+        : isPrivate
+        ? validateTimePrivate()
+        : validateTimeCertified();
+      if (!validateTimeResult) {
         toggleModal({
           open: true,
           text: (
@@ -687,7 +845,6 @@ const CreatePoolPage: React.FC = () => {
         liquidityPercentageAllocation,
         (liquidityAllocationTime / 1000).toFixed(),
       ];
-      // todo: add CertifiedAddition for certified presale, where nativeToken is
       // bytes32 saleTitle;      // название
       // bytes32 linkTelegram;   // ссылка телега
       // bytes32 linkGithub;     // ссылка гит
@@ -728,42 +885,89 @@ const CreatePoolPage: React.FC = () => {
             console.log('CreatePool handleSubmit', resultCreatePresalePublic);
           });
       } else {
-        // const nativeTokenAddress = // todo: get from library contract?
-        const whiteListArray1 = splitWhitelist(whitelist1);
-        const whiteListArray2 = splitWhitelist(whitelist2);
-        const whiteListArray3 = splitWhitelist(whitelist3);
-        const whiteListArray4 = splitWhitelist(whitelist4);
-        const whiteListArray5 = splitWhitelist(whitelist5);
+        // address tokenAddress; - адрес токена для пресейла
+        // uint256 tokenPriceInWei;-цена по которой токен будет продаваться
+        // uint256 hardCapInWei; - хард кап
+        // uint256 softCapInWei; - софт кап
+        // uint256 openTime; - время открытия пресейла
+        // uint256 closeTime; - время закрытия пресейла
+        // uint256 _tokenAmount; - кол-во застейканных токенов (дает бэк)
+        // bytes _signature; - подпись (дает бэк)
+        // uint256 _timestamp; - временная метка для подписи (дает бэк)
+        // uint8[4] poolPercentages; дает бэк
+        // uint256[5] stakingTiers; дает бэк
+        const presaleInfoCertified = [
+          tokenAddress,
+          tokenPriceInWei,
+          hardCapInWei,
+          softCapInWei,
+          (openTime / 1000).toFixed(),
+          (closeTime / 1000).toFixed(),
+          userLessAndLpBalanceFormatted,
+          signature,
+          timestamp.toString(),
+          poolPercentages,
+          stakingTiers,
+        ];
+        // const presaleInfoCertified = {
+        //   tokenAddress,
+        //   tokenPriceInWei,
+        //   hardCapInWei,
+        //   softCapInWei,
+        //   openTime: (openTime / 1000).toFixed(),
+        //   closeTime: (openTime / 1000).toFixed(),
+        //   _tokenAmount: userLessAndLpBalanceFormatted,
+        //   _signature: signature,
+        //   _timestamp: timestamp.toString(),
+        //   poolPercentages,
+        //   stakingTiers,
+        // };
+        // bool liquidity; - с ликвидностью / без
+        // bool automatically; - если с ликвидностью, то через бэк, либо ручками
+        // uint8 vesting; - процент вестинга
+        // address[] whitelist; - список адресов для приватного пресейла (если список пустой, то проводится регистрация как на публичном)
+        // address nativeToken; - в какой валюте продавать токены (котируются WETH, USDT, USDC)
+        const whiteListArray = splitWhitelist(whitelist);
+        const nativeTokenAddress = nativeTokensAddresses[nativeTokenSymbol];
         const certifiedAddition = [
           isLiquidity,
           isAutomatically,
-          isVesting,
-          whiteListArray1, // todo check
-          whiteListArray2, // todo check
-          whiteListArray3, // todo check
-          whiteListArray4, // todo check
-          whiteListArray5, // todo check
-          nativeToken, // todo: nativeTokenAddress get from library contract?
+          vestingPercent,
+          whiteListArray,
+          nativeTokenAddress,
         ];
+        // const certifiedAddition = {
+        //   liquidity: isLiquidity,
+        //   automatically: isAutomatically,
+        //   vesting: vestingPercent,
+        //   whitelist: whiteListArray,
+        //   nativeToken: nativeTokenAddress,
+        // };
         console.log('CreatePool handleSubmit:', {
-          isPublic,
-          presaleInfo,
+          createPresaleCertifiedInputs,
+          nativeTokenSymbol,
+          nativeTokensAddresses,
+          presaleInfoCertified,
           presalePancakeSwapInfo,
           presaleStringInfo,
           certifiedAddition,
+          usdtToEthFee,
         });
-        await ContractPresaleFactory.createPresalePublic({
+        await ContractPresaleFactoryCertified.createPresaleCertified({
           userAddress,
-          presaleInfo,
+          presaleInfo: presaleInfoCertified,
           presalePancakeSwapInfo,
           presaleStringInfo,
-        })
-          .on('transactionHash', (txHash: string) => {
-            handleTransactionHash(txHash);
-          })
-          .then((resultCreatePresalePublic) =>
-            console.log('CreatePool handleSubmit', resultCreatePresalePublic),
-          );
+          certifiedAddition,
+          usdtToEthFee,
+        });
+        console.log('end');
+        // .on('transactionHash', (txHash: string) => {
+        //   handleTransactionHash(txHash);
+        // })
+        // .then((resultCreatePresalePublic) =>
+        //   console.log('CreatePool handleSubmit', resultCreatePresalePublic),
+        // );
       }
     } catch (e) {
       console.error('PageCreatePool handleSubmit:', e);
@@ -928,12 +1132,14 @@ const CreatePoolPage: React.FC = () => {
               </div>
 
               {/* date pickers */}
-              <DateInput
-                title="Open voting Time"
-                value={openVotingTime}
-                onChange={setOpenVotingTime}
-                error={errors.openVotingTime}
-              />
+              {isPublic && (
+                <DateInput
+                  title="Open voting Time"
+                  value={openVotingTime}
+                  onChange={setOpenVotingTime}
+                  error={errors.openVotingTime}
+                />
+              )}
               <DateInput
                 title="Open Time"
                 value={openTime}
@@ -1021,29 +1227,9 @@ const CreatePoolPage: React.FC = () => {
                   {isWhiteListed && (
                     <>
                       <Input
-                        title="Tier 1 adresses, comma separated"
-                        value={whitelist1}
-                        onChange={setWhitelist1}
-                      />
-                      <Input
-                        title="Tier 2 adresses, comma separated"
-                        value={whitelist2}
-                        onChange={setWhitelist2}
-                      />
-                      <Input
-                        title="Tier 3 adresses, comma separated"
-                        value={whitelist3}
-                        onChange={setWhitelist3}
-                      />
-                      <Input
-                        title="Tier 4 adresses, comma separated"
-                        value={whitelist4}
-                        onChange={setWhitelist4}
-                      />
-                      <Input
-                        title="Tier 5 adresses, comma separated"
-                        value={whitelist5}
-                        onChange={setWhitelist5}
+                        title="Whitelist addresses, comma separated"
+                        value={whitelist}
+                        onChange={setWhitelist}
                       />
                     </>
                   )}
@@ -1072,8 +1258,8 @@ const CreatePoolPage: React.FC = () => {
               {!isPublic && (
                 <Checkbox
                   name="Native token"
-                  value={nativeToken}
-                  onChange={setNativeToken}
+                  value={nativeTokenSymbol}
+                  onChange={setNativeTokenSymbol}
                   options={nativeTokensSymbols.map((symbol: string) => {
                     return { key: symbol, text: symbol };
                   })}
