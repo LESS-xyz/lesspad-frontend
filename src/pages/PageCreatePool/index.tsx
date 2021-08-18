@@ -42,6 +42,7 @@ const checkIfExists = (value: any) => value;
 const checkPercentage = (value: number) => value >= 0 && value <= 100;
 const checkDuration = (value: number) => value >= 30;
 const checkGt0 = (value: number) => value > 0;
+const checkMaxStringLengthIs32 = (value: string) => value.length <= 32;
 
 const messageEnterValue = 'Enter value';
 const messagePercentValue = 'Percent value should be between 0 and 100';
@@ -49,6 +50,7 @@ const messageMin30Days = 'Minimum 30 days';
 const messageAddressIsNotValid = 'Address is not valid';
 const messageSoftCapLessThanHardCap = 'Softcap should be less than hardcap';
 const messageGt0 = 'Value should be greater than 0';
+const messageMaxStringLengthIs32 = 'Maximum length is 32';
 
 const validationIfExists = [
   {
@@ -72,6 +74,12 @@ const validationGt0 = [
   {
     equation: checkGt0,
     message: messageGt0,
+  },
+];
+const validationMaxStringLengthIs32 = [
+  {
+    equation: checkMaxStringLengthIs32,
+    message: messageMaxStringLengthIs32,
   },
 ];
 
@@ -273,7 +281,7 @@ const CreatePoolPage: React.FC = () => {
     }
   }, [fieldsMustExist]);
 
-  const validateFormForExistingValues = () => {
+  const validateFormForExistingValues = useCallback(() => {
     try {
       if (!IS_FORM_EXISTING_VALUES_VALIDATION_ENABLED) return true;
       const newErrors = {};
@@ -282,7 +290,7 @@ const CreatePoolPage: React.FC = () => {
         const [variableName, variable] = entries[i];
         newErrors[variableName] = !checkIfExists(variable) && messageEnterValue;
       }
-      setErrors({ ...errors, ...newErrors });
+      setErrors(newErrors);
       for (let i = 0; i < entries.length; i += 1) {
         const [, variable] = entries[i];
         if (!variable) return false;
@@ -292,9 +300,9 @@ const CreatePoolPage: React.FC = () => {
       console.error(e);
       return false;
     }
-  };
+  }, [fieldsMustExist]);
 
-  const validateSoftCapAndHardCap = () => {
+  const validateSoftCapAndHardCap = useCallback(() => {
     try {
       const isSoftCapLessThanHardCap = +softCap < +hardCap;
       const messageIfIsSoftCapLessThanHardCap =
@@ -303,16 +311,16 @@ const CreatePoolPage: React.FC = () => {
         softCap: messageIfIsSoftCapLessThanHardCap,
         hardCap: messageIfIsSoftCapLessThanHardCap,
       };
-      setErrors({ ...errors, ...newErrors });
+      setErrors(newErrors);
       if (!isSoftCapLessThanHardCap) return false;
       return true;
     } catch (e) {
       console.error(e);
       return false;
     }
-  };
+  }, [hardCap, softCap]);
 
-  const validateFormValues = () => {
+  const validateFormValues = useCallback(() => {
     try {
       const isSoftCapLessThan0 = +softCap < 0;
       const isHardCapLessThan0 = +hardCap < 0;
@@ -325,15 +333,30 @@ const CreatePoolPage: React.FC = () => {
         softCap: messageIfIsSoftCapLessThanHardCap || messageIfIsSoftCapLessThan0,
         hardCap: messageIfIsSoftCapLessThanHardCap || messageIfIsHardCapLessThan0,
       };
-      setErrors({ ...errors, ...newErrors });
+      setErrors(newErrors);
       if (!checkPercentage(+liquidityPercentageAllocation)) return false;
       if (!checkDuration(+lpTokensLockDurationInDays)) return false;
+      if (!checkMaxStringLengthIs32(saleTitle)) return false;
+      if (!checkMaxStringLengthIs32(linkTelegram)) return false;
+      if (!checkMaxStringLengthIs32(linkGithub)) return false;
+      if (!checkMaxStringLengthIs32(linkTwitter)) return false;
+      if (!checkMaxStringLengthIs32(linkWebsite)) return false;
       return true;
     } catch (e) {
       console.error(e);
       return false;
     }
-  };
+  }, [
+    hardCap,
+    softCap,
+    liquidityPercentageAllocation,
+    lpTokensLockDurationInDays,
+    saleTitle,
+    linkTelegram,
+    linkGithub,
+    linkTwitter,
+    linkWebsite,
+  ]);
 
   const validateAddresses = useCallback(async () => {
     try {
@@ -1011,7 +1034,7 @@ const CreatePoolPage: React.FC = () => {
                 value={saleTitle}
                 onChange={setSaleTitle}
                 error={errors.saleTitle}
-                validations={validationIfExists}
+                validations={[...validationIfExists, ...validationMaxStringLengthIs32]}
               />
               <Input
                 title="Description"
@@ -1188,11 +1211,6 @@ const CreatePoolPage: React.FC = () => {
                   options={nativeTokensSymbols.map((symbol: string) => {
                     return { key: symbol, text: symbol };
                   })}
-                  // options={[
-                  //   { key: 'WETH', text: 'WETH' },
-                  //   { key: 'USDT', text: 'USDT' },
-                  //   { key: 'USDC', text: 'USDC' },
-                  // ]}
                 />
               )}
 
@@ -1209,28 +1227,28 @@ const CreatePoolPage: React.FC = () => {
                 onChange={setLinkWebsite}
                 title="Link to Website"
                 error={errors.linkWebsite}
-                validations={validationIfExists}
+                validations={[...validationIfExists, ...validationMaxStringLengthIs32]}
               />
               <Input
                 value={linkTelegram}
                 onChange={setLinkTelegram}
                 title="Link to Telegram"
                 error={errors.linkTelegram}
-                validations={validationIfExists}
+                validations={[...validationIfExists, ...validationMaxStringLengthIs32]}
               />
               <Input
                 value={linkGithub}
                 onChange={setLinkGithub}
                 title="Link to Github"
                 error={errors.linkGithub}
-                validations={validationIfExists}
+                validations={[...validationIfExists, ...validationMaxStringLengthIs32]}
               />
               <Input
                 value={linkTwitter}
                 onChange={setLinkTwitter}
                 title="Link to Twitter"
                 error={errors.linkTwitter}
-                validations={validationIfExists}
+                validations={[...validationIfExists, ...validationMaxStringLengthIs32]}
               />
               <Input
                 value={whitepaper}

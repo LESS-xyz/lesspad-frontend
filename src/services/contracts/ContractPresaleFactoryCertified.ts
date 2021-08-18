@@ -1,5 +1,4 @@
 // import BigNumber from 'bignumber.js/bignumber';
-// import { ethers } from 'ethers';
 import Web3 from 'web3';
 
 import config from '../../config';
@@ -76,20 +75,6 @@ export default class ContractPresaleFactoryCertifiedService {
           from: userAddress,
           value: usdtToEthFee,
         });
-      // const provider = new ethers.providers.JsonRpcProvider(this.web3Provider).getSigner(
-      //   userAddress,
-      // );
-      // const contract = new ethers.Contract(this.contractAddress, this.contractAbi, provider);
-      // return contract.createPresaleCertified(
-      //   presaleInfo,
-      //   certifiedAddition,
-      //   presalePancakeSwapInfo,
-      //   presaleStringInfoFormatted,
-      //   {
-      //     from: userAddress,
-      //     value: usdtToEthFee,
-      //   },
-      // );
     } catch (e) {
       console.error('ContractPresaleFactoryCertified createPresaleCertified:', e);
       return null;
