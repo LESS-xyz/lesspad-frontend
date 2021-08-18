@@ -116,10 +116,9 @@ const Pool: React.FC = () => {
   const [tier, setTier] = React.useState<string>('');
   const [isMyTierTime, setIsMyTierTime] = useState<boolean>(false);
 
-  // const [logo, setLogo] = React.useState<string>(projectLogo);
+  const [logo, setLogo] = React.useState<string>(projectLogo);
 
   const [lessDecimals, setLessDecimals] = useState<number>();
-  // const [lpDecimals, setLpDecimals] = useState<number>();
   const [tokenDecimals, setTokenDecimals] = useState<number>(0);
 
   const [investments, setInvestments] = useState<any>({ amountEth: 0, amountTokens: 0 });
@@ -263,18 +262,23 @@ const Pool: React.FC = () => {
   const currency = CHAIN_SYMBOLS[chainType];
   const explorer = EXPLORERS[chainType];
 
-  // const getImage = useCallback(async () => {
-  //   try {
-  //     const { linkLogo } = info;
-  //     const result = await axios.get(linkLogo);
-  //     console.log('Pool getImage:', result);
-  //     if (!result.data) return;
-  //     setLogo(result.data);
-  //     return;
-  //   } catch (e) {
-  //     console.error('Pool getImage:', e);
-  //   }
-  // }, [info]);
+  const getImage = useCallback(async () => {
+    try {
+      const checkImage = (path: string) =>
+        new Promise((resolve) => {
+          const img = new Image();
+          img.onload = () => resolve(linkLogo);
+          img.onerror = () => resolve(projectLogo);
+          img.src = path;
+        });
+      const src: any = await checkImage(linkLogo);
+      setLogo(src);
+      return;
+    } catch (e) {
+      console.error('Pool getImage:', e);
+      setLogo(projectLogo);
+    }
+  }, [linkLogo]);
 
   const updateTimerBeforeVoting = useCallback(() => {
     try {
@@ -729,10 +733,10 @@ const Pool: React.FC = () => {
     if (!address) history.push('/');
   }, [address, history]);
 
-  // useEffect(() => {
-  //   if (!info) return () => {};
-  //   getImage();
-  // }, [info, getImage]);
+  useEffect(() => {
+    if (!info) return;
+    getImage();
+  }, [info, getImage]);
 
   useEffect(() => {
     if (!info) return () => {};
@@ -1311,7 +1315,7 @@ const Pool: React.FC = () => {
       <div className="preview">
         <div className="description">
           <div className="logo-center">
-            <img src={linkLogo ? addHttps(linkLogo) : projectLogo} alt="token-logo" />
+            <img src={logo || projectLogo} alt="token-logo" />
           </div>
           <div className="description-info">
             <div className="description-info-header">
