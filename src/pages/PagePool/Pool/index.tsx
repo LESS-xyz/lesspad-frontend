@@ -212,9 +212,6 @@ const Pool: React.FC = () => {
   const isUserInWhitelist =
     whitelist && whitelist.length && userAddress && whitelist.includes(userAddress.toLowerCase());
 
-  const isUserCreator = userAddress ? creator.toLowerCase() === userAddress.toLowerCase() : false;
-  const isUserOwner = userAddress ? owner.toLowerCase() === userAddress.toLowerCase() : false;
-
   const isEthereum = chainType === 'Ethereum';
   const isBinanceSmartChain = chainType === 'Binance-Smart-Chain';
 
@@ -1476,6 +1473,10 @@ const Pool: React.FC = () => {
       </div>
     </>
   );
+
+  const isUserCreator =
+    userAddress && creator && creator.toLowerCase() === userAddress.toLowerCase();
+  const isUserOwner = userAddress && owner && owner.toLowerCase() === userAddress.toLowerCase();
 
   const showHtmlVoting =
     !isCertified && isVotingTime && timeBeforeVoting && !isUserCreator && !myVote;
