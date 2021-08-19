@@ -1460,7 +1460,11 @@ const Pool: React.FC = () => {
   const showHtmlYouVoted =
     !isCertified && isVotingTime && timeBeforeVoting && !isUserCreator && myVote;
   const showHtmlVotingIsNotSuccessful =
-    !isUserCreator && isRegistrationTime && timeBeforeRegistration && !isVotingSuccessful;
+    !isCertified &&
+    !isUserCreator &&
+    isRegistrationTime &&
+    timeBeforeRegistration &&
+    !isVotingSuccessful;
   // Не набралось нужное количество голосов за или нет голосов вообще
   const showHtmlCollectFee =
     !isCertified &&
