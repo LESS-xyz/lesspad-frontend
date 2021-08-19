@@ -42,6 +42,12 @@ const LIQUIDITY_ALLOCATION_DURATION_ON_CERTIFIED = IS_PRODUCTION ? HOUR : MINUTE
 
 const TIER_PERCENTAGES = [30, 20, 15, 25, 10]; // Tier 5 >>> Tier 1
 
+// const chainsInfo: any = [
+//   { key: 'Ethereum', title: 'Ethereum', symbol: 'ETH', logo: ethLogo },
+//   { key: 'Binance-Smart-Chain', title: 'Binance Smart Chain', symbol: 'BNB', logo: bnbLogo },
+//   { key: 'Matic', title: 'Polygon (Matic)', symbol: 'MATIC', logo: maticLogo },
+// ];
+
 export default {
   IS_PRODUCTION,
   IS_TESTING_ON_ROPSTEN,

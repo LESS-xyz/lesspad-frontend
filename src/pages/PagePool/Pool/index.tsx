@@ -8,11 +8,8 @@ import { BigNumber as BN } from 'bignumber.js/bignumber';
 import dayjs from 'dayjs';
 import { v4 as uuid } from 'uuid';
 
-import bnbLogo from '../../../assets/img/icons/bnb-logo.svg';
-import ethLogo from '../../../assets/img/icons/eth-logo.svg';
 import Github from '../../../assets/img/icons/gh-icon.svg';
 import Link from '../../../assets/img/icons/link-icon.svg';
-import maticLogo from '../../../assets/img/icons/matic-logo.svg';
 import RegisterImg from '../../../assets/img/icons/register.svg';
 import Subscribe from '../../../assets/img/icons/subscribe.svg';
 import Telegram from '../../../assets/img/icons/tg-icon.svg';
@@ -43,12 +40,6 @@ const {
   ZERO_ADDRESS,
 }: any = config;
 const Backend = new BackendService();
-
-const chainsInfo: any = [
-  { key: 'Ethereum', title: 'Ethereum', symbol: 'ETH', logo: ethLogo },
-  { key: 'Binance-Smart-Chain', title: 'Binance Smart Chain', symbol: 'BNB', logo: bnbLogo },
-  { key: 'Matic', title: 'Polygon (Matic)', symbol: 'MATIC', logo: maticLogo },
-];
 
 declare global {
   interface Window {
@@ -116,7 +107,6 @@ const Pool: React.FC = () => {
   const [info, setInfo] = useState<any>(defaultInfo);
 
   const [isCertified, setIsCertified] = useState<boolean>();
-  const [chainInfo, setChainInfo] = useState<any>({});
   const [tier, setTier] = React.useState<string>('');
   const [isMyTierTime, setIsMyTierTime] = useState<boolean>(false);
 
@@ -351,15 +341,6 @@ const Pool: React.FC = () => {
     [pools],
   );
 
-  const getChainInfo = useCallback(() => {
-    try {
-      const chainInfoNew = chainsInfo.filter((item: any) => item.key === chainType);
-      setChainInfo(chainInfoNew[0]);
-    } catch (e) {
-      console.error(e);
-    }
-  }, [chainType]);
-
   const getInfo = useCallback(async () => {
     try {
       let newInfo;
@@ -530,6 +511,34 @@ const Pool: React.FC = () => {
     ],
   );
 
+  const approveNativeTokens = useCallback(async () => {
+    try {
+      const totalSupply = await ContractERC20.totalSupply({ contractAddress: nativeToken });
+      const { addresses }: any = config;
+      const spender = addresses[config.IS_MAINNET_OR_TESTNET][chainType].PresaleCertified;
+      const allowance = await ContractERC20.allowance({
+        contractAddress: nativeToken,
+        userAddress,
+        spender,
+      });
+      console.log('Pool approveTokens:', { totalSupply, spender, allowance });
+      if (allowance < totalSupply) {
+        const resultApprove = await ContractERC20.approve({
+          contractAddress: nativeToken,
+          userAddress,
+          spender,
+          amount: totalSupply,
+        });
+        console.log('Pool approveTokens resultApprove:', resultApprove);
+        return true;
+      }
+      return true;
+    } catch (e) {
+      console.error('Pool approveTokens:', e);
+      return false;
+    }
+  }, [ContractERC20, chainType, nativeToken, userAddress]);
+
   const invest = useCallback(async () => {
     try {
       const resultLoginToBackend = await loginToBackend();
@@ -565,6 +574,8 @@ const Pool: React.FC = () => {
             .toString(10);
           nativeTokenAmount = '0';
         } else {
+          const resultApprove = await approveNativeTokens();
+          if (!resultApprove) return;
           nativeTokenAmount = new BN(amountToInvest)
             .multipliedBy(new BN(10).pow(new BN(nativeTokenDecimals)))
             .toString(10);
@@ -600,6 +611,7 @@ const Pool: React.FC = () => {
       console.error('PagePool invest:', e);
     }
   }, [
+    approveNativeTokens,
     nativeTokenDecimals,
     nativeToken,
     isCertified,
@@ -1006,11 +1018,6 @@ const Pool: React.FC = () => {
   }, [userAddress, nativeToken, getNativeTokenInfo, ContractERC20]);
 
   useEffect(() => {
-    if (!chainType) return;
-    getChainInfo();
-  }, [chainType, getChainInfo]);
-
-  useEffect(() => {
     if (!pools || !pools.length) return;
     getIsCertified(address);
   }, [pools, address, getIsCertified]);
@@ -1336,10 +1343,10 @@ const Pool: React.FC = () => {
           </div>
           <div className="item-text">
             <div className="item-text-bold">
-              1 {tokenSymbol} = {tokenPrice} {currency}
+              1 {tokenSymbol} = {tokenPrice} {nativeTokenSymbol || currency}
             </div>
           </div>
-          <p>Please, enter amount to invest (in {nativeTokenSymbol || 'ETH'})</p>
+          <p>Please, enter amount to invest (in {nativeTokenSymbol || currency})</p>
           <Input
             title=""
             value={amountToInvest}
@@ -1614,11 +1621,11 @@ const Pool: React.FC = () => {
       {/*Scale*/}
       <div className="grow">
         <div className="grow-text preview-info-date__text-opacity">
-          {tokenPrice} {chainInfo.symbol} per {tokenSymbol}
+          {tokenPrice} {nativeTokenSymbol || currency} per {tokenSymbol}
         </div>
         <div className="grow-progress">
           <div>
-            {tokensSoldInNativeCurrency || 0} {chainInfo.symbol} Raised
+            {tokensSoldInNativeCurrency || 0} {nativeTokenSymbol || currency} Raised
           </div>
           <div>{participants} Participants</div>
         </div>
