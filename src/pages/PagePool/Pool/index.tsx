@@ -766,6 +766,7 @@ const Pool: React.FC = () => {
           handleTransactionHash(txHash);
         })
         .then((res) => {
+          getInfo();
           console.log('PagePool resultClaimTokens', res);
         });
       console.log('PagePool resultClaimTokens:', result);
@@ -779,6 +780,7 @@ const Pool: React.FC = () => {
     userAddress,
     address,
     handleTransactionHash,
+    getInfo,
   ]);
 
   // возможность отозвать инвестиции до набора софткапа
@@ -795,6 +797,7 @@ const Pool: React.FC = () => {
           handleTransactionHash(txHash);
         })
         .then((res) => {
+          getInfo();
           console.log('PagePool withdrawInvestment', res);
         });
       console.log('PagePool withdrawInvestment:', result);
@@ -808,6 +811,7 @@ const Pool: React.FC = () => {
     userAddress,
     address,
     handleTransactionHash,
+    getInfo,
   ]);
 
   // модальное окно с формой инвестирования
