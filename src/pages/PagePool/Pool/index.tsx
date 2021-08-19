@@ -1733,7 +1733,7 @@ const Pool: React.FC = () => {
             <div className="presale-status-text">{timeBeforeRegistration}</div>
           </div>
         </div>
-      ) : isRegistrationTime ? (
+      ) : isRegistrationTime && isVotingSuccessful ? (
         <div className="container-presale-status">
           <div className="container-presale-status-inner">
             <div className="gradient-header">Registration started</div>
