@@ -125,6 +125,7 @@ const Pool: React.FC = () => {
   const [isInvestStart, setInvestStart] = useState<boolean>(false);
   const [isUserRegister, setUserRegister] = useState<boolean>(false);
 
+  const [whitelist, setWhitelist] = useState<string[]>([]);
   const [currentTier, setCurrentTier] = useState<number>(0);
   const [
     percentageOfTokensSoldInCurrentTier,
@@ -208,6 +209,8 @@ const Pool: React.FC = () => {
   const isPresaleClosed = closeTimePresale <= NOW;
   const didCreatorCollectFee = +collectedFee === 0;
   const didUserInvest = +investedEthByUser > 0;
+  const isUserInWhitelist =
+    whitelist && whitelist.length && userAddress && whitelist.includes(userAddress.toLowerCase());
 
   const isUserCreator = userAddress ? creator.toLowerCase() === userAddress.toLowerCase() : false;
   // const isUserOwner = userAddress ? owner.toLowerCase() === userAddress.toLowerCase() : false;
@@ -266,6 +269,19 @@ const Pool: React.FC = () => {
 
   const currency = CHAIN_SYMBOLS[chainType];
   const explorer = EXPLORERS[chainType];
+
+  const getWhitelist = useCallback(async () => {
+    try {
+      const resultWhitelist = await ContractPresaleCertified.getWhitelistFull({
+        contractAddress: address,
+      });
+      setWhitelist(resultWhitelist);
+      // console.log('Pool getWhitelist:', resultWhitelist);
+      return;
+    } catch (e) {
+      console.error('Pool getWhitelist:', e);
+    }
+  }, [ContractPresaleCertified, address]);
 
   const getImage = useCallback(async () => {
     try {
@@ -1090,6 +1106,12 @@ const Pool: React.FC = () => {
     }
   }, [getUserRegister, ContractPresalePublic, address, userAddress]);
 
+  useEffect(() => {
+    if (!info) return;
+    if (!ContractPresaleCertified) return;
+    getWhitelist();
+  }, [info, ContractPresaleCertified, getWhitelist]);
+
   const row1 = [
     {
       header: 'Softcap',
@@ -1574,6 +1596,27 @@ const Pool: React.FC = () => {
     (isInvestmentTime || isPresaleClosed) &&
     didUserInvest &&
     (cancelled || !isPresaleSuccessful);
+
+  if (isCertified && whitelist && whitelist.length && !userAddress)
+    return (
+      <div className="container">
+        <div className="container-presale-status">
+          <div className="container-presale-status-inner">
+            <div className="gradient-header">This presale is private</div>
+          </div>
+        </div>
+      </div>
+    );
+  if (isCertified && !isUserInWhitelist)
+    return (
+      <div className="container">
+        <div className="container-presale-status">
+          <div className="container-presale-status-inner">
+            <div className="gradient-header">This presale is private</div>
+          </div>
+        </div>
+      </div>
+    );
 
   return (
     <div className="container">

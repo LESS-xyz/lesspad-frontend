@@ -353,4 +353,24 @@ export default class ContractPresaleCertifiedService {
       return null;
     }
   };
+
+  public getWhitelistFull = async (props: TypeClaimTokensProps) => {
+    try {
+      const { contractAddress } = props;
+      // console.log('ContractPresaleCertified getWhitelistFull:', props);
+      const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
+      let whitelist: string[] = [];
+      for (let i = 1; i <= 5; i += 1) {
+        const whitelistOfTier: string[] = await contract.methods.getWhitelist(i).call();
+        const whitelistOfTierInLowerCase = whitelistOfTier.map((item: string) =>
+          item.toLowerCase(),
+        );
+        whitelist = whitelist.concat(whitelistOfTierInLowerCase);
+      }
+      return whitelist;
+    } catch (e) {
+      console.error('ContractPresaleCertified getWhitelistFull:', e);
+      return null;
+    }
+  };
 }

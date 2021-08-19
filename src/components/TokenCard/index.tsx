@@ -85,6 +85,7 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
   const [logo, setLogo] = useState<string>('');
   const [chainInfo, setChainInfo] = useState<any>({});
   const [loading, setLoading] = useState<boolean>(true);
+  const [whitelist, setWhitelist] = useState<string[]>([]);
 
   const { chainType } = useSelector(({ wallet }: any) => wallet);
   const { address: userAddress } = useSelector(({ user }: any) => user);
@@ -142,6 +143,8 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
     if (closeTimePresale < NOW) presaleStatus = 'Ended';
   }
   const isOpened = openTimePresale < NOW;
+  const isUserInWhitelist =
+    whitelist && whitelist.length && userAddress && whitelist.includes(userAddress.toLowerCase());
 
   const getImage = useCallback(async () => {
     try {
@@ -206,10 +209,29 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
     chainType,
   ]);
 
+  const getWhitelist = useCallback(async () => {
+    try {
+      const resultWhitelist = await ContractPresaleCertified.getWhitelistFull({
+        contractAddress: address,
+      });
+      setWhitelist(resultWhitelist);
+      // console.log('Pool getWhitelist:', resultWhitelist);
+      return;
+    } catch (e) {
+      console.error('Pool getWhitelist:', e);
+    }
+  }, [ContractPresaleCertified, address]);
+
   useEffect(() => {
     if (!info) return;
     getImage();
   }, [info, getImage]);
+
+  useEffect(() => {
+    if (!info) return;
+    if (!ContractPresaleCertified) return;
+    getWhitelist();
+  }, [info, ContractPresaleCertified, getWhitelist]);
 
   useEffect(() => {
     if (!chainType) return;
@@ -242,6 +264,8 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
   )
     return null;
 
+  if (isCertified && whitelist && whitelist.length && !userAddress) return null;
+  if (isCertified && !isUserInWhitelist) return null;
   if (loading) return <div className={s.cardLoading}>Loading...</div>;
 
   return (
