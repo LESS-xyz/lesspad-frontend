@@ -704,13 +704,13 @@ const Pool: React.FC = () => {
         .on('transactionHash', (txHash: string) => {
           handleTransactionHash(txHash);
         })
+        .on('error', (e) => {
+          console.error(e);
+          handleTransactionWentWrong();
+        })
         .then((res) => {
           console.log('PagePool cancelPresale', res);
           getInfo();
-        })
-        .catch((e) => {
-          console.error(e);
-          handleTransactionWentWrong();
         });
       console.log('PagePool cancelPresale:', result);
     } catch (e) {
@@ -740,13 +740,13 @@ const Pool: React.FC = () => {
         .on('transactionHash', (txHash: string) => {
           handleTransactionHash(txHash);
         })
+        .on('error', (e) => {
+          console.error(e);
+          handleTransactionWentWrong();
+        })
         .then((res) => {
           console.log('PagePool collectFee', res);
           getInfo();
-        })
-        .catch((e) => {
-          console.error(e);
-          handleTransactionWentWrong();
         });
       console.log('PagePool collectFee:', result);
     } catch (e) {
@@ -787,13 +787,13 @@ const Pool: React.FC = () => {
         .on('transactionHash', (txHash: string) => {
           handleTransactionHash(txHash);
         })
-        .then((res) => {
-          getInfo();
-          console.log('PagePool resultClaimTokens', res);
-        })
-        .catch((e) => {
+        .on('error', (e) => {
           console.error(e);
           handleTransactionWentWrong();
+        })
+        .then((res) => {
+          console.log('PagePool resultClaimTokens', res);
+          getInfo();
         });
       console.log('PagePool resultClaimTokens:', result);
     } catch (e) {
@@ -823,13 +823,13 @@ const Pool: React.FC = () => {
         .on('transactionHash', (txHash: string) => {
           handleTransactionHash(txHash);
         })
-        .then((res) => {
-          getInfo();
-          console.log('PagePool withdrawInvestment', res);
-        })
-        .catch((e) => {
+        .on('error', (e) => {
           console.error(e);
           handleTransactionWentWrong();
+        })
+        .then((res) => {
+          console.log('PagePool withdrawInvestment', res);
+          getInfo();
         });
       console.log('PagePool withdrawInvestment:', result);
     } catch (e) {
