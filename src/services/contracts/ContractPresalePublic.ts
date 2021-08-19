@@ -225,7 +225,7 @@ export default class ContractPresalePublicService {
     }
   };
 
-  public vote = async (props: TypeVoteProps): Promise<any> => {
+  public vote = async (props: TypeVoteProps) => {
     try {
       const {
         userAddress,
@@ -238,8 +238,7 @@ export default class ContractPresalePublicService {
       } = props;
       // console.log('ContractPresalePublicService vote:', props);
       const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
-      // todo: add timestamp in new contract
-      return await contract.methods
+      return contract.methods
         .vote(yes, stakingAmount, date, signature, totalStakedAmount)
         .send({ from: userAddress });
     } catch (e) {
@@ -248,7 +247,7 @@ export default class ContractPresalePublicService {
     }
   };
 
-  public invest = async (props: TypeInvestProps): Promise<any> => {
+  public invest = async (props: TypeInvestProps) => {
     try {
       const {
         userAddress,
@@ -262,7 +261,7 @@ export default class ContractPresalePublicService {
       } = props;
       console.log('ContractPresalePublicService vote props:', props);
       const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
-      return await contract.methods
+      return contract.methods
         .invest(signature, userBalance, timestamp)
         .send({ from: userAddress, value: amount });
     } catch (e) {
@@ -271,12 +270,12 @@ export default class ContractPresalePublicService {
     }
   };
 
-  public collectFundsRaised = async (props: TypeInvestProps): Promise<any> => {
+  public collectFundsRaised = async (props: TypeInvestProps) => {
     try {
       const { userAddress, contractAddress } = props;
       // console.log('ContractPresalePublicService collectFundsRaised props:', props);
       const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
-      return await contract.methods.collectFundsRaised().send({ from: userAddress });
+      return contract.methods.collectFundsRaised().send({ from: userAddress });
     } catch (e) {
       console.error('ContractPresalePublicService collectFundsRaised:', e);
       return null;
@@ -320,7 +319,7 @@ export default class ContractPresalePublicService {
     }
   };
 
-  public register = async (props: TypeRegisterProps): Promise<any> => {
+  public register = async (props: TypeRegisterProps) => {
     try {
       const {
         contractAddress,
@@ -333,7 +332,7 @@ export default class ContractPresalePublicService {
       } = props;
       console.log('ContractPresalePublicService register:', props);
       const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
-      return await contract.methods
+      return contract.methods
         .register(stakedAmount, tier, timestamp, signature)
         .send({ from: userAddress });
     } catch (e) {
@@ -342,50 +341,50 @@ export default class ContractPresalePublicService {
     }
   };
 
-  public claimTokens = async (props: TypeClaimTokensProps): Promise<any> => {
+  public claimTokens = async (props: TypeClaimTokensProps) => {
     try {
       const { userAddress, contractAddress } = props;
       // console.log('ContractPresalePublicService claimTokens:', props);
       const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
-      return await contract.methods.claimTokens().send({ from: userAddress });
+      return contract.methods.claimTokens().send({ from: userAddress });
     } catch (e) {
       console.error('ContractPresalePublicService claimTokens:', e);
       return null;
     }
   };
 
-  public cancelPresale = async (props: TypeClaimTokensProps): Promise<any> => {
+  public cancelPresale = async (props: TypeClaimTokensProps) => {
     try {
       const { userAddress, contractAddress } = props;
       // console.log('ContractPresalePublicService cancelPresale:', props);
       const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
-      return await contract.methods.cancelPresale().send({ from: userAddress });
+      return contract.methods.cancelPresale().send({ from: userAddress });
     } catch (e) {
       console.error('ContractPresalePublicService cancelPresale:', e);
       return null;
     }
   };
 
-  public collectFee = async (props: TypeClaimTokensProps): Promise<any> => {
+  public collectFee = async (props: TypeClaimTokensProps) => {
     try {
       const { userAddress, contractAddress } = props;
       // console.log('ContractPresalePublicService collectFee:', props);
       const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
-      return await contract.methods.collectFee().send({ from: userAddress });
+      return contract.methods.collectFee().send({ from: userAddress });
     } catch (e) {
       console.error('ContractPresalePublicService collectFee:', e);
       return null;
     }
   };
 
-  public withdrawInvestment = async (props: TypeClaimTokensProps): Promise<any> => {
+  public withdrawInvestment = async (props: TypeClaimTokensProps) => {
     try {
       const { userAddress, contractAddress } = props;
       // console.log('ContractPresalePublicService cancelPresale:', props);
       const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
       const amountEth = await this.investmentsEth({ userAddress, contractAddress });
       const amountEthInWei = convertToWei(amountEth, 18);
-      return await contract.methods
+      return contract.methods
         .withdrawInvestment(userAddress, amountEthInWei)
         .send({ from: userAddress });
     } catch (e) {

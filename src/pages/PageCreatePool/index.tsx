@@ -909,14 +909,13 @@ const CreatePoolPage: React.FC = () => {
           presaleStringInfo,
           certifiedAddition,
           usdtToEthFee,
-        });
-        console.log('end');
-        // .on('transactionHash', (txHash: string) => {
-        //   handleTransactionHash(txHash);
-        // })
-        // .then((resultCreatePresalePublic) =>
-        //   console.log('CreatePool handleSubmit', resultCreatePresalePublic),
-        // );
+        })
+          .on('transactionHash', (txHash: string) => {
+            handleTransactionHash(txHash);
+          })
+          .then((resultCreatePresalePublic) =>
+            console.log('CreatePool handleSubmit', resultCreatePresalePublic),
+          );
       }
     } catch (e) {
       console.error('PageCreatePool handleSubmit:', e);

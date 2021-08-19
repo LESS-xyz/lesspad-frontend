@@ -3,6 +3,7 @@ import Web3 from 'web3';
 
 import config from '../../config';
 import ERC20Abi from '../../data/abi/ERC20Abi';
+import { convertHexToString, convertToWei } from '../../utils/ethereum';
 
 type TypeConstructorProps = {
   web3Provider: any;
@@ -13,10 +14,41 @@ type TypeGetInfoProps = {
   contractAddress: string;
 };
 
-type TypeVoteProps = {
+type TypeClaimTokensProps = {
+  contractAddress: string;
+  userAddress: string;
+};
+
+type TypeRegisterProps = {
   userAddress: string;
   contractAddress: string;
-  yes: boolean;
+  tier: string;
+  stakedAmount: string;
+  signature: string;
+  // totalStakedAmount: string;
+  timestamp: string;
+};
+
+type TypeInvestProps = {
+  userAddress: string;
+  contractAddress: string;
+  amount: string;
+  signature: string;
+  userBalance: string;
+  timestamp: number;
+  poolPercentages: number[];
+  stakingTiers: number[];
+};
+
+type TypeInvestmentsProps = {
+  userAddress: string;
+  contractAddress: string;
+  tokenDecimals: number;
+};
+
+type TypeInvestmentsEthProps = {
+  userAddress: string;
+  contractAddress: string;
 };
 
 export default class ContractPresaleCertifiedService {
@@ -43,25 +75,20 @@ export default class ContractPresaleCertifiedService {
   public getInfo = async ({ contractAddress }: TypeGetInfoProps): Promise<any> => {
     try {
       const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
-      // console.log(
-      //   'ContractPresaleCertifiedService getInfo:',
-      //   this.contractAbi,
-      //   this.contractAddress,
-      // );
       const generalInfo = await contract.methods.generalInfo().call();
       const uniswapInfo = await contract.methods.uniswapInfo().call();
       const stringInfo = await contract.methods.stringInfo().call();
       const intermediate = await contract.methods.intermediate().call();
       const certifiedAddition = await contract.methods.certifiedAddition().call();
-      // const certifiedAddition = await contract.methods.certifiedAddition().call();
-      console.log('ContractPresaleCertifiedService getInfo:', {
+      console.log('ContractPresaleCertified getInfo:', {
         generalInfo,
         uniswapInfo,
         stringInfo,
         intermediate,
         certifiedAddition,
       });
-      const contractToken = new this.web3.eth.Contract(ERC20Abi, generalInfo.token);
+      const tokenAddress = generalInfo.token;
+      const contractToken = new this.web3.eth.Contract(ERC20Abi, tokenAddress);
       const decimals = await contractToken.methods.decimals().call();
       const tokenSymbol = await contractToken.methods.symbol().call();
       const {
@@ -74,6 +101,8 @@ export default class ContractPresaleCertifiedService {
         tokensForLiquidityLeft,
         openTimePresale,
         closeTimePresale,
+        openTimeVoting,
+        closeTimeVoting,
         collectedFee,
       } = generalInfo;
       const {
@@ -100,6 +129,9 @@ export default class ContractPresaleCertifiedService {
         liquidityAdded,
         participants,
         raisedAmount,
+        yesVotes,
+        noVotes,
+        lastTotalStakedAmount,
       } = intermediate;
       const { liquidity, automatically, vesting, nativeToken } = certifiedAddition;
       // format
@@ -111,8 +143,8 @@ export default class ContractPresaleCertifiedService {
       const tokensForLiquidityLeftInEth = +new BN(tokensForLiquidityLeft).div(pow);
       const listingPriceInEth = +new BN(listingPriceInWei).div(pow);
       const beginingAmountInEth = +new BN(beginingAmount).div(pow);
-      const raisedAmountInEth = +new BN(raisedAmount).div(pow);
-
+      const raisedAmountInEth = +new BN(raisedAmount).div(pow); // todo: decimals of native token
+      // result
       return {
         // general
         creator,
@@ -125,13 +157,15 @@ export default class ContractPresaleCertifiedService {
         tokensForLiquidityLeft: tokensForLiquidityLeftInEth,
         openTimePresale: openTimePresale * 1000,
         closeTimePresale: closeTimePresale * 1000,
+        openTimeVoting: openTimeVoting * 1000,
+        closeTimeVoting: closeTimeVoting * 1000,
         collectedFee,
         // string
-        saleTitle: this.web3.utils.hexToString(saleTitle),
-        linkTelegram: this.web3.utils.hexToString(linkTelegram),
-        linkGithub: this.web3.utils.hexToString(linkGithub),
-        linkTwitter: this.web3.utils.hexToString(linkTwitter),
-        linkWebsite: this.web3.utils.hexToString(linkWebsite),
+        saleTitle: convertHexToString(saleTitle),
+        linkTelegram: convertHexToString(linkTelegram),
+        linkGithub: convertHexToString(linkGithub),
+        linkTwitter: convertHexToString(linkTwitter),
+        linkWebsite: convertHexToString(linkWebsite),
         linkLogo,
         description,
         whitepaper,
@@ -148,25 +182,174 @@ export default class ContractPresaleCertifiedService {
         liquidityAdded,
         participants,
         raisedAmount: raisedAmountInEth,
-        // certifiedAddition
+        yesVotes,
+        noVotes,
+        lastTotalStakedAmount,
+        // certified addition
         liquidity,
         automatically,
         vesting,
         nativeToken,
       };
     } catch (e) {
-      console.error('ContractPresaleCertifiedService getInfo:', e);
+      console.error('ContractPresaleCertified getInfo:', e);
       return null;
     }
   };
 
-  public vote = async (props: TypeVoteProps): Promise<any> => {
+  public getUserRegister = async (contractAddress: string, userAddress: string) => {
     try {
-      const { userAddress, contractAddress, yes } = props;
       const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
-      return await contract.methods.vote(yes).send({ from: userAddress });
+      const result = contract.methods.whitelistTier(userAddress).call();
+      return result;
     } catch (e) {
-      console.error('ContractPresaleCertifiedService vote:', e);
+      console.error('ContractPresaleCertified getUserRegister:', e);
+      return null;
+    }
+  };
+
+  public invest = async (props: TypeInvestProps) => {
+    try {
+      const {
+        userAddress,
+        contractAddress,
+        amount,
+        userBalance,
+        signature,
+        timestamp,
+        // poolPercentages,
+        // stakingTiers,
+      } = props;
+      console.log('ContractPresaleCertified vote props:', props);
+      const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
+      return contract.methods
+        .invest(signature, userBalance, timestamp)
+        .send({ from: userAddress, value: amount });
+    } catch (e) {
+      console.error('ContractPresaleCertified invest:', e);
+      return null;
+    }
+  };
+
+  public collectFundsRaised = async (props: TypeInvestProps) => {
+    try {
+      const { userAddress, contractAddress } = props;
+      // console.log('ContractPresaleCertified collectFundsRaised props:', props);
+      const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
+      return contract.methods.collectFundsRaised().send({ from: userAddress });
+    } catch (e) {
+      console.error('ContractPresaleCertified collectFundsRaised:', e);
+      return null;
+    }
+  };
+
+  public investments = async (props: TypeInvestmentsProps): Promise<any> => {
+    try {
+      const { userAddress, contractAddress, tokenDecimals } = props;
+      // console.log('ContractPresaleCertified investments props:', props);
+      const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
+      const result = await contract.methods.investments(userAddress).call();
+      const { amountEth, amountTokens } = result;
+      const pow = new BN(10).pow(new BN(18));
+      const amountEthInEth = +new BN(amountEth).div(pow);
+      const powToken = new BN(10).pow(new BN(tokenDecimals));
+      const amountTokensInEth = +new BN(amountTokens).div(powToken);
+      return {
+        amountEth: amountEthInEth,
+        amountTokens: amountTokensInEth,
+      };
+    } catch (e) {
+      console.error('ContractPresaleCertified investments:', e);
+      return null;
+    }
+  };
+
+  public investmentsEth = async (props: TypeInvestmentsEthProps): Promise<any> => {
+    try {
+      const { userAddress, contractAddress } = props;
+      // console.log('ContractPresaleCertified investments props:', props);
+      const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
+      const result = await contract.methods.investments(userAddress).call();
+      const { amountEth } = result;
+      const pow = new BN(10).pow(new BN(18));
+      const amountEthInEth = +new BN(amountEth).div(pow);
+      return amountEthInEth;
+    } catch (e) {
+      console.error('ContractPresaleCertified investmentsEth:', e);
+      return null;
+    }
+  };
+
+  public register = async (props: TypeRegisterProps) => {
+    try {
+      const {
+        contractAddress,
+        userAddress,
+        stakedAmount,
+        signature,
+        // totalStakedAmount,
+        timestamp,
+        tier,
+      } = props;
+      // console.log('ContractPresaleCertified register:', props);
+      const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
+      return contract.methods
+        .register(stakedAmount, tier, timestamp, signature)
+        .send({ from: userAddress });
+    } catch (e) {
+      console.error('ContractPresaleCertified register:', e);
+      return null;
+    }
+  };
+
+  public claimTokens = async (props: TypeClaimTokensProps) => {
+    try {
+      const { userAddress, contractAddress } = props;
+      // console.log('ContractPresaleCertified claimTokens:', props);
+      const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
+      return contract.methods.claimTokens().send({ from: userAddress });
+    } catch (e) {
+      console.error('ContractPresaleCertified claimTokens:', e);
+      return null;
+    }
+  };
+
+  public cancelPresale = async (props: TypeClaimTokensProps) => {
+    try {
+      const { userAddress, contractAddress } = props;
+      // console.log('ContractPresaleCertified cancelPresale:', props);
+      const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
+      return contract.methods.cancelPresale().send({ from: userAddress });
+    } catch (e) {
+      console.error('ContractPresaleCertified cancelPresale:', e);
+      return null;
+    }
+  };
+
+  public collectFee = async (props: TypeClaimTokensProps) => {
+    try {
+      const { userAddress, contractAddress } = props;
+      // console.log('ContractPresaleCertified collectFee:', props);
+      const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
+      return contract.methods.collectFee().send({ from: userAddress });
+    } catch (e) {
+      console.error('ContractPresaleCertified collectFee:', e);
+      return null;
+    }
+  };
+
+  public withdrawInvestment = async (props: TypeClaimTokensProps) => {
+    try {
+      const { userAddress, contractAddress } = props;
+      // console.log('ContractPresaleCertified cancelPresale:', props);
+      const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
+      const amountEth = await this.investmentsEth({ userAddress, contractAddress });
+      const amountEthInWei = convertToWei(amountEth, 18);
+      return contract.methods
+        .withdrawInvestment(userAddress, amountEthInWei)
+        .send({ from: userAddress });
+    } catch (e) {
+      console.error('ContractPresaleCertified cancelPresale:', e);
       return null;
     }
   };

@@ -18,6 +18,7 @@ import Subscribe from '../../../assets/img/icons/subscribe.svg';
 import Telegram from '../../../assets/img/icons/tg-icon.svg';
 import Twitter from '../../../assets/img/icons/twitter-icon.svg';
 import projectLogo from '../../../assets/img/sections/token-card/logo-1.png';
+import Button from '../../../components/Button';
 import Input from '../../../components/Input';
 import YourTier from '../../../components/YourTier/index';
 import config from '../../../config';
@@ -30,6 +31,7 @@ import { addHttps, prettyNumber } from '../../../utils/prettifiers';
 import ParticipantsTable from '../ParticipantsTable';
 
 import './index.scss';
+import s from '../../PageCreatePool/CreatePool.module.scss';
 
 const {
   CHAIN_SYMBOLS,
@@ -102,9 +104,10 @@ const Pool: React.FC = () => {
   const { web3 } = useWeb3ConnectorContext();
   const {
     ContractERC20,
-    ContractPresalePublicWithMetamask,
     ContractPresalePublic,
+    ContractPresalePublicWithMetamask,
     ContractPresaleCertified,
+    ContractPresaleCertifiedWithMetamask,
     ContractLessToken,
     ContractStaking,
   } = useContractsContext();
@@ -457,7 +460,9 @@ const Pool: React.FC = () => {
       console.log('PagePool resultGetTierSignature:', resultGetTierSignature);
       // const userBalance = new BN(`${user_balance}`).toString(10);
       if (!resultGetTierSignature.data) return;
-      const resultVote = await ContractPresalePublicWithMetamask.invest({
+      let ContractPresale = ContractPresalePublicWithMetamask;
+      if (isCertified) ContractPresale = ContractPresaleCertifiedWithMetamask;
+      const resultVote = await ContractPresale.invest({
         userAddress,
         contractAddress: address,
         amount: amountToInvestInWei,
@@ -472,8 +477,10 @@ const Pool: React.FC = () => {
       console.error('PagePool invest:', e);
     }
   }, [
+    isCertified,
     amountToInvest,
     ContractPresalePublicWithMetamask,
+    ContractPresaleCertifiedWithMetamask,
     address,
     tokenDecimals,
     loginToBackend,
@@ -482,12 +489,14 @@ const Pool: React.FC = () => {
 
   const getUserRegister = useCallback(async () => {
     try {
-      const resultRegister = await ContractPresalePublic.getUserRegister(address, userAddress);
+      let ContractPresale = ContractPresalePublic;
+      if (isCertified) ContractPresale = ContractPresaleCertified;
+      const resultRegister = await ContractPresale.getUserRegister(address, userAddress);
       setUserRegister(resultRegister);
     } catch (e) {
       console.error(e);
     }
-  }, [userAddress, ContractPresalePublic, address]);
+  }, [isCertified, userAddress, ContractPresalePublic, ContractPresaleCertified, address]);
 
   const register = useCallback(async () => {
     try {
@@ -532,7 +541,9 @@ const Pool: React.FC = () => {
             </div>
           ),
         });
-      const resultVote = await ContractPresalePublicWithMetamask.register({
+      let ContractPresale = ContractPresalePublicWithMetamask;
+      if (isCertified) ContractPresale = ContractPresaleCertifiedWithMetamask;
+      const resultVote = await ContractPresale.register({
         userAddress,
         contractAddress: address,
         tier: userTier,
@@ -544,7 +555,16 @@ const Pool: React.FC = () => {
     } catch (e) {
       console.error('PagePool register:', e);
     }
-  }, [ContractPresalePublicWithMetamask, ContractStaking, address, userAddress, toggleModal, web3]);
+  }, [
+    isCertified,
+    ContractPresalePublicWithMetamask,
+    ContractPresaleCertifiedWithMetamask,
+    ContractStaking,
+    address,
+    userAddress,
+    toggleModal,
+    web3,
+  ]);
 
   const getDecimals = useCallback(async () => {
     try {
@@ -638,31 +658,83 @@ const Pool: React.FC = () => {
     }
   }, [address, closeTimeVoting]);
 
+  const handleTransactionHash = useCallback(
+    (txHash: string) => {
+      toggleModal({
+        open: true,
+        text: (
+          <div className={s.messageContainer}>
+            <p>Transaction submitted</p>
+            <div className={s.messageContainerButtons}>
+              <Button href={`${config.EXPLORERS[chainType]}/tx/${txHash}`}>
+                View on etherscan
+              </Button>
+            </div>
+          </div>
+        ),
+      });
+      history.push('/pools');
+    },
+    [toggleModal, chainType, history],
+  );
+
   // не набрался софтап, время инвестирования закончилось. В этом случае овнер пресейла может забрать свои токены
   const cancelPresale = useCallback(async () => {
     try {
-      const resultCancelPresale = await ContractPresalePublicWithMetamask.cancelPresale({
+      let ContractPresale = ContractPresalePublicWithMetamask;
+      if (isCertified) ContractPresale = ContractPresaleCertifiedWithMetamask;
+      const result = await ContractPresale.cancelPresale({
         userAddress,
         contractAddress: address,
       });
-      console.log('PagePool cancelPresale:', resultCancelPresale);
+      result
+        .on('transactionHash', (txHash: string) => {
+          handleTransactionHash(txHash);
+        })
+        .then((res) => {
+          console.log('PagePool cancelPresale', res);
+        });
+      console.log('PagePool cancelPresale:', result);
     } catch (e) {
       console.error(e);
     }
-  }, [ContractPresalePublicWithMetamask, address, userAddress]);
+  }, [
+    isCertified,
+    ContractPresalePublicWithMetamask,
+    ContractPresaleCertifiedWithMetamask,
+    address,
+    userAddress,
+    handleTransactionHash,
+  ]);
 
   // когда не набралось голосов, создатель пресейла может потребовать обратно свои 1000$ в эфирах и токены, которые были на продаже
   const collectFee = useCallback(async () => {
     try {
-      const resultCancelPresale = await ContractPresalePublicWithMetamask.collectFee({
+      let ContractPresale = ContractPresalePublicWithMetamask;
+      if (isCertified) ContractPresale = ContractPresaleCertifiedWithMetamask;
+      const result = await ContractPresale.collectFee({
         userAddress,
         contractAddress: address,
       });
-      console.log('PagePool collectFee:', resultCancelPresale);
+      result
+        .on('transactionHash', (txHash: string) => {
+          handleTransactionHash(txHash);
+        })
+        .then((res) => {
+          console.log('PagePool collectFee', res);
+        });
+      console.log('PagePool collectFee:', result);
     } catch (e) {
       console.error(e);
     }
-  }, [ContractPresalePublicWithMetamask, address, userAddress]);
+  }, [
+    isCertified,
+    ContractPresalePublicWithMetamask,
+    ContractPresaleCertifiedWithMetamask,
+    address,
+    userAddress,
+    handleTransactionHash,
+  ]);
 
   const handleVote = useCallback(
     async (yes: boolean) => {
@@ -678,28 +750,60 @@ const Pool: React.FC = () => {
   // забрать токены после окончания пресейла и добавления ликвидности (если она есть)
   const handleClaimTokens = useCallback(async () => {
     try {
-      const resultClaimTokens = await ContractPresalePublicWithMetamask.claimTokens({
+      let ContractPresale = ContractPresalePublicWithMetamask;
+      if (isCertified) ContractPresale = ContractPresaleCertifiedWithMetamask;
+      const result = await ContractPresale.claimTokens({
         userAddress,
         contractAddress: address,
       });
-      console.log('PagePool resultClaimTokens:', resultClaimTokens);
+      result
+        .on('transactionHash', (txHash: string) => {
+          handleTransactionHash(txHash);
+        })
+        .then((res) => {
+          console.log('PagePool resultClaimTokens', res);
+        });
+      console.log('PagePool resultClaimTokens:', result);
     } catch (e) {
       console.error('PagePool resultClaimTokens:', e);
     }
-  }, [ContractPresalePublicWithMetamask, userAddress, address]);
+  }, [
+    isCertified,
+    ContractPresalePublicWithMetamask,
+    ContractPresaleCertifiedWithMetamask,
+    userAddress,
+    address,
+    handleTransactionHash,
+  ]);
 
   // возможность отозвать инвестиции до набора софткапа
   const withdrawInvestment = useCallback(async () => {
     try {
-      const resultClaimTokens = await ContractPresalePublicWithMetamask.withdrawInvestment({
+      let ContractPresale = ContractPresalePublicWithMetamask;
+      if (isCertified) ContractPresale = ContractPresaleCertifiedWithMetamask;
+      const result = await ContractPresale.withdrawInvestment({
         userAddress,
         contractAddress: address,
       });
-      console.log('PagePool withdrawInvestment:', resultClaimTokens);
+      result
+        .on('transactionHash', (txHash: string) => {
+          handleTransactionHash(txHash);
+        })
+        .then((res) => {
+          console.log('PagePool withdrawInvestment', res);
+        });
+      console.log('PagePool withdrawInvestment:', result);
     } catch (e) {
       console.error('PagePool withdrawInvestment:', e);
     }
-  }, [ContractPresalePublicWithMetamask, userAddress, address]);
+  }, [
+    isCertified,
+    ContractPresalePublicWithMetamask,
+    ContractPresaleCertifiedWithMetamask,
+    userAddress,
+    address,
+    handleTransactionHash,
+  ]);
 
   // модальное окно с формой инвестирования
   // const handleInvest = useCallback(async () => {
@@ -753,13 +857,13 @@ const Pool: React.FC = () => {
   }, [info, updateTimerBeforeVoting]);
 
   useEffect(() => {
-    if (!info) return;
+    if (!token || token === '...') return;
     if (!userAddress) return;
     if (!ContractLessToken) return;
     if (!ContractERC20) return;
     // getDecimals();
     getTokenDecimals();
-  }, [ContractLessToken, userAddress, info, getTokenDecimals, ContractERC20]);
+  }, [ContractLessToken, userAddress, token, getTokenDecimals, ContractERC20]);
 
   useEffect(() => {
     if (!chainType) return;
@@ -802,7 +906,7 @@ const Pool: React.FC = () => {
 
   useEffect(() => {
     if (isCertified !== undefined && ContractPresalePublicWithMetamask && userAddress && address) {
-      getMyVote();
+      if (!isCertified) getMyVote();
     }
   }, [getMyVote, isCertified, ContractPresalePublicWithMetamask, userAddress, address]);
 
