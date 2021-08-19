@@ -74,7 +74,12 @@ const chainsInfo: any = [
 
 const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
   const { address, isCertified, statusChoosenInFilter } = props;
-  const { ContractPresalePublic, ContractPresaleCertified } = useContractsContext();
+  const {
+    ContractPresalePublic,
+    ContractPresaleCertified,
+    ContractPresalePublicWithMetamask,
+    ContractPresaleCertifiedWithMetamask,
+  } = useContractsContext();
 
   const [info, setInfo] = useState<any>(defaultInfo);
   const [logo, setLogo] = useState<string>('');
@@ -82,7 +87,7 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
   const [loading, setLoading] = useState<boolean>(true);
 
   const { chainType } = useSelector(({ wallet }: any) => wallet);
-  // const { address: userAddress } = useSelector(({ user }: any) => user);
+  const { address: userAddress } = useSelector(({ user }: any) => user);
 
   const {
     // #additional info
@@ -168,7 +173,18 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
       if (!ContractPresalePublic) return;
       if (!ContractPresaleCertified) return;
       let newInfo;
-      if (isCertified) {
+      if (userAddress) {
+        console.log('TokenCard getInfo:', userAddress);
+        if (isCertified) {
+          newInfo = await ContractPresaleCertifiedWithMetamask.getInfo({
+            contractAddress: address,
+          });
+          console.log('TokenCard getInfo certified:', newInfo);
+        } else {
+          newInfo = await ContractPresalePublicWithMetamask.getInfo({ contractAddress: address });
+          console.log('TokenCard getInfo public:', newInfo);
+        }
+      } else if (isCertified) {
         newInfo = await ContractPresaleCertified.getInfo({ contractAddress: address });
         console.log('TokenCard getInfo certified:', newInfo);
       } else {
@@ -180,7 +196,16 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
     } catch (e) {
       console.error('TokenCard getInfo:', e);
     }
-  }, [ContractPresaleCertified, ContractPresalePublic, address, isCertified, chainType]);
+  }, [
+    ContractPresaleCertified,
+    ContractPresalePublic,
+    ContractPresaleCertifiedWithMetamask,
+    ContractPresalePublicWithMetamask,
+    address,
+    userAddress,
+    isCertified,
+    chainType,
+  ]);
 
   useEffect(() => {
     if (!info) return;
@@ -197,8 +222,19 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
     if (!chainType) return;
     if (!ContractPresalePublic) return;
     if (!ContractPresaleCertified) return;
+    if (userAddress && !ContractPresalePublicWithMetamask) return;
+    if (userAddress && !ContractPresaleCertifiedWithMetamask) return;
     getInfo();
-  }, [ContractPresalePublic, ContractPresaleCertified, getInfo, address, chainType]);
+  }, [
+    ContractPresalePublic,
+    ContractPresaleCertified,
+    ContractPresaleCertifiedWithMetamask,
+    ContractPresalePublicWithMetamask,
+    getInfo,
+    address,
+    userAddress,
+    chainType,
+  ]);
 
   if (
     statusChoosenInFilter &&

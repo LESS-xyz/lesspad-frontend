@@ -21,6 +21,7 @@ const contractsContext = createContext<any>({
   ContractCalculations: {},
   ContractERC20: {},
   ContractPresalePublicWithMetamask: {},
+  ContractPresaleCertifiedWithMetamask: {},
   ContractLessLibrary: {},
   ContractPresalePublic: {},
   ContractPresaleFactory: {},
@@ -89,6 +90,10 @@ const ContractsContext: React.FC = ({ children }) => {
         web3Provider: web3.provider,
         chainType,
       });
+      const ContractPresaleCertifiedWithMetamask = new ContractPresalePublicService({
+        web3Provider: web3.provider,
+        chainType,
+      });
       const ContractPresaleFactory = new ContractPresaleFactoryService({
         web3Provider: web3.provider,
         chainType,
@@ -114,6 +119,7 @@ const ContractsContext: React.FC = ({ children }) => {
         ContractCalculations,
         ContractERC20,
         ContractPresalePublicWithMetamask,
+        ContractPresaleCertifiedWithMetamask,
         ContractPresaleFactory,
         ContractPresaleFactoryCertified,
         ContractStaking,
