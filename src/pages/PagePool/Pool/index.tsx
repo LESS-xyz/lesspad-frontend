@@ -139,6 +139,7 @@ const Pool: React.FC = () => {
 
   const [timeBeforeVoting, setTimeBeforeVoting] = useState<string>('');
   const [timeBeforeRegistration, setTimeBeforeRegistration] = useState<string>('');
+  const [timeBeforeInvestmentEnd, setTimeBeforeInvestmentEnd] = useState<string>('');
   const [timeBeforeMyTier, setTimeBeforeMyTier] = useState<string>('');
 
   const { pools } = useSelector(({ pool }: any) => pool);
@@ -286,7 +287,7 @@ const Pool: React.FC = () => {
     }
   }, [linkLogo]);
 
-  const updateTimerBeforeVoting = useCallback(() => {
+  const updateTimer = useCallback(() => {
     try {
       if (openTimeVoting === '0') return;
       if (openTimePresale === '0') return;
@@ -295,10 +296,13 @@ const Pool: React.FC = () => {
       const openRegistrationTime = openTimePresale - REGISTRATION_DURATION;
       const newTimeBeforeRegistration = dayjs(openRegistrationTime).fromNow();
       setTimeBeforeRegistration(newTimeBeforeRegistration);
+      if (closeTimePresale === '0') return;
+      const newTimeBeforeInvestmentEnd = dayjs(closeTimePresale).fromNow();
+      setTimeBeforeInvestmentEnd(newTimeBeforeInvestmentEnd);
     } catch (e) {
       console.error(e);
     }
-  }, [openTimeVoting, openTimePresale]);
+  }, [openTimeVoting, openTimePresale, closeTimePresale]);
 
   const getTokenDecimals = useCallback(async () => {
     try {
@@ -395,6 +399,36 @@ const Pool: React.FC = () => {
     }
   }, [userAddress, web3]);
 
+  const handleTransactionHash = useCallback(
+    (txHash: string) => {
+      toggleModal({
+        open: true,
+        text: (
+          <div className={s.messageContainer}>
+            <p>Transaction submitted</p>
+            <div className={s.messageContainerButtons}>
+              <Button href={`${config.EXPLORERS[chainType]}/tx/${txHash}`}>
+                View on etherscan
+              </Button>
+            </div>
+          </div>
+        ),
+      });
+    },
+    [toggleModal, chainType],
+  );
+
+  const handleTransactionWentWrong = useCallback(() => {
+    toggleModal({
+      open: true,
+      text: (
+        <div className={s.messageContainer}>
+          <p>Something went wrong</p>
+        </div>
+      ),
+    });
+  }, [toggleModal]);
+
   const vote = useCallback(
     async (yes: boolean) => {
       try {
@@ -413,9 +447,7 @@ const Pool: React.FC = () => {
           user_balance: stakingAmount,
           stakedAmount: totalStakedAmount,
         } = resultGetPoolSignature.data;
-        // const totalStakedAmountInEth = new BN(`${stakedAmount}`).toString(10);
-        // const stakingAmountInEth = new BN(`${user_balance}`).toString(10);
-        const resultVote = await ContractPresalePublicWithMetamask.vote({
+        const result = await ContractPresalePublicWithMetamask.vote({
           contractAddress: address,
           stakingAmount,
           userAddress,
@@ -424,14 +456,36 @@ const Pool: React.FC = () => {
           yes,
           totalStakedAmount,
         });
-        console.log('PagePool vote:', resultVote);
+        result
+          .on('transactionHash', (txHash: string) => {
+            handleTransactionHash(txHash);
+            getInfo();
+          })
+          .on('error', (e) => {
+            console.error(e);
+            handleTransactionWentWrong();
+          })
+          .then((res) => {
+            console.log('PagePool cancelPresale', res);
+            getInfo();
+          });
+        console.log('PagePool vote:', result);
         await getMyVote();
         await getInfo();
       } catch (e) {
         console.error('PagePool vote:', e);
       }
     },
-    [ContractPresalePublicWithMetamask, address, getInfo, getMyVote, loginToBackend, userAddress],
+    [
+      ContractPresalePublicWithMetamask,
+      address,
+      getInfo,
+      getMyVote,
+      loginToBackend,
+      userAddress,
+      handleTransactionHash,
+      handleTransactionWentWrong,
+    ],
   );
 
   const invest = useCallback(async () => {
@@ -661,36 +715,6 @@ const Pool: React.FC = () => {
     }
   }, [address, closeTimeVoting]);
 
-  const handleTransactionHash = useCallback(
-    (txHash: string) => {
-      toggleModal({
-        open: true,
-        text: (
-          <div className={s.messageContainer}>
-            <p>Transaction submitted</p>
-            <div className={s.messageContainerButtons}>
-              <Button href={`${config.EXPLORERS[chainType]}/tx/${txHash}`}>
-                View on etherscan
-              </Button>
-            </div>
-          </div>
-        ),
-      });
-    },
-    [toggleModal, chainType],
-  );
-
-  const handleTransactionWentWrong = useCallback(() => {
-    toggleModal({
-      open: true,
-      text: (
-        <div className={s.messageContainer}>
-          <p>Something went wrong</p>
-        </div>
-      ),
-    });
-  }, [toggleModal]);
-
   // не набрался софтап, время инвестирования закончилось. В этом случае овнер пресейла может забрать свои токены
   const cancelPresale = useCallback(async () => {
     try {
@@ -890,12 +914,12 @@ const Pool: React.FC = () => {
 
   useEffect(() => {
     if (!info) return () => {};
-    updateTimerBeforeVoting();
-    const interval = setInterval(() => updateTimerBeforeVoting(), 3000);
+    updateTimer();
+    const interval = setInterval(() => updateTimer(), 3000);
     return () => {
       clearInterval(interval);
     };
-  }, [info, updateTimerBeforeVoting]);
+  }, [info, updateTimer]);
 
   useEffect(() => {
     if (!token || token === '...') return;
@@ -917,10 +941,14 @@ const Pool: React.FC = () => {
   }, [pools, address, getIsCertified]);
 
   useEffect(() => {
-    if (!ContractPresalePublic) return;
-    if (!ContractPresaleCertified) return;
-    if (isCertified === undefined) return;
+    if (!ContractPresalePublic) return () => {};
+    if (!ContractPresaleCertified) return () => {};
+    if (isCertified === undefined) return () => {};
     getInfo();
+    const interval = setInterval(() => getInfo(), 10000);
+    return () => {
+      clearInterval(interval);
+    };
   }, [ContractPresalePublic, ContractPresaleCertified, isCertified, getInfo]);
 
   useEffect(() => {
@@ -1625,6 +1653,16 @@ const Pool: React.FC = () => {
           </div>
         </div>
       ) : null}
+
+      {isUserCreator &&
+        (isInvestmentTime ? (
+          <div className="container-presale-status">
+            <div className="container-presale-status-inner">
+              <div className="gradient-header">Investment ends</div>
+              <div className="presale-status-text">{timeBeforeInvestmentEnd}</div>
+            </div>
+          </div>
+        ) : null)}
 
       {openTimePresale !== '0' ? (
         <div className="box box-bg">
