@@ -1434,7 +1434,7 @@ const Pool: React.FC = () => {
   const showHtmlWithdrawInvestment =
     !isCertified &&
     !isUserCreator &&
-    isInvestmentTime &&
+    (isInvestmentTime || isPresaleClosed) &&
     didUserInvest &&
     (cancelled || !isPresaleSuccessful);
 
@@ -1485,7 +1485,7 @@ const Pool: React.FC = () => {
   const showHtmlWithdrawInvestmentOnCertified =
     isCertified &&
     !isUserCreator &&
-    isInvestmentTime &&
+    (isInvestmentTime || isPresaleClosed) &&
     didUserInvest &&
     (cancelled || !isPresaleSuccessful);
 
