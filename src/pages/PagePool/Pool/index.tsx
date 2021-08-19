@@ -680,19 +680,19 @@ const Pool: React.FC = () => {
       const percentageOfTokensSoldInCurrentTierNew = (+tokensSold / +tokensShouldBeSoldNew) * 100;
       setPercentageOfTokensSoldInCurrentTier(percentageOfTokensSoldInCurrentTierNew);
       setTokensShouldBeSold(tokensShouldBeSoldNew);
-      console.log('PagePool getTierTime:', {
-        currentTierNew,
-        hardCap,
-        tokensShouldBeSoldNew,
-        tokensSold,
-        percentagesShouldBeSold,
-        percentageOfTokensSoldInCurrentTierNew,
-      });
+      // console.log('PagePool getTierTime:', {
+      //   currentTierNew,
+      //   hardCap,
+      //   tokensShouldBeSoldNew,
+      //   tokensSold,
+      //   percentagesShouldBeSold,
+      //   percentageOfTokensSoldInCurrentTierNew,
+      // });
     } catch (e) {
       console.error(e);
     }
   }, [
-    hardCap,
+    // hardCap,
     tokensSold,
     tier,
     info,
@@ -945,7 +945,7 @@ const Pool: React.FC = () => {
     if (!ContractPresaleCertified) return () => {};
     if (isCertified === undefined) return () => {};
     getInfo();
-    const interval = setInterval(() => getInfo(), 10000);
+    const interval = setInterval(() => getInfo(), 30000);
     return () => {
       clearInterval(interval);
     };
