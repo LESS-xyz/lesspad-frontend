@@ -225,7 +225,7 @@ export default class ContractPresalePublicService {
     }
   };
 
-  public vote = async (props: TypeVoteProps) => {
+  public vote = (props: TypeVoteProps) => {
     try {
       const {
         userAddress,
@@ -247,7 +247,7 @@ export default class ContractPresalePublicService {
     }
   };
 
-  public invest = async (props: TypeInvestProps) => {
+  public invest = (props: TypeInvestProps) => {
     try {
       const {
         userAddress,
@@ -270,7 +270,7 @@ export default class ContractPresalePublicService {
     }
   };
 
-  public collectFundsRaised = async (props: TypeInvestProps) => {
+  public collectFundsRaised = (props: TypeInvestProps) => {
     try {
       const { userAddress, contractAddress } = props;
       // console.log('ContractPresalePublicService collectFundsRaised props:', props);
@@ -319,7 +319,7 @@ export default class ContractPresalePublicService {
     }
   };
 
-  public register = async (props: TypeRegisterProps) => {
+  public register = (props: TypeRegisterProps) => {
     try {
       const {
         contractAddress,
@@ -341,7 +341,7 @@ export default class ContractPresalePublicService {
     }
   };
 
-  public claimTokens = async (props: TypeClaimTokensProps) => {
+  public claimTokens = (props: TypeClaimTokensProps) => {
     try {
       const { userAddress, contractAddress } = props;
       // console.log('ContractPresalePublicService claimTokens:', props);
@@ -353,7 +353,7 @@ export default class ContractPresalePublicService {
     }
   };
 
-  public cancelPresale = async (props: TypeClaimTokensProps) => {
+  public cancelPresale = (props: TypeClaimTokensProps) => {
     try {
       const { userAddress, contractAddress } = props;
       // console.log('ContractPresalePublicService cancelPresale:', props);
@@ -365,7 +365,7 @@ export default class ContractPresalePublicService {
     }
   };
 
-  public collectFee = async (props: TypeClaimTokensProps) => {
+  public collectFee = (props: TypeClaimTokensProps) => {
     try {
       const { userAddress, contractAddress } = props;
       // console.log('ContractPresalePublicService collectFee:', props);

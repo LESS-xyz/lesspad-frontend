@@ -208,7 +208,7 @@ export default class ContractPresaleCertifiedService {
     }
   };
 
-  public invest = async (props: TypeInvestProps) => {
+  public invest = (props: TypeInvestProps) => {
     try {
       const {
         userAddress,
@@ -231,7 +231,7 @@ export default class ContractPresaleCertifiedService {
     }
   };
 
-  public collectFundsRaised = async (props: TypeInvestProps) => {
+  public collectFundsRaised = (props: TypeInvestProps) => {
     try {
       const { userAddress, contractAddress } = props;
       // console.log('ContractPresaleCertified collectFundsRaised props:', props);
@@ -280,7 +280,7 @@ export default class ContractPresaleCertifiedService {
     }
   };
 
-  public register = async (props: TypeRegisterProps) => {
+  public register = (props: TypeRegisterProps) => {
     try {
       const {
         contractAddress,
@@ -302,7 +302,7 @@ export default class ContractPresaleCertifiedService {
     }
   };
 
-  public claimTokens = async (props: TypeClaimTokensProps) => {
+  public claimTokens = (props: TypeClaimTokensProps) => {
     try {
       const { userAddress, contractAddress } = props;
       // console.log('ContractPresaleCertified claimTokens:', props);
@@ -314,7 +314,7 @@ export default class ContractPresaleCertifiedService {
     }
   };
 
-  public cancelPresale = async (props: TypeClaimTokensProps) => {
+  public cancelPresale = (props: TypeClaimTokensProps) => {
     try {
       const { userAddress, contractAddress } = props;
       // console.log('ContractPresaleCertified cancelPresale:', props);
@@ -326,7 +326,7 @@ export default class ContractPresaleCertifiedService {
     }
   };
 
-  public collectFee = async (props: TypeClaimTokensProps) => {
+  public collectFee = (props: TypeClaimTokensProps) => {
     try {
       const { userAddress, contractAddress } = props;
       // console.log('ContractPresaleCertified collectFee:', props);
