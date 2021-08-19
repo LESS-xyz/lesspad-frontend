@@ -638,6 +638,7 @@ const Pool: React.FC = () => {
     }
   }, [address, closeTimeVoting]);
 
+  // не набрался софтап, время инвестирования закончилось. В этом случае овнер пресейла может забрать свои токены
   const cancelPresale = useCallback(async () => {
     try {
       const resultCancelPresale = await ContractPresalePublicWithMetamask.cancelPresale({
@@ -650,6 +651,7 @@ const Pool: React.FC = () => {
     }
   }, [ContractPresalePublicWithMetamask, address, userAddress]);
 
+  // когда не набралось голосов, создатель пресейла может потребовать обратно свои 1000$ в эфирах и токены, которые были на продаже
   const collectFee = useCallback(async () => {
     try {
       const resultCancelPresale = await ContractPresalePublicWithMetamask.collectFee({
@@ -673,6 +675,7 @@ const Pool: React.FC = () => {
     [vote],
   );
 
+  // забрать токены после окончания пресейла и добавления ликвидности (если она есть)
   const handleClaimTokens = useCallback(async () => {
     try {
       const resultClaimTokens = await ContractPresalePublicWithMetamask.claimTokens({
@@ -685,6 +688,7 @@ const Pool: React.FC = () => {
     }
   }, [ContractPresalePublicWithMetamask, userAddress, address]);
 
+  // возможность отозвать инвестиции до набора софткапа
   const withdrawInvestment = useCallback(async () => {
     try {
       const resultClaimTokens = await ContractPresalePublicWithMetamask.withdrawInvestment({
@@ -697,6 +701,7 @@ const Pool: React.FC = () => {
     }
   }, [ContractPresalePublicWithMetamask, userAddress, address]);
 
+  // модальное окно с формой инвестирования
   // const handleInvest = useCallback(async () => {
   //   try {
   //     toggleModal({
@@ -1001,7 +1006,8 @@ const Pool: React.FC = () => {
     </div>
   );
 
-  const htmlVotingIsNotSuccessfulForCreator = (
+  // Не набралось нужное количество голосов за или нет голосов вообще, создатель может забрать свои 1000$ и токены
+  const htmlCollectFee = (
     <div className="item">
       <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
         Voting
@@ -1174,11 +1180,11 @@ const Pool: React.FC = () => {
     </>
   );
 
-  const htmlClosePresale = (
+  const htmlCancelPresale = (
     <>
       <div className="item">
         <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
-          Close presale
+          Cancel presale
         </div>
         <div className="button-border">
           <div
@@ -1188,7 +1194,7 @@ const Pool: React.FC = () => {
             onClick={cancelPresale}
             onKeyDown={() => {}}
           >
-            <div className="gradient-button-text">Close</div>
+            <div className="gradient-button-text">Cancel</div>
           </div>
         </div>
       </div>
@@ -1200,8 +1206,9 @@ const Pool: React.FC = () => {
   const showHtmlYouVoted =
     !isCertified && isVotingTime && timeBeforeVoting && !isUserCreator && myVote;
   const showHtmlVotingIsNotSuccessful =
-    isRegistrationTime && timeBeforeRegistration && !isVotingSuccessful;
-  const showHtmlVotingIsNotSuccessfulForCreator =
+    !isUserCreator && isRegistrationTime && timeBeforeRegistration && !isVotingSuccessful;
+  // Не набралось нужное количество голосов за или нет голосов вообще
+  const showHtmlCollectFee =
     !isCertified &&
     isUserCreator &&
     (isRegistrationTime || isInvestmentTime || isPresaleClosed) &&
@@ -1243,12 +1250,13 @@ const Pool: React.FC = () => {
     isVotingSuccessful &&
     isUserRegister &&
     isPresaleClosed;
+  // инвестор может (создатель не может) забрать токены после окончания пресейла и добавления ликвидности (если она есть)
   const showHtmlClaimTokens = !isUserCreator && isPresaleClosed && !cancelled && liquidityAdded;
   // Cancel presale админом платформы может использоваться в любой момент.
   //   Овнером пресейла он может использоваться в случае, если не набран софткап.
   //   В случае  ненабора голосов используется метод collect fee для того чтоб овнер пресейла мог вывести не только бабло в токенах, но и свои 1000$
   // Создатель может отменять ТОЛЬКО свой пресейл и ТОЛЬКО после инвеста, если не набран софткап
-  const showHtmlClosePresale =
+  const showHtmlCancelPresale =
     !isCertified && isUserCreator && isPresaleClosed && !isPresaleSuccessful;
   const showHtmlWithdrawInvestment =
     !isCertified && !isUserCreator && isPresaleClosed && (cancelled || !isPresaleSuccessful);
@@ -1474,14 +1482,14 @@ const Pool: React.FC = () => {
             {showHtmlVoting && htmlVoting}
             {showHtmlYouVoted && htmlYouVoted}
             {showHtmlVotingIsNotSuccessful && htmlVotingIsNotSuccessful}
-            {showHtmlVotingIsNotSuccessfulForCreator && htmlVotingIsNotSuccessfulForCreator}
+            {showHtmlCollectFee && htmlCollectFee}
             {showHtmlRegistration && htmlRegistration}
             {showHtmlYouAreRegistered && htmlYouAreRegistered}
             {showHtmlYouNeedToBeRegisteredToInvest && htmlYouNeedToBeRegisteredToInvest}
             {showHtmlInvestment && htmlInvestment}
             {showHtmlInvestmentIsClosed && htmlInvestmentIsClosed}
             {showHtmlClaimTokens && htmlClaimTokens}
-            {showHtmlClosePresale && htmlClosePresale}
+            {showHtmlCancelPresale && htmlCancelPresale}
             {showHtmlWithdrawInvestment && htmlWithdrawInvestment}
             {/*Certified*/}
             {showHtmlRegistrationOnCertified && htmlRegistration}
@@ -1490,7 +1498,7 @@ const Pool: React.FC = () => {
             {showHtmlInvestmentOnCertified && htmlInvestment}
             {showHtmlInvestmentIsClosedOnCertified && htmlInvestmentIsClosed}
             {showHtmlClaimTokensOnCertified && htmlClaimTokens}
-            {showHtmlClosePresaleOnCertified && htmlClosePresale}
+            {showHtmlClosePresaleOnCertified && htmlCancelPresale}
             {showHtmlWithdrawInvestmentOnCertified && htmlWithdrawInvestment}
           </div>
         </div>
