@@ -174,7 +174,6 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
       if (!ContractPresaleCertified) return;
       let newInfo;
       if (userAddress) {
-        console.log('TokenCard getInfo:', userAddress);
         if (isCertified) {
           newInfo = await ContractPresaleCertifiedWithMetamask.getInfo({
             contractAddress: address,

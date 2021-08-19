@@ -90,7 +90,7 @@ const ContractsContext: React.FC = ({ children }) => {
         web3Provider: web3.provider,
         chainType,
       });
-      const ContractPresaleCertifiedWithMetamask = new ContractPresalePublicService({
+      const ContractPresaleCertifiedWithMetamask = new ContractPresaleCertifiedService({
         web3Provider: web3.provider,
         chainType,
       });

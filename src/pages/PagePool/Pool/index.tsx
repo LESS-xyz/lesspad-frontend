@@ -339,18 +339,36 @@ const Pool: React.FC = () => {
   const getInfo = useCallback(async () => {
     try {
       let newInfo;
-      if (isCertified) {
+      if (userAddress) {
+        if (isCertified) {
+          newInfo = await ContractPresaleCertifiedWithMetamask.getInfo({
+            contractAddress: address,
+          });
+          console.log('TokenCard getInfo certified:', newInfo);
+        } else {
+          newInfo = await ContractPresalePublicWithMetamask.getInfo({ contractAddress: address });
+          console.log('TokenCard getInfo public:', newInfo);
+        }
+      } else if (isCertified) {
         newInfo = await ContractPresaleCertified.getInfo({ contractAddress: address });
-        console.log('PagePool getInfo certified:', newInfo);
+        console.log('TokenCard getInfo certified:', newInfo);
       } else {
         newInfo = await ContractPresalePublic.getInfo({ contractAddress: address });
-        console.log('PagePool getInfo public:', newInfo);
+        console.log('TokenCard getInfo public:', newInfo);
       }
       if (newInfo) setInfo(newInfo);
     } catch (e) {
       console.error('PagePool getInfo:', e);
     }
-  }, [ContractPresaleCertified, ContractPresalePublic, address, isCertified]);
+  }, [
+    ContractPresaleCertified,
+    ContractPresaleCertifiedWithMetamask,
+    ContractPresalePublicWithMetamask,
+    ContractPresalePublic,
+    userAddress,
+    address,
+    isCertified,
+  ]);
 
   const getMyVote = useCallback(async () => {
     try {
