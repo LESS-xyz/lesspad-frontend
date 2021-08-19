@@ -676,10 +676,20 @@ const Pool: React.FC = () => {
           </div>
         ),
       });
-      history.push('/pools');
     },
-    [toggleModal, chainType, history],
+    [toggleModal, chainType],
   );
+
+  const handleTransactionWentWrong = useCallback(() => {
+    toggleModal({
+      open: true,
+      text: (
+        <div className={s.messageContainer}>
+          <p>Something went wrong</p>
+        </div>
+      ),
+    });
+  }, [toggleModal]);
 
   // не набрался софтап, время инвестирования закончилось. В этом случае овнер пресейла может забрать свои токены
   const cancelPresale = useCallback(async () => {
@@ -697,6 +707,10 @@ const Pool: React.FC = () => {
         .then((res) => {
           console.log('PagePool cancelPresale', res);
           getInfo();
+        })
+        .catch((e) => {
+          console.error(e);
+          handleTransactionWentWrong();
         });
       console.log('PagePool cancelPresale:', result);
     } catch (e) {
@@ -710,6 +724,7 @@ const Pool: React.FC = () => {
     address,
     userAddress,
     handleTransactionHash,
+    handleTransactionWentWrong,
   ]);
 
   // когда не набралось голосов, создатель пресейла может потребовать обратно свои 1000$ в эфирах и токены, которые были на продаже
@@ -728,6 +743,10 @@ const Pool: React.FC = () => {
         .then((res) => {
           console.log('PagePool collectFee', res);
           getInfo();
+        })
+        .catch((e) => {
+          console.error(e);
+          handleTransactionWentWrong();
         });
       console.log('PagePool collectFee:', result);
     } catch (e) {
@@ -741,6 +760,7 @@ const Pool: React.FC = () => {
     address,
     userAddress,
     handleTransactionHash,
+    handleTransactionWentWrong,
   ]);
 
   const handleVote = useCallback(
@@ -770,6 +790,10 @@ const Pool: React.FC = () => {
         .then((res) => {
           getInfo();
           console.log('PagePool resultClaimTokens', res);
+        })
+        .catch((e) => {
+          console.error(e);
+          handleTransactionWentWrong();
         });
       console.log('PagePool resultClaimTokens:', result);
     } catch (e) {
@@ -782,6 +806,7 @@ const Pool: React.FC = () => {
     userAddress,
     address,
     handleTransactionHash,
+    handleTransactionWentWrong,
     getInfo,
   ]);
 
@@ -801,6 +826,10 @@ const Pool: React.FC = () => {
         .then((res) => {
           getInfo();
           console.log('PagePool withdrawInvestment', res);
+        })
+        .catch((e) => {
+          console.error(e);
+          handleTransactionWentWrong();
         });
       console.log('PagePool withdrawInvestment:', result);
     } catch (e) {
@@ -813,6 +842,7 @@ const Pool: React.FC = () => {
     userAddress,
     address,
     handleTransactionHash,
+    handleTransactionWentWrong,
     getInfo,
   ]);
 
