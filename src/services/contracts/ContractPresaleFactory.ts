@@ -46,13 +46,13 @@ export default class ContractPresaleFactoryService {
         usdtToEthFee,
       } = props;
       const presaleStringInfoFormatted = presaleStringInfo.map((item: string, ii: number) => {
+        if (ii > 4) return item;
         const hex = this.web3.utils.asciiToHex(item);
         console.log('hex:', hex, hex.length);
         const newLength = 66 - hex.length;
         if (newLength <= 0) return hex;
         const zeros = new Array(66 - hex.length).fill('0').join('');
-        if (ii <= 4) return hex + zeros;
-        return item;
+        return hex + zeros;
       });
       console.log('ContractPresaleFactoryService createPresalePublic:', {
         usdtToEthFee,
