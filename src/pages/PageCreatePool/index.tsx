@@ -49,6 +49,7 @@ const messagePercentValue = 'Percent value should be between 0 and 100';
 const messageMin30Days = 'Minimum 30 days';
 const messageAddressIsNotValid = 'Address is not valid';
 const messageSoftCapLessThanHardCap = 'Softcap should be less than hardcap';
+const messageTokenPriceLessThanHardCap = 'Token price should be less than hardcap';
 const messageGt0 = 'Value should be greater than 0';
 const messageMaxStringLengthIs32 = 'Maximum length is 32';
 
@@ -207,16 +208,16 @@ const CreatePoolPage: React.FC = () => {
     }
   };
 
-  const getMinCreatorStakedBalance = async () => {
+  const getMinCreatorStakedBalance = useCallback(async () => {
     try {
       const resultGetMinCreatorStakedBalance = await ContractLessLibrary.getMinCreatorStakedBalance();
       setLibrary({ minCreatorStakedBalance: resultGetMinCreatorStakedBalance });
     } catch (e) {
       console.error(e);
     }
-  };
+  }, [ContractLessLibrary, setLibrary]);
 
-  const getUsdtFeeForCreation = async () => {
+  const getUsdtFeeForCreation = useCallback(async () => {
     try {
       const resultUsdtToEthFee = await ContractCalculations.usdtToEthFee();
       setUsdtToEthFee(resultUsdtToEthFee);
@@ -224,7 +225,7 @@ const CreatePoolPage: React.FC = () => {
     } catch (e) {
       console.error(e);
     }
-  };
+  }, [ContractCalculations]);
 
   const fieldsMustExist = useMemo(() => {
     return {
@@ -320,6 +321,24 @@ const CreatePoolPage: React.FC = () => {
       return false;
     }
   }, [hardCap, softCap]);
+
+  const validateTokenPriceAndHardCap = useCallback(() => {
+    try {
+      const isTokenPriceLessThanHardCap = +tokenPrice < +hardCap;
+      const messageIfisTokenPriceLessThanHardCap =
+        !isTokenPriceLessThanHardCap && messageTokenPriceLessThanHardCap;
+      const newErrors = {
+        tokenPrice: messageIfisTokenPriceLessThanHardCap,
+        hardCap: messageIfisTokenPriceLessThanHardCap,
+      };
+      setErrors(newErrors);
+      if (!isTokenPriceLessThanHardCap) return false;
+      return true;
+    } catch (e) {
+      console.error(e);
+      return false;
+    }
+  }, [hardCap, tokenPrice]);
 
   const validateFormValues = useCallback(() => {
     try {
@@ -943,15 +962,19 @@ const CreatePoolPage: React.FC = () => {
     if (!ContractLessLibrary) return;
     if (!ContractStaking) return;
     getMinCreatorStakedBalance();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ContractStaking, userAddress]);
+  }, [
+    getMinCreatorStakedBalance,
+    ContractStaking,
+    userAddress,
+    ContractLessToken,
+    ContractLessLibrary,
+  ]);
 
   useEffect(() => {
     if (!userAddress) return;
     if (!ContractCalculations) return;
     getUsdtFeeForCreation();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ContractCalculations, userAddress]);
+  }, [getUsdtFeeForCreation, ContractCalculations, userAddress]);
 
   useEffect(() => {
     clearErrors();
@@ -976,13 +999,16 @@ const CreatePoolPage: React.FC = () => {
     description,
     whitepaper,
   ]);
-
   useEffect(() => {
     if (!softCap) return;
     if (!hardCap) return;
     validateSoftCapAndHardCap();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [softCap, hardCap]);
+  }, [softCap, hardCap, validateSoftCapAndHardCap]);
+  useEffect(() => {
+    if (!tokenPrice) return;
+    if (!hardCap) return;
+    validateTokenPriceAndHardCap();
+  }, [hardCap, tokenPrice, validateTokenPriceAndHardCap]);
 
   useEffect(() => {
     if (!tokenAddress) return;
