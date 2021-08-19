@@ -1597,7 +1597,7 @@ const Pool: React.FC = () => {
     didUserInvest &&
     (cancelled || !isPresaleSuccessful);
 
-  if (isCertified && whitelist && whitelist.length && !userAddress)
+  if (!isUserCreator && isCertified && whitelist && whitelist.length && !userAddress)
     return (
       <div className="container">
         <div className="container-presale-status">
@@ -1607,7 +1607,7 @@ const Pool: React.FC = () => {
         </div>
       </div>
     );
-  if (isCertified && !isUserInWhitelist)
+  if (!isUserCreator && isCertified && !isUserInWhitelist)
     return (
       <div className="container">
         <div className="container-presale-status">

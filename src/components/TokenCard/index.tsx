@@ -94,7 +94,7 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
     // #additional info
     tokenSymbol,
     // #general info
-    // creator,
+    creator,
     // token,
     // tokenPrice,
     // softCap,
@@ -145,6 +145,7 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
   const isOpened = openTimePresale < NOW;
   const isUserInWhitelist =
     whitelist && whitelist.length && userAddress && whitelist.includes(userAddress.toLowerCase());
+  const isUserCreator = userAddress ? creator.toLowerCase() === userAddress.toLowerCase() : false;
 
   const getImage = useCallback(async () => {
     try {
@@ -264,8 +265,8 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
   )
     return null;
 
-  if (isCertified && whitelist && whitelist.length && !userAddress) return null;
-  if (isCertified && !isUserInWhitelist) return null;
+  if (isCertified && !isUserCreator && whitelist && whitelist.length && !userAddress) return null;
+  if (isCertified && !isUserCreator && !isUserInWhitelist) return null;
   if (loading) return <div className={s.cardLoading}>Loading...</div>;
 
   return (
