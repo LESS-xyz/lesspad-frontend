@@ -89,6 +89,7 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
 
   const { chainType } = useSelector(({ wallet }: any) => wallet);
   const { address: userAddress } = useSelector(({ user }: any) => user);
+  const { owner } = useSelector(({ library }: any) => library);
 
   const {
     // #additional info
@@ -146,6 +147,7 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
   const isUserInWhitelist =
     whitelist && whitelist.length && userAddress && whitelist.includes(userAddress.toLowerCase());
   const isUserCreator = userAddress ? creator.toLowerCase() === userAddress.toLowerCase() : false;
+  const isUserOwner = userAddress ? owner.toLowerCase() === userAddress.toLowerCase() : false;
 
   const getImage = useCallback(async () => {
     try {
@@ -265,8 +267,16 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
   )
     return null;
 
-  if (isCertified && !isUserCreator && whitelist && whitelist.length && !userAddress) return null;
-  if (isCertified && !isUserCreator && !isUserInWhitelist) return null;
+  if (
+    isCertified &&
+    !isUserCreator &&
+    !isUserOwner &&
+    whitelist &&
+    whitelist.length &&
+    !userAddress
+  )
+    return null;
+  if (isCertified && !isUserCreator && !isUserOwner && !isUserInWhitelist) return null;
   if (loading) return <div className={s.cardLoading}>Loading...</div>;
 
   return (

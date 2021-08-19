@@ -140,7 +140,7 @@ const Pool: React.FC = () => {
   const { pools } = useSelector(({ pool }: any) => pool);
   const { chainType } = useSelector(({ wallet }: any) => wallet);
   const { address: userAddress } = useSelector(({ user }: any) => user);
-  const { stakedLess, stakedLp, lessPerLp } = useSelector(({ library }: any) => library);
+  const { stakedLess, stakedLp, lessPerLp, owner } = useSelector(({ library }: any) => library);
 
   const dispatch = useDispatch();
   const toggleModal = useCallback((params) => dispatch(modalActions.toggleModal(params)), [
@@ -213,7 +213,7 @@ const Pool: React.FC = () => {
     whitelist && whitelist.length && userAddress && whitelist.includes(userAddress.toLowerCase());
 
   const isUserCreator = userAddress ? creator.toLowerCase() === userAddress.toLowerCase() : false;
-  // const isUserOwner = userAddress ? owner.toLowerCase() === userAddress.toLowerCase() : false;
+  const isUserOwner = userAddress ? owner.toLowerCase() === userAddress.toLowerCase() : false;
 
   const isEthereum = chainType === 'Ethereum';
   const isBinanceSmartChain = chainType === 'Binance-Smart-Chain';
@@ -1597,7 +1597,14 @@ const Pool: React.FC = () => {
     didUserInvest &&
     (cancelled || !isPresaleSuccessful);
 
-  if (!isUserCreator && isCertified && whitelist && whitelist.length && !userAddress)
+  if (
+    !isUserOwner &&
+    !isUserCreator &&
+    isCertified &&
+    whitelist &&
+    whitelist.length &&
+    !userAddress
+  )
     return (
       <div className="container">
         <div className="container-presale-status">
@@ -1607,7 +1614,7 @@ const Pool: React.FC = () => {
         </div>
       </div>
     );
-  if (!isUserCreator && isCertified && !isUserInWhitelist)
+  if (!isUserOwner && !isUserCreator && isCertified && !isUserInWhitelist)
     return (
       <div className="container">
         <div className="container-presale-status">
