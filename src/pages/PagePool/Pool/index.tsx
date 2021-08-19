@@ -1196,7 +1196,7 @@ const Pool: React.FC = () => {
           onClick={collectFee}
           onKeyDown={() => {}}
         >
-          <div className="gradient-button-text">Collect fee</div>
+          <div className="gradient-button-text">Claim refund</div>
         </div>
       </div>
     </div>
@@ -1622,20 +1622,22 @@ const Pool: React.FC = () => {
       {/*Your Investment*/}
       <div className="container-header">Your Investment</div>
 
-      {isBeforeVotimgTime ? (
-        <div className="container-presale-status">
-          <div className="container-presale-status-inner">
-            <div className="gradient-header">Voting will start</div>
-            <div className="presale-status-text">{timeBeforeVoting}</div>
+      {!isCertified ? (
+        isBeforeVotimgTime ? (
+          <div className="container-presale-status">
+            <div className="container-presale-status-inner">
+              <div className="gradient-header">Voting will start</div>
+              <div className="presale-status-text">{timeBeforeVoting}</div>
+            </div>
           </div>
-        </div>
-      ) : isVotingTime ? (
-        <div className="container-presale-status">
-          <div className="container-presale-status-inner">
-            <div className="gradient-header">Voting started</div>
-            <div className="presale-status-text">{timeBeforeVoting}</div>
+        ) : isVotingTime ? (
+          <div className="container-presale-status">
+            <div className="container-presale-status-inner">
+              <div className="gradient-header">Voting started</div>
+              <div className="presale-status-text">{timeBeforeVoting}</div>
+            </div>
           </div>
-        </div>
+        ) : null
       ) : null}
 
       {isBeforeRegistrationTime ? (
