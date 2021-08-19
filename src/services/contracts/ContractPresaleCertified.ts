@@ -33,6 +33,7 @@ type TypeInvestProps = {
   userAddress: string;
   contractAddress: string;
   amount: string;
+  nativeTokenAmount: string;
   signature: string;
   userBalance: string;
   timestamp: number;
@@ -217,13 +218,12 @@ export default class ContractPresaleCertifiedService {
         userBalance,
         signature,
         timestamp,
-        // poolPercentages,
-        // stakingTiers,
+        nativeTokenAmount,
       } = props;
       console.log('ContractPresaleCertified vote props:', props);
       const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
       return contract.methods
-        .invest(signature, userBalance, timestamp)
+        .invest(nativeTokenAmount, signature, userBalance, timestamp)
         .send({ from: userAddress, value: amount });
     } catch (e) {
       console.error('ContractPresaleCertified invest:', e);

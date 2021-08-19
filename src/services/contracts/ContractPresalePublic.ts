@@ -249,16 +249,7 @@ export default class ContractPresalePublicService {
 
   public invest = (props: TypeInvestProps) => {
     try {
-      const {
-        userAddress,
-        contractAddress,
-        amount,
-        userBalance,
-        signature,
-        timestamp,
-        // poolPercentages,
-        // stakingTiers,
-      } = props;
+      const { userAddress, contractAddress, amount, userBalance, signature, timestamp } = props;
       console.log('ContractPresalePublicService vote props:', props);
       const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
       return contract.methods

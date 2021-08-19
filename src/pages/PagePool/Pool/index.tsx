@@ -40,6 +40,7 @@ const {
   REGISTRATION_DURATION,
   TIER_DURATION,
   TIER_PERCENTAGES,
+  ZERO_ADDRESS,
 }: any = config;
 const Backend = new BackendService();
 
@@ -124,6 +125,9 @@ const Pool: React.FC = () => {
   const [lessDecimals, setLessDecimals] = useState<number>();
   const [tokenDecimals, setTokenDecimals] = useState<number>(0);
 
+  const [nativeTokenDecimals, setNativeTokenDecimals] = useState<string>('');
+  const [nativeTokenSymbol, setNativeTokenSymbol] = useState<string>('');
+
   const [investments, setInvestments] = useState<any>({ amountEth: 0, amountTokens: 0 });
   const [amountToInvest, setAmountToInvest] = useState<string>('');
   const [myVote, setMyVote] = useState<number>(0);
@@ -183,7 +187,6 @@ const Pool: React.FC = () => {
     liquidityPercentageAllocation,
     liquidityAllocationTime,
     // unlockTime,
-    // todo: native token
     approved,
     beginingAmount,
     cancelled,
@@ -193,6 +196,11 @@ const Pool: React.FC = () => {
     yesVotes,
     noVotes,
     lastTotalStakedAmount,
+    // # certifiedAddition
+    // liquidity,
+    // automatically,
+    // vesting,
+    nativeToken,
   } = info;
   const { amountEth: investedEthByUser } = investments;
 
@@ -313,6 +321,22 @@ const Pool: React.FC = () => {
       console.error(e);
     }
   }, [info, ContractERC20, token]);
+
+  const getNativeTokenInfo = useCallback(async () => {
+    try {
+      if (!nativeToken) return;
+      const resultDecimals = await ContractERC20.decimals({
+        contractAddress: nativeToken,
+      });
+      const resultSymbol = await ContractERC20.symbol({
+        contractAddress: nativeToken,
+      });
+      setNativeTokenDecimals(resultDecimals);
+      setNativeTokenSymbol(resultSymbol);
+    } catch (e) {
+      console.error(e);
+    }
+  }, [nativeToken, ContractERC20]);
 
   const getIsCertified = useCallback(
     (presaleAddress: string) => {
@@ -525,33 +549,59 @@ const Pool: React.FC = () => {
         stakingTiers,
       } = resultGetInvestSignature.data;
       console.log('PagePool invest:', { amountToInvest, tokenDecimals });
-      const amountToInvestInWei = new BN(amountToInvest)
-        .multipliedBy(new BN(10).pow(new BN(tokenDecimals)))
-        .toString(10);
       const resultGetTierSignature = await Backend.getTierSignature({
         token: key,
         presale: address,
       });
       console.log('PagePool resultGetTierSignature:', resultGetTierSignature);
-      // const userBalance = new BN(`${user_balance}`).toString(10);
       if (!resultGetTierSignature.data) return;
-      let ContractPresale = ContractPresalePublicWithMetamask;
-      if (isCertified) ContractPresale = ContractPresaleCertifiedWithMetamask;
-      const resultVote = await ContractPresale.invest({
-        userAddress,
-        contractAddress: address,
-        amount: amountToInvestInWei,
-        userBalance,
-        signature,
-        timestamp,
-        poolPercentages,
-        stakingTiers,
-      });
-      console.log('PagePool invest:', resultVote);
+      let resultInvest;
+      if (isCertified) {
+        let amountToInvestInWei = '0'; // вввод в эфирах
+        let nativeTokenAmount; // вввод в нативных токенах
+        if (nativeToken === ZERO_ADDRESS) {
+          amountToInvestInWei = new BN(amountToInvest)
+            .multipliedBy(new BN(10).pow(new BN(18)))
+            .toString(10);
+          nativeTokenAmount = '0';
+        } else {
+          nativeTokenAmount = new BN(amountToInvest)
+            .multipliedBy(new BN(10).pow(new BN(nativeTokenDecimals)))
+            .toString(10);
+        }
+        resultInvest = await ContractPresaleCertifiedWithMetamask.invest({
+          userAddress,
+          contractAddress: address,
+          amount: amountToInvestInWei,
+          nativeTokenAmount,
+          userBalance,
+          signature,
+          timestamp,
+          poolPercentages,
+          stakingTiers,
+        });
+      } else {
+        const amountToInvestInWei = new BN(amountToInvest)
+          .multipliedBy(new BN(10).pow(new BN(tokenDecimals)))
+          .toString(10);
+        resultInvest = await ContractPresalePublicWithMetamask.invest({
+          userAddress,
+          contractAddress: address,
+          amount: amountToInvestInWei,
+          userBalance,
+          signature,
+          timestamp,
+          poolPercentages,
+          stakingTiers,
+        });
+      }
+      console.log('PagePool invest:', resultInvest);
     } catch (e) {
       console.error('PagePool invest:', e);
     }
   }, [
+    nativeTokenDecimals,
+    nativeToken,
     isCertified,
     amountToInvest,
     ContractPresalePublicWithMetamask,
@@ -949,6 +999,13 @@ const Pool: React.FC = () => {
   }, [ContractLessToken, userAddress, token, getTokenDecimals, ContractERC20]);
 
   useEffect(() => {
+    if (!nativeToken || nativeToken === '...' || nativeToken === ZERO_ADDRESS) return;
+    if (!userAddress) return;
+    if (!ContractERC20) return;
+    getNativeTokenInfo();
+  }, [userAddress, nativeToken, getNativeTokenInfo, ContractERC20]);
+
+  useEffect(() => {
     if (!chainType) return;
     getChainInfo();
   }, [chainType, getChainInfo]);
@@ -1282,7 +1339,7 @@ const Pool: React.FC = () => {
               1 {tokenSymbol} = {tokenPrice} {currency}
             </div>
           </div>
-          <p>Please, enter amount to invest (in ether)</p>
+          <p>Please, enter amount to invest (in {nativeTokenSymbol || 'ETH'})</p>
           <Input
             title=""
             value={amountToInvest}
