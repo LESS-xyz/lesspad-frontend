@@ -193,6 +193,7 @@ const Pool: React.FC = () => {
     noVotes,
     lastTotalStakedAmount,
   } = info;
+  const { amountEth: investedEthByUser } = investments;
 
   const [tokensShouldBeSold, setTokensShouldBeSold] = useState<number>(hardCap);
   console.log('Pool:', { percentageOfTokensSoldInCurrentTier, tokensShouldBeSold });
@@ -207,6 +208,7 @@ const Pool: React.FC = () => {
   const isOpened = openTimePresale <= NOW;
   const isPresaleClosed = closeTimePresale <= NOW;
   const didCreatorCollectFee = +collectedFee === 0;
+  const didUserInvest = +investedEthByUser > 0;
 
   const isUserCreator = userAddress ? creator.toLowerCase() === userAddress.toLowerCase() : false;
   // const isUserOwner = userAddress ? owner.toLowerCase() === userAddress.toLowerCase() : false;
@@ -1372,7 +1374,11 @@ const Pool: React.FC = () => {
   const showHtmlCancelPresale =
     !isCertified && isUserCreator && isPresaleClosed && !isPresaleSuccessful;
   const showHtmlWithdrawInvestment =
-    !isCertified && !isUserCreator && isInvestmentTime && (cancelled || !isPresaleSuccessful);
+    !isCertified &&
+    !isUserCreator &&
+    isInvestmentTime &&
+    didUserInvest &&
+    (cancelled || !isPresaleSuccessful);
 
   const showHtmlRegistrationOnCertified =
     isCertified &&
@@ -1419,7 +1425,11 @@ const Pool: React.FC = () => {
   const showHtmlClosePresaleOnCertified =
     isCertified && isUserCreator && isPresaleClosed && !isPresaleSuccessful;
   const showHtmlWithdrawInvestmentOnCertified =
-    isCertified && !isUserCreator && isInvestmentTime && (cancelled || !isPresaleSuccessful);
+    isCertified &&
+    !isUserCreator &&
+    isInvestmentTime &&
+    didUserInvest &&
+    (cancelled || !isPresaleSuccessful);
 
   return (
     <div className="container">
