@@ -166,7 +166,7 @@ const Pool: React.FC = () => {
     closeTimePresale,
     openTimeVoting,
     closeTimeVoting,
-    // collectedFee,
+    collectedFee,
     // #string info
     saleTitle,
     linkTelegram,
@@ -206,6 +206,7 @@ const Pool: React.FC = () => {
   const isInvestmentTime = openTimePresale <= NOW && closeTimePresale > NOW;
   const isOpened = openTimePresale <= NOW;
   const isPresaleClosed = closeTimePresale <= NOW;
+  const didCreatorCollectFee = +collectedFee === 0;
 
   const isUserCreator = userAddress ? creator.toLowerCase() === userAddress.toLowerCase() : false;
   // const isUserOwner = userAddress ? owner.toLowerCase() === userAddress.toLowerCase() : false;
@@ -260,7 +261,7 @@ const Pool: React.FC = () => {
     return new BN(softCap).div(hardCap).multipliedBy(new BN(100)).toString(10);
   }, [softCap, hardCap]);
 
-  const isPresaleSuccessful = +percentOfTokensSold >= 100;
+  const isPresaleSuccessful = +percentOfTokensSold >= +percentOfSoftCap;
 
   const currency = CHAIN_SYMBOLS[chainType];
   const explorer = EXPLORERS[chainType];
@@ -693,12 +694,14 @@ const Pool: React.FC = () => {
         })
         .then((res) => {
           console.log('PagePool cancelPresale', res);
+          getInfo();
         });
       console.log('PagePool cancelPresale:', result);
     } catch (e) {
       console.error(e);
     }
   }, [
+    getInfo,
     isCertified,
     ContractPresalePublicWithMetamask,
     ContractPresaleCertifiedWithMetamask,
@@ -722,12 +725,14 @@ const Pool: React.FC = () => {
         })
         .then((res) => {
           console.log('PagePool collectFee', res);
+          getInfo();
         });
       console.log('PagePool collectFee:', result);
     } catch (e) {
       console.error(e);
     }
   }, [
+    getInfo,
     isCertified,
     ContractPresalePublicWithMetamask,
     ContractPresaleCertifiedWithMetamask,
@@ -1268,7 +1273,6 @@ const Pool: React.FC = () => {
         <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
           Withdraw
         </div>
-        <div className="item-text">Presale is not successful</div>
         <div className="button-border">
           <div
             className="button"
@@ -1315,6 +1319,7 @@ const Pool: React.FC = () => {
   const showHtmlCollectFee =
     !isCertified &&
     isUserCreator &&
+    !didCreatorCollectFee &&
     (isRegistrationTime || isInvestmentTime || isPresaleClosed) &&
     !isVotingSuccessful;
 
@@ -1363,7 +1368,7 @@ const Pool: React.FC = () => {
   const showHtmlCancelPresale =
     !isCertified && isUserCreator && isPresaleClosed && !isPresaleSuccessful;
   const showHtmlWithdrawInvestment =
-    !isCertified && !isUserCreator && isPresaleClosed && (cancelled || !isPresaleSuccessful);
+    !isCertified && !isUserCreator && isInvestmentTime && (cancelled || !isPresaleSuccessful);
 
   const showHtmlRegistrationOnCertified =
     isCertified &&
@@ -1410,10 +1415,7 @@ const Pool: React.FC = () => {
   const showHtmlClosePresaleOnCertified =
     isCertified && isUserCreator && isPresaleClosed && !isPresaleSuccessful;
   const showHtmlWithdrawInvestmentOnCertified =
-    isCertified &&
-    !isUserCreator &&
-    isPresaleClosed &&
-    (cancelled || !isPresaleSuccessful || !approved);
+    isCertified && !isUserCreator && isInvestmentTime && (cancelled || !isPresaleSuccessful);
 
   return (
     <div className="container">
