@@ -1477,6 +1477,7 @@ const Pool: React.FC = () => {
   const isUserCreator =
     userAddress && creator && creator.toLowerCase() === userAddress.toLowerCase();
   const isUserOwner = userAddress && owner && owner.toLowerCase() === userAddress.toLowerCase();
+  const isUserTier = tier;
 
   const showHtmlVoting =
     !isCertified && isVotingTime && timeBeforeVoting && !isUserCreator && !myVote;
@@ -1499,6 +1500,7 @@ const Pool: React.FC = () => {
   const showHtmlRegistration =
     !isCertified &&
     !isUserCreator &&
+    isUserTier &&
     isRegistrationTime &&
     timeBeforeRegistration &&
     isVotingSuccessful &&
@@ -1550,6 +1552,7 @@ const Pool: React.FC = () => {
   const showHtmlRegistrationOnCertified =
     isCertified &&
     !isUserCreator &&
+    isUserTier &&
     isRegistrationTime &&
     timeBeforeRegistration &&
     approved &&

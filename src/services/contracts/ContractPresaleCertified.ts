@@ -220,7 +220,7 @@ export default class ContractPresaleCertifiedService {
         timestamp,
         nativeTokenAmount,
       } = props;
-      console.log('ContractPresaleCertified vote props:', props);
+      console.log('ContractPresaleCertified invest props:', props);
       const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
       return contract.methods
         .invest(nativeTokenAmount, signature, userBalance, timestamp)
