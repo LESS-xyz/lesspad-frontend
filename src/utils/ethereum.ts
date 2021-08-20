@@ -26,6 +26,6 @@ export const convertToWei = (amount: string | number, decimals: string | number)
 };
 
 export const convertHexToString = (hex: string) => {
-  const removedZeros = hex.replace(/^0+|0+$/g, '');
-  return web3.utils.toAscii(`0${removedZeros}`);
+  const removedZeros = hex.replace(/00/g, '');
+  return web3.utils.toAscii(removedZeros);
 };

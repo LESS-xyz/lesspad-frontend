@@ -13,6 +13,8 @@ export const prettyNumber = (number: string) => {
   return parseFloat(resultIsNan.toString());
 };
 
+// todo: add filter new lines and other
+// This will match a single non-ASCII character: [^\x00-\x7F]
 export const detectNonLatinLetters = (string: string) => {
   const result = string.match(/[^a-z0-9 !$%^&*()_+|~\-=`{}[\]:";'<>?,./\\@#№]/gi);
   return result;
