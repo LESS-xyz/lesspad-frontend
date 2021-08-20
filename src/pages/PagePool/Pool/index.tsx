@@ -106,7 +106,7 @@ const Pool: React.FC = () => {
 
   const [info, setInfo] = useState<any>(defaultInfo);
 
-  const [isCertified, setIsCertified] = useState<boolean>();
+  const [isCertified, setIsCertified] = useState<boolean>(false);
   const [tier, setTier] = React.useState<string>('');
   const [isMyTierTime, setIsMyTierTime] = useState<boolean>(false);
 
@@ -1286,7 +1286,58 @@ const Pool: React.FC = () => {
   const htmlVotingIsNotSuccessfulAndPresaleIsClosedForCreator = (
     <div className="container-presale-status">
       <div className="container-presale-status-inner">
-        <div className="gradient-header">Voting is not successful</div>
+        <div className="gradient-header">Presale is closed</div>
+      </div>
+    </div>
+  );
+
+  const htmlPresaleIsNotSuccessfulAndIsClosedForUser = (
+    <div className="container-presale-status">
+      <div className="container-presale-status-inner">
+        <div className="gradient-header">Softcap limit not reached</div>
+        <div className="presale-status-text">Presale is closed</div>
+      </div>
+    </div>
+  );
+
+  const htmlPresaleIsNotSuccessfulForCreator = (
+    <div className="container-presale-status">
+      <div className="container-presale-status-inner">
+        <div className="gradient-header">Softcap limit not reached</div>
+      </div>
+    </div>
+  );
+
+  const htmlPresaleIsNotSuccessfulAndIsClosedForCreator = (
+    <div className="container-presale-status">
+      <div className="container-presale-status-inner">
+        <div className="gradient-header">Softcap limit not reached</div>
+        <div className="presale-status-text">Presale is closed</div>
+      </div>
+    </div>
+  );
+
+  const htmlAuditIsNotApprovedForUserOnCertified = (
+    <div className="container-presale-status">
+      <div className="container-presale-status-inner">
+        <div className="gradient-header">Audit is not successful</div>
+        <div className="presale-status-text">Presale is closed</div>
+      </div>
+    </div>
+  );
+
+  const htmlAuditIsNotApprovedForCreatorOnCertified = (
+    <div className="container-presale-status">
+      <div className="container-presale-status-inner">
+        <div className="gradient-header">Audit is not successful</div>
+      </div>
+    </div>
+  );
+
+  const htmlAuditIsNotApprovedAndPresaleIsClosedForCreatorOnCertified = (
+    <div className="container-presale-status">
+      <div className="container-presale-status-inner">
+        <div className="gradient-header">Audit is not successful</div>
         <div className="presale-status-text">Presale is closed</div>
       </div>
     </div>
@@ -1514,6 +1565,8 @@ const Pool: React.FC = () => {
   const isUserOwner = userAddress && owner && owner.toLowerCase() === userAddress.toLowerCase();
   const isUserTier = tier;
 
+  // Public presale
+  // Voting
   const showHtmlVoting =
     !isCertified && isVotingTime && timeBeforeVoting && !isUserCreator && !myVote;
   const showHtmlYouVoted =
@@ -1521,22 +1574,21 @@ const Pool: React.FC = () => {
   const showHtmlVotingIsNotSuccessfulForUser =
     !isCertified &&
     !isUserCreator &&
-    isRegistrationTime &&
-    timeBeforeRegistration &&
+    (isRegistrationTime || isInvestmentTime || isPresaleClosed) &&
     !isVotingSuccessful;
   const showHtmlVotingIsNotSuccessfulForCreator =
     !isCertified &&
     isUserCreator &&
-    isRegistrationTime &&
-    timeBeforeRegistration &&
-    !isVotingSuccessful;
+    (isRegistrationTime || isInvestmentTime || isPresaleClosed) &&
+    !isVotingSuccessful &&
+    !didCreatorCollectFee;
   const showHtmlVotingIsNotSuccessfulAndPresaleIsClosedForCreator =
     !isCertified &&
     isUserCreator &&
-    isRegistrationTime &&
-    timeBeforeRegistration &&
+    (isRegistrationTime || isInvestmentTime || isPresaleClosed) &&
     !isVotingSuccessful &&
     didCreatorCollectFee;
+  // Collect fee (Claim refund)
   // Не набралось нужное количество голосов за или нет голосов вообще
   const showHtmlCollectFee =
     !isCertified &&
@@ -1544,7 +1596,29 @@ const Pool: React.FC = () => {
     !didCreatorCollectFee &&
     (isRegistrationTime || isInvestmentTime || isPresaleClosed) &&
     !isVotingSuccessful;
-
+  // Softcap is not reached
+  // This happens only when voting is successful
+  const showHtmlPresaleIsNotSuccessfulAndIsClosedForUser =
+    !isCertified &&
+    !isUserCreator &&
+    (isRegistrationTime || isInvestmentTime || isPresaleClosed) &&
+    isVotingSuccessful &&
+    !isPresaleSuccessful;
+  const showHtmlPresaleIsNotSuccessfulForCreator =
+    !isCertified &&
+    isUserCreator &&
+    (isRegistrationTime || isInvestmentTime || isPresaleClosed) &&
+    isVotingSuccessful &&
+    !isPresaleSuccessful &&
+    !didCreatorCollectFee;
+  const showHtmlPresaleIsNotSuccessfulAndIsClosedForCreator =
+    !isCertified &&
+    isUserCreator &&
+    (isRegistrationTime || isInvestmentTime || isPresaleClosed) &&
+    isVotingSuccessful &&
+    !isPresaleSuccessful &&
+    didCreatorCollectFee;
+  // Registration
   const showHtmlRegistration =
     !isCertified &&
     !isUserCreator &&
@@ -1560,6 +1634,7 @@ const Pool: React.FC = () => {
     timeBeforeRegistration &&
     isVotingSuccessful &&
     isUserRegister;
+  // Investment
   const showHtmlYouNeedToBeRegisteredToInvest =
     !isCertified &&
     !isUserCreator &&
@@ -1582,6 +1657,28 @@ const Pool: React.FC = () => {
     isVotingSuccessful &&
     isUserRegister &&
     isPresaleClosed;
+  // Softcap is not reached
+  // This happens only when audit is approved
+  const showHtmlPresaleIsNotSuccessfulAndIsClosedForUserOnCertified =
+    isCertified &&
+    !isUserCreator &&
+    approved &&
+    (isRegistrationTime || isInvestmentTime || isPresaleClosed) &&
+    !isPresaleSuccessful;
+  const showHtmlPresaleIsNotSuccessfulForCreatorOnCertified =
+    !isCertified &&
+    isUserCreator &&
+    approved &&
+    (isRegistrationTime || isInvestmentTime || isPresaleClosed) &&
+    !isPresaleSuccessful &&
+    !didCreatorCollectFee;
+  const showHtmlPresaleIsNotSuccessfulAndIsClosedForCreatorOnCertified =
+    !isCertified &&
+    isUserCreator &&
+    approved &&
+    (isRegistrationTime || isInvestmentTime || isPresaleClosed) &&
+    !isPresaleSuccessful &&
+    didCreatorCollectFee;
   // инвестор может (создатель не может) забрать токены после окончания пресейла и добавления ликвидности (если она есть)
   const showHtmlClaimTokens =
     !isCertified && !isUserCreator && isPresaleClosed && !cancelled && liquidityAdded;
@@ -1591,6 +1688,7 @@ const Pool: React.FC = () => {
   // Создатель может отменять ТОЛЬКО свой пресейл и ТОЛЬКО после инвеста, если не набран софткап
   const showHtmlCancelPresale =
     !isCertified && isUserCreator && isPresaleClosed && !isPresaleSuccessful;
+  // Withdraw investment
   const showHtmlWithdrawInvestment =
     !isCertified &&
     !isUserCreator &&
@@ -1598,7 +1696,33 @@ const Pool: React.FC = () => {
     didUserInvest &&
     (cancelled || !isPresaleSuccessful);
 
-  // Certified
+  // Certified presale
+  // Audit is not approved
+  const showHtmlAuditIsNotApprovedForUserOnCertified =
+    isCertified &&
+    isUserCreator &&
+    (isRegistrationTime || isInvestmentTime || isPresaleClosed) &&
+    !approved;
+  const showHtmlAuditIsNotApprovedForCreatorOnCertified =
+    isCertified &&
+    isUserCreator &&
+    (isRegistrationTime || isInvestmentTime || isPresaleClosed) &&
+    !approved &&
+    !didCreatorCollectFee;
+  const showHtmlAuditIsNotApprovedAndPresaleIsClosedForCreatorOnCertified =
+    isCertified &&
+    isUserCreator &&
+    (isRegistrationTime || isInvestmentTime || isPresaleClosed) &&
+    !approved &&
+    didCreatorCollectFee;
+  // Collect fee (Claim refund) when not approved
+  const showHtmlCollectFeeOnCertified =
+    isCertified &&
+    isUserCreator &&
+    !didCreatorCollectFee &&
+    (isRegistrationTime || isInvestmentTime || isPresaleClosed) &&
+    !approved;
+  // Registration
   const showHtmlRegistrationOnCertified =
     isCertified &&
     !isUserCreator &&
@@ -1616,6 +1740,7 @@ const Pool: React.FC = () => {
     approved &&
     !isWhitelist &&
     isUserRegister;
+  // Investment
   const showHtmlYouNeedToBeRegisteredToInvestOnCertified =
     isCertified &&
     !isUserCreator &&
@@ -1641,12 +1766,7 @@ const Pool: React.FC = () => {
   // Создатель может отменять ТОЛЬКО свой пресейл и ТОЛЬКО после инвеста, если не набран софткап
   const showHtmlClosePresaleOnCertified =
     isCertified && isUserCreator && isPresaleClosed && !isPresaleSuccessful;
-  const showHtmlCollectFeeOnCertified =
-    isCertified &&
-    isUserCreator &&
-    !didCreatorCollectFee &&
-    (isRegistrationTime || isInvestmentTime || isPresaleClosed) &&
-    !approved;
+  // Withdraw investment
   const showHtmlWithdrawInvestmentOnCertified =
     isCertified &&
     !isUserCreator &&
@@ -1654,6 +1774,7 @@ const Pool: React.FC = () => {
     didUserInvest &&
     (cancelled || !isPresaleSuccessful);
 
+  // Presale is private
   if (!isUserOwner && !isUserCreator && isCertified && isWhitelist && !userAddress)
     return (
       <div className="container">
@@ -1808,6 +1929,7 @@ const Pool: React.FC = () => {
       {/*Your Investment*/}
       <div className="container-header">Your Investment</div>
 
+      {/*Voting*/}
       {!isCertified ? (
         isBeforeVotimgTime ? (
           <div className="container-presale-status">
@@ -1830,6 +1952,7 @@ const Pool: React.FC = () => {
       {showHtmlVotingIsNotSuccessfulAndPresaleIsClosedForCreator &&
         htmlVotingIsNotSuccessfulAndPresaleIsClosedForCreator}
 
+      {/*Registration*/}
       {isBeforeRegistrationTime ? (
         <div className="container-presale-status">
           <div className="container-presale-status-inner">
@@ -1846,6 +1969,29 @@ const Pool: React.FC = () => {
         </div>
       ) : null}
 
+      {/*Softcap is not reached*/}
+      {showHtmlPresaleIsNotSuccessfulAndIsClosedForUser &&
+        htmlPresaleIsNotSuccessfulAndIsClosedForUser}
+      {showHtmlPresaleIsNotSuccessfulForCreator && htmlPresaleIsNotSuccessfulForCreator}
+      {showHtmlPresaleIsNotSuccessfulAndIsClosedForCreator &&
+        htmlPresaleIsNotSuccessfulAndIsClosedForCreator}
+
+      {/*Certified presale*/}
+      {/*Audit is not approved*/}
+      {showHtmlAuditIsNotApprovedForUserOnCertified && htmlAuditIsNotApprovedForUserOnCertified}
+      {showHtmlAuditIsNotApprovedForCreatorOnCertified &&
+        htmlAuditIsNotApprovedForCreatorOnCertified}
+      {showHtmlAuditIsNotApprovedAndPresaleIsClosedForCreatorOnCertified &&
+        htmlAuditIsNotApprovedAndPresaleIsClosedForCreatorOnCertified}
+
+      {/*Softcap is not reached*/}
+      {showHtmlPresaleIsNotSuccessfulAndIsClosedForUserOnCertified &&
+        htmlPresaleIsNotSuccessfulAndIsClosedForUser}
+      {showHtmlPresaleIsNotSuccessfulForCreatorOnCertified && htmlPresaleIsNotSuccessfulForCreator}
+      {showHtmlPresaleIsNotSuccessfulAndIsClosedForCreatorOnCertified &&
+        htmlPresaleIsNotSuccessfulAndIsClosedForCreator}
+
+      {/*Investment end*/}
       {isUserCreator &&
         (isInvestmentTime ? (
           <div className="container-presale-status">
@@ -1856,36 +2002,49 @@ const Pool: React.FC = () => {
           </div>
         ) : null)}
 
+      {/*Buttons*/}
       {openTimePresale !== '0' ? (
         <div className="box box-bg">
           <div className="row">
+            {/*Public presale*/}
+            {/*Voting*/}
             {showHtmlVoting && htmlVoting}
             {showHtmlYouVoted && htmlYouVoted}
+            {/*Registration*/}
             {showHtmlCollectFee && htmlCollectFeeWhenVotingNotSuccessful}
             {showHtmlRegistration && htmlRegistration}
             {showHtmlYouAreRegistered && htmlYouAreRegistered}
+            {/*Investment*/}
             {showHtmlYouNeedToBeRegisteredToInvest && htmlYouNeedToBeRegisteredToInvest}
             {showHtmlInvestment && htmlInvestment}
             {showHtmlInvestmentIsClosed && htmlInvestmentIsClosed}
+            {/*Claim tokens*/}
             {showHtmlClaimTokens && htmlClaimTokens}
             {showHtmlCancelPresale && htmlCancelPresale}
+            {/*Withdraw investment*/}
             {showHtmlWithdrawInvestment && htmlWithdrawInvestment}
-            {/*Certified*/}
+
+            {/*Certified presale*/}
+            {/*Registration*/}
             {showHtmlRegistrationOnCertified && htmlRegistration}
             {showHtmlYouAreRegisteredOnCertified && htmlYouAreRegistered}
+            {/*Investment*/}
             {showHtmlYouNeedToBeRegisteredToInvestOnCertified && htmlYouNeedToBeRegisteredToInvest}
             {showHtmlInvestmentOnCertified && htmlInvestment}
             {showHtmlInvestmentIsClosedOnCertified && htmlInvestmentIsClosed}
+            {/*Claim tokens*/}
             {showHtmlClaimTokensOnCertified && htmlClaimTokens}
             {showHtmlClosePresaleOnCertified && htmlCancelPresale}
+            {/*Claim tokens*/}
             {showHtmlCollectFeeOnCertified && htmlCollectFeeWhenNotApproved}
+            {/*Withdraw investment*/}
             {showHtmlWithdrawInvestmentOnCertified && htmlWithdrawInvestment}
           </div>
         </div>
       ) : null}
 
       {/*Participants*/}
-      <ParticipantsTable poolAddress={address} isCertified={isCertified || true} />
+      <ParticipantsTable poolAddress={address} isCertified={isCertified} />
 
       {/*Important Links*/}
       <div className="container-header">Important Links</div>
