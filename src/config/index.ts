@@ -206,7 +206,7 @@ export default {
         Staking: '0xE4D00cA4eceFB3bEE229FFf97ffF3de3bBAD4B4B',
         LessLibrary: '0xa78C93A963C7C1d786EFf8CFbf54f37E0E9c12E1',
         PresaleFactory: '0xa8FD2169DFf71c22cB011c07196728B9FB75C58f',
-        PresaleFactoryCertified: '0xb194B5502b133eaEbABdc09872C5A37837910A19',
+        PresaleFactoryCertified: '0xDB4ED8E7CA42cBADD4d551a8e34dD4CAD23E3b58',
       },
     },
   },

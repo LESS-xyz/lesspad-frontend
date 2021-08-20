@@ -127,6 +127,7 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
     // automatically,
     // vesting,
     // nativeToken,
+    privatePresale,
   } = info;
 
   const presaleType = isCertified ? 'Certified' : 'Public';
@@ -144,7 +145,7 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
     if (closeTimePresale < NOW) presaleStatus = 'Ended';
   }
   const isOpened = openTimePresale < NOW;
-  const isWhitelist = whitelist && whitelist.length;
+  const isWhitelist = privatePresale;
   const isUserInWhitelist =
     whitelist && whitelist.length && userAddress && whitelist.includes(userAddress.toLowerCase());
   const isUserCreator = userAddress ? creator.toLowerCase() === userAddress.toLowerCase() : false;

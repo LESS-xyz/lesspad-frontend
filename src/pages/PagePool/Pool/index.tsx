@@ -189,6 +189,7 @@ const Pool: React.FC = () => {
     // automatically,
     // vesting,
     nativeToken,
+    privatePresale,
   } = info;
   const { amountEth: investedEthByUser } = investments;
 
@@ -206,7 +207,7 @@ const Pool: React.FC = () => {
   const isPresaleClosed = closeTimePresale <= NOW;
   const didCreatorCollectFee = +collectedFee === 0;
   const didUserInvest = +investedEthByUser > 0;
-  const isWhitelist = whitelist && whitelist.length;
+  const isWhitelist = privatePresale;
   const isUserInWhitelist =
     whitelist && whitelist.length && userAddress && whitelist.includes(userAddress.toLowerCase());
 

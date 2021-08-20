@@ -36,6 +36,7 @@ export default [
     outputs: [
       { internalType: 'bool', name: 'liquidity', type: 'bool' },
       { internalType: 'bool', name: 'automatically', type: 'bool' },
+      { internalType: 'bool', name: 'privatePresale', type: 'bool' },
       { internalType: 'uint8', name: 'vesting', type: 'uint8' },
       { internalType: 'address', name: 'nativeToken', type: 'address' },
     ],

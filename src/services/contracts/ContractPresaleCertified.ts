@@ -134,7 +134,7 @@ export default class ContractPresaleCertifiedService {
         noVotes,
         lastTotalStakedAmount,
       } = intermediate;
-      const { liquidity, automatically, vesting, nativeToken, whitelist } = certifiedAddition;
+      const { liquidity, automatically, vesting, nativeToken, privatePresale } = certifiedAddition;
       // format
       const pow = new BN(10).pow(new BN(decimals));
       const tokenPrice = +new BN(tokenPriceInWei).div(pow);
@@ -191,7 +191,7 @@ export default class ContractPresaleCertifiedService {
         automatically,
         vesting,
         nativeToken,
-        whitelist,
+        privatePresale,
       };
     } catch (e) {
       console.error('ContractPresaleCertified getInfo:', e);
