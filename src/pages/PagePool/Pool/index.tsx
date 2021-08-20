@@ -1599,22 +1599,18 @@ const Pool: React.FC = () => {
   // Softcap is not reached
   // This happens only when voting is successful
   const showHtmlPresaleIsNotSuccessfulAndIsClosedForUser =
-    !isCertified &&
-    !isUserCreator &&
-    (isRegistrationTime || isInvestmentTime || isPresaleClosed) &&
-    isVotingSuccessful &&
-    !isPresaleSuccessful;
+    !isCertified && !isUserCreator && isPresaleClosed && isVotingSuccessful && !isPresaleSuccessful;
   const showHtmlPresaleIsNotSuccessfulForCreator =
     !isCertified &&
     isUserCreator &&
-    (isRegistrationTime || isInvestmentTime || isPresaleClosed) &&
+    isPresaleClosed &&
     isVotingSuccessful &&
     !isPresaleSuccessful &&
     !didCreatorCollectFee;
   const showHtmlPresaleIsNotSuccessfulAndIsClosedForCreator =
     !isCertified &&
     isUserCreator &&
-    (isRegistrationTime || isInvestmentTime || isPresaleClosed) &&
+    isPresaleClosed &&
     isVotingSuccessful &&
     !isPresaleSuccessful &&
     didCreatorCollectFee;
@@ -1660,23 +1656,19 @@ const Pool: React.FC = () => {
   // Softcap is not reached
   // This happens only when audit is approved
   const showHtmlPresaleIsNotSuccessfulAndIsClosedForUserOnCertified =
-    isCertified &&
-    !isUserCreator &&
-    approved &&
-    (isRegistrationTime || isInvestmentTime || isPresaleClosed) &&
-    !isPresaleSuccessful;
+    isCertified && !isUserCreator && approved && isPresaleClosed && !isPresaleSuccessful;
   const showHtmlPresaleIsNotSuccessfulForCreatorOnCertified =
     !isCertified &&
     isUserCreator &&
     approved &&
-    (isRegistrationTime || isInvestmentTime || isPresaleClosed) &&
+    isPresaleClosed &&
     !isPresaleSuccessful &&
     !didCreatorCollectFee;
   const showHtmlPresaleIsNotSuccessfulAndIsClosedForCreatorOnCertified =
     !isCertified &&
     isUserCreator &&
     approved &&
-    (isRegistrationTime || isInvestmentTime || isPresaleClosed) &&
+    isPresaleClosed &&
     !isPresaleSuccessful &&
     didCreatorCollectFee;
   // инвестор может (создатель не может) забрать токены после окончания пресейла и добавления ликвидности (если она есть)
