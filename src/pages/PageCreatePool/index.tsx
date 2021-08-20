@@ -14,7 +14,7 @@ import { useWeb3ConnectorContext } from '../../contexts/Web3Connector';
 import { libraryActions, modalActions } from '../../redux/actions';
 import { BackendService } from '../../services/Backend';
 import { convertFromWei, convertToWei } from '../../utils/ethereum';
-import { prettyNumber } from '../../utils/prettifiers';
+import { detectNonLatinLetters, prettyNumber } from '../../utils/prettifiers';
 
 import s from './CreatePool.module.scss';
 
@@ -43,6 +43,7 @@ const checkPercentage = (value: number) => value >= 0 && value <= 100;
 const checkDuration = (value: number) => value >= 30;
 const checkGt0 = (value: number) => value > 0;
 const checkMaxStringLengthIs32 = (value: string) => value.length <= 32;
+const checkLatinLettersNumbersSymbols = (value: string) => !detectNonLatinLetters(value);
 
 const messageEnterValue = 'Enter value';
 const messagePercentValue = 'Percent value should be between 0 and 100';
@@ -52,6 +53,7 @@ const messageSoftCapLessThanHardCap = 'Softcap should be less than hardcap';
 const messageTokenPriceLessThanHardCap = 'Token price should be less than hardcap';
 const messageGt0 = 'Value should be greater than 0';
 const messageMaxStringLengthIs32 = 'Maximum length is 32';
+const messageLatinLettersNumbersSymbols = 'Allowed only latin letters, numbers and symbols';
 
 const validationIfExists = [
   {
@@ -81,6 +83,12 @@ const validationMaxStringLengthIs32 = [
   {
     equation: checkMaxStringLengthIs32,
     message: messageMaxStringLengthIs32,
+  },
+];
+const validationLatinLettersAndNumbersAndSymbols = [
+  {
+    equation: checkLatinLettersNumbersSymbols,
+    message: messageLatinLettersNumbersSymbols,
   },
 ];
 
@@ -361,12 +369,15 @@ const CreatePoolPage: React.FC = () => {
       if (!checkMaxStringLengthIs32(linkGithub)) return false;
       if (!checkMaxStringLengthIs32(linkTwitter)) return false;
       if (!checkMaxStringLengthIs32(linkWebsite)) return false;
+      if (!checkLatinLettersNumbersSymbols(saleTitle)) return false;
+      if (!checkLatinLettersNumbersSymbols(description)) return false;
       return true;
     } catch (e) {
       console.error(e);
       return false;
     }
   }, [
+    description,
     hardCap,
     softCap,
     liquidityPercentageAllocation,
@@ -1060,14 +1071,18 @@ const CreatePoolPage: React.FC = () => {
                 value={saleTitle}
                 onChange={setSaleTitle}
                 error={errors.saleTitle}
-                validations={[...validationIfExists, ...validationMaxStringLengthIs32]}
+                validations={[
+                  ...validationIfExists,
+                  ...validationMaxStringLengthIs32,
+                  ...validationLatinLettersAndNumbersAndSymbols,
+                ]}
               />
               <Input
                 title="Description"
                 value={description}
                 onChange={setDescription}
                 error={errors.description}
-                validations={validationIfExists}
+                validations={[...validationIfExists, ...validationLatinLettersAndNumbersAndSymbols]}
               />
               <Input
                 title="Token Contract Address"
