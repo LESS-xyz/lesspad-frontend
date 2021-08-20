@@ -53,16 +53,6 @@ export default [
     type: 'function',
   },
   { inputs: [], name: 'claimTokens', outputs: [], stateMutability: 'nonpayable', type: 'function' },
-  {
-    inputs: [{ internalType: 'address', name: '', type: 'address' }],
-    name: 'claimed',
-    outputs: [
-      { internalType: 'uint256', name: 'amountClaimed', type: 'uint256' },
-      { internalType: 'uint256', name: 'lastTimeClaimed', type: 'uint256' },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
   { inputs: [], name: 'collectFee', outputs: [], stateMutability: 'nonpayable', type: 'function' },
   {
     inputs: [],
@@ -165,6 +155,7 @@ export default [
     outputs: [
       { internalType: 'uint256', name: 'amountEth', type: 'uint256' },
       { internalType: 'uint256', name: 'amountTokens', type: 'uint256' },
+      { internalType: 'uint256', name: 'amountClaimed', type: 'uint256' },
     ],
     stateMutability: 'view',
     type: 'function',
@@ -319,13 +310,6 @@ export default [
       { internalType: 'address', name: 'lpAddress', type: 'address' },
       { internalType: 'uint256', name: 'lpAmount', type: 'uint256' },
     ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [{ internalType: 'bytes32', name: '', type: 'bytes32' }],
-    name: 'usedSignature',
-    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
   },
