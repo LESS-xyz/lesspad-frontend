@@ -15,7 +15,6 @@ import Subscribe from '../../../assets/img/icons/subscribe.svg';
 import Telegram from '../../../assets/img/icons/tg-icon.svg';
 import Twitter from '../../../assets/img/icons/twitter-icon.svg';
 import projectLogo from '../../../assets/img/sections/token-card/logo-1.png';
-import Button from '../../../components/Button';
 import Input from '../../../components/Input';
 import YourTier from '../../../components/YourTier/index';
 import config from '../../../config';
@@ -23,7 +22,7 @@ import { useContractsContext } from '../../../contexts/ContractsContext';
 import { useWeb3ConnectorContext } from '../../../contexts/Web3Connector';
 import { modalActions } from '../../../redux/actions';
 import { BackendService } from '../../../services/Backend';
-import { convertFromWei } from '../../../utils/ethereum';
+import { convertFromWei, useTransactionHash } from '../../../utils/ethereum';
 import { addHttps, prettyNumber } from '../../../utils/prettifiers';
 import ParticipantsTable from '../ParticipantsTable';
 
@@ -92,7 +91,7 @@ const defaultInfo = {
 const Pool: React.FC = () => {
   const { address }: any = useParams();
   const history = useHistory();
-
+  const { handleTransactionHash } = useTransactionHash();
   const { web3 } = useWeb3ConnectorContext();
   const {
     ContractERC20,
@@ -433,7 +432,7 @@ const Pool: React.FC = () => {
     }
   }, [userAddress, web3]);
 
-  const handleTransactionHash = useCallback(
+  /* const handleTransactionHash = useCallback(
     (txHash: string) => {
       toggleModal({
         open: true,
@@ -450,7 +449,7 @@ const Pool: React.FC = () => {
       });
     },
     [toggleModal, chainType],
-  );
+  );*/
 
   const handleTransactionWentWrong = useCallback(() => {
     toggleModal({
@@ -481,7 +480,7 @@ const Pool: React.FC = () => {
           user_balance: stakingAmount,
           stakedAmount: totalStakedAmount,
         } = resultGetPoolSignature.data;
-        const result = await ContractPresalePublicWithMetamask.vote({
+        const result = ContractPresalePublicWithMetamask.vote({
           contractAddress: address,
           stakingAmount,
           userAddress,
@@ -489,8 +488,7 @@ const Pool: React.FC = () => {
           signature,
           yes,
           totalStakedAmount,
-        });
-        result
+        })
           .on('transactionHash', (txHash: string) => {
             handleTransactionHash(txHash);
             getInfo();
@@ -691,19 +689,22 @@ const Pool: React.FC = () => {
         });
       let ContractPresale = ContractPresalePublicWithMetamask;
       if (isCertified) ContractPresale = ContractPresaleCertifiedWithMetamask;
-      const resultVote = await ContractPresale.register({
+      const resultVote = ContractPresale.register({
         userAddress,
         contractAddress: address,
         tier: userTier,
         signature,
         stakedAmount: userBalance,
         timestamp,
+      }).on('transactionHash', (txHash: string) => {
+        handleTransactionHash(txHash);
       });
       console.log('PagePool resultVote:', resultVote);
     } catch (e) {
       console.error('PagePool register:', e);
     }
   }, [
+    handleTransactionHash,
     isCertified,
     ContractPresalePublicWithMetamask,
     ContractPresaleCertifiedWithMetamask,
@@ -810,7 +811,7 @@ const Pool: React.FC = () => {
     try {
       let ContractPresale = ContractPresalePublicWithMetamask;
       if (isCertified) ContractPresale = ContractPresaleCertifiedWithMetamask;
-      const result = await ContractPresale.cancelPresale({
+      const result = ContractPresale.cancelPresale({
         userAddress,
         contractAddress: address,
       });
@@ -846,7 +847,7 @@ const Pool: React.FC = () => {
     try {
       let ContractPresale = ContractPresalePublicWithMetamask;
       if (isCertified) ContractPresale = ContractPresaleCertifiedWithMetamask;
-      const result = await ContractPresale.collectFee({
+      const result = ContractPresale.collectFee({
         userAddress,
         contractAddress: address,
       });
@@ -893,7 +894,7 @@ const Pool: React.FC = () => {
     try {
       let ContractPresale = ContractPresalePublicWithMetamask;
       if (isCertified) ContractPresale = ContractPresaleCertifiedWithMetamask;
-      const result = await ContractPresale.claimTokens({
+      const result = ContractPresale.claimTokens({
         userAddress,
         contractAddress: address,
       });
@@ -929,7 +930,7 @@ const Pool: React.FC = () => {
     try {
       let ContractPresale = ContractPresalePublicWithMetamask;
       if (isCertified) ContractPresale = ContractPresaleCertifiedWithMetamask;
-      const result = await ContractPresale.withdrawInvestment({
+      const result = ContractPresale.withdrawInvestment({
         userAddress,
         contractAddress: address,
       });
