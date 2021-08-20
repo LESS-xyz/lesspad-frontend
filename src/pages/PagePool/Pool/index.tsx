@@ -1266,13 +1266,28 @@ const Pool: React.FC = () => {
     </div>
   );
 
-  const htmlVotingIsNotSuccessful = (
-    <div className="item">
-      <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
-        Voting
+  const htmlVotingIsNotSuccessfulForUser = (
+    <div className="container-presale-status">
+      <div className="container-presale-status-inner">
+        <div className="gradient-header">Voting is not successful</div>
+        <div className="presale-status-text">Presale is closed</div>
       </div>
-      <div className="item-text">
-        <div className="item-text-bold">is not successful</div>
+    </div>
+  );
+
+  const htmlVotingIsNotSuccessfulForCreator = (
+    <div className="container-presale-status">
+      <div className="container-presale-status-inner">
+        <div className="gradient-header">Voting is not successful</div>
+      </div>
+    </div>
+  );
+
+  const htmlVotingIsNotSuccessfulAndPresaleIsClosedForCreator = (
+    <div className="container-presale-status">
+      <div className="container-presale-status-inner">
+        <div className="gradient-header">Voting is not successful</div>
+        <div className="presale-status-text">Presale is closed</div>
       </div>
     </div>
   );
@@ -1503,12 +1518,25 @@ const Pool: React.FC = () => {
     !isCertified && isVotingTime && timeBeforeVoting && !isUserCreator && !myVote;
   const showHtmlYouVoted =
     !isCertified && isVotingTime && timeBeforeVoting && !isUserCreator && myVote;
-  const showHtmlVotingIsNotSuccessful =
+  const showHtmlVotingIsNotSuccessfulForUser =
     !isCertified &&
     !isUserCreator &&
     isRegistrationTime &&
     timeBeforeRegistration &&
     !isVotingSuccessful;
+  const showHtmlVotingIsNotSuccessfulForCreator =
+    !isCertified &&
+    isUserCreator &&
+    isRegistrationTime &&
+    timeBeforeRegistration &&
+    !isVotingSuccessful;
+  const showHtmlVotingIsNotSuccessfulAndPresaleIsClosedForCreator =
+    !isCertified &&
+    isUserCreator &&
+    isRegistrationTime &&
+    timeBeforeRegistration &&
+    !isVotingSuccessful &&
+    didCreatorCollectFee;
   // Не набралось нужное количество голосов за или нет голосов вообще
   const showHtmlCollectFee =
     !isCertified &&
@@ -1797,6 +1825,10 @@ const Pool: React.FC = () => {
           </div>
         ) : null
       ) : null}
+      {showHtmlVotingIsNotSuccessfulForUser && htmlVotingIsNotSuccessfulForUser}
+      {showHtmlVotingIsNotSuccessfulForCreator && htmlVotingIsNotSuccessfulForCreator}
+      {showHtmlVotingIsNotSuccessfulAndPresaleIsClosedForCreator &&
+        htmlVotingIsNotSuccessfulAndPresaleIsClosedForCreator}
 
       {isBeforeRegistrationTime ? (
         <div className="container-presale-status">
@@ -1829,7 +1861,6 @@ const Pool: React.FC = () => {
           <div className="row">
             {showHtmlVoting && htmlVoting}
             {showHtmlYouVoted && htmlYouVoted}
-            {showHtmlVotingIsNotSuccessful && htmlVotingIsNotSuccessful}
             {showHtmlCollectFee && htmlCollectFeeWhenVotingNotSuccessful}
             {showHtmlRegistration && htmlRegistration}
             {showHtmlYouAreRegistered && htmlYouAreRegistered}
