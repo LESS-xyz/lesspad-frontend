@@ -1281,13 +1281,36 @@ const Pool: React.FC = () => {
   );
 
   // Не набралось нужное количество голосов за или нет голосов вообще, создатель может забрать свои 1000$ и токены
-  const htmlCollectFee = (
+  const htmlCollectFeeWhenVotingNotSuccessful = (
     <div className="item">
       <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
-        Voting
+        Claim refund
       </div>
       <div className="item-text">
-        <div className="item-text-bold">is not successful</div>
+        <div className="item-text-bold">Voting is not successful</div>
+      </div>
+      <div className="button-border">
+        <div
+          className="button"
+          role="button"
+          tabIndex={0}
+          onClick={collectFee}
+          onKeyDown={() => {}}
+        >
+          <div className="gradient-button-text">Claim refund</div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Сертифицированный пресейл не прошел аудит (то есть, не был аппрувнут админом платформы). Cоздатель может забрать свои 1000$ и токены
+  const htmlCollectFeeWhenNotApproved = (
+    <div className="item">
+      <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
+        Claim refund
+      </div>
+      <div className="item-text">
+        <div className="item-text-bold">Presale is not approved</div>
       </div>
       <div className="button-border">
         <div
@@ -1595,6 +1618,12 @@ const Pool: React.FC = () => {
   // Создатель может отменять ТОЛЬКО свой пресейл и ТОЛЬКО после инвеста, если не набран софткап
   const showHtmlClosePresaleOnCertified =
     isCertified && isUserCreator && isPresaleClosed && !isPresaleSuccessful;
+  const showHtmlCollectFeeOnCertified =
+    isCertified &&
+    isUserCreator &&
+    !didCreatorCollectFee &&
+    (isRegistrationTime || isInvestmentTime || isPresaleClosed) &&
+    !approved;
   const showHtmlWithdrawInvestmentOnCertified =
     isCertified &&
     !isUserCreator &&
@@ -1813,7 +1842,7 @@ const Pool: React.FC = () => {
             {showHtmlVoting && htmlVoting}
             {showHtmlYouVoted && htmlYouVoted}
             {showHtmlVotingIsNotSuccessful && htmlVotingIsNotSuccessful}
-            {showHtmlCollectFee && htmlCollectFee}
+            {showHtmlCollectFee && htmlCollectFeeWhenVotingNotSuccessful}
             {showHtmlRegistration && htmlRegistration}
             {showHtmlYouAreRegistered && htmlYouAreRegistered}
             {showHtmlYouNeedToBeRegisteredToInvest && htmlYouNeedToBeRegisteredToInvest}
@@ -1830,6 +1859,7 @@ const Pool: React.FC = () => {
             {showHtmlInvestmentIsClosedOnCertified && htmlInvestmentIsClosed}
             {showHtmlClaimTokensOnCertified && htmlClaimTokens}
             {showHtmlClosePresaleOnCertified && htmlCancelPresale}
+            {showHtmlCollectFeeOnCertified && htmlCollectFeeWhenNotApproved}
             {showHtmlWithdrawInvestmentOnCertified && htmlWithdrawInvestment}
           </div>
         </div>
