@@ -164,10 +164,10 @@ export class BackendService {
     try {
       const url = `/pool/tiers/`;
       const result = await this.axios.post(url, props);
-      // console.log('BackendService getAllPools:', result);
+      console.log('BackendService getTiersAndWinners:', result);
       return { data: result.data };
     } catch (e) {
-      // console.error('BackendService getAllPools:', e);
+      // console.error('BackendService getTiersAndWinners:', e);
       return { data: null, error: e.response.data };
     }
   };

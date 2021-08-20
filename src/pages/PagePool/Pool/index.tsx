@@ -360,17 +360,17 @@ const Pool: React.FC = () => {
           newInfo = await ContractPresaleCertifiedWithMetamask.getInfo({
             contractAddress: address,
           });
-          console.log('TokenCard getInfo certified:', newInfo);
+          console.log('PagePool getInfo certified:', newInfo);
         } else {
           newInfo = await ContractPresalePublicWithMetamask.getInfo({ contractAddress: address });
-          console.log('TokenCard getInfo public:', newInfo);
+          console.log('PagePool getInfo public:', newInfo);
         }
       } else if (isCertified) {
         newInfo = await ContractPresaleCertified.getInfo({ contractAddress: address });
-        console.log('TokenCard getInfo certified:', newInfo);
+        console.log('PagePool getInfo certified:', newInfo);
       } else {
         newInfo = await ContractPresalePublic.getInfo({ contractAddress: address });
-        console.log('TokenCard getInfo public:', newInfo);
+        console.log('PagePool getInfo public:', newInfo);
       }
       if (newInfo) setInfo(newInfo);
     } catch (e) {
