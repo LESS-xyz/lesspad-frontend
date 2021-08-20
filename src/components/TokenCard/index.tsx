@@ -144,6 +144,7 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
     if (closeTimePresale < NOW) presaleStatus = 'Ended';
   }
   const isOpened = openTimePresale < NOW;
+  const isWhitelist = whitelist && whitelist.length;
   const isUserInWhitelist =
     whitelist && whitelist.length && userAddress && whitelist.includes(userAddress.toLowerCase());
   const isUserCreator = userAddress ? creator.toLowerCase() === userAddress.toLowerCase() : false;
@@ -267,16 +268,9 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
   )
     return null;
 
-  if (
-    isCertified &&
-    !isUserCreator &&
-    !isUserOwner &&
-    whitelist &&
-    whitelist.length &&
-    !userAddress
-  )
+  if (isCertified && !isUserCreator && !isUserOwner && isWhitelist && !userAddress) return null;
+  if (isCertified && !isUserCreator && !isUserOwner && isWhitelist && !isUserInWhitelist)
     return null;
-  if (isCertified && !isUserCreator && !isUserOwner && !isUserInWhitelist) return null;
   if (loading) return <div className={s.cardLoading}>Loading...</div>;
 
   return (

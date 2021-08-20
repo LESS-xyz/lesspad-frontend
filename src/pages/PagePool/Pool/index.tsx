@@ -126,11 +126,8 @@ const Pool: React.FC = () => {
   const [isUserRegister, setUserRegister] = useState<boolean>(false);
 
   const [whitelist, setWhitelist] = useState<string[]>([]);
-  const [currentTier, setCurrentTier] = useState<number>(0);
-  const [
-    percentageOfTokensSoldInCurrentTier,
-    setPercentageOfTokensSoldInCurrentTier,
-  ] = useState<number>(0);
+  const [, setCurrentTier] = useState<number>(0);
+  const [, setPercentageOfTokensSoldInCurrentTier] = useState<number>(0);
 
   const [timeBeforeVoting, setTimeBeforeVoting] = useState<string>('');
   const [timeBeforeRegistration, setTimeBeforeRegistration] = useState<string>('');
@@ -195,8 +192,8 @@ const Pool: React.FC = () => {
   } = info;
   const { amountEth: investedEthByUser } = investments;
 
-  const [tokensShouldBeSold, setTokensShouldBeSold] = useState<number>(hardCap);
-  console.log('Pool:', { percentageOfTokensSoldInCurrentTier, tokensShouldBeSold });
+  const [, setTokensShouldBeSold] = useState<number>(hardCap);
+  // console.log('Pool:', { percentageOfTokensSoldInCurrentTier, tokensShouldBeSold });
 
   const isBeforeVotimgTime = openTimeVoting > NOW;
   const isVotingTime = openTimeVoting <= NOW && closeTimeVoting > NOW;
@@ -209,6 +206,7 @@ const Pool: React.FC = () => {
   const isPresaleClosed = closeTimePresale <= NOW;
   const didCreatorCollectFee = +collectedFee === 0;
   const didUserInvest = +investedEthByUser > 0;
+  const isWhitelist = whitelist && whitelist.length;
   const isUserInWhitelist =
     whitelist && whitelist.length && userAddress && whitelist.includes(userAddress.toLowerCase());
 
@@ -273,7 +271,7 @@ const Pool: React.FC = () => {
         contractAddress: address,
       });
       setWhitelist(resultWhitelist);
-      // console.log('Pool getWhitelist:', resultWhitelist);
+      console.log('Pool getWhitelist:', resultWhitelist);
       return;
     } catch (e) {
       console.error('Pool getWhitelist:', e);
@@ -794,7 +792,6 @@ const Pool: React.FC = () => {
     isInvestmentTime,
     hardCapInTokens,
   ]);
-  console.log('Pool currentTier:', currentTier);
 
   const getPoolStatus = useCallback(async () => {
     try {
@@ -1573,6 +1570,7 @@ const Pool: React.FC = () => {
     didUserInvest &&
     (cancelled || !isPresaleSuccessful);
 
+  // Certified
   const showHtmlRegistrationOnCertified =
     isCertified &&
     !isUserCreator &&
@@ -1580,6 +1578,7 @@ const Pool: React.FC = () => {
     isRegistrationTime &&
     timeBeforeRegistration &&
     approved &&
+    !isWhitelist &&
     !isUserRegister;
   const showHtmlYouAreRegisteredOnCertified =
     isCertified &&
@@ -1587,6 +1586,7 @@ const Pool: React.FC = () => {
     isRegistrationTime &&
     timeBeforeRegistration &&
     approved &&
+    !isWhitelist &&
     isUserRegister;
   const showHtmlYouNeedToBeRegisteredToInvestOnCertified =
     isCertified &&
@@ -1594,22 +1594,17 @@ const Pool: React.FC = () => {
     isInvestmentTime &&
     isInvestStart &&
     approved &&
+    !isWhitelist &&
     timeBeforeMyTier &&
     !isUserRegister;
   const showHtmlInvestmentOnCertified =
-    isCertified &&
-    !isUserCreator &&
-    isInvestmentTime &&
-    isInvestStart &&
-    approved &&
-    isUserRegister;
+    isCertified && !isUserCreator && isInvestmentTime && isInvestStart && approved && isWhitelist
+      ? isUserInWhitelist
+      : isUserRegister;
   const showHtmlInvestmentIsClosedOnCertified =
-    isCertified &&
-    isInvestmentTime &&
-    isInvestStart &&
-    approved &&
-    isUserRegister &&
-    isPresaleClosed;
+    isCertified && isInvestmentTime && isInvestStart && approved && isPresaleClosed && isWhitelist
+      ? isUserInWhitelist
+      : isUserRegister;
   const showHtmlClaimTokensOnCertified =
     isCertified && !isUserCreator && isPresaleClosed && !cancelled && liquidityAdded;
   // Cancel presale админом платформы может использоваться в любой момент.
@@ -1631,14 +1626,7 @@ const Pool: React.FC = () => {
     didUserInvest &&
     (cancelled || !isPresaleSuccessful);
 
-  if (
-    !isUserOwner &&
-    !isUserCreator &&
-    isCertified &&
-    whitelist &&
-    whitelist.length &&
-    !userAddress
-  )
+  if (!isUserOwner && !isUserCreator && isCertified && isWhitelist && !userAddress)
     return (
       <div className="container">
         <div className="container-presale-status">
@@ -1648,7 +1636,7 @@ const Pool: React.FC = () => {
         </div>
       </div>
     );
-  if (!isUserOwner && !isUserCreator && isCertified && !isUserInWhitelist)
+  if (!isUserOwner && !isUserCreator && isCertified && isWhitelist && !isUserInWhitelist)
     return (
       <div className="container">
         <div className="container-presale-status">
