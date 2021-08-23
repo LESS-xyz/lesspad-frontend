@@ -73,12 +73,17 @@
 
   &.img {
     padding-left: 20px;
-    mix-blend-mode: luminosity;
+    //mix-blend-mode: luminosity;
+
+    height: 48px;
+    width: 48px;
+    border-radius: 50%;
+    overflow: hidden;
 
     img {
-      height: 48px;
-      width: 48px;
-      border-radius: 50%;
+      height: 100%;
+      width: 100%;
+      object-fit: cover;
     }
   }
 

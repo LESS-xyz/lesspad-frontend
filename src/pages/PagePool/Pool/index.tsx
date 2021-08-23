@@ -88,6 +88,7 @@ const defaultInfo = {
   noVotes: '0',
   lastTotalStakedAmount: '0',
 };
+const tiers = ['Pawn', 'Bishop', 'Rook', 'Queen', 'King'];
 
 const Pool: React.FC = () => {
   const { address }: any = useParams();
@@ -126,8 +127,12 @@ const Pool: React.FC = () => {
   const [isUserRegister, setUserRegister] = useState<boolean>(false);
 
   const [whitelist, setWhitelist] = useState<string[]>([]);
-  const [, setCurrentTier] = useState<number>(0);
-  const [, setPercentageOfTokensSoldInCurrentTier] = useState<number>(0);
+  const [currentTier, setCurrentTier] = useState<number>(0);
+  const [
+    percentageOfTokensSoldInCurrentTier,
+    setPercentageOfTokensSoldInCurrentTier,
+  ] = useState<number>(0);
+  const [tokensSoldInCurrentTier, setTokensSoldInCurrentTier] = useState<number>(0);
 
   const [timeBeforeVoting, setTimeBeforeVoting] = useState<string>('');
   const [timeBeforeRegistration, setTimeBeforeRegistration] = useState<string>('');
@@ -192,7 +197,7 @@ const Pool: React.FC = () => {
   } = info;
   const { amountEth: investedEthByUser } = investments;
 
-  const [, setTokensShouldBeSold] = useState<number>(hardCap);
+  const [tokensShouldBeSold, setTokensShouldBeSold] = useState<number>(hardCap);
   // console.log('Pool:', { percentageOfTokensSoldInCurrentTier, tokensShouldBeSold });
 
   const isBeforeVotimgTime = openTimeVoting > NOW;
@@ -752,6 +757,7 @@ const Pool: React.FC = () => {
         });
         return null;
       });
+      percentagesShouldBeSold.reverse();
       // current tier 5 >>> 1
       let currentTierNew = 0;
       for (let i = 1; i <= 5; i += 1) {
@@ -763,17 +769,46 @@ const Pool: React.FC = () => {
       }
       setCurrentTier(currentTierNew);
       // tokens should be sold in current tier
-      let tokensShouldBeSoldNew = +hardCapInTokens;
-      if (currentTierNew) {
-        tokensShouldBeSoldNew =
-          (+hardCapInTokens * percentagesShouldBeSold[currentTierNew - 1]) / 100;
-      }
-      const percentageOfTokensSoldInCurrentTierNew = (+tokensSold / +tokensShouldBeSoldNew) * 100;
+      // const tokensShouldBeSoldNew = +new BN(hardCapInTokens)
+      //   .multipliedBy(percentagesShouldBeSold[currentTierNew - 1])
+      //   .dividedBy(100)
+      //   .minus(new BN(hardCapInTokens).minus(tokensForSaleLeft))
+      //   .toString(10);
+      const tokensShouldBeSoldNew = +new BN(hardCapInTokens).multipliedBy(
+        new BN(percentagesShouldBeSold[currentTierNew - 1]).dividedBy(100),
+      );
+      // const tokensSoldNew = +new BN(hardCap-tokensSold)
+      const tokensSoldNew = +new BN(hardCapInTokens).minus(tokensForSaleLeft).toString(10);
+      // const tokensSoldNew = +new BN(hardCapInTokens)
+      //   .multipliedBy(new BN(percentagesShouldBeSold[currentTierNew - 1]))
+      //   .dividedBy(100)
+      //   .minus(tokensShouldBeSoldNew)
+      //   .minus(tokensSold)
+      //   .toString(10);
+      // if (currentTierNew) {
+      //   tokensShouldBeSoldNew = +new BN(hardCapInTokens)
+      //     .multipliedBy(percentagesShouldBeSold[currentTierNew - 1])
+      //     .dividedBy(100)
+      //     .minus(tokensSold)
+      //     .toString(10);
+      //   // (+hardCapInTokens * percentagesShouldBeSold[currentTierNew - 1]) / 100;
+      // }
+      // const percentageOfTokensSoldInCurrentTierNew = (+tokensSold / +tokensShouldBeSoldNew) * 100;
+      // const percentageOfTokensSoldInCurrentTierNew = +new BN(tokensSold)
+      //   .dividedBy(tokensShouldBeSoldNew)
+      //   .multipliedBy(100)
+      //   .toFixed(2);
+      const percentageOfTokensSoldInCurrentTierNew = +new BN(tokensSoldNew)
+        .dividedBy(tokensShouldBeSoldNew)
+        .multipliedBy(100)
+        .toFixed(2);
       setPercentageOfTokensSoldInCurrentTier(percentageOfTokensSoldInCurrentTierNew);
       setTokensShouldBeSold(tokensShouldBeSoldNew);
+      setTokensSoldInCurrentTier(tokensSoldNew);
       // console.log('PagePool getTierTime:', {
       //   currentTierNew,
       //   hardCap,
+      //   tokensForSaleLeft,
       //   tokensShouldBeSoldNew,
       //   tokensSold,
       //   percentagesShouldBeSold,
@@ -783,8 +818,7 @@ const Pool: React.FC = () => {
       console.error(e);
     }
   }, [
-    // hardCap,
-    tokensSold,
+    tokensForSaleLeft,
     tier,
     info,
     openTimePresale,
@@ -792,6 +826,7 @@ const Pool: React.FC = () => {
     isInvestmentTime,
     hardCapInTokens,
   ]);
+  // console.log('Pool currentTier:', currentTier);
 
   const getPoolStatus = useCallback(async () => {
     try {
@@ -1850,18 +1885,33 @@ const Pool: React.FC = () => {
           <div className="grow-scale-progress">
             <div
               className="grow-scale-progress-value"
-              style={{ width: `${percentOfTokensSold}%` }}
+              style={{ width: `${percentageOfTokensSoldInCurrentTier}%` }}
             />
           </div>
         </div>
-
         <div className="grow-info">
           <div className="grow-min">
-            {prettyNumber(percentOfTokensSold.toString()) || 0}% (Min{' '}
-            {!Number.isNaN(+percentOfSoftCap) ? percentOfSoftCap : 0}%)
+            {!isCertified && (
+              <div>
+                {tiers[+currentTier - 1] || 'Current'} stage completion{' '}
+                {prettyNumber(percentageOfTokensSoldInCurrentTier.toString()) || 0}%
+              </div>
+            )}
+            <div className="grow-total">
+              Total completion {prettyNumber(percentOfTokensSold.toString()) || 0}%
+            </div>
           </div>
           <div className="grow-max">
-            {tokensSold || 0} / {prettyNumber(hardCapInTokens) || 0} {tokenSymbol}
+            {!isCertified && (
+              <div>
+                {tokensSoldInCurrentTier || 0} /{' '}
+                {prettyNumber(`${tokensShouldBeSold}`) || prettyNumber(hardCapInTokens)}{' '}
+                {tokenSymbol}
+              </div>
+            )}
+            <div className="grow-total">
+              {tokensSold || 0} / {prettyNumber(hardCapInTokens) || 0} {tokenSymbol}
+            </div>
           </div>
         </div>
       </div>
