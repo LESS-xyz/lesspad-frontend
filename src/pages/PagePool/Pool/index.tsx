@@ -2053,6 +2053,7 @@ const Pool: React.FC = () => {
                 {showHtmlWithdrawInvestment && htmlWithdrawInvestment}
 
                 {/*Certified presale*/}
+                {/*todo: audit approve*/}
                 {/*Registration*/}
                 {showHtmlRegistrationOnCertified && htmlRegistration}
                 {showHtmlYouAreRegisteredOnCertified && htmlYouAreRegistered}

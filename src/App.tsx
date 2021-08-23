@@ -8,6 +8,7 @@ import { Modal } from './components/Modal';
 import { useContractsContext } from './contexts/ContractsContext';
 import { libraryActions, poolActions } from './redux/actions';
 import { convertFromWei } from './utils/ethereum';
+import { storageCache } from './utils/localStorage';
 import { Header } from './components';
 import {
   AboutPage,
@@ -52,8 +53,14 @@ export const App: React.FC = memo(() => {
   const getArrForSearch = useCallback(async () => {
     try {
       const arrForSearch = await ContractLessLibrary.getArrForSearch();
+      // const arrForSearch = await storageCache({
+      //   key: 'arrForSearch',
+      //   method: arrForSearchMethod,
+      //   delay: 20000,
+      // });
       const compareOpenVotingTime = (a, b) => b.openVotingTime - a.openVotingTime;
-      if (arrForSearch) setPools(arrForSearch.sort(compareOpenVotingTime));
+      const arrForSearchSorted = arrForSearch.sort(compareOpenVotingTime);
+      if (arrForSearch) setPools(arrForSearchSorted);
       console.log('App getArrForSearch:', arrForSearch);
     } catch (e) {
       console.error('App getArrForSearch:', e);
