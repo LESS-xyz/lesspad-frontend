@@ -197,7 +197,7 @@ const ParticipantsTable: React.FC<IParticipantsTable> = (props) => {
           <div className={s.table_body_adresses}>
             {/*Participants*/}
             <div className={s.table_body_adresses__left}>
-              <div className={s.table_body_adresses__title}>Participants</div>
+              <div className={s.table_body_adresses__title}>{isCertified ? 'Whitelist' : 'Participants'}</div>
               {participantsFiltered.length ? (
                 participantsFiltered.map((participant) => (
                   <div key={uuid()} className={s.participant}>
