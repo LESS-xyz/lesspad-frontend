@@ -1386,9 +1386,6 @@ const Pool: React.FC = () => {
       <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
         Claim refund
       </div>
-      <div className="item-text">
-        <div className="item-text-bold">Voting is not successful</div>
-      </div>
       <div className="button-border">
         <div
           className="button"
@@ -1408,9 +1405,6 @@ const Pool: React.FC = () => {
     <div className="item">
       <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
         Claim refund
-      </div>
-      <div className="item-text">
-        <div className="item-text-bold">Presale is not approved</div>
       </div>
       <div className="button-border">
         <div
