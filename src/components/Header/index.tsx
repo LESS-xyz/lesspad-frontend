@@ -12,7 +12,7 @@ import logo from '../../assets/img/icons/logo.svg';
 import maticLogo from '../../assets/img/icons/matic-logo.svg';
 import { ReactComponent as ImageBackgroundBottom } from '../../assets/img/sections/header/header-menu-background-bottom.svg';
 import { ReactComponent as ImageBackground } from '../../assets/img/sections/header/header-menu-background.svg';
-import { modalActions, userActions, walletActions } from '../../redux/actions';
+import { userActions, walletActions } from '../../redux/actions';
 import { setToStorage } from '../../utils/localStorage';
 import Button from '../Button/index';
 
@@ -43,25 +43,6 @@ const Header: React.FC = () => {
   const setWalletType = (props: string) => dispatch(walletActions.setWalletType(props));
   const setChainType = (props: string) => dispatch(walletActions.setChainType(props));
   const setUserData = (props: any) => dispatch(userActions.setUserData(props));
-  const toggleModal = React.useCallback((params) => dispatch(modalActions.toggleModal(params)), [
-    dispatch,
-  ]);
-
-  const showMessageIfNoMetamask = async () => {
-    try {
-      if (userAddress) return;
-      toggleModal({
-        open: true,
-        text: (
-          <div className={s.messageContainer}>
-            <p>Please, connect metamask to be able to create pool</p>
-          </div>
-        ),
-      });
-    } catch (e) {
-      console.error(e);
-    }
-  };
 
   const handleConnectWallet = () => {
     try {
@@ -84,7 +65,7 @@ const Header: React.FC = () => {
   const handleGoToCreatePool = () => {
     try {
       history.push('/create-pool');
-      showMessageIfNoMetamask();
+      window.location.reload();
     } catch (e) {
       console.error(e);
     }

@@ -203,6 +203,26 @@ const CreatePoolPage: React.FC = () => {
     dispatch,
   ]);
 
+  const showMessageIfNoMetamask = useCallback(() => {
+    try {
+      if (!userAddress) {
+        toggleModal({
+          open: true,
+          text: (
+            <div className={s.messageContainer}>
+              <p>Please, connect metamask to be able to create pool</p>
+            </div>
+          ),
+        });
+        return false;
+      }
+      return true;
+    } catch (e) {
+      console.error(e);
+      return false;
+    }
+  }, [userAddress, toggleModal]);
+
   const splitWhitelist = (data: string) => {
     try {
       const whitelistArray = data.split(',');
@@ -671,6 +691,7 @@ const CreatePoolPage: React.FC = () => {
     try {
       event.preventDefault();
       setIsLoading(true);
+      if (!showMessageIfNoMetamask()) return;
       if (!isPublic && !SHOW_CERTIFIED_PRESALE) {
         toggleModal({
           open: true,
@@ -1010,11 +1031,13 @@ const CreatePoolPage: React.FC = () => {
     description,
     whitepaper,
   ]);
+
   useEffect(() => {
     if (!softCap) return;
     if (!hardCap) return;
     validateSoftCapAndHardCap();
   }, [softCap, hardCap, validateSoftCapAndHardCap]);
+
   useEffect(() => {
     if (!tokenPrice) return;
     if (!hardCap) return;
