@@ -272,6 +272,7 @@ const Pool: React.FC = () => {
 
   const getWhitelist = useCallback(async () => {
     try {
+      if (!address) return;
       const resultWhitelist = await ContractPresaleCertified.getWhitelistFull({
         contractAddress: address,
       });
@@ -359,21 +360,26 @@ const Pool: React.FC = () => {
 
   const getInfo = useCallback(async () => {
     try {
+      if (!address) return;
       let newInfo;
       if (userAddress) {
         if (isCertified) {
+          if (!ContractPresaleCertifiedWithMetamask) return;
           newInfo = await ContractPresaleCertifiedWithMetamask.getInfo({
             contractAddress: address,
           });
           console.log('PagePool getInfo certified:', newInfo);
         } else {
+          if (!ContractPresalePublicWithMetamask) return;
           newInfo = await ContractPresalePublicWithMetamask.getInfo({ contractAddress: address });
           console.log('PagePool getInfo public:', newInfo);
         }
       } else if (isCertified) {
+        if (!ContractPresaleCertified) return;
         newInfo = await ContractPresaleCertified.getInfo({ contractAddress: address });
         console.log('PagePool getInfo certified:', newInfo);
       } else {
+        if (!ContractPresalePublic) return;
         newInfo = await ContractPresalePublic.getInfo({ contractAddress: address });
         console.log('PagePool getInfo public:', newInfo);
       }
@@ -393,6 +399,7 @@ const Pool: React.FC = () => {
 
   const getMyVote = useCallback(async () => {
     try {
+      if (!ContractPresalePublic) return;
       const resultVote = await ContractPresalePublic.getMyVote(address, userAddress);
       setMyVote(+resultVote);
     } catch (e) {
@@ -402,6 +409,9 @@ const Pool: React.FC = () => {
 
   const getInvestments = useCallback(async () => {
     try {
+      if (!ContractPresalePublic) return;
+      if (!userAddress) return;
+      if (!tokenDecimals) return;
       const resultInvestments = await ContractPresalePublic.investments({
         contractAddress: address,
         userAddress,
@@ -1123,13 +1133,13 @@ const Pool: React.FC = () => {
   }, [getTierTime]);
 
   useEffect(() => {
-    if (!info) return () => {};
+    if (!closeTimeVoting) return () => {};
     getPoolStatus();
     const interval = setInterval(() => {
       getPoolStatus();
     }, 10000);
     return () => clearInterval(interval);
-  }, [getPoolStatus, info]);
+  }, [getPoolStatus, closeTimeVoting]);
 
   useEffect(() => {
     if (ContractPresalePublic && address && userAddress) {
