@@ -1633,6 +1633,7 @@ const Pool: React.FC = () => {
   // Registration
   const showHtmlRegistration =
     !isCertified &&
+    tier &&
     !isUserCreator &&
     isUserTier &&
     isRegistrationTime &&
@@ -1733,6 +1734,7 @@ const Pool: React.FC = () => {
   // Registration
   const showHtmlRegistrationOnCertified =
     isCertified &&
+    tier &&
     !isUserCreator &&
     isUserTier &&
     isRegistrationTime &&
