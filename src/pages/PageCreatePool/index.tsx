@@ -871,7 +871,7 @@ const CreatePoolPage: React.FC = () => {
           presaleStringInfo,
           usdtToEthFee,
         });
-        await ContractPresaleFactory.createPresalePublic({
+        ContractPresaleFactory.createPresalePublic({
           userAddress,
           presaleInfo,
           presalePancakeSwapInfo,
@@ -932,7 +932,7 @@ const CreatePoolPage: React.FC = () => {
           certifiedAddition,
           usdtToEthFee,
         });
-        await ContractPresaleFactoryCertified.createPresaleCertified({
+        ContractPresaleFactoryCertified.createPresaleCertified({
           userAddress,
           presaleInfo: presaleInfoCertified,
           presalePancakeSwapInfo,
