@@ -151,6 +151,10 @@
       text-align: center;
     }
 
+    &-total {
+      margin-top: 5px;
+    }
+
     &-text {
       margin-bottom: 14px;
 
@@ -168,6 +172,10 @@
       font-weight: 700;
 
       color: #6f45ff;
+
+      .grow-tier {
+        @include gradient-text;
+      }
 
       div:last-child {
         text-align: end;
@@ -255,6 +263,7 @@
     &-bg {
       background: linear-gradient(to right, #040404, #1c0e40);
     }
+
     .row + .row {
       border-top: 1px solid rgba(103, 77, 246, 0.5);
     }
@@ -266,6 +275,7 @@
       @include b(tablet) {
         border-bottom: none;
       }
+
       &-items {
         @include b(tablet) {
           .item {
@@ -273,6 +283,7 @@
           }
           .item.cell {
             position: relative;
+
             &::before {
               content: '';
               position: absolute;
@@ -292,6 +303,7 @@
           border-left: unset;
         }
       }
+
       .item:only-child {
         width: 100%;
         @include flex(column, center, center, nowrap);
@@ -428,6 +440,7 @@
 
           &-header {
             margin-bottom: 13px;
+
             div {
               word-break: break-all;
               overflow-wrap: break-word;

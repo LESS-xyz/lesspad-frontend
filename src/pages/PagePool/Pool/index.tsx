@@ -15,7 +15,6 @@ import Subscribe from '../../../assets/img/icons/subscribe.svg';
 import Telegram from '../../../assets/img/icons/tg-icon.svg';
 import Twitter from '../../../assets/img/icons/twitter-icon.svg';
 import projectLogo from '../../../assets/img/sections/token-card/logo-1.png';
-import Button from '../../../components/Button';
 import Input from '../../../components/Input';
 import YourTier from '../../../components/YourTier/index';
 import config from '../../../config';
@@ -23,7 +22,7 @@ import { useContractsContext } from '../../../contexts/ContractsContext';
 import { useWeb3ConnectorContext } from '../../../contexts/Web3Connector';
 import { modalActions } from '../../../redux/actions';
 import { BackendService } from '../../../services/Backend';
-import { convertFromWei } from '../../../utils/ethereum';
+import { convertFromWei, useTransactionHash } from '../../../utils/ethereum';
 import { addHttps, prettyNumber } from '../../../utils/prettifiers';
 import ParticipantsTable from '../ParticipantsTable';
 
@@ -88,11 +87,12 @@ const defaultInfo = {
   noVotes: '0',
   lastTotalStakedAmount: '0',
 };
+const tiers = ['Pawn', 'Bishop', 'Rook', 'Queen', 'King'];
 
 const Pool: React.FC = () => {
   const { address }: any = useParams();
   const history = useHistory();
-
+  const { handleTransactionHash } = useTransactionHash();
   const { web3 } = useWeb3ConnectorContext();
   const {
     ContractERC20,
@@ -126,8 +126,12 @@ const Pool: React.FC = () => {
   const [isUserRegister, setUserRegister] = useState<boolean>(false);
 
   const [whitelist, setWhitelist] = useState<string[]>([]);
-  const [, setCurrentTier] = useState<number>(0);
-  const [, setPercentageOfTokensSoldInCurrentTier] = useState<number>(0);
+  const [currentTier, setCurrentTier] = useState<number>(0);
+  const [
+    percentageOfTokensSoldInCurrentTier,
+    setPercentageOfTokensSoldInCurrentTier,
+  ] = useState<number>(0);
+  const [tokensSoldInCurrentTier, setTokensSoldInCurrentTier] = useState<number>(0);
 
   const [timeBeforeVoting, setTimeBeforeVoting] = useState<string>('');
   const [timeBeforeRegistration, setTimeBeforeRegistration] = useState<string>('');
@@ -193,7 +197,7 @@ const Pool: React.FC = () => {
   } = info;
   const { amountEth: investedEthByUser } = investments;
 
-  const [, setTokensShouldBeSold] = useState<number>(hardCap);
+  const [tokensShouldBeSold, setTokensShouldBeSold] = useState<number>(hardCap);
   // console.log('Pool:', { percentageOfTokensSoldInCurrentTier, tokensShouldBeSold });
 
   const isBeforeVotimgTime = openTimeVoting > NOW;
@@ -434,7 +438,7 @@ const Pool: React.FC = () => {
     }
   }, [userAddress, web3]);
 
-  const handleTransactionHash = useCallback(
+  /* const handleTransactionHash = useCallback(
     (txHash: string) => {
       toggleModal({
         open: true,
@@ -451,7 +455,7 @@ const Pool: React.FC = () => {
       });
     },
     [toggleModal, chainType],
-  );
+  );*/
 
   const handleTransactionWentWrong = useCallback(() => {
     toggleModal({
@@ -482,7 +486,7 @@ const Pool: React.FC = () => {
           user_balance: stakingAmount,
           stakedAmount: totalStakedAmount,
         } = resultGetPoolSignature.data;
-        const result = await ContractPresalePublicWithMetamask.vote({
+        const result = ContractPresalePublicWithMetamask.vote({
           contractAddress: address,
           stakingAmount,
           userAddress,
@@ -490,8 +494,7 @@ const Pool: React.FC = () => {
           signature,
           yes,
           totalStakedAmount,
-        });
-        result
+        })
           .on('transactionHash', (txHash: string) => {
             handleTransactionHash(txHash);
             getInfo();
@@ -692,19 +695,22 @@ const Pool: React.FC = () => {
         });
       let ContractPresale = ContractPresalePublicWithMetamask;
       if (isCertified) ContractPresale = ContractPresaleCertifiedWithMetamask;
-      const resultVote = await ContractPresale.register({
+      const resultVote = ContractPresale.register({
         userAddress,
         contractAddress: address,
         tier: userTier,
         signature,
         stakedAmount: userBalance,
         timestamp,
+      }).on('transactionHash', (txHash: string) => {
+        handleTransactionHash(txHash);
       });
       console.log('PagePool resultVote:', resultVote);
     } catch (e) {
       console.error('PagePool register:', e);
     }
   }, [
+    handleTransactionHash,
     isCertified,
     ContractPresalePublicWithMetamask,
     ContractPresaleCertifiedWithMetamask,
@@ -753,6 +759,7 @@ const Pool: React.FC = () => {
         });
         return null;
       });
+      percentagesShouldBeSold.reverse();
       // current tier 5 >>> 1
       let currentTierNew = 0;
       for (let i = 1; i <= 5; i += 1) {
@@ -764,17 +771,46 @@ const Pool: React.FC = () => {
       }
       setCurrentTier(currentTierNew);
       // tokens should be sold in current tier
-      let tokensShouldBeSoldNew = +hardCapInTokens;
-      if (currentTierNew) {
-        tokensShouldBeSoldNew =
-          (+hardCapInTokens * percentagesShouldBeSold[currentTierNew - 1]) / 100;
-      }
-      const percentageOfTokensSoldInCurrentTierNew = (+tokensSold / +tokensShouldBeSoldNew) * 100;
+      // const tokensShouldBeSoldNew = +new BN(hardCapInTokens)
+      //   .multipliedBy(percentagesShouldBeSold[currentTierNew - 1])
+      //   .dividedBy(100)
+      //   .minus(new BN(hardCapInTokens).minus(tokensForSaleLeft))
+      //   .toString(10);
+      const tokensShouldBeSoldNew = +new BN(hardCapInTokens).multipliedBy(
+        new BN(percentagesShouldBeSold[currentTierNew - 1]).dividedBy(100),
+      );
+      // const tokensSoldNew = +new BN(hardCap-tokensSold)
+      const tokensSoldNew = +new BN(hardCapInTokens).minus(tokensForSaleLeft).toString(10);
+      // const tokensSoldNew = +new BN(hardCapInTokens)
+      //   .multipliedBy(new BN(percentagesShouldBeSold[currentTierNew - 1]))
+      //   .dividedBy(100)
+      //   .minus(tokensShouldBeSoldNew)
+      //   .minus(tokensSold)
+      //   .toString(10);
+      // if (currentTierNew) {
+      //   tokensShouldBeSoldNew = +new BN(hardCapInTokens)
+      //     .multipliedBy(percentagesShouldBeSold[currentTierNew - 1])
+      //     .dividedBy(100)
+      //     .minus(tokensSold)
+      //     .toString(10);
+      //   // (+hardCapInTokens * percentagesShouldBeSold[currentTierNew - 1]) / 100;
+      // }
+      // const percentageOfTokensSoldInCurrentTierNew = (+tokensSold / +tokensShouldBeSoldNew) * 100;
+      // const percentageOfTokensSoldInCurrentTierNew = +new BN(tokensSold)
+      //   .dividedBy(tokensShouldBeSoldNew)
+      //   .multipliedBy(100)
+      //   .toFixed(2);
+      const percentageOfTokensSoldInCurrentTierNew = +new BN(tokensSoldNew)
+        .dividedBy(tokensShouldBeSoldNew)
+        .multipliedBy(100)
+        .toFixed(2);
       setPercentageOfTokensSoldInCurrentTier(percentageOfTokensSoldInCurrentTierNew);
       setTokensShouldBeSold(tokensShouldBeSoldNew);
+      setTokensSoldInCurrentTier(tokensSoldNew);
       // console.log('PagePool getTierTime:', {
       //   currentTierNew,
       //   hardCap,
+      //   tokensForSaleLeft,
       //   tokensShouldBeSoldNew,
       //   tokensSold,
       //   percentagesShouldBeSold,
@@ -784,8 +820,7 @@ const Pool: React.FC = () => {
       console.error(e);
     }
   }, [
-    // hardCap,
-    tokensSold,
+    tokensForSaleLeft,
     tier,
     info,
     openTimePresale,
@@ -793,6 +828,7 @@ const Pool: React.FC = () => {
     isInvestmentTime,
     hardCapInTokens,
   ]);
+  // console.log('Pool currentTier:', currentTier);
 
   const getPoolStatus = useCallback(async () => {
     try {
@@ -811,7 +847,7 @@ const Pool: React.FC = () => {
     try {
       let ContractPresale = ContractPresalePublicWithMetamask;
       if (isCertified) ContractPresale = ContractPresaleCertifiedWithMetamask;
-      const result = await ContractPresale.cancelPresale({
+      const result = ContractPresale.cancelPresale({
         userAddress,
         contractAddress: address,
       });
@@ -847,7 +883,7 @@ const Pool: React.FC = () => {
     try {
       let ContractPresale = ContractPresalePublicWithMetamask;
       if (isCertified) ContractPresale = ContractPresaleCertifiedWithMetamask;
-      const result = await ContractPresale.collectFee({
+      const result = ContractPresale.collectFee({
         userAddress,
         contractAddress: address,
       });
@@ -894,7 +930,7 @@ const Pool: React.FC = () => {
     try {
       let ContractPresale = ContractPresalePublicWithMetamask;
       if (isCertified) ContractPresale = ContractPresaleCertifiedWithMetamask;
-      const result = await ContractPresale.claimTokens({
+      const result = ContractPresale.claimTokens({
         userAddress,
         contractAddress: address,
       });
@@ -930,7 +966,7 @@ const Pool: React.FC = () => {
     try {
       let ContractPresale = ContractPresalePublicWithMetamask;
       if (isCertified) ContractPresale = ContractPresaleCertifiedWithMetamask;
-      const result = await ContractPresale.withdrawInvestment({
+      const result = ContractPresale.withdrawInvestment({
         userAddress,
         contractAddress: address,
       });
@@ -1851,18 +1887,33 @@ const Pool: React.FC = () => {
           <div className="grow-scale-progress">
             <div
               className="grow-scale-progress-value"
-              style={{ width: `${percentOfTokensSold}%` }}
+              style={{ width: `${percentageOfTokensSoldInCurrentTier}%` }}
             />
           </div>
         </div>
-
         <div className="grow-info">
           <div className="grow-min">
-            {prettyNumber(percentOfTokensSold.toString()) || 0}% (Min{' '}
-            {!Number.isNaN(+percentOfSoftCap) ? percentOfSoftCap : 0}%)
+            {!isCertified && (
+              <div>
+                {tiers[+currentTier - 1] || 'Current'} stage completion{' '}
+                {prettyNumber(percentageOfTokensSoldInCurrentTier.toString()) || 0}%
+              </div>
+            )}
+            <div className="grow-total">
+              Total completion {prettyNumber(percentOfTokensSold.toString()) || 0}%
+            </div>
           </div>
           <div className="grow-max">
-            {tokensSold || 0} / {prettyNumber(hardCapInTokens) || 0} {tokenSymbol}
+            {!isCertified && (
+              <div>
+                {tokensSoldInCurrentTier || 0} /{' '}
+                {prettyNumber(`${tokensShouldBeSold}`) || prettyNumber(hardCapInTokens)}{' '}
+                {tokenSymbol}
+              </div>
+            )}
+            <div className="grow-total">
+              {tokensSold || 0} / {prettyNumber(hardCapInTokens) || 0} {tokenSymbol}
+            </div>
           </div>
         </div>
       </div>
