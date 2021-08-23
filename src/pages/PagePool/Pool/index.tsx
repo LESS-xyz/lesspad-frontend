@@ -200,6 +200,7 @@ const Pool: React.FC = () => {
   const [tokensShouldBeSold, setTokensShouldBeSold] = useState<number>(hardCap);
   // console.log('Pool:', { percentageOfTokensSoldInCurrentTier, tokensShouldBeSold });
 
+  const isInfo = token !== '...';
   const isBeforeVotimgTime = openTimeVoting > NOW;
   const isVotingTime = openTimeVoting <= NOW && closeTimeVoting > NOW;
   const isBeforeRegistrationTime =
@@ -321,13 +322,13 @@ const Pool: React.FC = () => {
 
   const getTokenDecimals = useCallback(async () => {
     try {
-      if (!info) return;
+      if (!isInfo) return;
       const resultTokenDecimals = await ContractERC20.decimals({ contractAddress: token });
       setTokenDecimals(resultTokenDecimals);
     } catch (e) {
       console.error(e);
     }
-  }, [info, ContractERC20, token]);
+  }, [isInfo, ContractERC20, token]);
 
   const getNativeTokenInfo = useCallback(async () => {
     try {
@@ -399,6 +400,7 @@ const Pool: React.FC = () => {
 
   const getMyVote = useCallback(async () => {
     try {
+      if (!address) return;
       if (!ContractPresalePublic) return;
       const resultVote = await ContractPresalePublic.getMyVote(address, userAddress);
       setMyVote(+resultVote);
@@ -447,25 +449,6 @@ const Pool: React.FC = () => {
       return { success: false, data: null };
     }
   }, [userAddress, web3]);
-
-  /* const handleTransactionHash = useCallback(
-    (txHash: string) => {
-      toggleModal({
-        open: true,
-        text: (
-          <div className={s.messageContainer}>
-            <p>Transaction submitted</p>
-            <div className={s.messageContainerButtons}>
-              <Button href={`${config.EXPLORERS[chainType]}/tx/${txHash}`}>
-                View on etherscan
-              </Button>
-            </div>
-          </div>
-        ),
-      });
-    },
-    [toggleModal, chainType],
-  );*/
 
   const handleTransactionWentWrong = useCallback(() => {
     toggleModal({
@@ -651,6 +634,8 @@ const Pool: React.FC = () => {
 
   const getUserRegister = useCallback(async () => {
     try {
+      if (!address) return;
+      if (!userAddress) return;
       let ContractPresale = ContractPresalePublic;
       if (isCertified) ContractPresale = ContractPresaleCertified;
       const resultRegister = await ContractPresale.getUserRegister(address, userAddress);
@@ -733,6 +718,7 @@ const Pool: React.FC = () => {
 
   const getDecimals = useCallback(async () => {
     try {
+      if (!ContractLessToken) return;
       const resultLessDecimals = await ContractLessToken.decimals();
       setLessDecimals(resultLessDecimals);
     } catch (e) {
@@ -749,13 +735,10 @@ const Pool: React.FC = () => {
     }
   }, [ContractStaking, userAddress]);
 
-  // todo: fix, and for certified
   const getTierTime = useCallback(() => {
     try {
-      if (!info) return;
+      if (!isInfo) return;
       if (!tier) return;
-      if (openTimePresale === '0') return;
-      if (closeTimePresale === '0') return;
       const tierTimeNew = +openTimePresale + TIER_DURATION * (5 - +tier);
       const isMyTierTimeNew = isInvestmentTime && tierTimeNew <= NOW;
       const timeBeforeMyTierNew = dayjs(tierTimeNew).fromNow();
@@ -829,15 +812,7 @@ const Pool: React.FC = () => {
     } catch (e) {
       console.error(e);
     }
-  }, [
-    tokensForSaleLeft,
-    tier,
-    info,
-    openTimePresale,
-    closeTimePresale,
-    isInvestmentTime,
-    hardCapInTokens,
-  ]);
+  }, [tokensForSaleLeft, tier, isInfo, openTimePresale, isInvestmentTime, hardCapInTokens]);
   // console.log('Pool currentTier:', currentTier);
 
   const getPoolStatus = useCallback(async () => {
@@ -1975,121 +1950,127 @@ const Pool: React.FC = () => {
       <YourTier tier={tier} className="tier-block" />
 
       {/*Your Investment*/}
-      <div className="container-header">Your Investment</div>
+      {isInfo && (
+        <>
+          <div className="container-header">Your Investment</div>
 
-      {/*Voting*/}
-      {!isCertified ? (
-        isBeforeVotimgTime ? (
-          <div className="container-presale-status">
-            <div className="container-presale-status-inner">
-              <div className="gradient-header">Voting will start</div>
-              <div className="presale-status-text">{timeBeforeVoting}</div>
+          {/*Voting*/}
+          {!isCertified ? (
+            isBeforeVotimgTime ? (
+              <div className="container-presale-status">
+                <div className="container-presale-status-inner">
+                  <div className="gradient-header">Voting will start</div>
+                  <div className="presale-status-text">{timeBeforeVoting}</div>
+                </div>
+              </div>
+            ) : isVotingTime ? (
+              <div className="container-presale-status">
+                <div className="container-presale-status-inner">
+                  <div className="gradient-header">Voting started</div>
+                  <div className="presale-status-text">{timeBeforeVoting}</div>
+                </div>
+              </div>
+            ) : null
+          ) : null}
+          {showHtmlVotingIsNotSuccessfulForUser && htmlVotingIsNotSuccessfulForUser}
+          {showHtmlVotingIsNotSuccessfulForCreator && htmlVotingIsNotSuccessfulForCreator}
+          {showHtmlVotingIsNotSuccessfulAndPresaleIsClosedForCreator &&
+            htmlVotingIsNotSuccessfulAndPresaleIsClosedForCreator}
+
+          {/*Registration*/}
+          {isBeforeRegistrationTime ? (
+            <div className="container-presale-status">
+              <div className="container-presale-status-inner">
+                <div className="gradient-header">Registration will start</div>
+                <div className="presale-status-text">{timeBeforeRegistration}</div>
+              </div>
             </div>
-          </div>
-        ) : isVotingTime ? (
-          <div className="container-presale-status">
-            <div className="container-presale-status-inner">
-              <div className="gradient-header">Voting started</div>
-              <div className="presale-status-text">{timeBeforeVoting}</div>
+          ) : isRegistrationTime && isVotingSuccessful ? (
+            <div className="container-presale-status">
+              <div className="container-presale-status-inner">
+                <div className="gradient-header">Registration started</div>
+                <div className="presale-status-text">{timeBeforeRegistration}</div>
+              </div>
             </div>
-          </div>
-        ) : null
-      ) : null}
-      {showHtmlVotingIsNotSuccessfulForUser && htmlVotingIsNotSuccessfulForUser}
-      {showHtmlVotingIsNotSuccessfulForCreator && htmlVotingIsNotSuccessfulForCreator}
-      {showHtmlVotingIsNotSuccessfulAndPresaleIsClosedForCreator &&
-        htmlVotingIsNotSuccessfulAndPresaleIsClosedForCreator}
+          ) : null}
 
-      {/*Registration*/}
-      {isBeforeRegistrationTime ? (
-        <div className="container-presale-status">
-          <div className="container-presale-status-inner">
-            <div className="gradient-header">Registration will start</div>
-            <div className="presale-status-text">{timeBeforeRegistration}</div>
-          </div>
-        </div>
-      ) : isRegistrationTime && isVotingSuccessful ? (
-        <div className="container-presale-status">
-          <div className="container-presale-status-inner">
-            <div className="gradient-header">Registration started</div>
-            <div className="presale-status-text">{timeBeforeRegistration}</div>
-          </div>
-        </div>
-      ) : null}
+          {/*Softcap is not reached*/}
+          {showHtmlPresaleIsNotSuccessfulAndIsClosedForUser &&
+            htmlPresaleIsNotSuccessfulAndIsClosedForUser}
+          {showHtmlPresaleIsNotSuccessfulForCreator && htmlPresaleIsNotSuccessfulForCreator}
+          {showHtmlPresaleIsNotSuccessfulAndIsClosedForCreator &&
+            htmlPresaleIsNotSuccessfulAndIsClosedForCreator}
 
-      {/*Softcap is not reached*/}
-      {showHtmlPresaleIsNotSuccessfulAndIsClosedForUser &&
-        htmlPresaleIsNotSuccessfulAndIsClosedForUser}
-      {showHtmlPresaleIsNotSuccessfulForCreator && htmlPresaleIsNotSuccessfulForCreator}
-      {showHtmlPresaleIsNotSuccessfulAndIsClosedForCreator &&
-        htmlPresaleIsNotSuccessfulAndIsClosedForCreator}
+          {/*Certified presale*/}
+          {/*Audit is not approved*/}
+          {showHtmlAuditIsNotApprovedForUserOnCertified && htmlAuditIsNotApprovedForUserOnCertified}
+          {showHtmlAuditIsNotApprovedForCreatorOnCertified &&
+            htmlAuditIsNotApprovedForCreatorOnCertified}
+          {showHtmlAuditIsNotApprovedAndPresaleIsClosedForCreatorOnCertified &&
+            htmlAuditIsNotApprovedAndPresaleIsClosedForCreatorOnCertified}
 
-      {/*Certified presale*/}
-      {/*Audit is not approved*/}
-      {showHtmlAuditIsNotApprovedForUserOnCertified && htmlAuditIsNotApprovedForUserOnCertified}
-      {showHtmlAuditIsNotApprovedForCreatorOnCertified &&
-        htmlAuditIsNotApprovedForCreatorOnCertified}
-      {showHtmlAuditIsNotApprovedAndPresaleIsClosedForCreatorOnCertified &&
-        htmlAuditIsNotApprovedAndPresaleIsClosedForCreatorOnCertified}
+          {/*Softcap is not reached*/}
+          {showHtmlPresaleIsNotSuccessfulAndIsClosedForUserOnCertified &&
+            htmlPresaleIsNotSuccessfulAndIsClosedForUser}
+          {showHtmlPresaleIsNotSuccessfulForCreatorOnCertified &&
+            htmlPresaleIsNotSuccessfulForCreator}
+          {showHtmlPresaleIsNotSuccessfulAndIsClosedForCreatorOnCertified &&
+            htmlPresaleIsNotSuccessfulAndIsClosedForCreator}
 
-      {/*Softcap is not reached*/}
-      {showHtmlPresaleIsNotSuccessfulAndIsClosedForUserOnCertified &&
-        htmlPresaleIsNotSuccessfulAndIsClosedForUser}
-      {showHtmlPresaleIsNotSuccessfulForCreatorOnCertified && htmlPresaleIsNotSuccessfulForCreator}
-      {showHtmlPresaleIsNotSuccessfulAndIsClosedForCreatorOnCertified &&
-        htmlPresaleIsNotSuccessfulAndIsClosedForCreator}
+          {/*Investment end*/}
+          {isUserCreator &&
+            (isInvestmentTime ? (
+              <div className="container-presale-status">
+                <div className="container-presale-status-inner">
+                  <div className="gradient-header">Investment ends</div>
+                  <div className="presale-status-text">{timeBeforeInvestmentEnd}</div>
+                </div>
+              </div>
+            ) : null)}
 
-      {/*Investment end*/}
-      {isUserCreator &&
-        (isInvestmentTime ? (
-          <div className="container-presale-status">
-            <div className="container-presale-status-inner">
-              <div className="gradient-header">Investment ends</div>
-              <div className="presale-status-text">{timeBeforeInvestmentEnd}</div>
+          {/*Buttons*/}
+          {openTimePresale !== '0' ? (
+            <div className="box box-bg">
+              <div className="row">
+                {/*Public presale*/}
+                {/*Voting*/}
+                {showHtmlVoting && htmlVoting}
+                {showHtmlYouVoted && htmlYouVoted}
+                {/*Registration*/}
+                {showHtmlCollectFee && htmlCollectFeeWhenVotingNotSuccessful}
+                {showHtmlRegistration && htmlRegistration}
+                {showHtmlYouAreRegistered && htmlYouAreRegistered}
+                {/*Investment*/}
+                {showHtmlYouNeedToBeRegisteredToInvest && htmlYouNeedToBeRegisteredToInvest}
+                {showHtmlInvestment && htmlInvestment}
+                {showHtmlInvestmentIsClosed && htmlInvestmentIsClosed}
+                {/*Claim tokens*/}
+                {showHtmlClaimTokens && htmlClaimTokens}
+                {showHtmlCancelPresale && htmlCancelPresale}
+                {/*Withdraw investment*/}
+                {showHtmlWithdrawInvestment && htmlWithdrawInvestment}
+
+                {/*Certified presale*/}
+                {/*Registration*/}
+                {showHtmlRegistrationOnCertified && htmlRegistration}
+                {showHtmlYouAreRegisteredOnCertified && htmlYouAreRegistered}
+                {/*Investment*/}
+                {showHtmlYouNeedToBeRegisteredToInvestOnCertified &&
+                  htmlYouNeedToBeRegisteredToInvest}
+                {showHtmlInvestmentOnCertified && htmlInvestment}
+                {showHtmlInvestmentIsClosedOnCertified && htmlInvestmentIsClosed}
+                {/*Claim tokens*/}
+                {showHtmlClaimTokensOnCertified && htmlClaimTokens}
+                {showHtmlClosePresaleOnCertified && htmlCancelPresale}
+                {/*Claim tokens*/}
+                {showHtmlCollectFeeOnCertified && htmlCollectFeeWhenNotApproved}
+                {/*Withdraw investment*/}
+                {showHtmlWithdrawInvestmentOnCertified && htmlWithdrawInvestment}
+              </div>
             </div>
-          </div>
-        ) : null)}
-
-      {/*Buttons*/}
-      {openTimePresale !== '0' ? (
-        <div className="box box-bg">
-          <div className="row">
-            {/*Public presale*/}
-            {/*Voting*/}
-            {showHtmlVoting && htmlVoting}
-            {showHtmlYouVoted && htmlYouVoted}
-            {/*Registration*/}
-            {showHtmlCollectFee && htmlCollectFeeWhenVotingNotSuccessful}
-            {showHtmlRegistration && htmlRegistration}
-            {showHtmlYouAreRegistered && htmlYouAreRegistered}
-            {/*Investment*/}
-            {showHtmlYouNeedToBeRegisteredToInvest && htmlYouNeedToBeRegisteredToInvest}
-            {showHtmlInvestment && htmlInvestment}
-            {showHtmlInvestmentIsClosed && htmlInvestmentIsClosed}
-            {/*Claim tokens*/}
-            {showHtmlClaimTokens && htmlClaimTokens}
-            {showHtmlCancelPresale && htmlCancelPresale}
-            {/*Withdraw investment*/}
-            {showHtmlWithdrawInvestment && htmlWithdrawInvestment}
-
-            {/*Certified presale*/}
-            {/*Registration*/}
-            {showHtmlRegistrationOnCertified && htmlRegistration}
-            {showHtmlYouAreRegisteredOnCertified && htmlYouAreRegistered}
-            {/*Investment*/}
-            {showHtmlYouNeedToBeRegisteredToInvestOnCertified && htmlYouNeedToBeRegisteredToInvest}
-            {showHtmlInvestmentOnCertified && htmlInvestment}
-            {showHtmlInvestmentIsClosedOnCertified && htmlInvestmentIsClosed}
-            {/*Claim tokens*/}
-            {showHtmlClaimTokensOnCertified && htmlClaimTokens}
-            {showHtmlClosePresaleOnCertified && htmlCancelPresale}
-            {/*Claim tokens*/}
-            {showHtmlCollectFeeOnCertified && htmlCollectFeeWhenNotApproved}
-            {/*Withdraw investment*/}
-            {showHtmlWithdrawInvestmentOnCertified && htmlWithdrawInvestment}
-          </div>
-        </div>
-      ) : null}
+          ) : null}
+        </>
+      )}
 
       {/*Participants*/}
       <ParticipantsTable poolAddress={address} isCertified={isCertified} />
