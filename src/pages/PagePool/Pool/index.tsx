@@ -1719,7 +1719,12 @@ const Pool: React.FC = () => {
     isPresaleClosed;
   // инвестор может (создатель не может) забрать токены после окончания пресейла и добавления ликвидности (если она есть)
   const showHtmlClaimTokens =
-    !isCertified && !isUserCreator && isPresaleClosed && !cancelled && isPresaleSuccessful && liquidityAdded;
+    !isCertified &&
+    !isUserCreator &&
+    isPresaleClosed &&
+    !cancelled &&
+    isPresaleSuccessful &&
+    liquidityAdded;
   //   Создателем пресейла Cancel presale может использоваться в случае, если не набран софткап.
   //   В случае  ненабора голосов используется метод collect fee для того чтоб овнер пресейла мог вывести не только бабло в токенах, но и свои 1000$
   // Создатель может отменять ТОЛЬКО свой пресейл и ТОЛЬКО после инвеста, если не набран софткап
