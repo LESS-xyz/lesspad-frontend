@@ -620,6 +620,7 @@ const Pool: React.FC = () => {
           poolPercentages,
           stakingTiers,
         });
+        getInvestments();
       }
       console.log('PagePool invest:', resultInvest);
     } catch (e) {
@@ -637,6 +638,7 @@ const Pool: React.FC = () => {
     tokenDecimals,
     loginToBackend,
     userAddress,
+    getInvestments,
   ]);
 
   const getUserRegister = useCallback(async () => {
@@ -1341,14 +1343,6 @@ const Pool: React.FC = () => {
     </div>
   );
 
-  const htmlAuditIsNotApprovedForCreatorOnCertified = (
-    <div className="container-presale-status">
-      <div className="container-presale-status-inner">
-        <div className="gradient-header">Audit is not successful</div>
-      </div>
-    </div>
-  );
-
   const htmlAuditIsNotApprovedAndPresaleIsClosedForCreatorOnCertified = (
     <div className="container-presale-status">
       <div className="container-presale-status-inner">
@@ -1735,7 +1729,7 @@ const Pool: React.FC = () => {
   //   В случае  ненабора голосов используется метод collect fee для того чтоб овнер пресейла мог вывести не только бабло в токенах, но и свои 1000$
   // Создатель может отменять ТОЛЬКО свой пресейл и ТОЛЬКО после инвеста, если не набран софткап
   const showHtmlCancelPresale =
-    !isCertified && isUserCreator && isPresaleClosed && !isPresaleSuccessful;
+    !isCertified && isUserCreator && isPresaleClosed && !isPresaleSuccessful && !cancelled;
   // Claim tokens
   // инвестор может (создатель не может) забрать токены после окончания пресейла и добавления ликвидности (если она есть)
   const showHtmlClaimTokens =
@@ -1754,12 +1748,6 @@ const Pool: React.FC = () => {
     isUserCreator &&
     (isRegistrationTime || isInvestmentTime || isPresaleClosed) &&
     !approved;
-  const showHtmlAuditIsNotApprovedForCreatorOnCertified =
-    isCertified &&
-    isUserCreator &&
-    (isRegistrationTime || isInvestmentTime || isPresaleClosed) &&
-    !approved &&
-    !didCreatorCollectFee;
   const showHtmlAuditIsNotApprovedAndPresaleIsClosedForCreatorOnCertified =
     isCertified &&
     isUserCreator &&
@@ -1821,17 +1809,22 @@ const Pool: React.FC = () => {
     approved &&
     isPresaleClosed &&
     !isPresaleSuccessful &&
-    didCreatorCollectFee;
+    cancelled;
   // Cancel presale (Close presale)
   // админом платформы может использоваться в любой момент.
   //   Овнером пресейла он может использоваться в случае, если не набран софткап.
   //   В случае  ненабора голосов используется метод collect fee для того чтоб овнер пресейла мог вывести не только бабло в токенах, но и свои 1000$
   // Создатель может отменять ТОЛЬКО свой пресейл и ТОЛЬКО после инвеста, если не набран софткап
-  const showHtmlClosePresaleOnCertified =
-    isCertified && isUserCreator && isPresaleClosed && !isPresaleSuccessful;
+  const showHtmlCancelPresaleOnCertified =
+    isCertified && isUserCreator && isPresaleClosed && !isPresaleSuccessful && !cancelled;
   // Withdraw investment
+  // Если пресейл завершился и не набрал софткап
   const showHtmlWithdrawInvestmentOnCertified =
-    isCertified && !isUserCreator && (isInvestmentTime || isPresaleClosed) && didUserInvest;
+    isCertified &&
+    !isUserCreator &&
+    (isInvestmentTime || isPresaleClosed) &&
+    !isPresaleSuccessful &&
+    didUserInvest;
   // Claim tokens
   // при успешном пресейле
   // Кнопка НЕ должна появляться у не-инвесторов и овнера пресейла
@@ -2054,8 +2047,6 @@ const Pool: React.FC = () => {
 
           {/*Audit is not approved*/}
           {showHtmlAuditIsNotApprovedForUserOnCertified && htmlAuditIsNotApprovedForUserOnCertified}
-          {showHtmlAuditIsNotApprovedForCreatorOnCertified &&
-            htmlAuditIsNotApprovedForCreatorOnCertified}
           {showHtmlAuditIsNotApprovedAndPresaleIsClosedForCreatorOnCertified &&
             htmlAuditIsNotApprovedAndPresaleIsClosedForCreatorOnCertified}
 
@@ -2107,7 +2098,7 @@ const Pool: React.FC = () => {
                 {showHtmlClaimTokensOnCertified && htmlClaimTokens}
                 {showHtmlClaimTokensOnCertifiedWithLiquidity && htmlClaimTokens}
                 {/*Cancel presale*/}
-                {showHtmlClosePresaleOnCertified && htmlCancelPresale}
+                {showHtmlCancelPresaleOnCertified && htmlCancelPresale}
                 {/*Claim tokens*/}
                 {showHtmlCollectFeeOnCertified && htmlCollectFeeWhenNotApproved}
                 {/*Withdraw investment*/}
