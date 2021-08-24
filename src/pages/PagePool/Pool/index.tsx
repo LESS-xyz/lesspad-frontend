@@ -1868,7 +1868,11 @@ const Pool: React.FC = () => {
           <div className="grow-scale-progress">
             <div
               className="grow-scale-progress-value"
-              style={{ width: `${percentageOfTokensSoldInCurrentTier}%` }}
+              style={{
+                width: `${
+                  !isCertified ? percentageOfTokensSoldInCurrentTier : percentOfTokensSold
+                }%`,
+              }}
             />
           </div>
         </div>
