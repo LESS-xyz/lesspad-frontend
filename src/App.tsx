@@ -8,7 +8,7 @@ import { Modal } from './components/Modal';
 import { useContractsContext } from './contexts/ContractsContext';
 import { libraryActions, poolActions } from './redux/actions';
 import { convertFromWei } from './utils/ethereum';
-import { storageCache } from './utils/localStorage';
+// import { storageCache } from './utils/localStorage';
 import { Header } from './components';
 import {
   AboutPage,
