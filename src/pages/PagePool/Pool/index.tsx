@@ -806,8 +806,11 @@ const Pool: React.FC = () => {
       if (!isInfo) return;
       if (!tier) return;
       const tierTimeNew = +openTimePresale + TIER_DURATION * (5 - +tier);
-      const isMyTierTimeNew = isInvestmentTime && tierTimeNew <= NOW;
-      const timeBeforeMyTierNew = dayjs(tierTimeNew).fromNow();
+      const isMyTierTimeNew =
+        isInvestmentTime && (isCertified ? openTimePresale : tierTimeNew) <= NOW;
+      const timeBeforeMyTierNew = isCertified
+        ? dayjs(openTimePresale).fromNow()
+        : dayjs(tierTimeNew).fromNow();
       setIsMyTierTime(isMyTierTimeNew);
       setTimeBeforeMyTier(timeBeforeMyTierNew);
       // percentage should be sold in current tier
@@ -878,7 +881,15 @@ const Pool: React.FC = () => {
     } catch (e) {
       console.error(e);
     }
-  }, [tokensForSaleLeft, tier, isInfo, openTimePresale, isInvestmentTime, hardCapInTokens]);
+  }, [
+    isCertified,
+    tokensForSaleLeft,
+    tier,
+    isInfo,
+    openTimePresale,
+    isInvestmentTime,
+    hardCapInTokens,
+  ]);
   // console.log('Pool currentTier:', currentTier);
 
   const getPoolStatus = useCallback(async () => {
@@ -1863,11 +1874,11 @@ const Pool: React.FC = () => {
     !isUserRegister;
   const showHtmlInvestmentOnCertified =
     isCertified && !isUserCreator && isInvestmentTime && isInvestStart && approved && isWhitelist
-      ? isUserInWhitelist
+      ? isUserInWhitelist && (tier === '5' || tier === '4')
       : isUserRegister;
   const showHtmlInvestmentIsClosedOnCertified =
     isCertified && isInvestmentTime && isInvestStart && approved && isPresaleClosed && isWhitelist
-      ? isUserInWhitelist
+      ? isUserInWhitelist && (tier === '5' || tier === '4')
       : isUserRegister;
   // Softcap is not reached
   // This happens only when audit is approved
