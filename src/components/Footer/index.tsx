@@ -37,18 +37,38 @@ const Footer: React.FC = () => {
           <div className={s.info}>
             <div className={s.info_text}>2021 © Lesspad a product of Less Token — less.xyz</div>
             <div className={s.social_links}>
-              <div className={s.social_link}>
+              <a
+                href="https://twitter.com/LessToken"
+                target="_blank"
+                rel="noreferrer nooppener"
+                className={s.social_link}
+              >
                 <img src={twitter} alt="twitter" />
-              </div>
-              <div className={s.social_link}>
+              </a>
+              <a
+                href="https://less-token.medium.com/"
+                target="_blank"
+                rel="noreferrer nooppener"
+                className={s.social_link}
+              >
                 <img src={medium} alt="medium" />
-              </div>
-              <div className={s.social_link}>
+              </a>
+              <a
+                href="https://t.me/lesstokenann"
+                target="_blank"
+                rel="noreferrer nooppener"
+                className={s.social_link}
+              >
                 <img src={telegram} alt="telegram" />
-              </div>
-              <div className={s.social_link}>
+              </a>
+              <a
+                href="https://github.com/LESS-xyz"
+                target="_blank"
+                rel="noreferrer nooppener"
+                className={s.social_link}
+              >
                 <img src={github} alt="github" />
-              </div>
+              </a>
             </div>
           </div>
         </div>
