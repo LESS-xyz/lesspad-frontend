@@ -14,6 +14,11 @@ type TypeGetInfoProps = {
   contractAddress: string;
 };
 
+type TypeGetIntermediateInfoProps = {
+  tokenAddress: string;
+  contractAddress: string;
+};
+
 type TypeClaimTokensProps = {
   contractAddress: string;
   userAddress: string;
@@ -198,6 +203,50 @@ export default class ContractPresalePublicService {
       };
     } catch (e) {
       console.error('ContractPresalePublicService getInfo:', e);
+      return null;
+    }
+  };
+
+  public getIntermediateInfo = async (props: TypeGetIntermediateInfoProps): Promise<any> => {
+    try {
+      const { tokenAddress, contractAddress } = props;
+      const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
+      const intermediate = await contract.methods.intermediate().call();
+      console.log('ContractPresalePublicService getIntermediateInfo:', {
+        intermediate,
+      });
+      const contractToken = new this.web3.eth.Contract(ERC20Abi, tokenAddress);
+      const decimals = await contractToken.methods.decimals().call();
+      const {
+        cancelled,
+        liquidityAdded,
+        beginingAmount,
+        raisedAmount,
+        raisedAmountBeforeLiquidity,
+        participants,
+        yesVotes,
+        noVotes,
+        lastTotalStakedAmount,
+      } = intermediate;
+      // format
+      const pow = new BN(10).pow(new BN(decimals));
+      const beginingAmountInEth = +new BN(beginingAmount).div(pow);
+      const raisedAmountInEth = +new BN(raisedAmount).div(pow);
+      const raisedAmountBeforeLiquidityInEth = +new BN(raisedAmountBeforeLiquidity).div(pow);
+      // result
+      return {
+        beginingAmount: beginingAmountInEth,
+        cancelled,
+        liquidityAdded,
+        participants,
+        raisedAmount: raisedAmountInEth,
+        raisedAmountBeforeLiquidity: raisedAmountBeforeLiquidityInEth,
+        yesVotes,
+        noVotes,
+        lastTotalStakedAmount,
+      };
+    } catch (e) {
+      console.error('ContractPresalePublicService getIntermediateInfo:', e);
       return null;
     }
   };

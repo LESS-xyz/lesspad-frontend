@@ -14,6 +14,11 @@ type TypeGetInfoProps = {
   contractAddress: string;
 };
 
+type TypeGetIntermediateInfoProps = {
+  tokenAddress: string;
+  contractAddress: string;
+};
+
 type TypeClaimTokensProps = {
   contractAddress: string;
   userAddress: string;
@@ -195,6 +200,45 @@ export default class ContractPresaleCertifiedService {
       };
     } catch (e) {
       console.error('ContractPresaleCertified getInfo:', e);
+      return null;
+    }
+  };
+
+  public getIntermediateInfo = async ({
+    tokenAddress,
+    contractAddress,
+  }: TypeGetIntermediateInfoProps): Promise<any> => {
+    try {
+      const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
+      const intermediate = await contract.methods.intermediate().call();
+      console.log('ContractPresaleCertified getIntermediateInfo:', {
+        intermediate,
+      });
+      const contractToken = new this.web3.eth.Contract(ERC20Abi, tokenAddress);
+      const decimals = await contractToken.methods.decimals().call();
+      const {
+        approved,
+        cancelled,
+        liquidityAdded,
+        beginingAmount,
+        raisedAmount,
+        participants,
+      } = intermediate;
+      // format
+      const pow = new BN(10).pow(new BN(decimals));
+      const beginingAmountInEth = +new BN(beginingAmount).div(pow);
+      const raisedAmountInEth = +new BN(raisedAmount).div(pow); // todo: decimals of native token
+      // result
+      return {
+        approved,
+        cancelled,
+        liquidityAdded,
+        beginingAmount: beginingAmountInEth,
+        raisedAmount: raisedAmountInEth,
+        participants,
+      };
+    } catch (e) {
+      console.error('ContractPresaleCertified getIntermediateInfo:', e);
       return null;
     }
   };

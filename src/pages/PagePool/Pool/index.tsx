@@ -77,12 +77,12 @@ const defaultInfo = {
   liquidityPercentageAllocation: '0',
   liquidityAllocationTime: '0',
   // #additional
-  approved: false,
-  beginingAmount: '0',
   cancelled: false,
   liquidityAdded: '0',
-  participants: '',
+  beginingAmount: '0',
   raisedAmount: '0',
+  raisedAmountBeforeLiquidity: '0',
+  participants: '',
   yesVotes: '0',
   noVotes: '0',
   lastTotalStakedAmount: '0',
@@ -92,6 +92,8 @@ const defaultInfo = {
   privatePresale: false,
   vesting: 0,
   nativeToken: '',
+  // # intermediate certified
+  approved: false,
 };
 const tiers = ['Pawn', 'Bishop', 'Rook', 'Queen', 'King'];
 
@@ -111,6 +113,7 @@ const Pool: React.FC = () => {
   } = useContractsContext();
 
   const [info, setInfo] = useState<any>(defaultInfo);
+  const [intermediateInfo, setIntermediateInfo] = useState<any>(defaultInfo);
 
   const [isCertified, setIsCertified] = useState<boolean>(false);
   const [tier, setTier] = React.useState<string>('');
@@ -185,6 +188,15 @@ const Pool: React.FC = () => {
     liquidityPercentageAllocation,
     liquidityAllocationTime,
     // unlockTime,
+    // # certifiedAddition
+    liquidity,
+    // automatically,
+    // vesting,
+    nativeToken,
+    privatePresale,
+  } = info;
+
+  const {
     approved,
     beginingAmount,
     cancelled,
@@ -194,13 +206,7 @@ const Pool: React.FC = () => {
     yesVotes,
     noVotes,
     lastTotalStakedAmount,
-    // # certifiedAddition
-    liquidity,
-    // automatically,
-    // vesting,
-    nativeToken,
-    privatePresale,
-  } = info;
+  } = intermediateInfo;
   const { amountEth: investedEthByUser } = investments;
 
   const [tokensShouldBeSold, setTokensShouldBeSold] = useState<number>(hardCap);
@@ -403,6 +409,57 @@ const Pool: React.FC = () => {
     userAddress,
     address,
     isCertified,
+  ]);
+
+  const getIntermediateInfo = useCallback(async () => {
+    try {
+      if (!token) return;
+      if (!address) return;
+      let newInfo;
+      if (userAddress) {
+        if (isCertified) {
+          if (!ContractPresaleCertifiedWithMetamask) return;
+          newInfo = await ContractPresaleCertifiedWithMetamask.getIntermediateInfo({
+            contractAddress: address,
+            tokenAddress: token,
+          });
+          console.log('PagePool getIntermediateInfo certified:', newInfo);
+        } else {
+          if (!ContractPresalePublicWithMetamask) return;
+          newInfo = await ContractPresalePublicWithMetamask.getIntermediateInfo({
+            contractAddress: address,
+            tokenAddress: token,
+          });
+          console.log('PagePool getIntermediateInfo public:', newInfo);
+        }
+      } else if (isCertified) {
+        if (!ContractPresaleCertified) return;
+        newInfo = await ContractPresaleCertified.getIntermediateInfo({
+          contractAddress: address,
+          tokenAddress: token,
+        });
+        console.log('PagePool getIntermediateInfo certified:', newInfo);
+      } else {
+        if (!ContractPresalePublic) return;
+        newInfo = await ContractPresalePublic.getIntermediateInfo({
+          contractAddress: address,
+          tokenAddress: token,
+        });
+        console.log('PagePool getIntermediateInfo public:', newInfo);
+      }
+      if (newInfo) setIntermediateInfo(newInfo);
+    } catch (e) {
+      console.error('PagePool getIntermediateInfo:', e);
+    }
+  }, [
+    ContractPresaleCertified,
+    ContractPresaleCertifiedWithMetamask,
+    ContractPresalePublicWithMetamask,
+    ContractPresalePublic,
+    userAddress,
+    address,
+    isCertified,
+    token,
   ]);
 
   const getMyVote = useCallback(async () => {
@@ -1070,11 +1127,24 @@ const Pool: React.FC = () => {
     if (!ContractPresaleCertified) return () => {};
     if (isCertified === undefined) return () => {};
     getInfo();
-    const interval = setInterval(() => getInfo(), 30000);
-    return () => {
-      clearInterval(interval);
-    };
+    return () => {};
+    // const interval = setInterval(() => getInfo(), 60000);
+    // return () => {
+    //   clearInterval(interval);
+    // };
   }, [ContractPresalePublic, ContractPresaleCertified, isCertified, getInfo]);
+
+  useEffect(() => {
+    if (!ContractPresalePublic) return () => {};
+    if (!ContractPresaleCertified) return () => {};
+    if (isCertified === undefined) return () => {};
+    getIntermediateInfo();
+    return () => {};
+    // const interval = setInterval(() => getIntermediateInfo(), 10000);
+    // return () => {
+    //   clearInterval(interval);
+    // };
+  }, [ContractPresalePublic, ContractPresaleCertified, isCertified, getIntermediateInfo]);
 
   useEffect(() => {
     if (!ContractLessToken) return;
