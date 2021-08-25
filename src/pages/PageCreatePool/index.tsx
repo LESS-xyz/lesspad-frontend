@@ -180,7 +180,7 @@ const CreatePoolPage: React.FC = () => {
   // чекбоксы
   const [presaleType, setPresaleType] = useState<string>('Certified');
   const [liquidity, setLiquidity] = useState<string>('Liquidity');
-  const [automatically, setAutomatically] = useState<string>('Automatically');
+  // const [automatically, setAutomatically] = useState<string>('Automatically');
   const [vesting, setVesting] = useState<string>('Vesting');
   const [whiteListed, setWhiteListed] = useState<string>('Whitelist');
   // const [isFormSubmitted, setIsFormSubmitted] = useState<boolean>(false);
@@ -190,7 +190,7 @@ const CreatePoolPage: React.FC = () => {
 
   const isPublic = presaleType === 'Public';
   const isLiquidity = liquidity === 'Liquidity';
-  const isAutomatically = automatically === 'Automatically';
+  // const isAutomatically = automatically === 'Automatically';
   const isVesting = vesting === 'Vesting';
   const isWhiteListed = whiteListed === 'Whitelist';
   const isPrivate = isWhiteListed;
@@ -202,7 +202,6 @@ const CreatePoolPage: React.FC = () => {
   const setLibrary = useCallback((params) => dispatch(libraryActions.setLibrary(params)), [
     dispatch,
   ]);
-
   const showMessageIfNoMetamask = useCallback(() => {
     try {
       if (!userAddress) {
@@ -939,7 +938,8 @@ const CreatePoolPage: React.FC = () => {
         const nativeTokenAddress = nativeTokensAddresses[nativeTokenSymbol];
         const certifiedAddition = [
           isLiquidity,
-          isAutomatically,
+          // isAutomatically,
+          false,
           vestingPercent,
           whiteListArray,
           nativeTokenAddress,
@@ -1116,6 +1116,16 @@ const CreatePoolPage: React.FC = () => {
                 error={errors.tokenAddress}
                 validations={validationIfExists}
               />
+              {!isPublic && (
+                <Checkbox
+                  name="Native token"
+                  value={nativeTokenSymbol}
+                  onChange={setNativeTokenSymbol}
+                  options={nativeTokensSymbols.map((symbol: string) => {
+                    return { key: symbol, text: symbol };
+                  })}
+                />
+              )}
               <Input
                 type="number"
                 title="Token Price"
@@ -1216,7 +1226,7 @@ const CreatePoolPage: React.FC = () => {
                     onChange={setLiquidityAllocationTime}
                     error={errors.liquidityAllocationTime}
                   />
-                  {!isPublic && (
+                  {/* {!isPublic && (
                     <Checkbox
                       name="Liquidity allocation Automatically / Not Automatically"
                       value={automatically}
@@ -1226,7 +1236,7 @@ const CreatePoolPage: React.FC = () => {
                         { key: 'Not Automatically', text: 'Not Automatically' },
                       ]}
                     />
-                  )}
+                  )} */}
                 </>
               )}
               {/* Liquidity inputs end */}
@@ -1245,6 +1255,7 @@ const CreatePoolPage: React.FC = () => {
                   {isWhiteListed && (
                     <>
                       <Input
+                        type="addresses"
                         title="Whitelist addresses, comma separated"
                         value={whitelist}
                         onChange={setWhitelist}
@@ -1272,17 +1283,6 @@ const CreatePoolPage: React.FC = () => {
                     </>
                   )}
                 </>
-              )}
-
-              {!isPublic && (
-                <Checkbox
-                  name="Native token"
-                  value={nativeTokenSymbol}
-                  onChange={setNativeTokenSymbol}
-                  options={nativeTokensSymbols.map((symbol: string) => {
-                    return { key: symbol, text: symbol };
-                  })}
-                />
               )}
 
               <Input

@@ -229,22 +229,23 @@ const ParticipantsTable: React.FC<IParticipantsTable> = (props) => {
             </div>
 
             {/*Winners*/}
-            {!isCertified && (isPawns || isBishops) && (
-              <div className={s.table_body_adresses__right}>
-                <div className={`${s.table_body_adresses__title} ${s.winner}`}>
-                  <span>Lottery winners</span>
+            {!isCertified ||
+              (!isPrivate && (isPawns || isBishops) && (
+                <div className={s.table_body_adresses__right}>
+                  <div className={`${s.table_body_adresses__title} ${s.winner}`}>
+                    <span>Lottery winners</span>
+                  </div>
+                  {winnersFiltered.length ? (
+                    winnersFiltered.map((winner) => (
+                      <div key={uuid()} className={`${s.participant} ${s.winner}`}>
+                        <span>{winner}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <div>No data</div>
+                  )}
                 </div>
-                {winnersFiltered.length ? (
-                  winnersFiltered.map((winner) => (
-                    <div key={uuid()} className={`${s.participant} ${s.winner}`}>
-                      <span>{winner}</span>
-                    </div>
-                  ))
-                ) : (
-                  <div>No data</div>
-                )}
-              </div>
-            )}
+              ))}
           </div>
           <div className={s.table_body_pagination}>
             <Pagination countOfPages={countOfPages} onChange={handleChangePage} />

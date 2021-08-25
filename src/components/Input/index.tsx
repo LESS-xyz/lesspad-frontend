@@ -7,7 +7,7 @@ import s from './Input.module.scss';
 
 interface IInputProps {
   title: string;
-  type?: 'text' | 'number';
+  type?: 'text' | 'number' | 'addresses';
   value: string;
   onChange: (str: string) => void;
   error?: string;
@@ -45,14 +45,17 @@ const Input: React.FC<IInputProps> = (props) => {
   const debouncedInputValue = useDebounce(inputValue, delay);
 
   const handleChange = async (str: string) => {
-    let numberValue: string | null = null;
+    let typedValue: string | null = null;
     if (type === 'number') {
-      numberValue = str.replace(/[^\d.,]/g, '').replace(/,/g, '.');
+      typedValue = str.replace(/[^\d.,]/g, '').replace(/,/g, '.');
+    }
+    if (type === 'addresses') {
+      typedValue = str.replace(/[!@#$%^&*()`;.?[\]'":{}|\-\\<>/_+=~]/g, '');
     }
     if (validations) {
       for (let i = 0; i < validations.length; i += 1) {
         const { equation, message } = validations[i];
-        const equal = await equation(numberValue || str);
+        const equal = await equation(typedValue || str);
         if (!equal) {
           setErrorInner(message);
           break; // show only first message if equation returns false
@@ -61,7 +64,7 @@ const Input: React.FC<IInputProps> = (props) => {
         }
       }
     }
-    setInputValue(numberValue || str);
+    setInputValue(typedValue || str);
   };
 
   useEffect(() => {
