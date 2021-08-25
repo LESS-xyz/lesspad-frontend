@@ -1802,7 +1802,8 @@ const Pool: React.FC = () => {
     isInvestStart &&
     isVotingSuccessful &&
     isUserRegister;
-  const showHtmlInvestmentEndsForCreator = isUserCreator && isInvestmentTime;
+  const showHtmlInvestmentEndsForCreator =
+    !isCertified && isUserCreator && isInvestmentTime && isVotingSuccessful;
   const showHtmlInvestmentIsClosed =
     !isCertified &&
     isInvestmentTime &&
@@ -1871,6 +1872,8 @@ const Pool: React.FC = () => {
     !isWhitelist &&
     isUserRegister;
   // Investment
+  const showHtmlInvestmentEndsForCreatorOnCertified =
+    isCertified && isUserCreator && isInvestmentTime && approved;
   const showHtmlYouNeedToBeRegisteredToInvestOnCertified =
     isCertified &&
     !isUserCreator &&
@@ -2132,6 +2135,9 @@ const Pool: React.FC = () => {
           {showHtmlPresaleIsNotSuccessfulAndIsClosedForCreator &&
             htmlPresaleIsNotSuccessfulAndIsClosedForCreator}
 
+          {/*Investment ends*/}
+          {showHtmlInvestmentEndsForCreator && htmlInvestmentEnds}
+
           {/*=============== Certified presale ================*/}
 
           {/*Audit is not approved*/}
@@ -2145,8 +2151,8 @@ const Pool: React.FC = () => {
           {showHtmlPresaleIsNotSuccessfulAndIsClosedForCreatorOnCertified &&
             htmlPresaleIsNotSuccessfulAndIsClosedForCreator}
 
-          {/*Investment end*/}
-          {showHtmlInvestmentEndsForCreator && htmlInvestmentEnds}
+          {/*Investment ends*/}
+          {showHtmlInvestmentEndsForCreatorOnCertified && htmlInvestmentEnds}
 
           {/*=============== Buttons ===============*/}
 
