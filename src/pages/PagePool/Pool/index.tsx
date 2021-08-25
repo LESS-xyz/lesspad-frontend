@@ -2033,7 +2033,8 @@ const Pool: React.FC = () => {
         </div>
         <div className="grow-info">
           <div className="grow-min">
-            {!isCertified && !whitelist.length && +hardCapInTokens !== tokensShouldBeSold && (
+            {((!isCertified && +hardCapInTokens !== tokensShouldBeSold) ||
+              (isCertified && !isWhitelist && +hardCapInTokens !== tokensShouldBeSold)) && (
               <div>
                 {tiers[+currentTier - 1] || 'Current'} stage completion{' '}
                 {prettyNumber(percentageOfTokensSoldInCurrentTier.toString()) || 0}%
@@ -2044,7 +2045,8 @@ const Pool: React.FC = () => {
             </div>
           </div>
           <div className="grow-max">
-            {!isCertified && !whitelist.length && +hardCapInTokens !== tokensShouldBeSold && (
+            {((!isCertified && +hardCapInTokens !== tokensShouldBeSold) ||
+              (isCertified && !isWhitelist && +hardCapInTokens !== tokensShouldBeSold)) && (
               <div>
                 {tokensSoldInCurrentTier || 0} /{' '}
                 {prettyNumber(`${tokensShouldBeSold}`) || prettyNumber(hardCapInTokens)}{' '}
