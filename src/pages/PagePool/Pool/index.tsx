@@ -1745,7 +1745,7 @@ const Pool: React.FC = () => {
   // Audit is not approved
   const showHtmlAuditIsNotApprovedForUserOnCertified =
     isCertified &&
-    isUserCreator &&
+    !isUserCreator &&
     (isRegistrationTime || isInvestmentTime || isPresaleClosed) &&
     !approved;
   const showHtmlAuditIsNotApprovedAndPresaleIsClosedForCreatorOnCertified =
