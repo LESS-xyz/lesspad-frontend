@@ -621,10 +621,13 @@ const Pool: React.FC = () => {
           timestamp,
           poolPercentages,
           stakingTiers,
-        }).on('transactionHash', (txHash: string) => {
-          handleTransactionHash(txHash);
-        });
-        getInvestments();
+        })
+          .on('transactionHash', (txHash: string) => {
+            handleTransactionHash(txHash);
+          })
+          .then(() => {
+            getInvestments();
+          });
       }
       console.log('PagePool invest:', resultInvest);
     } catch (e) {
