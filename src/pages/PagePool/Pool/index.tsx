@@ -1583,16 +1583,18 @@ const Pool: React.FC = () => {
 
   const htmlInvestment = (
     <>
-      <div className="item">
-        <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
-          Your {currency} Investment
-        </div>
-        <div className="item-text">
-          <div className="item-text-bold">
-            {investments.amountEth} {currency}
+      {didUserInvest && (
+        <div className="item">
+          <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
+            Your {currency} Investment
+          </div>
+          <div className="item-text">
+            <div className="item-text-bold">
+              {investments.amountEth} {currency}
+            </div>
           </div>
         </div>
-      </div>
+      )}
       {isMyTierTime ? (
         <div className="item">
           <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
@@ -1633,15 +1635,6 @@ const Pool: React.FC = () => {
         </div>
       )}
     </>
-  );
-
-  const htmlInvestmentIsClosed = (
-    <div className="item">
-      <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
-        Investment
-      </div>
-      <div className="item-text">Is closed</div>
-    </div>
   );
 
   // Presale is successful
@@ -1801,16 +1794,10 @@ const Pool: React.FC = () => {
     isInvestmentTime &&
     isInvestStart &&
     isVotingSuccessful &&
-    isUserRegister;
+    isUserRegister &&
+    !cancelled;
   const showHtmlInvestmentEndsForCreator =
     !isCertified && isUserCreator && isInvestmentTime && isVotingSuccessful;
-  const showHtmlInvestmentIsClosed =
-    !isCertified &&
-    isInvestmentTime &&
-    isInvestStart &&
-    isVotingSuccessful &&
-    isUserRegister &&
-    isPresaleClosed;
   // Withdraw investment
   const showHtmlWithdrawInvestment =
     !isCertified && !isUserCreator && (isInvestmentTime || isPresaleClosed) && didUserInvest;
@@ -1884,11 +1871,13 @@ const Pool: React.FC = () => {
     timeBeforeMyTier &&
     !isUserRegister;
   const showHtmlInvestmentOnCertified =
-    isCertified && !isUserCreator && isInvestmentTime && isInvestStart && approved && isWhitelist
-      ? isUserInWhitelist && (tier === '5' || tier === '4')
-      : isUserRegister;
-  const showHtmlInvestmentIsClosedOnCertified =
-    isCertified && isInvestmentTime && isInvestStart && approved && isPresaleClosed && isWhitelist
+    isCertified &&
+    !isUserCreator &&
+    isInvestmentTime &&
+    isInvestStart &&
+    approved &&
+    !cancelled &&
+    isWhitelist
       ? isUserInWhitelist && (tier === '5' || tier === '4')
       : isUserRegister;
   // Softcap is not reached
@@ -2173,7 +2162,6 @@ const Pool: React.FC = () => {
                 {/*Investment*/}
                 {showHtmlYouNeedToBeRegisteredToInvest && htmlYouNeedToBeRegisteredToInvest}
                 {showHtmlInvestment && htmlInvestment}
-                {showHtmlInvestmentIsClosed && htmlInvestmentIsClosed}
                 {/*Claim tokens*/}
                 {showHtmlClaimTokens && htmlClaimTokens}
                 {showHtmlCancelPresale && htmlCancelPresale}
@@ -2190,7 +2178,6 @@ const Pool: React.FC = () => {
                 {showHtmlYouNeedToBeRegisteredToInvestOnCertified &&
                   htmlYouNeedToBeRegisteredToInvest}
                 {showHtmlInvestmentOnCertified && htmlInvestment}
-                {showHtmlInvestmentIsClosedOnCertified && htmlInvestmentIsClosed}
                 {/*Claim tokens*/}
                 {showHtmlClaimTokensOnCertified && htmlClaimTokens}
                 {showHtmlClaimTokensOnCertifiedWithLiquidity && htmlClaimTokens}
