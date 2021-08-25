@@ -13,11 +13,12 @@ type Tiers = 'pawns' | 'bishops' | 'rooks' | 'queens' | 'kings';
 interface IParticipantsTable {
   poolAddress: string;
   isCertified: boolean;
-  whitelist: string[];
+  whitelist?: string[];
+  isPrivate?: boolean;
 }
 
 const ParticipantsTable: React.FC<IParticipantsTable> = (props) => {
-  const { poolAddress, isCertified, whitelist } = props;
+  const { poolAddress, isCertified, whitelist = [], isPrivate = false } = props;
   const [activeTier, setActiveTier] = useState<Tiers>('pawns');
 
   const [page, setPage] = useState<number>(0);
@@ -91,10 +92,10 @@ const ParticipantsTable: React.FC<IParticipantsTable> = (props) => {
   const filterData = useCallback(() => {
     try {
       // в сертифицированном все завайтлисченные находятся в 5 тире
-      if (isCertified && whitelist.length) {
-        setParticipantsFiltered(whitelist);
+      if (isCertified && isPrivate) {
+        setParticipantsFiltered([whitelist[0]]);
       } else {
-        const newParticipants = isCertified ? participants.kings : participants[activeTier];
+        const newParticipants = participants[activeTier];
         const newWinners = winners[activeTier];
         const newParticipantsFiltered = newParticipants.filter((item: any, index: number) => {
           if (index < page * itemsOnPage || index >= (page + 1) * itemsOnPage) return false;
@@ -114,7 +115,7 @@ const ParticipantsTable: React.FC<IParticipantsTable> = (props) => {
     } catch (e) {
       console.error('ParticipantsTable:', e);
     }
-  }, [whitelist, activeTier, page, participants, winners, isCertified]);
+  }, [isCertified, isPrivate, whitelist, participants, activeTier, winners, page]);
 
   const handleChangePage = (p: number) => {
     setPage(p);
@@ -139,73 +140,82 @@ const ParticipantsTable: React.FC<IParticipantsTable> = (props) => {
         {isCertified && whitelist.length ? 'Whitelist' : 'Participants'}
       </div>
       <div className={s.table}>
-        {!isCertified && !whitelist.length && (
-          <div className={s.table_header}>
-            <div className={s.table_header__button}>
-              <div
-                onKeyDown={() => {}}
-                role="button"
-                tabIndex={0}
-                className={`${s.table_header__button_inner} ${activeTier === 'pawns' && s.active}`}
-                onClick={() => handleChangeTier('pawns')}
-              >
-                Pawns
+        {!isCertified ||
+          (!isPrivate && (
+            <div className={s.table_header}>
+              <div className={s.table_header__button}>
+                <div
+                  onKeyDown={() => {}}
+                  role="button"
+                  tabIndex={0}
+                  className={`${s.table_header__button_inner} ${
+                    activeTier === 'pawns' && s.active
+                  }`}
+                  onClick={() => handleChangeTier('pawns')}
+                >
+                  Pawns
+                </div>
+              </div>
+              <div className={s.table_header__button}>
+                <div
+                  onKeyDown={() => {}}
+                  role="button"
+                  tabIndex={0}
+                  className={`${s.table_header__button_inner} ${
+                    activeTier === 'bishops' && s.active
+                  }`}
+                  onClick={() => handleChangeTier('bishops')}
+                >
+                  Bishops
+                </div>
+              </div>
+              <div className={s.table_header__button}>
+                <div
+                  onKeyDown={() => {}}
+                  role="button"
+                  tabIndex={0}
+                  className={`${s.table_header__button_inner} ${
+                    activeTier === 'rooks' && s.active
+                  }`}
+                  onClick={() => handleChangeTier('rooks')}
+                >
+                  Rooks
+                </div>
+              </div>
+              <div className={s.table_header__button}>
+                <div
+                  onKeyDown={() => {}}
+                  role="button"
+                  tabIndex={0}
+                  className={`${s.table_header__button_inner} ${
+                    activeTier === 'queens' && s.active
+                  }`}
+                  onClick={() => handleChangeTier('queens')}
+                >
+                  Queens
+                </div>
+              </div>
+              <div className={s.table_header__button}>
+                <div
+                  onKeyDown={() => {}}
+                  role="button"
+                  tabIndex={0}
+                  className={`${s.table_header__button_inner} ${
+                    activeTier === 'kings' && s.active
+                  }`}
+                  onClick={() => handleChangeTier('kings')}
+                >
+                  Kings
+                </div>
               </div>
             </div>
-            <div className={s.table_header__button}>
-              <div
-                onKeyDown={() => {}}
-                role="button"
-                tabIndex={0}
-                className={`${s.table_header__button_inner} ${
-                  activeTier === 'bishops' && s.active
-                }`}
-                onClick={() => handleChangeTier('bishops')}
-              >
-                Bishops
-              </div>
-            </div>
-            <div className={s.table_header__button}>
-              <div
-                onKeyDown={() => {}}
-                role="button"
-                tabIndex={0}
-                className={`${s.table_header__button_inner} ${activeTier === 'rooks' && s.active}`}
-                onClick={() => handleChangeTier('rooks')}
-              >
-                Rooks
-              </div>
-            </div>
-            <div className={s.table_header__button}>
-              <div
-                onKeyDown={() => {}}
-                role="button"
-                tabIndex={0}
-                className={`${s.table_header__button_inner} ${activeTier === 'queens' && s.active}`}
-                onClick={() => handleChangeTier('queens')}
-              >
-                Queens
-              </div>
-            </div>
-            <div className={s.table_header__button}>
-              <div
-                onKeyDown={() => {}}
-                role="button"
-                tabIndex={0}
-                className={`${s.table_header__button_inner} ${activeTier === 'kings' && s.active}`}
-                onClick={() => handleChangeTier('kings')}
-              >
-                Kings
-              </div>
-            </div>
-          </div>
-        )}
+          ))}
         <div className={s.table_body}>
           <div className={s.table_body_adresses}>
             {/*Participants*/}
             <div className={s.table_body_adresses__left}>
               <div className={s.table_body_adresses__title}>
-                {isCertified && whitelist.length ? '' : 'Participants'}
+                {isCertified && isPrivate ? '' : 'Participants'}
               </div>
               {participantsFiltered.length ? (
                 participantsFiltered.map((participant) => (
