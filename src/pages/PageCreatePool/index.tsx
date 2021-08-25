@@ -1117,6 +1117,7 @@ const CreatePoolPage: React.FC = () => {
                 validations={validationIfExists}
               />
               <Input
+                type="number"
                 title="Token Price"
                 placeholder="1"
                 value={tokenPrice}
@@ -1126,6 +1127,7 @@ const CreatePoolPage: React.FC = () => {
               />
               <div className={s.small_inputs}>
                 <Input
+                  type="number"
                   title="Soft Cap"
                   placeholder="1"
                   value={softCap}
@@ -1134,6 +1136,7 @@ const CreatePoolPage: React.FC = () => {
                   validations={[...validationIfExists, ...validationGt0]}
                 />
                 <Input
+                  type="number"
                   title="Hard Cap"
                   placeholder="2"
                   value={hardCap}
@@ -1181,6 +1184,7 @@ const CreatePoolPage: React.FC = () => {
               {(isPublic || isLiquidity) && (
                 <>
                   <Input
+                    type="number"
                     title="Liquidity Percentage"
                     placeholder="10"
                     value={liquidityPercentageAllocation}
@@ -1189,6 +1193,7 @@ const CreatePoolPage: React.FC = () => {
                     validations={[...validationIfExists, ...validationPercentage]}
                   />
                   <Input
+                    type="number"
                     title="Listing price"
                     placeholder="1"
                     value={listingPrice}
@@ -1197,6 +1202,7 @@ const CreatePoolPage: React.FC = () => {
                     validations={validationIfExists}
                   />
                   <Input
+                    type="number"
                     title="Number Of Days To Lock LP Tokens"
                     placeholder="30"
                     value={lpTokensLockDurationInDays}
@@ -1257,6 +1263,7 @@ const CreatePoolPage: React.FC = () => {
                   {isVesting && (
                     <>
                       <Input
+                        type="number"
                         title="Vesting Percent"
                         placeholder="10"
                         value={vestingPercent}
