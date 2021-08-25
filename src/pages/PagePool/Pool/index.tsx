@@ -2194,7 +2194,12 @@ const Pool: React.FC = () => {
       )}
 
       {/*Participants*/}
-      <ParticipantsTable poolAddress={address} isCertified={isCertified} />
+      <ParticipantsTable
+        isPrivate={privatePresale}
+        whitelist={whitelist}
+        poolAddress={address}
+        isCertified={isCertified}
+      />
 
       {/*Important Links*/}
       <div className="container-header">Important Links</div>
