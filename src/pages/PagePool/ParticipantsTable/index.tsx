@@ -13,10 +13,11 @@ type Tiers = 'pawns' | 'bishops' | 'rooks' | 'queens' | 'kings';
 interface IParticipantsTable {
   poolAddress: string;
   isCertified: boolean;
+  whitelist: string[];
 }
 
 const ParticipantsTable: React.FC<IParticipantsTable> = (props) => {
-  const { poolAddress, isCertified } = props;
+  const { poolAddress, isCertified, whitelist } = props;
   const [activeTier, setActiveTier] = useState<Tiers>('pawns');
 
   const [page, setPage] = useState<number>(0);
@@ -90,26 +91,30 @@ const ParticipantsTable: React.FC<IParticipantsTable> = (props) => {
   const filterData = useCallback(() => {
     try {
       // в сертифицированном все завайтлисченные находятся в 5 тире
-      const newParticipants = isCertified ? participants.kings : participants[activeTier];
-      const newWinners = winners[activeTier];
-      const newParticipantsFiltered = newParticipants.filter((item: any, index: number) => {
-        if (index < page * itemsOnPage || index >= (page + 1) * itemsOnPage) return false;
-        return true;
-      });
-      const newWinnersFiltered = newWinners.filter((item: any, index: number) => {
-        if (index < page * itemsOnPage || index >= (page + 1) * itemsOnPage) return false;
-        return true;
-      });
-      console.log('ParticipantsTable filterData:', {
-        newParticipantsFiltered,
-        newWinnersFiltered,
-      });
-      setParticipantsFiltered(newParticipantsFiltered);
-      setWinnersFiltered(newWinnersFiltered);
+      if (isCertified && whitelist.length) {
+        setParticipantsFiltered(whitelist);
+      } else {
+        const newParticipants = isCertified ? participants.kings : participants[activeTier];
+        const newWinners = winners[activeTier];
+        const newParticipantsFiltered = newParticipants.filter((item: any, index: number) => {
+          if (index < page * itemsOnPage || index >= (page + 1) * itemsOnPage) return false;
+          return true;
+        });
+        const newWinnersFiltered = newWinners.filter((item: any, index: number) => {
+          if (index < page * itemsOnPage || index >= (page + 1) * itemsOnPage) return false;
+          return true;
+        });
+        console.log('ParticipantsTable filterData:', {
+          newParticipantsFiltered,
+          newWinnersFiltered,
+        });
+        setParticipantsFiltered(newParticipantsFiltered);
+        setWinnersFiltered(newWinnersFiltered);
+      }
     } catch (e) {
       console.error('ParticipantsTable:', e);
     }
-  }, [activeTier, page, participants, winners, isCertified]);
+  }, [whitelist, activeTier, page, participants, winners, isCertified]);
 
   const handleChangePage = (p: number) => {
     setPage(p);
@@ -130,9 +135,11 @@ const ParticipantsTable: React.FC<IParticipantsTable> = (props) => {
 
   return (
     <section className={s.block}>
-      <div className={s.title}>Participants</div>
+      <div className={s.title}>
+        {isCertified && whitelist.length ? 'Whitelist' : 'Participants'}
+      </div>
       <div className={s.table}>
-        {!isCertified && (
+        {!isCertified && !whitelist.length && (
           <div className={s.table_header}>
             <div className={s.table_header__button}>
               <div
@@ -198,7 +205,7 @@ const ParticipantsTable: React.FC<IParticipantsTable> = (props) => {
             {/*Participants*/}
             <div className={s.table_body_adresses__left}>
               <div className={s.table_body_adresses__title}>
-                {isCertified ? 'Whitelist' : 'Participants'}
+                {isCertified && whitelist.length ? '' : 'Participants'}
               </div>
               {participantsFiltered.length ? (
                 participantsFiltered.map((participant) => (
