@@ -413,7 +413,7 @@ const Pool: React.FC = () => {
 
   const getIntermediateInfo = useCallback(async () => {
     try {
-      if (!token) return;
+      if (!token || token === '...') return;
       if (!address) return;
       let newInfo;
       if (userAddress) {
