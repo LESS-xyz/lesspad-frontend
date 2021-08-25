@@ -202,7 +202,6 @@ const CreatePoolPage: React.FC = () => {
   const setLibrary = useCallback((params) => dispatch(libraryActions.setLibrary(params)), [
     dispatch,
   ]);
-
   const showMessageIfNoMetamask = useCallback(() => {
     try {
       if (!userAddress) {
@@ -1246,6 +1245,7 @@ const CreatePoolPage: React.FC = () => {
                   {isWhiteListed && (
                     <>
                       <Input
+                        type="addresses"
                         title="Whitelist addresses, comma separated"
                         value={whitelist}
                         onChange={setWhitelist}
