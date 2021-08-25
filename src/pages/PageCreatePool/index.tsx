@@ -1116,6 +1116,16 @@ const CreatePoolPage: React.FC = () => {
                 error={errors.tokenAddress}
                 validations={validationIfExists}
               />
+              {!isPublic && (
+                <Checkbox
+                  name="Native token"
+                  value={nativeTokenSymbol}
+                  onChange={setNativeTokenSymbol}
+                  options={nativeTokensSymbols.map((symbol: string) => {
+                    return { key: symbol, text: symbol };
+                  })}
+                />
+              )}
               <Input
                 type="number"
                 title="Token Price"
@@ -1273,17 +1283,6 @@ const CreatePoolPage: React.FC = () => {
                     </>
                   )}
                 </>
-              )}
-
-              {!isPublic && (
-                <Checkbox
-                  name="Native token"
-                  value={nativeTokenSymbol}
-                  onChange={setNativeTokenSymbol}
-                  options={nativeTokensSymbols.map((symbol: string) => {
-                    return { key: symbol, text: symbol };
-                  })}
-                />
               )}
 
               <Input
