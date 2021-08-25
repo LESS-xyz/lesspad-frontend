@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { BigNumber as BN } from 'bignumber.js/bignumber';
 
 import maxImg from '../../assets/img/icons/max.svg';
-import { NumberInput } from '../../components';
 import Button from '../../components/Button/index';
 import YourTier from '../../components/YourTier/index';
 import config from '../../config';
@@ -440,14 +439,14 @@ const StakingPage: React.FC = () => {
     userAddress,
   ]);
 
-  const handleChangeStakeLessValue = (value) => {
-    // const value = e.target.value.replace(/[^\d.,]/g, '').replace(/,/g, '.');
+  const handleChangeStakeLessValue = (e) => {
+    const value = e.target.value.replace(/[^\d.,]/g, '').replace(/,/g, '.');
     // console.log('Staking handleChangeStakeLessValue:', value);
     setStakeLessValue(value);
   };
 
-  const handleChangeStakeLpValue = (value) => {
-    // const value = e.target.value.replace(/[^\d.,]/g, '').replace(/,/g, '.');
+  const handleChangeStakeLpValue = (e) => {
+    const value = e.target.value.replace(/[^\d.,]/g, '').replace(/,/g, '.');
     // console.log('Staking handleChangeStakeLpValue:', value);
     setStakeLPValue(value);
   };
@@ -540,7 +539,7 @@ const StakingPage: React.FC = () => {
                 <div className={s.balance_amount}>
                   <div className={s.balance_amount__inner}>
                     <div className={s.balance_amount__money}>
-                      <NumberInput
+                      <input
                         type="text"
                         placeholder="0.0"
                         value={stakeLessValue}
@@ -581,7 +580,7 @@ const StakingPage: React.FC = () => {
                 <div className={s.balance_amount}>
                   <div className={s.balance_amount__inner}>
                     <div className={s.balance_amount__money}>
-                      <NumberInput
+                      <input
                         type="text"
                         placeholder="0.0"
                         value={stakeLPValue}
