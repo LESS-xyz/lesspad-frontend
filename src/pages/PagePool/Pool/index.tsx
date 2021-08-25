@@ -1581,60 +1581,53 @@ const Pool: React.FC = () => {
     </div>
   );
 
-  const htmlInvestment = (
-    <>
-      {didUserInvest && (
-        <div className="item">
-          <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
-            Your {currency} Investment
-          </div>
-          <div className="item-text">
-            <div className="item-text-bold">
-              {investments.amountEth} {currency}
-            </div>
-          </div>
+  const htmlYourInvestment = (
+    <div className="item">
+      <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
+        Your {currency} Investment
+      </div>
+      <div className="item-text">
+        <div className="item-text-bold">
+          {investments.amountEth} {currency}
         </div>
-      )}
-      {isMyTierTime ? (
-        <div className="item">
-          <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
-            Buy tokens
-          </div>
-          <div className="item-text">
-            <div className="item-text-bold">
-              1 {tokenSymbol} = {tokenPrice} {nativeTokenSymbol || currency}
-            </div>
-          </div>
-          <p>Please, enter amount to invest (in {nativeTokenSymbol || currency})</p>
-          <Input
-            title=""
-            value={amountToInvest}
-            onChange={setAmountToInvest}
-            style={{ marginBottom: 10 }}
-          />
-          <div className="button-border" style={{ margin: '5px 0' }}>
-            <div
-              className="button"
-              role="button"
-              tabIndex={0}
-              onClick={invest}
-              onKeyDown={() => {}}
-            >
-              <div className="gradient-button-text">Invest</div>
-            </div>
-          </div>
+      </div>
+    </div>
+  );
+
+  const htmlInvestmentBuyTokens = (
+    <div className="item">
+      <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
+        Buy tokens
+      </div>
+      <div className="item-text">
+        <div className="item-text-bold">
+          1 {tokenSymbol} = {tokenPrice} {nativeTokenSymbol || currency}
         </div>
-      ) : (
-        <div className="item">
-          <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
-            Buy tokens
-          </div>
-          <div className="item-text">
-            <div className="item-text-bold">Your tier invest time starts {timeBeforeMyTier}</div>
-          </div>
+      </div>
+      <p>Please, enter amount to invest (in {nativeTokenSymbol || currency})</p>
+      <Input
+        title=""
+        value={amountToInvest}
+        onChange={setAmountToInvest}
+        style={{ marginBottom: 10 }}
+      />
+      <div className="button-border" style={{ margin: '5px 0' }}>
+        <div className="button" role="button" tabIndex={0} onClick={invest} onKeyDown={() => {}}>
+          <div className="gradient-button-text">Invest</div>
         </div>
-      )}
-    </>
+      </div>
+    </div>
+  );
+
+  const htmlInvestmentYourTierStarts = (
+    <div className="item">
+      <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
+        Buy tokens
+      </div>
+      <div className="item-text">
+        <div className="item-text-bold">Your tier invest time starts {timeBeforeMyTier}</div>
+      </div>
+    </div>
   );
 
   // Presale is successful
@@ -1788,14 +1781,33 @@ const Pool: React.FC = () => {
     isVotingSuccessful &&
     timeBeforeMyTier &&
     !isUserRegister;
-  const showHtmlInvestment =
+  const showHtmlYourInvestment =
+    !isCertified &&
+    !isUserCreator &&
+    (isInvestmentTime || isPresaleClosed) &&
+    isInvestStart &&
+    isVotingSuccessful &&
+    isUserRegister &&
+    !cancelled &&
+    didUserInvest;
+  const showHtmlInvestmentYourTierStarts =
     !isCertified &&
     !isUserCreator &&
     isInvestmentTime &&
     isInvestStart &&
     isVotingSuccessful &&
     isUserRegister &&
-    !cancelled;
+    !cancelled &&
+    !isMyTierTime;
+  const showHtmlInvestmentBuyTokens =
+    !isCertified &&
+    !isUserCreator &&
+    isInvestmentTime &&
+    isInvestStart &&
+    isVotingSuccessful &&
+    isUserRegister &&
+    !cancelled &&
+    isMyTierTime;
   const showHtmlInvestmentEndsForCreator =
     !isCertified && isUserCreator && isInvestmentTime && isVotingSuccessful;
   // Withdraw investment
@@ -1870,7 +1882,7 @@ const Pool: React.FC = () => {
     !isWhitelist &&
     timeBeforeMyTier &&
     !isUserRegister;
-  const showHtmlInvestmentOnCertified =
+  const showHtmlInvestmentBuyTokensOnCertified =
     isCertified &&
     !isUserCreator &&
     isInvestmentTime &&
@@ -1880,6 +1892,15 @@ const Pool: React.FC = () => {
     isWhitelist
       ? isUserInWhitelist && (tier === '5' || tier === '4')
       : isUserRegister;
+  const showHtmlYourInvestmentOnCertified =
+    isCertified &&
+    !isUserCreator &&
+    (isInvestmentTime || isPresaleClosed) &&
+    isInvestStart &&
+    approved &&
+    isUserRegister &&
+    !cancelled &&
+    didUserInvest;
   // Softcap is not reached
   // This happens only when audit is approved
   const showHtmlPresaleIsNotSuccessfulAndIsClosedForUserOnCertified =
@@ -2161,7 +2182,9 @@ const Pool: React.FC = () => {
                 {showHtmlYouAreRegistered && htmlYouAreRegistered}
                 {/*Investment*/}
                 {showHtmlYouNeedToBeRegisteredToInvest && htmlYouNeedToBeRegisteredToInvest}
-                {showHtmlInvestment && htmlInvestment}
+                {showHtmlYourInvestment && htmlYourInvestment}
+                {showHtmlInvestmentYourTierStarts && htmlInvestmentYourTierStarts}
+                {showHtmlInvestmentBuyTokens && htmlInvestmentBuyTokens}
                 {/*Claim tokens*/}
                 {showHtmlClaimTokens && htmlClaimTokens}
                 {showHtmlCancelPresale && htmlCancelPresale}
@@ -2177,7 +2200,8 @@ const Pool: React.FC = () => {
                 {/*Investment*/}
                 {showHtmlYouNeedToBeRegisteredToInvestOnCertified &&
                   htmlYouNeedToBeRegisteredToInvest}
-                {showHtmlInvestmentOnCertified && htmlInvestment}
+                {showHtmlInvestmentBuyTokensOnCertified && htmlInvestmentBuyTokens}
+                {showHtmlYourInvestmentOnCertified && htmlYourInvestment}
                 {/*Claim tokens*/}
                 {showHtmlClaimTokensOnCertified && htmlClaimTokens}
                 {showHtmlClaimTokensOnCertifiedWithLiquidity && htmlClaimTokens}
