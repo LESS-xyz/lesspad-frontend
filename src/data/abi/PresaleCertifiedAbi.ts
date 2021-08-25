@@ -43,16 +43,6 @@ export default [
     stateMutability: 'view',
     type: 'function',
   },
-  {
-    inputs: [
-      { internalType: 'uint256', name: '_newOpenTime', type: 'uint256' },
-      { internalType: 'uint256', name: '_newCloseTime', type: 'uint256' },
-    ],
-    name: 'changePresaleTime',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
   { inputs: [], name: 'claimTokens', outputs: [], stateMutability: 'nonpayable', type: 'function' },
   { inputs: [], name: 'collectFee', outputs: [], stateMutability: 'nonpayable', type: 'function' },
   {
@@ -84,13 +74,6 @@ export default [
       { internalType: 'uint256', name: 'closeTimePresale', type: 'uint256' },
       { internalType: 'uint256', name: 'collectedFee', type: 'uint256' },
     ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'getPresaleId',
-    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
   },
