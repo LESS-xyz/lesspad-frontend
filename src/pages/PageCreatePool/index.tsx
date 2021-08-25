@@ -112,9 +112,9 @@ const CreatePoolPage: React.FC = () => {
 
   const nativeTokensAddresses =
     CERTIFIED_PRESALE_CURRENCIES[IS_MAINNET_OR_TESTNET][chainType] || {};
-  const nativeTokensSymbols = Object.keys(
-    CERTIFIED_PRESALE_CURRENCIES[IS_MAINNET_OR_TESTNET][chainType] || {},
-  );
+  const nativeTokensSymbols = useMemo(() => {
+    return Object.keys(CERTIFIED_PRESALE_CURRENCIES[IS_MAINNET_OR_TESTNET][chainType] || {});
+  }, [chainType]);
 
   const defaultNativeTokenSymbol = nativeTokensSymbols[0] || '';
 
@@ -1066,6 +1066,11 @@ const CreatePoolPage: React.FC = () => {
     checkStakingBalance();
   }, [stakedLess, stakedLp, lessPerLp, toggleModal, minCreatorStakedBalance, checkStakingBalance]);
 
+  // change native symbol to default on presale type change
+  useEffect(() => {
+    setNativeTokenSymbol(nativeTokensSymbols[0] || '');
+  }, [nativeTokensSymbols, presaleType]);
+
   return (
     <section className={s.page}>
       <Helmet>
@@ -1129,6 +1134,7 @@ const CreatePoolPage: React.FC = () => {
               <Input
                 type="number"
                 title="Token Price"
+                suffix={nativeTokenSymbol}
                 placeholder="1"
                 value={tokenPrice}
                 onChange={setTokenPrice}
@@ -1139,6 +1145,7 @@ const CreatePoolPage: React.FC = () => {
                 <Input
                   type="number"
                   title="Soft Cap"
+                  suffix={nativeTokenSymbol}
                   placeholder="1"
                   value={softCap}
                   onChange={setSoftCap}
@@ -1148,6 +1155,7 @@ const CreatePoolPage: React.FC = () => {
                 <Input
                   type="number"
                   title="Hard Cap"
+                  suffix={nativeTokenSymbol}
                   placeholder="2"
                   value={hardCap}
                   onChange={setHardCap}
@@ -1196,6 +1204,7 @@ const CreatePoolPage: React.FC = () => {
                   <Input
                     type="number"
                     title="Liquidity Percentage"
+                    suffix="%"
                     placeholder="10"
                     value={liquidityPercentageAllocation}
                     onChange={setLiquidityPercentageAllocation}
@@ -1205,6 +1214,7 @@ const CreatePoolPage: React.FC = () => {
                   <Input
                     type="number"
                     title="Listing price"
+                    suffix={nativeTokenSymbol}
                     placeholder="1"
                     value={listingPrice}
                     onChange={setListingPrice}
@@ -1276,6 +1286,7 @@ const CreatePoolPage: React.FC = () => {
                       <Input
                         type="number"
                         title="Vesting Percent"
+                        suffix="%"
                         placeholder="10"
                         value={vestingPercent}
                         onChange={setVestingPercent}
