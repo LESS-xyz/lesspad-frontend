@@ -662,6 +662,8 @@ const Pool: React.FC = () => {
           timestamp,
           poolPercentages,
           stakingTiers,
+        }).on('transactionHash', (txHash: string) => {
+          handleTransactionHash(txHash);
         });
       } else {
         const amountToInvestInWei = new BN(amountToInvest)
@@ -676,25 +678,31 @@ const Pool: React.FC = () => {
           timestamp,
           poolPercentages,
           stakingTiers,
-        });
-        getInvestments();
+        })
+          .on('transactionHash', (txHash: string) => {
+            handleTransactionHash(txHash);
+          })
+          .then(() => {
+            getInvestments();
+          });
       }
       console.log('PagePool invest:', resultInvest);
     } catch (e) {
       console.error('PagePool invest:', e);
     }
   }, [
+    loginToBackend,
+    address,
+    amountToInvest,
+    tokenDecimals,
+    isCertified,
+    nativeToken,
+    ContractPresaleCertifiedWithMetamask,
+    userAddress,
     approveNativeTokens,
     nativeTokenDecimals,
-    nativeToken,
-    isCertified,
-    amountToInvest,
+    handleTransactionHash,
     ContractPresalePublicWithMetamask,
-    ContractPresaleCertifiedWithMetamask,
-    address,
-    tokenDecimals,
-    loginToBackend,
-    userAddress,
     getInvestments,
   ]);
 
