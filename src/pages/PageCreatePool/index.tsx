@@ -111,7 +111,7 @@ const CreatePoolPage: React.FC = () => {
   const { stakedLess, stakedLp, lessPerLp } = useSelector(({ library }: any) => library);
 
   const nativeTokensAddresses =
-    CERTIFIED_PRESALE_CURRENCIES[IS_MAINNET_OR_TESTNET][chainType] || {};
+    CERTIFIED_PRESALE_CURRENCIES[IS_MAINNET_OR_TESTNET][chainType].address || {};
   const nativeTokensSymbols = Object.keys(
     CERTIFIED_PRESALE_CURRENCIES[IS_MAINNET_OR_TESTNET][chainType] || {},
   );
@@ -654,9 +654,18 @@ const CreatePoolPage: React.FC = () => {
   const countAmountOfTokensToCreate = async () => {
     try {
       const decimals = await ContractERC20.decimals({ contractAddress: tokenAddress });
-      const hardCapInWei = convertToWei(hardCap, 18);
-      const tokenPriceInWei = convertToWei(tokenPrice, 18);
-      const listingPriceInWei = convertToWei(listingPrice, 18);
+      const hardCapInWei = convertToWei(
+        hardCap,
+        CERTIFIED_PRESALE_CURRENCIES[IS_MAINNET_OR_TESTNET][chainType][nativeTokenSymbol].decimals,
+      );
+      const tokenPriceInWei = convertToWei(
+        tokenPrice,
+        CERTIFIED_PRESALE_CURRENCIES[IS_MAINNET_OR_TESTNET][chainType][nativeTokenSymbol].decimals,
+      );
+      const listingPriceInWei = convertToWei(
+        listingPrice,
+        CERTIFIED_PRESALE_CURRENCIES[IS_MAINNET_OR_TESTNET][chainType][nativeTokenSymbol].decimals,
+      );
       const result = await ContractCalculations.countAmountOfTokens({
         hardCap: hardCapInWei,
         tokenPrice: tokenPriceInWei,
@@ -825,10 +834,22 @@ const CreatePoolPage: React.FC = () => {
         tokenDecimals,
         userLessAndLpBalance,
       });
-      const tokenPriceInWei = convertToWei(tokenPrice, 18); // todo: check 18
-      const hardCapInWei = convertToWei(hardCap, 18);
-      const softCapInWei = convertToWei(softCap, 18);
-      const listingPriceInWei = convertToWei(listingPrice, 18); // todo: check 18
+      const tokenPriceInWei = convertToWei(
+        tokenPrice,
+        CERTIFIED_PRESALE_CURRENCIES[IS_MAINNET_OR_TESTNET][chainType][nativeTokenSymbol].decimals,
+      );
+      const hardCapInWei = convertToWei(
+        hardCap,
+        CERTIFIED_PRESALE_CURRENCIES[IS_MAINNET_OR_TESTNET][chainType][nativeTokenSymbol].decimals,
+      );
+      const softCapInWei = convertToWei(
+        softCap,
+        CERTIFIED_PRESALE_CURRENCIES[IS_MAINNET_OR_TESTNET][chainType][nativeTokenSymbol].decimals,
+      );
+      const listingPriceInWei = convertToWei(
+        listingPrice,
+        CERTIFIED_PRESALE_CURRENCIES[IS_MAINNET_OR_TESTNET][chainType][nativeTokenSymbol].decimals,
+      );
       const userLessAndLpBalanceFormatted = new BN(userLessAndLpBalance.toString()).toString(10);
       const poolPercentages = await ContractStaking.poolPercentages();
       const stakingTiers = await ContractStaking.stakingTiers();

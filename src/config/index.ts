@@ -153,36 +153,90 @@ export default {
   CERTIFIED_PRESALE_CURRENCIES: {
     mainnet: {
       'Ethereum': {
-        ETH: '0x0000000000000000000000000000000000000000',
-        USDT: '0xdac17f958d2ee523a2206206994597c13d831ec7',
-        USDC: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+        ETH: {
+          address: '0x0000000000000000000000000000000000000000',
+          decimals: 18,
+        },
+        USDT: {
+          address: '0xdac17f958d2ee523a2206206994597c13d831ec7',
+          decimals: 6,
+        },
+        USDC: {
+          address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+          decimals: 6,
+        },
       },
       'Binance-Smart-Chain': {
-        BNB: '',
-        BUSD: '',
+        BNB: {
+          address: '',
+          decimals: 18,
+        },
+        BUSD: {
+          address: '',
+          decimals: 18,
+        },
       },
       'Matic': {
-        MATIC: '',
-        WETH: '',
-        USDC: '',
-        QUICK: '',
+        MATIC: {
+          address: '',
+          decimals: 18,
+        },
+        WETH: {
+          address: '',
+          decimals: 18,
+        },
+        USDC: {
+          address: '',
+          decimals: 18,
+        },
+        QUICK: {
+          address: '',
+          decimals: 18,
+        },
       },
     },
     testnet: {
       'Ethereum': {
-        ETH: '0x0000000000000000000000000000000000000000',
-        USDT: '0x07de306FF27a2B630B1141956844eB1552B956B5',
-        USDC: '0xb7a4F3E9097C08dA09517b5aB877F7a917224ede',
+        ETH: {
+          address: '0x0000000000000000000000000000000000000000',
+          decimals: 18,
+        },
+        USDT: {
+          address: '0xdac17f958d2ee523a2206206994597c13d831ec7',
+          decimals: 6,
+        },
+        USDC: {
+          address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+          decimals: 6,
+        },
       },
       'Binance-Smart-Chain': {
-        BNB: '',
-        BUSD: '',
+        BNB: {
+          address: '',
+          decimals: 18,
+        },
+        BUSD: {
+          address: '',
+          decimals: 18,
+        },
       },
       'Matic': {
-        MATIC: '',
-        WETH: '',
-        USDC: '',
-        QUICK: '',
+        MATIC: {
+          address: '',
+          decimals: 18,
+        },
+        WETH: {
+          address: '',
+          decimals: 18,
+        },
+        USDC: {
+          address: '',
+          decimals: 18,
+        },
+        QUICK: {
+          address: '',
+          decimals: 18,
+        },
       },
     },
   },
