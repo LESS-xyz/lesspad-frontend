@@ -1883,7 +1883,6 @@ const Pool: React.FC = () => {
     approved &&
     !isWhitelist &&
     !isUserRegister;
-  console.log('Pool:', { isWhitelist });
   const showHtmlYouAreRegisteredOnCertified =
     isCertified &&
     !isUserCreator &&

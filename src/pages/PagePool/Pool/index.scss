@@ -360,7 +360,7 @@
 
           &-gradient {
             text-align: center;
-            margin-left: 12px;
+            margin: 0 12px;
 
             @include gradient-text();
             font-size: 16px;
