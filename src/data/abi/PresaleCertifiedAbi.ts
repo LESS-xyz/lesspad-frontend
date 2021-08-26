@@ -3,7 +3,6 @@ export default [
     inputs: [
       { internalType: 'address payable', name: '_factory', type: 'address' },
       { internalType: 'address', name: '_library', type: 'address' },
-      { internalType: 'address', name: '_platformOwner', type: 'address' },
       { internalType: 'address', name: '_devAddress', type: 'address' },
     ],
     stateMutability: 'nonpayable',
