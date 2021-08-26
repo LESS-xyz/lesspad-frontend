@@ -20,6 +20,7 @@ interface IInputProps {
   styleInput?: any;
   styleTitle?: any;
   styleSubtitle?: any;
+  suffix?: string;
 }
 
 const Input: React.FC<IInputProps> = (props) => {
@@ -38,6 +39,7 @@ const Input: React.FC<IInputProps> = (props) => {
     styleInput,
     styleTitle,
     styleSubtitle,
+    suffix,
   } = props;
 
   const [errorInner, setErrorInner] = useState(error);
@@ -76,14 +78,17 @@ const Input: React.FC<IInputProps> = (props) => {
       <div className={s.input_title} style={styleTitle}>
         {title}
       </div>
-      <input
-        required={required}
-        value={inputValue}
-        placeholder={placeholder}
-        onChange={(e) => handleChange(e.target.value)}
-        type="text"
-        style={styleInput}
-      />
+      <div className={s.input_wrapper}>
+        <input
+          required={required}
+          value={inputValue}
+          placeholder={placeholder}
+          onChange={(e) => handleChange(e.target.value)}
+          type="text"
+          style={styleInput}
+        />
+        {suffix && <div className={s.input_suffix}>{suffix}</div>}
+      </div>
       {subtitle && (
         <div className={s.input_subtitle} style={styleSubtitle}>
           {subtitle}
