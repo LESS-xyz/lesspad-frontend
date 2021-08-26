@@ -147,6 +147,7 @@ const Pool: React.FC = () => {
   const [timeBeforeRegistration, setTimeBeforeRegistration] = useState<string>('');
   const [timeBeforeInvestmentEnd, setTimeBeforeInvestmentEnd] = useState<string>('');
   const [timeBeforeMyTier, setTimeBeforeMyTier] = useState<string>('');
+  const [timeBeforePresaleStart, setTimeBeforePresaleStart] = useState<string>('');
 
   const { pools } = useSelector(({ pool }: any) => pool);
   const { chainType } = useSelector(({ wallet }: any) => wallet);
@@ -331,6 +332,8 @@ const Pool: React.FC = () => {
       setTimeBeforeInvestmentEnd(newTimeBeforeInvestmentEnd);
       const timeBeforeAuditEndNew = dayjs(openRegistrationTime).fromNow();
       setTimeBeforeAuditEnd(timeBeforeAuditEndNew);
+      const timeBeforePresaleStartNew = dayjs(openTimePresale).fromNow();
+      setTimeBeforePresaleStart(timeBeforePresaleStartNew);
     } catch (e) {
       console.error(e);
     }
@@ -1388,10 +1391,28 @@ const Pool: React.FC = () => {
   );
 
   // Audit
+  const htmlAuditApprovedPresaleWillStartIn = (
+    <div className="container-presale-status">
+      <div className="container-presale-status-inner">
+        <div className="gradient-header">Audit is successful</div>
+        <div className="presale-status-text">Presale will start {timeBeforePresaleStart}</div>
+      </div>
+    </div>
+  );
+
+  const htmlAuditApprovedRegistrationWillStartIn = (
+    <div className="container-presale-status">
+      <div className="container-presale-status-inner">
+        <div className="gradient-header">Audit is successful</div>
+        <div className="presale-status-text">Registration will start {timeBeforeRegistration}</div>
+      </div>
+    </div>
+  );
+
   const htmlAuditWillBeFinishedIn = (
     <div className="container-presale-status">
       <div className="container-presale-status-inner">
-        <div className="gradient-header">Presail is currently being audited</div>
+        <div className="gradient-header">Presale is currently being audited</div>
         <div className="presale-status-text">Audit will be finished {timeBeforeAuditEnd}</div>
       </div>
     </div>
@@ -1720,7 +1741,7 @@ const Pool: React.FC = () => {
   const isUserCreator =
     userAddress && creator && creator.toLowerCase() === userAddress.toLowerCase();
   const isUserOwner = userAddress && owner && owner.toLowerCase() === userAddress.toLowerCase();
-  const isUserTier = tier;
+  const isUserTier = tier && tier !== '0';
 
   // ===================== Public presale ============================
 
@@ -1847,6 +1868,22 @@ const Pool: React.FC = () => {
   // ===================== Certified presale ============================
 
   // Audit
+  const showHtmlAuditApprovedPresaleWillStartIn =
+    isCertified &&
+    isWhitelist &&
+    !isRegistrationTime &&
+    !isInvestmentTime &&
+    !isPresaleClosed &&
+    approved &&
+    timeBeforePresaleStart;
+  const showHtmlAuditApprovedRegistrationWillStartIn =
+    isCertified &&
+    !isWhitelist &&
+    !isRegistrationTime &&
+    !isInvestmentTime &&
+    !isPresaleClosed &&
+    approved &&
+    timeBeforeRegistration;
   const showHtmlAuditWillBeFinishedIn =
     isCertified &&
     !isRegistrationTime &&
@@ -1931,12 +1968,17 @@ const Pool: React.FC = () => {
     isInvestStart &&
     approved &&
     isUserRegister &&
-    !cancelled &&
+    // !cancelled && // убрано для случая, когда создатель нажал cancel, а инвестор еще не нажал withdraw
     didUserInvest;
   // Softcap is not reached
   // This happens only when audit is approved
   const showHtmlPresaleIsNotSuccessfulAndIsClosedForUserOnCertified =
-    isCertified && !isUserCreator && approved && isPresaleClosed && !isPresaleSuccessful;
+    isCertified &&
+    !isUserCreator &&
+    approved &&
+    isPresaleClosed &&
+    !isPresaleSuccessful &&
+    !didUserInvest;
   const showHtmlPresaleIsNotSuccessfulAndIsClosedForCreatorOnCertified =
     isCertified &&
     isUserCreator &&
@@ -2185,6 +2227,8 @@ const Pool: React.FC = () => {
           {/*=============== Certified presale ================*/}
 
           {/*Audit*/}
+          {showHtmlAuditApprovedPresaleWillStartIn && htmlAuditApprovedPresaleWillStartIn}
+          {showHtmlAuditApprovedRegistrationWillStartIn && htmlAuditApprovedRegistrationWillStartIn}
           {showHtmlAuditWillBeFinishedIn && htmlAuditWillBeFinishedIn}
           {/*Audit is not approved*/}
           {showHtmlAuditIsNotApprovedForUserOnCertified && htmlAuditIsNotApprovedForUserOnCertified}
