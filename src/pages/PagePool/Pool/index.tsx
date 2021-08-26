@@ -1966,12 +1966,17 @@ const Pool: React.FC = () => {
     isInvestStart &&
     approved &&
     isUserRegister &&
-    !cancelled &&
+    // !cancelled && // убрано для случая, когда создатель нажал cancel, а инвестор еще не нажал withdraw
     didUserInvest;
   // Softcap is not reached
   // This happens only when audit is approved
   const showHtmlPresaleIsNotSuccessfulAndIsClosedForUserOnCertified =
-    isCertified && !isUserCreator && approved && isPresaleClosed && !isPresaleSuccessful;
+    isCertified &&
+    !isUserCreator &&
+    approved &&
+    isPresaleClosed &&
+    !isPresaleSuccessful &&
+    !didUserInvest;
   const showHtmlPresaleIsNotSuccessfulAndIsClosedForCreatorOnCertified =
     isCertified &&
     isUserCreator &&
