@@ -66,9 +66,11 @@ export default class ContractPresaleCertifiedService {
 
   public contractName: any;
 
+  public nativeTokens: any;
+
   constructor(props: TypeConstructorProps) {
     const { web3Provider, chainType } = props;
-    const { addresses, IS_MAINNET_OR_TESTNET, abis }: any = config;
+    const { addresses, IS_MAINNET_OR_TESTNET, CERTIFIED_PRESALE_CURRENCIES, abis }: any = config;
     const addressesOfNetType = addresses[IS_MAINNET_OR_TESTNET];
     const abisOfNetType = abis[IS_MAINNET_OR_TESTNET];
     this.web3 = new Web3(web3Provider);
@@ -76,6 +78,7 @@ export default class ContractPresaleCertifiedService {
     this.contractName = 'PresaleCertified';
     this.contractAddress = addressesOfNetType[chainType][this.contractName];
     this.contractAbi = abisOfNetType[chainType][this.contractName];
+    this.nativeTokens = CERTIFIED_PRESALE_CURRENCIES[IS_MAINNET_OR_TESTNET][chainType] || {};
   }
 
   public getInfo = async ({ contractAddress }: TypeGetInfoProps): Promise<any> => {
@@ -95,7 +98,6 @@ export default class ContractPresaleCertifiedService {
       });
       const tokenAddress = generalInfo.token;
       const contractToken = new this.web3.eth.Contract(ERC20Abi, tokenAddress);
-      const decimals = await contractToken.methods.decimals().call();
       const tokenSymbol = await contractToken.methods.symbol().call();
       const {
         creator,
@@ -141,7 +143,12 @@ export default class ContractPresaleCertifiedService {
       } = intermediate;
       const { liquidity, automatically, vesting, nativeToken, privatePresale } = certifiedAddition;
       // format
-      const pow = new BN(10).pow(new BN(decimals));
+      const nativeTokenDecimals = this.nativeTokens[
+        Object.keys(this.nativeTokens).find((key) => {
+          return this.nativeTokens[key].address === nativeToken.toLowerCase();
+        }) || ''
+      ].decimals;
+      const pow = new BN(10).pow(new BN(nativeTokenDecimals));
       const tokenPrice = +new BN(tokenPriceInWei).div(pow);
       const softCapFormatted = +new BN(softCapInWei).div(pow);
       const hardCapFormatted = +new BN(hardCapInWei).div(pow);
