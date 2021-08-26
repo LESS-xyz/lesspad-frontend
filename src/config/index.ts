@@ -158,11 +158,11 @@ export default {
           decimals: 18,
         },
         USDT: {
-          address: '0xdac17f958d2ee523a2206206994597c13d831ec7',
+          address: '0x07de306ff27a2b630b1141956844eb1552b956b5',
           decimals: 6,
         },
         USDC: {
-          address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+          address: '0xb7a4f3e9097c08da09517b5ab877f7a917224ede',
           decimals: 6,
         },
       },
@@ -202,11 +202,11 @@ export default {
           decimals: 18,
         },
         USDT: {
-          address: '0xdac17f958d2ee523a2206206994597c13d831ec7',
+          address: '0x07de306ff27a2b630b1141956844eb1552b956b5',
           decimals: 6,
         },
         USDC: {
-          address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+          address: '0xb7a4f3e9097c08da09517b5ab877f7a917224ede',
           decimals: 6,
         },
       },

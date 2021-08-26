@@ -112,7 +112,7 @@ const CreatePoolPage: React.FC = () => {
   const { handleTransactionHash } = useTransactionHash();
 
   const nativeTokensAddresses =
-    CERTIFIED_PRESALE_CURRENCIES[IS_MAINNET_OR_TESTNET][chainType].address || {};
+    CERTIFIED_PRESALE_CURRENCIES[IS_MAINNET_OR_TESTNET][chainType] || {};
   const nativeTokensSymbols = useMemo(() => {
     return Object.keys(CERTIFIED_PRESALE_CURRENCIES[IS_MAINNET_OR_TESTNET][chainType] || {});
   }, [chainType]);
@@ -942,7 +942,7 @@ const CreatePoolPage: React.FC = () => {
         // address[] whitelist; - список адресов для приватного пресейла (если список пустой, то проводится регистрация как на публичном)
         // address nativeToken; - в какой валюте продавать токены (котируются WETH, USDT, USDC)
         const whiteListArray = splitWhitelist(whitelist);
-        const nativeTokenAddress = nativeTokensAddresses[nativeTokenSymbol];
+        const nativeTokenAddress = nativeTokensAddresses[nativeTokenSymbol].address;
         const certifiedAddition = [
           isLiquidity,
           // isAutomatically,
