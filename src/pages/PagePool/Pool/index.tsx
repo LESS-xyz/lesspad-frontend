@@ -143,6 +143,7 @@ const Pool: React.FC = () => {
   const [tokensSoldInCurrentTier, setTokensSoldInCurrentTier] = useState<number>(0);
 
   const [timeBeforeVoting, setTimeBeforeVoting] = useState<string>('');
+  const [timeBeforeAuditEnd, setTimeBeforeAuditEnd] = useState<string>('');
   const [timeBeforeRegistration, setTimeBeforeRegistration] = useState<string>('');
   const [timeBeforeInvestmentEnd, setTimeBeforeInvestmentEnd] = useState<string>('');
   const [timeBeforeMyTier, setTimeBeforeMyTier] = useState<string>('');
@@ -328,6 +329,8 @@ const Pool: React.FC = () => {
       if (closeTimePresale === '0') return;
       const newTimeBeforeInvestmentEnd = dayjs(closeTimePresale).fromNow();
       setTimeBeforeInvestmentEnd(newTimeBeforeInvestmentEnd);
+      const timeBeforeAuditEndNew = dayjs(openRegistrationTime).fromNow();
+      setTimeBeforeAuditEnd(timeBeforeAuditEndNew);
     } catch (e) {
       console.error(e);
     }
@@ -1384,6 +1387,16 @@ const Pool: React.FC = () => {
     </div>
   );
 
+  // Audit
+  const htmlAuditWillBeFinishedIn = (
+    <div className="container-presale-status">
+      <div className="container-presale-status-inner">
+        <div className="gradient-header">Presail is currently being audited</div>
+        <div className="presale-status-text">Audit will be finished {timeBeforeAuditEnd}</div>
+      </div>
+    </div>
+  );
+
   // Registration
   const htmlRegistrationWillStart = (
     <div className="container-presale-status">
@@ -1831,6 +1844,14 @@ const Pool: React.FC = () => {
 
   // ===================== Certified presale ============================
 
+  // Audit
+  const showHtmlAuditWillBeFinishedIn =
+    isCertified &&
+    !isRegistrationTime &&
+    !isInvestmentTime &&
+    !isPresaleClosed &&
+    !approved &&
+    timeBeforeAuditEnd;
   // Audit is not approved
   const showHtmlAuditIsNotApprovedForUserOnCertified =
     isCertified &&
@@ -1862,6 +1883,7 @@ const Pool: React.FC = () => {
     approved &&
     !isWhitelist &&
     !isUserRegister;
+  console.log('Pool:', { isWhitelist });
   const showHtmlYouAreRegisteredOnCertified =
     isCertified &&
     !isUserCreator &&
@@ -2161,6 +2183,8 @@ const Pool: React.FC = () => {
 
           {/*=============== Certified presale ================*/}
 
+          {/*Audit*/}
+          {showHtmlAuditWillBeFinishedIn && htmlAuditWillBeFinishedIn}
           {/*Audit is not approved*/}
           {showHtmlAuditIsNotApprovedForUserOnCertified && htmlAuditIsNotApprovedForUserOnCertified}
           {showHtmlAuditIsNotApprovedAndPresaleIsClosedForCreatorOnCertified &&
