@@ -1391,7 +1391,7 @@ const Pool: React.FC = () => {
   const htmlAuditWillBeFinishedIn = (
     <div className="container-presale-status">
       <div className="container-presale-status-inner">
-        <div className="gradient-header">Presail is currently being audited</div>
+        <div className="gradient-header">Presale is currently being audited</div>
         <div className="presale-status-text">Audit will be finished {timeBeforeAuditEnd}</div>
       </div>
     </div>
@@ -1718,7 +1718,7 @@ const Pool: React.FC = () => {
   const isUserCreator =
     userAddress && creator && creator.toLowerCase() === userAddress.toLowerCase();
   const isUserOwner = userAddress && owner && owner.toLowerCase() === userAddress.toLowerCase();
-  const isUserTier = tier;
+  const isUserTier = tier && tier !== '0';
 
   // ===================== Public presale ============================
 
