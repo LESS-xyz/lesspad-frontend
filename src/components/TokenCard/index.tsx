@@ -16,8 +16,6 @@ import s from './TokenCard.module.scss';
 
 dayjs.extend(relativeTime);
 
-const { NOW } = config;
-
 const defaultInfo = {
   // #additional info
   tokenSymbol: '...',
@@ -71,6 +69,8 @@ const chainsInfo: any = [
   { key: 'Binance-Smart-Chain', title: 'Binance Smart Chain', symbol: 'BNB', logo: bnbLogo },
   { key: 'Matic', title: 'Polygon (Matic)', symbol: 'MATIC', logo: maticLogo },
 ];
+
+const { IS_MAINNET_OR_TESTNET, NOW, CERTIFIED_PRESALE_CURRENCIES } = config;
 
 const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
   const { address, isCertified, statusChoosenInFilter } = props;
@@ -126,7 +126,7 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
     // liquidity,
     // automatically,
     // vesting,
-    // nativeToken,
+    nativeToken,
     privatePresale,
   } = info;
 
@@ -170,9 +170,20 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
   }, [linkLogo]);
 
   const getChainInfo = useCallback(() => {
-    const chainInfoNew = chainsInfo.filter((item: any) => item.key === chainType);
-    setChainInfo(chainInfoNew[0]);
-  }, [chainType]);
+    let chainInfoNew = chainsInfo.find((item: any) => item.key === chainType);
+    if (isCertified && nativeToken) {
+      const symbols = CERTIFIED_PRESALE_CURRENCIES[IS_MAINNET_OR_TESTNET][chainType] || {};
+      const newSymbol = Object.keys(symbols).find((key) => {
+        return symbols[key].address === nativeToken.toLowerCase();
+      });
+      chainInfoNew = {
+        ...chainInfoNew,
+        symbol: newSymbol,
+      };
+    }
+
+    setChainInfo(chainInfoNew);
+  }, [isCertified, chainType, nativeToken]);
 
   const getInfo = useCallback(async () => {
     try {
@@ -320,7 +331,7 @@ const TokenCard: React.FC<ITokenCardProps> = (props: ITokenCardProps) => {
         <div className={s.card_body__info}>
           <div className={s.card_body__info_item}>
             <div className={s.card_body__info_item__title}>Chain</div>
-            <div className={s.card_body__info_item__value}>{chainInfo.symbol} Network</div>
+            <div className={s.card_body__info_item__value}>{chainInfo.title} Network</div>
           </div>
           <div className={s.card_body__info_item}>
             <div className={s.card_body__info_item__title}>Type</div>

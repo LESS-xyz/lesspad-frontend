@@ -1237,13 +1237,13 @@ const Pool: React.FC = () => {
   const row1 = [
     {
       header: 'Softcap',
-      value: `${softCap} ${currency}`,
+      value: `${softCap} ${nativeTokenSymbol || currency}`,
       gradient: true,
       less: false,
     },
     {
       header: 'Presale Rate',
-      value: `${tokenPrice} ${currency}`,
+      value: `${tokenPrice} ${nativeTokenSymbol || currency}`,
       gradient: false,
       less: false,
     },
@@ -1264,13 +1264,13 @@ const Pool: React.FC = () => {
   const row2 = [
     {
       header: 'Hardcap',
-      value: `${hardCap} ${currency}`,
+      value: `${hardCap} ${nativeTokenSymbol || currency}`,
       gradient: true,
       less: false,
     },
     {
       header: `${exchange} Listing Rate`,
-      value: `${listingPrice} ${currency}`,
+      value: `${listingPrice} ${nativeTokenSymbol || currency}`,
       gradient: false,
       less: false,
     },
@@ -1618,11 +1618,11 @@ const Pool: React.FC = () => {
   const htmlYourInvestment = (
     <div className="item">
       <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
-        Your {currency} Investment
+        Your {nativeTokenSymbol || currency} Investment
       </div>
       <div className="item-text">
         <div className="item-text-bold">
-          {investments.amountEth} {currency}
+          {investments.amountEth} {nativeTokenSymbol || currency}
         </div>
       </div>
     </div>
@@ -1635,10 +1635,12 @@ const Pool: React.FC = () => {
       </div>
       <div className="item-text">
         <div className="item-text-bold">
-          1 {tokenSymbol} = {tokenPrice} {nativeTokenSymbol || currency}
+          1 {tokenSymbol} = {tokenPrice} {nativeTokenSymbol || nativeTokenSymbol || currency}
         </div>
       </div>
-      <p>Please, enter amount to invest (in {nativeTokenSymbol || currency})</p>
+      <p>
+        Please, enter amount to invest (in {nativeTokenSymbol || nativeTokenSymbol || currency})
+      </p>
       <Input
         title=""
         value={amountToInvest}
