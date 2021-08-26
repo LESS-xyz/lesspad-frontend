@@ -1,15 +1,16 @@
 // input
 .input {
   margin-bottom: 40px;
+
   input {
     width: 100%;
-    padding: 17px 19px;
+    padding: 0;
+    border: none;
     color: #fff;
     font-weight: 700;
     font-size: 20px;
     background-color: #000;
-    border: 2px solid var(--blue);
-    border-radius: 2px;
+    padding: 17px 19px;
   }
 
   &_title {
@@ -20,9 +21,34 @@
     margin-bottom: 8px;
   }
 
+  &_wrapper {
+    //position: relative;
+    width: 100%;
+    color: #fff;
+    font-weight: 700;
+    font-size: 20px;
+    background-color: #000;
+    border: 2px solid var(--blue);
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+  }
+
   &_subtitle {
     margin-top: 10px;
     font-size: 15px;
+  }
+
+  &_suffix {
+    //position: absolute;
+    margin-right: 19px;
+    color: var(--blue);
+    background: black;
+    font-weight: 700;
+    font-size: 20px;
+    //top: 50%;
+    //right: 19px;
+    //transform: translate(0, -50%);
   }
 
   &.invalid {
