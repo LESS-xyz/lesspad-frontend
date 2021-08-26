@@ -112,7 +112,7 @@ const CreatePoolPage: React.FC = () => {
   const { handleTransactionHash } = useTransactionHash();
 
   const nativeTokensAddresses =
-    CERTIFIED_PRESALE_CURRENCIES[IS_MAINNET_OR_TESTNET][chainType] || {};
+    CERTIFIED_PRESALE_CURRENCIES[IS_MAINNET_OR_TESTNET][chainType].address || {};
   const nativeTokensSymbols = useMemo(() => {
     return Object.keys(CERTIFIED_PRESALE_CURRENCIES[IS_MAINNET_OR_TESTNET][chainType] || {});
   }, [chainType]);
