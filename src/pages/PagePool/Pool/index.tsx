@@ -1750,7 +1750,7 @@ const Pool: React.FC = () => {
     isPresaleClosed &&
     isVotingSuccessful &&
     !isPresaleSuccessful &&
-    didCreatorCollectFee;
+    cancelled;
 
   // Registration
   const showHtmlRegistrationWillStart = isBeforeRegistrationTime;
@@ -1889,9 +1889,18 @@ const Pool: React.FC = () => {
     isInvestStart &&
     approved &&
     !cancelled &&
-    isWhitelist
-      ? isUserInWhitelist && (tier === '5' || tier === '4')
-      : isUserRegister;
+    !isWhitelist &&
+    isUserRegister;
+  const showHtmlInvestmentBuyTokensOnCertifiedPrivate =
+    isCertified &&
+    !isUserCreator &&
+    isInvestmentTime &&
+    isInvestStart &&
+    approved &&
+    !cancelled &&
+    isWhitelist &&
+    isUserInWhitelist &&
+    (tier === '5' || tier === '4');
   const showHtmlYourInvestmentOnCertified =
     isCertified &&
     !isUserCreator &&
@@ -2184,7 +2193,7 @@ const Pool: React.FC = () => {
                 {showHtmlYouNeedToBeRegisteredToInvest && htmlYouNeedToBeRegisteredToInvest}
                 {showHtmlYourInvestment && htmlYourInvestment}
                 {showHtmlInvestmentYourTierStarts && htmlInvestmentYourTierStarts}
-                {showHtmlInvestmentBuyTokens && htmlInvestmentBuyTokens}
+                {showHtmlInvestmentBuyTokens ? htmlInvestmentBuyTokens : null}
                 {/*Claim tokens*/}
                 {showHtmlClaimTokens && htmlClaimTokens}
                 {showHtmlCancelPresale && htmlCancelPresale}
@@ -2201,6 +2210,7 @@ const Pool: React.FC = () => {
                 {showHtmlYouNeedToBeRegisteredToInvestOnCertified &&
                   htmlYouNeedToBeRegisteredToInvest}
                 {showHtmlInvestmentBuyTokensOnCertified && htmlInvestmentBuyTokens}
+                {showHtmlInvestmentBuyTokensOnCertifiedPrivate && htmlInvestmentBuyTokens}
                 {showHtmlYourInvestmentOnCertified && htmlYourInvestment}
                 {/*Claim tokens*/}
                 {showHtmlClaimTokensOnCertified && htmlClaimTokens}
