@@ -156,7 +156,14 @@ const Pool: React.FC = () => {
   const { pools } = useSelector(({ pool }: any) => pool);
   const { chainType } = useSelector(({ wallet }: any) => wallet);
   const { address: userAddress } = useSelector(({ user }: any) => user);
-  const { stakedLess, stakedLp, lessPerLp, owner } = useSelector(({ library }: any) => library);
+  const {
+    stakedLess,
+    stakedLp,
+    lessPerLp,
+    owner,
+    minVoterBalance,
+    minCreatorStakedBalance,
+  } = useSelector(({ library }: any) => library);
 
   const dispatch = useDispatch();
   const toggleModal = useCallback((params) => dispatch(modalActions.toggleModal(params)), [
@@ -220,6 +227,7 @@ const Pool: React.FC = () => {
 
   const isInfo = token !== '...';
   const isPresaleWithLiquidity = liquidity;
+
   const isBeforeVotimgTime = openTimeVoting > NOW;
   const isVotingTime = openTimeVoting <= NOW && closeTimeVoting > NOW;
   const isBeforeRegistrationTime =
@@ -231,13 +239,16 @@ const Pool: React.FC = () => {
     openTimePresale + PRESALE_DURATION_ON_CERTIFIED <= NOW && closeTimePresale > NOW;
   const isOpened = openTimePresale <= NOW;
   const isPresaleClosed = closeTimePresale <= NOW;
+
   const didCreatorCollectFee = +collectedFee === 0;
   const didUserInvest = +investedEthByUser > 0;
   const isWhitelist = privatePresale;
   const isUserInWhitelist =
     whitelist && whitelist.length && userAddress && whitelist.includes(userAddress.toLowerCase());
   const isUserWinner = winners.includes(userAddress);
-  console.log('Pool:', { isUserWinner });
+  const stakedSum = +stakedLess + +stakedLp * +lessPerLp;
+  const isUserBalanceLtNeededToVote = stakedSum < minCreatorStakedBalance;
+  // console.log('Pool:', { stakedSum, minCreatorStakedBalance });
 
   const isEthereum = chainType === 'Ethereum';
   const isBinanceSmartChain = chainType === 'Binance-Smart-Chain';
@@ -1558,6 +1569,22 @@ const Pool: React.FC = () => {
   // ======================= Buttons =========================
 
   // Voting
+  const htmlYouNeed500LessToVote = (
+    <div className="item">
+      <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
+        Voting
+      </div>
+      <div className="item-text">
+        You need at least {minVoterBalance} $LESS or{' '}
+        {prettyNumber((+minVoterBalance / lessPerLp).toString())} {currency}-LESS LP in stake to be
+        able to vote
+        <div className={s.messageContainerButtons}>
+          <Button onClick={handleGoToStaking}>Go to Staking</Button>
+        </div>
+      </div>
+    </div>
+  );
+
   const htmlVoting = (
     <div className="item">
       <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
@@ -1828,10 +1855,18 @@ const Pool: React.FC = () => {
   // ===================== Public presale ============================
 
   // Voting
+  // console.log('Pool:', { myVote, isUserBalanceLtNeededToVote });
   const showHtmlVotingWillStart = !isCertified && isBeforeVotimgTime;
   const showHtmlVotingStarted = !isCertified && isVotingTime;
+  const showHtmlYouNeed500LessToVote =
+    !isCertified && isVotingTime && !isUserCreator && !myVote && isUserBalanceLtNeededToVote;
   const showHtmlVoting =
-    !isCertified && isVotingTime && timeBeforeVoting && !isUserCreator && !myVote;
+    !isCertified &&
+    isVotingTime &&
+    timeBeforeVoting &&
+    !isUserCreator &&
+    !myVote &&
+    !isUserBalanceLtNeededToVote;
   const showHtmlYouVoted =
     !isCertified && isVotingTime && timeBeforeVoting && !isUserCreator && myVote;
   const showHtmlVotingIsNotSuccessfulForUser =
@@ -2371,6 +2406,7 @@ const Pool: React.FC = () => {
                 {/*=============== Public presale ================*/}
 
                 {/*Voting*/}
+                {showHtmlYouNeed500LessToVote && htmlYouNeed500LessToVote}
                 {showHtmlVoting && htmlVoting}
                 {showHtmlYouVoted && htmlYouVoted}
                 {/*Registration*/}
