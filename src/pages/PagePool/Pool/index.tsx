@@ -1279,7 +1279,7 @@ const Pool: React.FC = () => {
     },
     {
       header: `${exchange} Listing Rate`,
-      value: `${listingPrice} ${nativeTokenSymbol || currency}`,
+      value: `${listingPrice} ETH` /* ${nativeTokenSymbol || currency} */,
       gradient: false,
       less: false,
     },

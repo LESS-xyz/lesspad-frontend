@@ -154,9 +154,9 @@ export default class ContractPresaleCertifiedService {
       const hardCapFormatted = +new BN(hardCapInWei).div(pow);
       const tokensForSaleLeftInEth = +new BN(tokensForSaleLeft).div(pow);
       const tokensForLiquidityLeftInEth = +new BN(tokensForLiquidityLeft).div(pow);
-      const listingPriceInEth = +new BN(listingPriceInWei).div(pow);
+      const listingPriceInEth = +new BN(listingPriceInWei).div(new BN(10).pow(new BN(18)));
       const beginingAmountInEth = +new BN(beginingAmount).div(pow);
-      const raisedAmountInEth = +new BN(raisedAmount).div(pow); // todo: decimals of native token
+      const raisedAmountInEth = +new BN(raisedAmount).div(pow);
       // result
       return {
         // general
