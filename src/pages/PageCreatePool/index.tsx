@@ -834,7 +834,8 @@ const CreatePoolPage: React.FC = () => {
       );
       const listingPriceInWei = convertToWei(
         listingPrice,
-        CERTIFIED_PRESALE_CURRENCIES[IS_MAINNET_OR_TESTNET][chainType][nativeTokenSymbol].decimals,
+        18,
+        // CERTIFIED_PRESALE_CURRENCIES[IS_MAINNET_OR_TESTNET][chainType][nativeTokenSymbol].decimals,
       );
       const userLessAndLpBalanceFormatted = new BN(userLessAndLpBalance.toString()).toString(10);
       const poolPercentages = await ContractStaking.poolPercentages();
@@ -907,6 +908,7 @@ const CreatePoolPage: React.FC = () => {
         })
           .on('transactionHash', (txHash: string) => {
             handleTransactionHash(txHash);
+            history.push('/pools');
           })
           .then((resultCreatePresalePublic) => {
             console.log('CreatePool handleSubmit', resultCreatePresalePublic);
@@ -970,6 +972,7 @@ const CreatePoolPage: React.FC = () => {
         })
           .on('transactionHash', (txHash: string) => {
             handleTransactionHash(txHash);
+            history.push('/pools');
           })
           .then((resultCreatePresalePublic) =>
             console.log('CreatePool handleSubmit', resultCreatePresalePublic),
@@ -1221,7 +1224,7 @@ const CreatePoolPage: React.FC = () => {
                   <Input
                     type="number"
                     title="Listing price"
-                    suffix={nativeTokenSymbol}
+                    suffix="ETH"
                     placeholder="1"
                     value={listingPrice}
                     onChange={setListingPrice}
