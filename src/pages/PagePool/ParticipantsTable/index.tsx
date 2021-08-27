@@ -93,7 +93,10 @@ const ParticipantsTable: React.FC<IParticipantsTable> = (props) => {
     try {
       // в сертифицированном все завайтлисченные находятся в 5 тире
       if (isCertified && isPrivate) {
-        setParticipantsFiltered([whitelist[0]]);
+        const whitelistFiltered = whitelist.filter(
+          (value, index, self) => self.indexOf(value) === index,
+        );
+        setParticipantsFiltered(whitelistFiltered);
       } else {
         const newParticipants = participants[activeTier];
         const newWinners = winners[activeTier];
@@ -137,7 +140,7 @@ const ParticipantsTable: React.FC<IParticipantsTable> = (props) => {
   return (
     <section className={s.block}>
       <div className={s.title}>
-        {isCertified && whitelist.length ? 'Whitelist' : 'Participants'}
+        {isCertified && whitelist?.length ? 'Whitelist' : 'Participants'}
       </div>
       <div className={s.table}>
         {(!isCertified || (isCertified && !isPrivate)) && (
