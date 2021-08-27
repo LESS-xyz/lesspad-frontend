@@ -88,15 +88,15 @@ const ParticipantsTable: React.FC<IParticipantsTable> = (props) => {
       console.error('ParticipantsTable:', e);
     }
   }, [poolAddress]);
-
   const filterData = useCallback(() => {
     try {
       // в сертифицированном все завайтлисченные находятся в 5 тире
       if (isCertified && isPrivate) {
-        const whitelistFiltered = whitelist.filter(
-          (value, index, self) => self.indexOf(value) === index,
-        );
-        setParticipantsFiltered(whitelistFiltered);
+        //только уникальные
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const uniqueWhitelist = [...new Set(whitelist)];
+        setParticipantsFiltered(uniqueWhitelist);
       } else {
         const newParticipants = participants[activeTier];
         const newWinners = winners[activeTier];

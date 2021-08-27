@@ -138,10 +138,10 @@ const Pool: React.FC = () => {
 
   const [whitelist, setWhitelist] = useState<string[]>([]);
   const [currentTier, setCurrentTier] = useState<number>(0);
-  const [
-    percentageOfTokensSoldInCurrentTier,
-    setPercentageOfTokensSoldInCurrentTier,
-  ] = useState<number>(0);
+  // const [
+  //   percentageOfTokensSoldInCurrentTier,
+  //   setPercentageOfTokensSoldInCurrentTier,
+  // ] = useState<number>(0);
   const [tokensSoldInCurrentTier, setTokensSoldInCurrentTier] = useState<number>(0);
 
   const [winners, setWinners] = useState<string[]>([]);
@@ -289,6 +289,32 @@ const Pool: React.FC = () => {
     // const minus = new BN(beginingAmount).minus(tokensForSaleLeft);
     return new BN(raisedAmount).div(hardCap).multipliedBy(100).toString(10);
   }, [hardCap, raisedAmount]);
+
+  const percentageOfTokensSoldInCurrentTier = useMemo(() => {
+    const percentagesShouldBeSold: any = [];
+    TIER_PERCENTAGES.map((percentage, i) => {
+      percentagesShouldBeSold[i] = TIER_PERCENTAGES.reduce((percentages, percent, ir) => {
+        return ir <= i ? percentages + percent : percentages;
+      });
+      return null;
+    });
+    percentagesShouldBeSold.reverse();
+    // let currentTierNew = 0;
+    // for (let i = 1; i <= 5; i += 1) {
+    //   const tierTimeStart = +openTimePresale + TIER_DURATION * (5 - i);
+    //   const tierTimeEnd = +openTimePresale + TIER_DURATION * (5 - i + 1);
+    //   if (tierTimeStart <= NOW && tierTimeEnd > NOW) {
+    //     currentTierNew = i;
+    //   }
+    // }
+    const tokensShouldBeSoldNew = +new BN(hardCapInTokens).multipliedBy(
+      new BN(percentagesShouldBeSold[currentTier - 1] || 100).dividedBy(100),
+    );
+    return +new BN(raisedAmountInTokens)
+      .dividedBy(tokensShouldBeSoldNew)
+      .multipliedBy(100)
+      .toFixed(2);
+  }, [currentTier, hardCapInTokens, raisedAmountInTokens]);
 
   const percentOfSoftCap = useMemo(() => {
     return new BN(softCap).div(hardCap).multipliedBy(new BN(100)).toString(10);
@@ -909,11 +935,11 @@ const Pool: React.FC = () => {
       //   .dividedBy(tokensShouldBeSoldNew)
       //   .multipliedBy(100)
       //   .toFixed(2);
-      const percentageOfTokensSoldInCurrentTierNew = +new BN(tokensSoldNew)
-        .dividedBy(tokensShouldBeSoldNew)
-        .multipliedBy(100)
-        .toFixed(2);
-      setPercentageOfTokensSoldInCurrentTier(percentageOfTokensSoldInCurrentTierNew);
+      // const percentageOfTokensSoldInCurrentTierNew = +new BN(tokensSoldNew)
+      //   .dividedBy(tokensShouldBeSoldNew)
+      //   .multipliedBy(100)
+      //   .toFixed(2);
+      // setPercentageOfTokensSoldInCurrentTier(percentageOfTokensSoldInCurrentTierNew);
       setTokensShouldBeSold(tokensShouldBeSoldNew);
       setTokensSoldInCurrentTier(tokensSoldNew);
       // console.log('PagePool getTierTime:', {
