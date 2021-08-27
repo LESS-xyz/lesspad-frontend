@@ -1,5 +1,6 @@
 import React, { memo, useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
 import Button from '../../../components/Button';
 import config from '../../../config';
@@ -10,9 +11,10 @@ import Table from '../../PageVoting/Table';
 
 import s from './PoolsInVoting.module.scss';
 
-const { NOW } = config;
+const { NOW, CHAIN_SYMBOLS } = config;
 
 const PoolsiInVoting: React.FC = () => {
+  const history = useHistory();
   const { ContractLessLibrary } = useContractsContext();
 
   const [presalesAddressesFiltered, setPresalesAddressesFiltered] = useState<any[]>([]);
@@ -21,6 +23,7 @@ const PoolsiInVoting: React.FC = () => {
   const { pools } = useSelector(({ pool }: any) => pool);
   const { minVoterBalance } = useSelector(({ library }: any) => library);
   const { lessPerLp } = useSelector(({ library }: any) => library);
+  const { chainType } = useSelector(({ wallet }: any) => wallet);
 
   const dispatch = useDispatch();
   const toggleModal = React.useCallback((params) => dispatch(modalActions.toggleModal(params)), [
@@ -29,6 +32,8 @@ const PoolsiInVoting: React.FC = () => {
   const setLibrary = React.useCallback((params) => dispatch(libraryActions.setLibrary(params)), [
     dispatch,
   ]);
+
+  const currency = CHAIN_SYMBOLS[chainType];
 
   const getVotingTime = useCallback(async () => {
     try {
@@ -73,6 +78,15 @@ const PoolsiInVoting: React.FC = () => {
     }
   }, [ContractLessLibrary, setLibrary]);
 
+  const handleGoToStaking = useCallback(async () => {
+    try {
+      toggleModal({ open: false });
+      history.push('/staking');
+    } catch (e) {
+      console.error(e);
+    }
+  }, [toggleModal, history]);
+
   const handleShowInfo = () => {
     try {
       toggleModal({
@@ -80,10 +94,10 @@ const PoolsiInVoting: React.FC = () => {
         text: (
           <div className={s.messageContainer}>
             You need at least {minVoterBalance} $LESS or{' '}
-            {prettyNumber((+minVoterBalance / lessPerLp).toString())} ETH-LESS LP in stake to be
-            able to vote
+            {prettyNumber((+minVoterBalance / lessPerLp).toString())} {currency}-LESS LP in stake to
+            be able to vote
             <div className={s.messageContainerButtons}>
-              <Button to="/staking">Go to Staking</Button>
+              <Button onClick={handleGoToStaking}>Go to Staking</Button>
             </div>
           </div>
         ),

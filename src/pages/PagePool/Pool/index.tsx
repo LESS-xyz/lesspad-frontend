@@ -1052,8 +1052,8 @@ const Pool: React.FC = () => {
 
   const handleGoToStaking = useCallback(async () => {
     try {
-      history.push('/staking');
       toggleModal({ open: false });
+      history.push('/staking');
     } catch (e) {
       console.error(e);
     }
