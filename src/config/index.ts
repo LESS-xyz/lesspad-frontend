@@ -10,10 +10,11 @@ import StakingAbi from '../data/abi/StakingAbi';
 import UniswapRouterAbi from '../data/abi/UniswapRouterAbi';
 
 const IS_PRODUCTION = false;
+const IS_LOCALHOST = window.location.hostname === 'localhost';
 const IS_TESTING_ON_ROPSTEN = false;
 const SHOW_CONSOLE_LOGS = true;
 const SHOW_FORM_VALUES = true;
-const SHOW_FORM_VALUES_MINE = false;
+const SHOW_FORM_VALUES_MINE = IS_LOCALHOST;
 const SHOW_CERTIFIED_PRESALE = true;
 const IS_FORM_EXISTING_VALUES_VALIDATION_ENABLED = false;
 const IS_FORM_TIME_VALIDATION_ENABLED = false;

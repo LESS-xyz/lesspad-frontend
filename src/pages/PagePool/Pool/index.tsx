@@ -37,6 +37,7 @@ const {
   TIER_DURATION,
   TIER_PERCENTAGES,
   ZERO_ADDRESS,
+  PRESALE_DURATION_ON_CERTIFIED,
 }: any = config;
 const Backend = new BackendService();
 
@@ -142,6 +143,8 @@ const Pool: React.FC = () => {
   ] = useState<number>(0);
   const [tokensSoldInCurrentTier, setTokensSoldInCurrentTier] = useState<number>(0);
 
+  const [winners, setWinners] = useState<string[]>([]);
+
   const [timeBeforeVoting, setTimeBeforeVoting] = useState<string>('');
   const [timeBeforeAuditEnd, setTimeBeforeAuditEnd] = useState<string>('');
   const [timeBeforeRegistration, setTimeBeforeRegistration] = useState<string>('');
@@ -223,6 +226,8 @@ const Pool: React.FC = () => {
   const isRegistrationTime =
     openTimePresale - REGISTRATION_DURATION <= NOW && openTimePresale > NOW;
   const isInvestmentTime = openTimePresale <= NOW && closeTimePresale > NOW;
+  const isInvestmentForEverybodyTime =
+    openTimePresale + PRESALE_DURATION_ON_CERTIFIED <= NOW && closeTimePresale > NOW;
   const isOpened = openTimePresale <= NOW;
   const isPresaleClosed = closeTimePresale <= NOW;
   const didCreatorCollectFee = +collectedFee === 0;
@@ -230,6 +235,8 @@ const Pool: React.FC = () => {
   const isWhitelist = privatePresale;
   const isUserInWhitelist =
     whitelist && whitelist.length && userAddress && whitelist.includes(userAddress.toLowerCase());
+  const isUserWinner = winners.includes(userAddress);
+  console.log('Pool:', { isUserWinner });
 
   const isEthereum = chainType === 'Ethereum';
   const isBinanceSmartChain = chainType === 'Binance-Smart-Chain';
@@ -299,6 +306,23 @@ const Pool: React.FC = () => {
       console.error('Pool getWhitelist:', e);
     }
   }, [ContractPresaleCertified, address]);
+
+  const getWinners = useCallback(async () => {
+    try {
+      const resultGetTiersAndWinners = await Backend.getTiersAndWinners({
+        pool: address,
+      });
+      if (!resultGetTiersAndWinners.data) throw new Error('Pool getWinners Backend error');
+      const { winners: newWinners } = resultGetTiersAndWinners.data;
+      const { winners_1, winners_2 } = newWinners;
+      const winnersNew = winners_1.concat(winners_2);
+      const winnersNewFormatted = winnersNew.map((item: string) => item.toLowerCase());
+      console.log('Pool getWinners:', winnersNewFormatted);
+      setWinners(winnersNewFormatted);
+    } catch (e) {
+      console.error('Pool:', e);
+    }
+  }, [address]);
 
   const getImage = useCallback(async () => {
     try {
@@ -1234,7 +1258,8 @@ const Pool: React.FC = () => {
     if (!info) return;
     if (!ContractPresaleCertified) return;
     getWhitelist();
-  }, [info, ContractPresaleCertified, getWhitelist]);
+    getWinners();
+  }, [info, ContractPresaleCertified, getWhitelist, getWinners]);
 
   const row1 = [
     {
@@ -1953,7 +1978,9 @@ const Pool: React.FC = () => {
     !cancelled &&
     !isWhitelist &&
     isUserRegister &&
-    isMyTierTime;
+    isMyTierTime &&
+    (isInvestmentForEverybodyTime ? true : tier === '1' || tier === '2' ? isUserWinner : true);
+  // console.log('Pool:', { tier, isInvestmentTime });
   const showHtmlInvestmentBuyTokensOnCertifiedPrivate =
     isCertified &&
     !isUserCreator &&
@@ -2053,6 +2080,17 @@ const Pool: React.FC = () => {
         <div className="container-presale-status">
           <div className="container-presale-status-inner">
             <div className="gradient-header">This presale is private</div>
+          </div>
+        </div>
+      </div>
+    );
+
+  if (token === '...')
+    return (
+      <div className="container" style={{ marginTop: 200, marginBottom: 200 }}>
+        <div className="container-presale-status">
+          <div className="container-presale-status-inner">
+            <div className="gradient-header">Loading...</div>
           </div>
         </div>
       </div>
@@ -2284,7 +2322,6 @@ const Pool: React.FC = () => {
 
                 {/*=============== Certified presale ================*/}
 
-                {/*todo: audit approve*/}
                 {/*Registration*/}
                 {showHtmlRegistrationOnCertified && htmlRegistration}
                 {showHtmlYouAreRegisteredOnCertified && htmlYouAreRegistered}
