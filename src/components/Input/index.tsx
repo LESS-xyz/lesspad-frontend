@@ -52,7 +52,7 @@ const Input: React.FC<IInputProps> = (props) => {
       typedValue = str.replace(/[^\d.,]/g, '').replace(/,/g, '.');
     }
     if (type === 'addresses') {
-      typedValue = str.replace(/[!@#$%^&*()`;.?[\]'":{}|\-\\<>/_+=~]/g, '');
+      typedValue = str.replace(/[!@#$%^&*()`;.?[\]'":{}|\-\\<>/_+=~ ]/g, '').replace(/ /g, '');
     }
     if (validations) {
       for (let i = 0; i < validations.length; i += 1) {
