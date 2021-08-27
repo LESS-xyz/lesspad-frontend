@@ -1951,7 +1951,8 @@ const Pool: React.FC = () => {
     approved &&
     !cancelled &&
     !isWhitelist &&
-    isUserRegister;
+    isUserRegister &&
+    isMyTierTime;
   const showHtmlInvestmentBuyTokensOnCertifiedPrivate =
     isCertified &&
     !isUserCreator &&
