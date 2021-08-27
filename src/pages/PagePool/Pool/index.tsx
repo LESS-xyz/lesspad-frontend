@@ -821,10 +821,11 @@ const Pool: React.FC = () => {
       if (!tier) return;
       const tierTimeNew = +openTimePresale + TIER_DURATION * (5 - +tier);
       const isMyTierTimeNew =
-        isInvestmentTime && (isCertified ? openTimePresale : tierTimeNew) <= NOW;
-      const timeBeforeMyTierNew = isCertified
-        ? dayjs(openTimePresale).fromNow()
-        : dayjs(tierTimeNew).fromNow();
+        isInvestmentTime && (isCertified && isWhitelist ? openTimePresale : tierTimeNew) <= NOW;
+      const timeBeforeMyTierNew =
+        isCertified && isWhitelist
+          ? dayjs(openTimePresale).fromNow()
+          : dayjs(tierTimeNew).fromNow();
       setIsMyTierTime(isMyTierTimeNew);
       setTimeBeforeMyTier(timeBeforeMyTierNew);
       // percentage should be sold in current tier
@@ -896,13 +897,14 @@ const Pool: React.FC = () => {
       console.error(e);
     }
   }, [
-    isCertified,
-    tokensForSaleLeft,
-    tier,
     isInfo,
+    tier,
     openTimePresale,
     isInvestmentTime,
+    isCertified,
+    isWhitelist,
     hardCapInTokens,
+    tokensForSaleLeft,
   ]);
   // console.log('Pool currentTier:', currentTier);
 
@@ -1950,7 +1952,8 @@ const Pool: React.FC = () => {
     approved &&
     !cancelled &&
     !isWhitelist &&
-    isUserRegister;
+    isUserRegister &&
+    isMyTierTime;
   const showHtmlInvestmentBuyTokensOnCertifiedPrivate =
     isCertified &&
     !isUserCreator &&
@@ -1961,6 +1964,16 @@ const Pool: React.FC = () => {
     isWhitelist &&
     isUserInWhitelist &&
     (tier === '5' || tier === '4');
+  const showHtmlInvestmentYourTierStartsOnCertified =
+    isCertified &&
+    !isUserCreator &&
+    isInvestmentTime &&
+    isInvestStart &&
+    approved &&
+    !cancelled &&
+    !isWhitelist &&
+    isUserRegister &&
+    !isMyTierTime;
   const showHtmlYourInvestmentOnCertified =
     isCertified &&
     !isUserCreator &&
@@ -2280,6 +2293,7 @@ const Pool: React.FC = () => {
                   htmlYouNeedToBeRegisteredToInvest}
                 {showHtmlInvestmentBuyTokensOnCertified && htmlInvestmentBuyTokens}
                 {showHtmlInvestmentBuyTokensOnCertifiedPrivate && htmlInvestmentBuyTokens}
+                {showHtmlInvestmentYourTierStartsOnCertified && htmlInvestmentYourTierStarts}
                 {showHtmlYourInvestmentOnCertified && htmlYourInvestment}
                 {/*Claim tokens*/}
                 {showHtmlClaimTokensOnCertified && htmlClaimTokens}
