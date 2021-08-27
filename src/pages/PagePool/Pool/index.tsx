@@ -822,9 +822,10 @@ const Pool: React.FC = () => {
       const tierTimeNew = +openTimePresale + TIER_DURATION * (5 - +tier);
       const isMyTierTimeNew =
         isInvestmentTime && (isCertified && isWhitelist ? openTimePresale : tierTimeNew) <= NOW;
-      const timeBeforeMyTierNew = isCertified
-        ? dayjs(openTimePresale).fromNow()
-        : dayjs(tierTimeNew).fromNow();
+      const timeBeforeMyTierNew =
+        isCertified && isWhitelist
+          ? dayjs(openTimePresale).fromNow()
+          : dayjs(tierTimeNew).fromNow();
       setIsMyTierTime(isMyTierTimeNew);
       setTimeBeforeMyTier(timeBeforeMyTierNew);
       // percentage should be sold in current tier
@@ -1963,6 +1964,16 @@ const Pool: React.FC = () => {
     isWhitelist &&
     isUserInWhitelist &&
     (tier === '5' || tier === '4');
+  const showHtmlInvestmentYourTierStartsOnCertified =
+    isCertified &&
+    !isUserCreator &&
+    isInvestmentTime &&
+    isInvestStart &&
+    approved &&
+    !cancelled &&
+    !isWhitelist &&
+    isUserRegister &&
+    !isMyTierTime;
   const showHtmlYourInvestmentOnCertified =
     isCertified &&
     !isUserCreator &&
@@ -2282,6 +2293,7 @@ const Pool: React.FC = () => {
                   htmlYouNeedToBeRegisteredToInvest}
                 {showHtmlInvestmentBuyTokensOnCertified && htmlInvestmentBuyTokens}
                 {showHtmlInvestmentBuyTokensOnCertifiedPrivate && htmlInvestmentBuyTokens}
+                {showHtmlInvestmentYourTierStartsOnCertified && htmlInvestmentYourTierStarts}
                 {showHtmlYourInvestmentOnCertified && htmlYourInvestment}
                 {/*Claim tokens*/}
                 {showHtmlClaimTokensOnCertified && htmlClaimTokens}
