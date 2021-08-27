@@ -907,6 +907,7 @@ const CreatePoolPage: React.FC = () => {
         })
           .on('transactionHash', (txHash: string) => {
             handleTransactionHash(txHash);
+            history.push('/pools');
           })
           .then((resultCreatePresalePublic) => {
             console.log('CreatePool handleSubmit', resultCreatePresalePublic);
@@ -970,6 +971,7 @@ const CreatePoolPage: React.FC = () => {
         })
           .on('transactionHash', (txHash: string) => {
             handleTransactionHash(txHash);
+            history.push('/pools');
           })
           .then((resultCreatePresalePublic) =>
             console.log('CreatePool handleSubmit', resultCreatePresalePublic),
