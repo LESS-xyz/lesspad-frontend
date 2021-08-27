@@ -2066,7 +2066,7 @@ const Pool: React.FC = () => {
   // Presale is private
   if (!isUserOwner && !isUserCreator && isCertified && isWhitelist && !userAddress)
     return (
-      <div className="container">
+      <div className="container" style={{ marginTop: 100, marginBottom: 200 }}>
         <div className="container-presale-status">
           <div className="container-presale-status-inner">
             <div className="gradient-header">This presale is private</div>
@@ -2076,7 +2076,7 @@ const Pool: React.FC = () => {
     );
   if (!isUserOwner && !isUserCreator && isCertified && isWhitelist && !isUserInWhitelist)
     return (
-      <div className="container">
+      <div className="container" style={{ marginTop: 100, marginBottom: 200 }}>
         <div className="container-presale-status">
           <div className="container-presale-status-inner">
             <div className="gradient-header">This presale is private</div>
@@ -2087,7 +2087,7 @@ const Pool: React.FC = () => {
 
   if (token === '...')
     return (
-      <div className="container" style={{ marginTop: 200, marginBottom: 200 }}>
+      <div className="container" style={{ marginTop: 100, marginBottom: 200 }}>
         <div className="container-presale-status">
           <div className="container-presale-status-inner">
             <div className="gradient-header">Loading...</div>
