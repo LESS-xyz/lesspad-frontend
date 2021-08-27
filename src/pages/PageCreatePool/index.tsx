@@ -15,6 +15,7 @@ import { libraryActions, modalActions } from '../../redux/actions';
 import { BackendService } from '../../services/Backend';
 import { convertFromWei, convertToWei, useTransactionHash } from '../../utils/ethereum';
 import { detectNonLatinLetters, prettyNumber } from '../../utils/prettifiers';
+import { addressesRegexp, numberIntegerRegexp, numberRegexp } from '../../utils/regExps';
 
 import s from './CreatePool.module.scss';
 
@@ -49,6 +50,7 @@ const messageEnterValue = 'Enter value';
 const messagePercentValue = 'Percent value should be between 0 and 100';
 const messageMin30Days = 'Minimum 30 days';
 const messageAddressIsNotValid = 'Address is not valid';
+const messageVestingPercentIsNotValid = 'Vesting percent should be in 1-100 range';
 const messageSoftCapLessThanHardCap = 'Softcap should be less than hardcap';
 const messageTokenPriceLessThanHardCap = 'Token price should be less than hardcap';
 const messageGt0 = 'Value should be greater than 0';
@@ -150,7 +152,7 @@ const CreatePoolPage: React.FC = () => {
   const [lpTokensLockDurationInDays, setLpTokensLockDurationInDays] = useState(
     SHOW_FORM_VALUES ? '30' : '',
   );
-  const [vestingPercent, setVestingPercent] = useState<string>(SHOW_FORM_VALUES ? '0' : '');
+  const [vestingPercent, setVestingPercent] = useState<string>(SHOW_FORM_VALUES ? '1' : '');
   const [liquidityAllocationTime, setLiquidityAllocationTime] = useState<number>(
     defaultLiquidityAllocationTime,
   );
@@ -429,6 +431,25 @@ const CreatePoolPage: React.FC = () => {
       return false;
     }
   }, [isPublic, tokenAddress, web3]);
+
+  const validateVestingPercent = useCallback(() => {
+    try {
+      if (!web3) return false;
+      const isVestingPercentInRange = +vestingPercent >= 1 && +vestingPercent <= 100;
+      const messageIfEnterValue = !vestingPercent && messageEnterValue;
+      const messageIfVestingPercentNotValid =
+        !isVestingPercentInRange && messageVestingPercentIsNotValid;
+      const newErrors = {
+        vestingPercent: messageIfEnterValue || messageIfVestingPercentNotValid,
+      };
+      setErrors(newErrors);
+      if (!isVestingPercentInRange) return false;
+      return true;
+    } catch (e) {
+      console.error(e);
+      return false;
+    }
+  }, [vestingPercent, web3]);
 
   const validateTime = useCallback(() => {
     if (!IS_FORM_TIME_VALIDATION_ENABLED) return true;
@@ -1068,6 +1089,10 @@ const CreatePoolPage: React.FC = () => {
   }, [openVotingTime, openTime, closeTime, liquidityAllocationTime, validateTime]);
 
   useEffect(() => {
+    validateVestingPercent();
+  }, [vestingPercent, validateVestingPercent]);
+
+  useEffect(() => {
     if (!stakedLess) return;
     if (!stakedLp) return;
     if (!lessPerLp) return;
@@ -1142,7 +1167,7 @@ const CreatePoolPage: React.FC = () => {
                 />
               )}
               <Input
-                type="number"
+                regexp={numberRegexp}
                 title="Token Price"
                 suffix={nativeTokenSymbol}
                 placeholder="1"
@@ -1153,7 +1178,7 @@ const CreatePoolPage: React.FC = () => {
               />
               <div className={s.small_inputs}>
                 <Input
-                  type="number"
+                  regexp={numberRegexp}
                   title="Soft Cap"
                   suffix={nativeTokenSymbol}
                   placeholder="1"
@@ -1163,7 +1188,7 @@ const CreatePoolPage: React.FC = () => {
                   validations={[...validationIfExists, ...validationGt0]}
                 />
                 <Input
-                  type="number"
+                  regexp={numberRegexp}
                   title="Hard Cap"
                   suffix={nativeTokenSymbol}
                   placeholder="2"
@@ -1212,7 +1237,7 @@ const CreatePoolPage: React.FC = () => {
               {(isPublic || isLiquidity) && (
                 <>
                   <Input
-                    type="number"
+                    regexp={numberRegexp}
                     title="Liquidity Percentage"
                     suffix="%"
                     placeholder="10"
@@ -1222,7 +1247,7 @@ const CreatePoolPage: React.FC = () => {
                     validations={[...validationIfExists, ...validationPercentage]}
                   />
                   <Input
-                    type="number"
+                    regexp={numberRegexp}
                     title="Listing price"
                     suffix="ETH"
                     placeholder="1"
@@ -1232,7 +1257,7 @@ const CreatePoolPage: React.FC = () => {
                     validations={validationIfExists}
                   />
                   <Input
-                    type="number"
+                    regexp={numberRegexp}
                     title="Number Of Days To Lock LP Tokens"
                     placeholder="30"
                     value={lpTokensLockDurationInDays}
@@ -1275,7 +1300,7 @@ const CreatePoolPage: React.FC = () => {
                   {isWhiteListed && (
                     <>
                       <Input
-                        type="addresses"
+                        regexp={addressesRegexp}
                         title="Whitelist addresses, comma separated"
                         value={whitelist}
                         onChange={setWhitelist}
@@ -1294,11 +1319,13 @@ const CreatePoolPage: React.FC = () => {
                   {isVesting && (
                     <>
                       <Input
-                        type="number"
+                        regexp={numberIntegerRegexp}
                         title="Vesting Percent"
                         suffix="%"
                         placeholder="10"
+                        type="number"
                         value={vestingPercent}
+                        error={errors.vestingPercent}
                         onChange={setVestingPercent}
                       />
                     </>

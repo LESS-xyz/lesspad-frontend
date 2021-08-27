@@ -7,7 +7,7 @@ import s from './Input.module.scss';
 
 interface IInputProps {
   title: string;
-  type?: 'text' | 'number' | 'addresses';
+  type?: 'text' | 'number';
   value: string;
   onChange: (str: string) => void;
   error?: string;
@@ -21,6 +21,7 @@ interface IInputProps {
   styleTitle?: any;
   styleSubtitle?: any;
   suffix?: string;
+  regexp?: (str: string) => string;
 }
 
 const Input: React.FC<IInputProps> = (props) => {
@@ -40,6 +41,7 @@ const Input: React.FC<IInputProps> = (props) => {
     styleTitle,
     styleSubtitle,
     suffix,
+    regexp,
   } = props;
 
   const [errorInner, setErrorInner] = useState(error);
@@ -48,11 +50,14 @@ const Input: React.FC<IInputProps> = (props) => {
 
   const handleChange = async (str: string) => {
     let typedValue: string | null = null;
-    if (type === 'number') {
-      typedValue = str.replace(/[^\d.,]/g, '').replace(/,/g, '.');
-    }
-    if (type === 'addresses') {
-      typedValue = str.replace(/[!@#$%^&*()`;.?[\]'":{}|\-\\<>/_+=~ ]/g, '').replace(/ /g, '');
+    // if (type === 'number') {
+    //   typedValue = str.replace(/[^\d.,]/g, '').replace(/,/g, '.');
+    // }
+    // if (type === 'addresses') {
+    //   typedValue = str.replace(/[!@#$%^&*()`;.?[\]'":{}|\-\\<>/_+=~ ]/g, '').replace(/ /g, '');
+    // }
+    if (regexp) {
+      typedValue = regexp(str);
     }
     if (validations) {
       for (let i = 0; i < validations.length; i += 1) {
@@ -83,8 +88,11 @@ const Input: React.FC<IInputProps> = (props) => {
           required={required}
           value={inputValue}
           placeholder={placeholder}
+          onWheel={(evt) => {
+            evt.preventDefault();
+          }}
           onChange={(e) => handleChange(e.target.value)}
-          type="text"
+          type={type}
           style={styleInput}
         />
         {suffix && <div className={s.input_suffix}>{suffix}</div>}
