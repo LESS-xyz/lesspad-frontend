@@ -821,7 +821,7 @@ const Pool: React.FC = () => {
       if (!tier) return;
       const tierTimeNew = +openTimePresale + TIER_DURATION * (5 - +tier);
       const isMyTierTimeNew =
-        isInvestmentTime && (isCertified ? openTimePresale : tierTimeNew) <= NOW;
+        isInvestmentTime && (isCertified && isWhitelist ? openTimePresale : tierTimeNew) <= NOW;
       const timeBeforeMyTierNew = isCertified
         ? dayjs(openTimePresale).fromNow()
         : dayjs(tierTimeNew).fromNow();
@@ -896,13 +896,14 @@ const Pool: React.FC = () => {
       console.error(e);
     }
   }, [
-    isCertified,
-    tokensForSaleLeft,
-    tier,
     isInfo,
+    tier,
     openTimePresale,
     isInvestmentTime,
+    isCertified,
+    isWhitelist,
     hardCapInTokens,
+    tokensForSaleLeft,
   ]);
   // console.log('Pool currentTier:', currentTier);
 
