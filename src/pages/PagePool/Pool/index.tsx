@@ -168,7 +168,7 @@ const Pool: React.FC = () => {
     tokenPrice,
     softCap,
     hardCap,
-    tokensForSaleLeft,
+    // tokensForSaleLeft,
     // tokensForLiquidityLeft,
     openTimePresale,
     closeTimePresale,
@@ -200,11 +200,11 @@ const Pool: React.FC = () => {
 
   const {
     approved,
-    beginingAmount,
+    // beginingAmount,
     cancelled,
     liquidityAdded,
     participants,
-    // raisedAmount,
+    raisedAmount,
     yesVotes,
     noVotes,
     lastTotalStakedAmount,
@@ -257,25 +257,30 @@ const Pool: React.FC = () => {
     return result.toString(10);
   }, [hardCap, tokenPrice]);
 
-  const tokensSold = useMemo(() => {
-    const tokensSoldNew = new BN(beginingAmount).minus(tokensForSaleLeft);
-    // const pow = new BN(10).pow(tokenDecimals);
-    // const result = tokensSoldNew.div(pow);
-    return tokensSoldNew.toString(10);
-  }, [beginingAmount, tokensForSaleLeft]);
-
-  const tokensSoldInNativeCurrency = useMemo(() => {
-    const tokensSoldNew = new BN(beginingAmount).minus(tokensForSaleLeft);
-    const tokenPriceBN = new BN(tokenPrice);
-    // const pow = new BN(10).pow(tokenDecimals);
-    const result = tokensSoldNew.multipliedBy(tokenPriceBN);
+  const raisedAmountInTokens = useMemo(() => {
+    const result = new BN(raisedAmount).dividedBy(tokenPrice);
     return result.toString(10);
-  }, [beginingAmount, tokensForSaleLeft, tokenPrice]);
+  }, [raisedAmount, tokenPrice]);
+
+  // const tokensSold = useMemo(() => {
+  //   const tokensSoldNew = new BN(beginingAmount).minus(tokensForSaleLeft);
+  //   // const pow = new BN(10).pow(tokenDecimals);
+  //   // const result = tokensSoldNew.div(pow);
+  //   return tokensSoldNew.toString(10);
+  // }, [beginingAmount, tokensForSaleLeft]);
+
+  // const tokensSoldInNativeCurrency = useMemo(() => {
+  //   const tokensSoldNew = new BN(beginingAmount).minus(tokensForSaleLeft);
+  //   const tokenPriceBN = new BN(tokenPrice);
+  //   // const pow = new BN(10).pow(tokenDecimals);
+  //   const result = tokensSoldNew.multipliedBy(tokenPriceBN);
+  //   return result.toString(10);
+  // }, [beginingAmount, tokensForSaleLeft, tokenPrice]);
 
   const percentOfTokensSold = useMemo(() => {
-    const minus = new BN(beginingAmount).minus(tokensForSaleLeft);
-    return minus.div(beginingAmount).multipliedBy(new BN(100)).toString(10);
-  }, [beginingAmount, tokensForSaleLeft]);
+    // const minus = new BN(beginingAmount).minus(tokensForSaleLeft);
+    return new BN(raisedAmount).div(hardCap).multipliedBy(100).toString(10);
+  }, [hardCap, raisedAmount]);
 
   const percentOfSoftCap = useMemo(() => {
     return new BN(softCap).div(hardCap).multipliedBy(new BN(100)).toString(10);
@@ -857,7 +862,8 @@ const Pool: React.FC = () => {
         new BN(percentagesShouldBeSold[currentTierNew - 1] || 100).dividedBy(100),
       );
       // const tokensSoldNew = +new BN(hardCap-tokensSold)
-      const tokensSoldNew = +new BN(hardCapInTokens).minus(tokensForSaleLeft).toString(10);
+      const tokensSoldNew = +raisedAmountInTokens;
+      // const tokensSoldNew = +new BN(hardCapInTokens).minus(tokensForSaleLeft).toString(10);
       // const tokensSoldNew = +new BN(hardCapInTokens)
       //   .multipliedBy(new BN(percentagesShouldBeSold[currentTierNew - 1]))
       //   .dividedBy(100)
@@ -904,7 +910,7 @@ const Pool: React.FC = () => {
     isCertified,
     isWhitelist,
     hardCapInTokens,
-    tokensForSaleLeft,
+    raisedAmountInTokens,
   ]);
   // console.log('Pool currentTier:', currentTier);
 
@@ -2112,7 +2118,7 @@ const Pool: React.FC = () => {
         </div>
         <div className="grow-progress">
           <div>
-            {tokensSoldInNativeCurrency || 0} {nativeTokenSymbol || currency} Raised
+            {raisedAmount || 0} {nativeTokenSymbol || currency} Raised
           </div>
           <div>{participants} Participants</div>
         </div>
@@ -2122,7 +2128,9 @@ const Pool: React.FC = () => {
               className="grow-scale-progress-value"
               style={{
                 width: `${
-                  !isCertified ? percentageOfTokensSoldInCurrentTier : percentOfTokensSold
+                  isCertified && isWhitelist
+                    ? percentOfTokensSold
+                    : percentageOfTokensSoldInCurrentTier
                 }%`,
               }}
             />
@@ -2151,7 +2159,7 @@ const Pool: React.FC = () => {
               </div>
             )}
             <div className="grow-total">
-              {tokensSold || 0} / {prettyNumber(hardCapInTokens) || 0} {tokenSymbol}
+              {raisedAmountInTokens || 0} / {prettyNumber(hardCapInTokens) || 0} {tokenSymbol}
             </div>
           </div>
         </div>
