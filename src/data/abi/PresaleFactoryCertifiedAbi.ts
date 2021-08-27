@@ -107,13 +107,6 @@ export default [
   },
   {
     inputs: [],
-    name: 'owner',
-    outputs: [{ internalType: 'address', name: '', type: 'address' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
     name: 'safeLibrary',
     outputs: [{ internalType: 'contract LessLibrary', name: '', type: 'address' }],
     stateMutability: 'view',
