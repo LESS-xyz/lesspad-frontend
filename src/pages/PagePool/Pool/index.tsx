@@ -156,14 +156,9 @@ const Pool: React.FC = () => {
   const { pools } = useSelector(({ pool }: any) => pool);
   const { chainType } = useSelector(({ wallet }: any) => wallet);
   const { address: userAddress } = useSelector(({ user }: any) => user);
-  const {
-    stakedLess,
-    stakedLp,
-    lessPerLp,
-    owner,
-    minVoterBalance,
-    minCreatorStakedBalance,
-  } = useSelector(({ library }: any) => library);
+  const { stakedLess, stakedLp, lessPerLp, owner, minVoterBalance } = useSelector(
+    ({ library }: any) => library,
+  );
 
   const dispatch = useDispatch();
   const toggleModal = useCallback((params) => dispatch(modalActions.toggleModal(params)), [
@@ -247,8 +242,8 @@ const Pool: React.FC = () => {
     whitelist && whitelist.length && userAddress && whitelist.includes(userAddress.toLowerCase());
   const isUserWinner = winners.includes(userAddress);
   const stakedSum = +stakedLess + +stakedLp * +lessPerLp;
-  const isUserBalanceLtNeededToVote = stakedSum < minCreatorStakedBalance;
-  // console.log('Pool:', { stakedSum, minCreatorStakedBalance });
+  const isUserBalanceLtNeededToVote = stakedSum < minVoterBalance;
+  console.log('Pool:', { stakedSum, minVoterBalance });
 
   const isEthereum = chainType === 'Ethereum';
   const isBinanceSmartChain = chainType === 'Binance-Smart-Chain';
@@ -1578,9 +1573,9 @@ const Pool: React.FC = () => {
         You need at least {minVoterBalance} $LESS or{' '}
         {prettyNumber((+minVoterBalance / lessPerLp).toString())} {currency}-LESS LP in stake to be
         able to vote
-        <div className={s.messageContainerButtons}>
-          <Button onClick={handleGoToStaking}>Go to Staking</Button>
-        </div>
+      </div>
+      <div className="item-text">
+        <Button onClick={handleGoToStaking}>Go to Staking</Button>
       </div>
     </div>
   );

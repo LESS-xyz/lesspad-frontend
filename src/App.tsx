@@ -49,6 +49,15 @@ export const App: React.FC = memo(() => {
     }
   }, [ContractLessLibrary, setLibrary]);
 
+  const getMinVoterBalance = useCallback(async () => {
+    try {
+      const resultGetMinVoterBalance = await ContractLessLibrary.getMinVoterBalance();
+      setLibrary({ minVoterBalance: resultGetMinVoterBalance });
+    } catch (e) {
+      console.error(e);
+    }
+  }, [ContractLessLibrary, setLibrary]);
+
   const getOwner = useCallback(async () => {
     try {
       const owner = await ContractLessLibrary.owner();
@@ -136,6 +145,18 @@ export const App: React.FC = memo(() => {
     ContractLessToken,
     ContractLPToken,
     getMinCreatorStakedBalance,
+  ]);
+
+  useEffect(() => {
+    if (!getMinVoterBalance) return;
+    if (!ContractLessLibrary) return;
+    getMinVoterBalance();
+  }, [
+    ContractLessLibrary,
+    ContractStaking,
+    ContractLessToken,
+    ContractLPToken,
+    getMinVoterBalance,
   ]);
 
   useEffect(() => {
