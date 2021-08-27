@@ -597,8 +597,9 @@ const Pool: React.FC = () => {
   const approveNativeTokens = useCallback(async () => {
     try {
       const totalSupply = await ContractERC20.totalSupply({ contractAddress: nativeToken });
-      const { addresses }: any = config;
-      const spender = addresses[config.IS_MAINNET_OR_TESTNET][chainType].PresaleCertified;
+      // const { addresses }: any = config;
+      // const spender = addresses[config.IS_MAINNET_OR_TESTNET][chainType].PresaleCertified;
+      const spender = address;
       const allowance = await ContractERC20.allowance({
         contractAddress: nativeToken,
         userAddress,
@@ -620,7 +621,7 @@ const Pool: React.FC = () => {
       console.error('Pool approveTokens:', e);
       return false;
     }
-  }, [ContractERC20, chainType, nativeToken, userAddress]);
+  }, [ContractERC20, address, nativeToken, userAddress]);
 
   const invest = useCallback(async () => {
     try {
