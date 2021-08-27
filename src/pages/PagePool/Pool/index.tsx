@@ -15,6 +15,7 @@ import Subscribe from '../../../assets/img/icons/subscribe.svg';
 import Telegram from '../../../assets/img/icons/tg-icon.svg';
 import Twitter from '../../../assets/img/icons/twitter-icon.svg';
 import projectLogo from '../../../assets/img/sections/token-card/logo-1.png';
+import Button from '../../../components/Button';
 import Input from '../../../components/Input';
 import YourTier from '../../../components/YourTier/index';
 import config from '../../../config';
@@ -1049,6 +1050,15 @@ const Pool: React.FC = () => {
     handleTransactionWentWrong,
   ]);
 
+  const handleGoToStaking = useCallback(async () => {
+    try {
+      history.push('/staking');
+      toggleModal({ open: false });
+    } catch (e) {
+      console.error(e);
+    }
+  }, [toggleModal, history]);
+
   const handleVote = useCallback(
     async (yes: boolean) => {
       try {
@@ -1675,6 +1685,18 @@ const Pool: React.FC = () => {
     </div>
   );
 
+  const htmlYouNeedToBeInTier4or5ToInvestOnCertified = (
+    <div className="item">
+      <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
+        Investment
+      </div>
+      <div className="item-text">You need to be in tier Queen or King to invest</div>
+      <div className="item-text">
+        <Button onClick={handleGoToStaking}>Go to Staking</Button>
+      </div>
+    </div>
+  );
+
   const htmlYourInvestment = (
     <div className="item">
       <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
@@ -1991,6 +2013,17 @@ const Pool: React.FC = () => {
     !isWhitelist &&
     isUserRegister;
   // Investment
+  const showHtmlYouNeedToBeInTier4or5ToInvestOnCertified =
+    isCertified &&
+    !isUserCreator &&
+    isInvestmentTime &&
+    isInvestStart &&
+    approved &&
+    isWhitelist &&
+    timeBeforeMyTier &&
+    tier !== '4' &&
+    tier !== '5';
+  console.log('Pool:', { isMyTierTime, isWhitelist, tier });
   const showHtmlInvestmentEndsForCreatorOnCertified =
     isCertified && isUserCreator && isInvestmentTime && approved;
   const showHtmlYouNeedToBeRegisteredToInvestOnCertified =
@@ -2363,6 +2396,8 @@ const Pool: React.FC = () => {
                 {/*Investment*/}
                 {showHtmlYouNeedToBeRegisteredToInvestOnCertified &&
                   htmlYouNeedToBeRegisteredToInvest}
+                {showHtmlYouNeedToBeInTier4or5ToInvestOnCertified &&
+                  htmlYouNeedToBeInTier4or5ToInvestOnCertified}
                 {showHtmlInvestmentBuyTokensOnCertified && htmlInvestmentBuyTokens}
                 {showHtmlInvestmentBuyTokensOnCertifiedPrivate && htmlInvestmentBuyTokens}
                 {showHtmlInvestmentYourTierStartsOnCertified && htmlInvestmentYourTierStarts}

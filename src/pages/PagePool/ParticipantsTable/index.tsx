@@ -140,7 +140,7 @@ const ParticipantsTable: React.FC<IParticipantsTable> = (props) => {
   return (
     <section className={s.block}>
       <div className={s.title}>
-        {isCertified && whitelist.length ? 'Whitelist' : 'Participants'}
+        {isCertified && whitelist?.length ? 'Whitelist' : 'Participants'}
       </div>
       <div className={s.table}>
         {(!isCertified || (isCertified && !isPrivate)) && (
