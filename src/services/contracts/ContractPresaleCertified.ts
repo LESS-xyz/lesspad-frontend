@@ -131,6 +131,7 @@ export default class ContractPresaleCertifiedService {
         unlockTime,
       } = uniswapInfo;
       const {
+        withdrawedFunds,
         approved,
         beginingAmount,
         cancelled,
@@ -198,6 +199,7 @@ export default class ContractPresaleCertifiedService {
         yesVotes,
         noVotes,
         lastTotalStakedAmount,
+        withdrawedFunds,
         // certified addition
         liquidity,
         automatically,

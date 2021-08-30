@@ -96,6 +96,7 @@ const defaultInfo = {
   nativeToken: '',
   // # intermediate certified
   approved: false,
+  withdrawedFunds: false,
 };
 const tiers = ['Pawn', 'Bishop', 'Rook', 'Queen', 'King'];
 
@@ -202,6 +203,8 @@ const Pool: React.FC = () => {
     // vesting,
     nativeToken,
     privatePresale,
+    // # intermediate
+    withdrawedFunds,
   } = info;
 
   const {
@@ -236,6 +239,7 @@ const Pool: React.FC = () => {
   const isPresaleClosed = closeTimePresale <= NOW;
 
   const didCreatorCollectFee = +collectedFee === 0;
+  const didCreatorCollectFunds = withdrawedFunds;
   const didUserInvest = +investedEthByUser > 0;
   const isWhitelist = privatePresale;
   const isUserInWhitelist =
@@ -1899,6 +1903,14 @@ const Pool: React.FC = () => {
     </>
   );
 
+  const htmlPresaleEnded = (
+    <div className="container-presale-status">
+      <div className="container-presale-status-inner">
+        <div className="gradient-header">Presale ended</div>
+      </div>
+    </div>
+  );
+
   const isUserCreator =
     userAddress && creator && creator.toLowerCase() === userAddress.toLowerCase();
   const isUserOwner = userAddress && owner && owner.toLowerCase() === userAddress.toLowerCase();
@@ -2225,17 +2237,40 @@ const Pool: React.FC = () => {
     didUserInvest &&
     !isPresaleWithLiquidity;
   // Collect funds raised
-  // функция для создателя чтобы забрать заработанные средства (опять же после ликвидности и окончания пресейла)
-  const showHtmlCollectFundsOnCertifiedWithLiquidity =
+  // функция для создателя чтобы забрать заработанные средства (опять же после ликвидности и окончания пресейла) или (после окончания пресейла, который без добавлнеия ликвидности)
+  const showHtmlCollectFundsOnCertified =
     isCertified &&
     isUserCreator &&
     isPresaleClosed &&
     !cancelled &&
     isPresaleSuccessful &&
-    liquidityAdded;
-  // функция для создателя чтобы забрать заработанные средства (после окончания пресейла, который без добавлнеия ликвидности)
-  const showHtmlCollectFundsOnCertifiedWithoutLiquidity =
-    isCertified && isUserCreator && isPresaleClosed && !cancelled && isPresaleSuccessful;
+    (liquidity ? liquidityAdded : true) &&
+    !didCreatorCollectFunds;
+  // Presale ended
+  // Для всех. Для овнера - когда он сделал collect funds, для инвестора когда он сделал claim tokens, для всех кто не участвовал - показываем сразу после окончания пресейла
+  const showHtmlPresaleEndedOnCertifiedForCreator =
+    isCertified &&
+    isUserCreator &&
+    isPresaleClosed &&
+    !cancelled &&
+    isPresaleSuccessful &&
+    (liquidity ? liquidityAdded : true) &&
+    didCreatorCollectFunds;
+  const showHtmlPresaleEndedOnCertifiedForInvestor =
+    isCertified &&
+    !isUserCreator &&
+    isPresaleClosed &&
+    !cancelled &&
+    isPresaleSuccessful &&
+    (liquidity ? liquidityAdded : true) &&
+    didUserInvest;
+  const showHtmlPresaleEndedOnCertifiedForUser =
+    isCertified &&
+    !isUserCreator &&
+    isPresaleClosed &&
+    !cancelled &&
+    isPresaleSuccessful &&
+    !didUserInvest;
 
   // Presale is private
   if (!isUserOwner && !isUserCreator && isCertified && isWhitelist && !userAddress)
@@ -2437,17 +2472,14 @@ const Pool: React.FC = () => {
           {showHtmlVotingIsNotSuccessfulForUser && htmlVotingIsNotSuccessfulForUser}
           {showHtmlVotingIsNotSuccessfulAndPresaleIsClosedForCreator &&
             htmlVotingIsNotSuccessfulAndPresaleIsClosedForCreator}
-
           {/*Registration*/}
           {showHtmlRegistrationWillStart && htmlRegistrationWillStart}
           {showHtmlRegistrationStarted && htmlRegistrationStarted}
-
           {/*Softcap is not reached*/}
           {showHtmlPresaleIsNotSuccessfulAndIsClosedForUser &&
             htmlPresaleIsNotSuccessfulAndIsClosedForUser}
           {showHtmlPresaleIsNotSuccessfulAndIsClosedForCreator &&
             htmlPresaleIsNotSuccessfulAndIsClosedForCreator}
-
           {/*Investment ends*/}
           {showHtmlInvestmentEndsForCreator && htmlInvestmentEnds}
 
@@ -2461,15 +2493,17 @@ const Pool: React.FC = () => {
           {showHtmlAuditIsNotApprovedForUserOnCertified && htmlAuditIsNotApprovedForUserOnCertified}
           {showHtmlAuditIsNotApprovedAndPresaleIsClosedForCreatorOnCertified &&
             htmlAuditIsNotApprovedAndPresaleIsClosedForCreatorOnCertified}
-
           {/*Softcap is not reached*/}
           {showHtmlPresaleIsNotSuccessfulAndIsClosedForUserOnCertified &&
             htmlPresaleIsNotSuccessfulAndIsClosedForUser}
           {showHtmlPresaleIsNotSuccessfulAndIsClosedForCreatorOnCertified &&
             htmlPresaleIsNotSuccessfulAndIsClosedForCreator}
-
           {/*Investment ends*/}
           {showHtmlInvestmentEndsForCreatorOnCertified && htmlInvestmentEnds}
+          {/*Presale ended*/}
+          {showHtmlPresaleEndedOnCertifiedForCreator && htmlPresaleEnded}
+          {showHtmlPresaleEndedOnCertifiedForInvestor && htmlPresaleEnded}
+          {showHtmlPresaleEndedOnCertifiedForUser && htmlPresaleEnded}
 
           {/*=============== Buttons ===============*/}
 
@@ -2523,8 +2557,7 @@ const Pool: React.FC = () => {
                 {/*Withdraw investment*/}
                 {showHtmlWithdrawInvestmentOnCertified && htmlWithdrawInvestment}
                 {/*Collect funds*/}
-                {showHtmlCollectFundsOnCertifiedWithLiquidity && htmlCollectFunds}
-                {showHtmlCollectFundsOnCertifiedWithoutLiquidity && htmlCollectFunds}
+                {showHtmlCollectFundsOnCertified && htmlCollectFunds}
               </div>
             </div>
           ) : null}
