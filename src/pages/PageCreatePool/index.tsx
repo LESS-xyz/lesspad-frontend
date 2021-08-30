@@ -100,6 +100,7 @@ const CreatePoolPage: React.FC = () => {
   const {
     ContractERC20,
     ContractCalculations,
+    ContractCalculations1,
     ContractPresaleFactory,
     ContractPresaleFactoryCertified,
     ContractLessToken,
@@ -675,7 +676,9 @@ const CreatePoolPage: React.FC = () => {
 
   const countAmountOfTokensToCreate = async () => {
     try {
-      const decimals = await ContractERC20.decimals({ contractAddress: tokenAddress });
+      const decimalsToken = await ContractERC20.decimals({ contractAddress: tokenAddress });
+      const decimalsNativeToken =
+        CERTIFIED_PRESALE_CURRENCIES[IS_MAINNET_OR_TESTNET][chainType][nativeTokenSymbol].decimals;
       const hardCapInWei = convertToWei(
         hardCap,
         CERTIFIED_PRESALE_CURRENCIES[IS_MAINNET_OR_TESTNET][chainType][nativeTokenSymbol].decimals,
@@ -688,13 +691,25 @@ const CreatePoolPage: React.FC = () => {
         listingPrice,
         CERTIFIED_PRESALE_CURRENCIES[IS_MAINNET_OR_TESTNET][chainType][nativeTokenSymbol].decimals,
       );
-      const result = await ContractCalculations.countAmountOfTokens({
-        hardCap: hardCapInWei,
-        tokenPrice: tokenPriceInWei,
-        listingPrice: listingPriceInWei,
-        liquidityPercentageAllocation,
-        decimals,
-      });
+      let result;
+      if (isPublic) {
+        result = await ContractCalculations.countAmountOfTokens({
+          hardCap: hardCapInWei,
+          tokenPrice: tokenPriceInWei,
+          listingPrice: listingPriceInWei,
+          liquidityPercentageAllocation,
+          decimals: decimalsToken,
+        });
+      } else {
+        result = await ContractCalculations1.countAmountOfTokens({
+          hardCap: hardCapInWei,
+          tokenPrice: tokenPriceInWei,
+          listingPrice: listingPriceInWei,
+          liquidityPercentageAllocation,
+          decimalsToken,
+          decimalsNativeToken,
+        });
+      }
       return result;
     } catch (e) {
       console.error('CreatePool subscribeEvent:', e);

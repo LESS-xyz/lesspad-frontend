@@ -4,6 +4,7 @@ import Web3 from 'web3';
 
 import config from '../config';
 import ContractCalculationsService from '../services/contracts/ContractCalculations';
+import ContractCalculations1Service from '../services/contracts/ContractCalculations1';
 import ContractERC20Service from '../services/contracts/ContractERC20';
 import ContractLessLibraryService from '../services/contracts/ContractLessLibrary';
 import ContractLessTokenService from '../services/contracts/ContractLessToken';
@@ -19,6 +20,7 @@ import { useWeb3ConnectorContext } from './Web3Connector';
 
 const contractsContext = createContext<any>({
   ContractCalculations: {},
+  ContractCalculations1: {},
   ContractERC20: {},
   ContractPresalePublicWithMetamask: {},
   ContractPresaleCertifiedWithMetamask: {},
@@ -82,6 +84,10 @@ const ContractsContext: React.FC = ({ children }) => {
         web3Provider: web3.provider,
         chainType,
       });
+      const ContractCalculations1 = new ContractCalculations1Service({
+        web3Provider: web3.provider,
+        chainType,
+      });
       const ContractERC20 = new ContractERC20Service({
         web3Provider: web3.provider,
         chainType,
@@ -117,6 +123,7 @@ const ContractsContext: React.FC = ({ children }) => {
       });
       const newValue = {
         ContractCalculations,
+        ContractCalculations1,
         ContractERC20,
         ContractPresalePublicWithMetamask,
         ContractPresaleCertifiedWithMetamask,

@@ -1,3 +1,4 @@
+import Calculations1Abi from '../data/abi/Calculations1Abi';
 import CalculationsAbi from '../data/abi/CalculationsAbi';
 import ERC20Abi from '../data/abi/ERC20Abi';
 import LessLibraryAbi from '../data/abi/LessLibraryAbi';
@@ -245,6 +246,7 @@ export default {
     mainnet: {
       Ethereum: {
         Calculations: '0x3561A02e1192B89e2415724f43521f898e867013',
+        Calculations1: '',
         LessToken: '0x62786eeacc9246b4018e0146cb7a3efeacd9459d',
         LPToken: '0x432dbbd09fee1dfb2cae40c5abc1a301a2ef76ee',
         LessLibrary: '0x8ea0A4FC09cb381E18CE58673250ad47b6bED9cA',
@@ -256,12 +258,13 @@ export default {
     testnet: {
       Ethereum: {
         Calculations: '0x9Cdb409D0bE7442f3398ec196988813C35Cc0b57',
+        Calculations1: '0xA9cC76A913B7fFac6EE279ad987Df57a2b184d35',
         LessToken: '0x87feef975fd65f32A0836f910Fd13d9Cf4553690',
         LPToken: '0x4fe142c6cbd294ef96dbba8a837cde3035850a97',
         Staking: '0xE4D00cA4eceFB3bEE229FFf97ffF3de3bBAD4B4B',
         LessLibrary: '0xa78C93A963C7C1d786EFf8CFbf54f37E0E9c12E1',
         PresaleFactory: '0xa8FD2169DFf71c22cB011c07196728B9FB75C58f',
-        PresaleFactoryCertified: '0xf0be3D00beFC63943f997346e573393AC50Cca61',
+        PresaleFactoryCertified: '0x94DA9b277f789F726D5d225ea2930F3AD6fd8428',
       },
     },
   },
@@ -269,6 +272,7 @@ export default {
     mainnet: {
       Ethereum: {
         Calculations: CalculationsAbi,
+        Calculations1: Calculations1Abi,
         ERC20: ERC20Abi,
         LessToken: ERC20Abi,
         LPToken: LPTokenAbi,
@@ -284,6 +288,7 @@ export default {
     testnet: {
       Ethereum: {
         Calculations: CalculationsAbi,
+        Calculations1: Calculations1Abi,
         ERC20: ERC20Abi,
         LessToken: ERC20Abi,
         LPToken: LPTokenAbi,
