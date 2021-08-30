@@ -2052,7 +2052,11 @@ const Pool: React.FC = () => {
     !isCertified && isUserCreator && isInvestmentTime && isVotingSuccessful;
   // Withdraw investment
   const showHtmlWithdrawInvestment =
-    !isCertified && !isUserCreator && (isInvestmentTime || isPresaleClosed) && didUserInvest;
+    !isCertified &&
+    !isUserCreator &&
+    (isInvestmentTime || isPresaleClosed) &&
+    !isPresaleSuccessful &&
+    didUserInvest;
   // Cancel presale (Close presale)
   //   Создателем пресейла Cancel presale может использоваться в случае, если не набран софткап.
   //   В случае  ненабора голосов используется метод collect fee для того чтоб овнер пресейла мог вывести не только бабло в токенах, но и свои 1000$
