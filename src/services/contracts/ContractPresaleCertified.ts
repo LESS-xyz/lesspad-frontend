@@ -226,6 +226,7 @@ export default class ContractPresaleCertifiedService {
       const contractToken = new this.web3.eth.Contract(ERC20Abi, tokenAddress);
       const decimals = await contractToken.methods.decimals().call();
       const {
+        withdrawedFunds,
         approved,
         cancelled,
         liquidityAdded,
@@ -239,6 +240,7 @@ export default class ContractPresaleCertifiedService {
       const raisedAmountInEth = +new BN(raisedAmount).div(pow); // todo: decimals of native token
       // result
       return {
+        withdrawedFunds,
         approved,
         cancelled,
         liquidityAdded,

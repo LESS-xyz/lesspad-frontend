@@ -23,7 +23,7 @@ import { useContractsContext } from '../../../contexts/ContractsContext';
 import { useWeb3ConnectorContext } from '../../../contexts/Web3Connector';
 import { modalActions } from '../../../redux/actions';
 import { BackendService } from '../../../services/Backend';
-import { convertFromWei, useTransactionHash } from '../../../utils/ethereum';
+import { convertFromWei, convertToWei, useTransactionHash } from '../../../utils/ethereum';
 import { addHttps, prettyNumber } from '../../../utils/prettifiers';
 import ParticipantsTable from '../ParticipantsTable';
 
@@ -32,6 +32,8 @@ import s from '../../PageCreatePool/CreatePool.module.scss';
 
 const {
   CHAIN_SYMBOLS,
+  CERTIFIED_PRESALE_CURRENCIES,
+  IS_MAINNET_OR_TESTNET,
   EXPLORERS,
   NOW,
   REGISTRATION_DURATION,
@@ -133,6 +135,7 @@ const Pool: React.FC = () => {
   const [investments, setInvestments] = useState<any>({ amountEth: 0, amountTokens: 0 });
   const [amountToInvest, setAmountToInvest] = useState<string>('');
   const [myVote, setMyVote] = useState<number>(0);
+  const [presaleContractBalance, setPresaleContractBalance] = useState<string>('0');
 
   const [isInvestStart, setInvestStart] = useState<boolean>(false);
   const [isUserRegister, setUserRegister] = useState<boolean>(false);
@@ -203,11 +206,10 @@ const Pool: React.FC = () => {
     // vesting,
     nativeToken,
     privatePresale,
-    // # intermediate
-    withdrawedFunds,
   } = info;
 
   const {
+    withdrawedFunds,
     approved,
     // beginingAmount,
     cancelled,
@@ -239,7 +241,9 @@ const Pool: React.FC = () => {
   const isPresaleClosed = closeTimePresale <= NOW;
 
   const didCreatorCollectFee = +collectedFee === 0;
-  const didCreatorCollectFunds = withdrawedFunds;
+  const didCreatorCollectFunds = isCertified
+    ? withdrawedFunds
+    : +presaleContractBalance <= +collectedFee;
   const didUserInvest = +investedEthByUser > 0;
   const isWhitelist = privatePresale;
   const isUserInWhitelist =
@@ -247,7 +251,7 @@ const Pool: React.FC = () => {
   const isUserWinner = winners.includes(userAddress);
   const stakedSum = +stakedLess + +stakedLp * +lessPerLp;
   const isUserBalanceLtNeededToVote = stakedSum < minVoterBalance;
-  console.log('Pool:', { stakedSum, minVoterBalance });
+  console.log('Pool:', { presaleContractBalance, collectedFee, withdrawedFunds });
 
   const isEthereum = chainType === 'Ethereum';
   const isBinanceSmartChain = chainType === 'Binance-Smart-Chain';
@@ -348,6 +352,24 @@ const Pool: React.FC = () => {
       console.error('Pool getWhitelist:', e);
     }
   }, [ContractPresaleCertified, address]);
+
+  const getPresaleContractBalance = useCallback(async () => {
+    try {
+      if (!web3) return;
+      if (!address) return;
+      if (!chainType) return;
+      const chainSymbol = CHAIN_SYMBOLS[chainType];
+      const decimalsEth =
+        CERTIFIED_PRESALE_CURRENCIES[IS_MAINNET_OR_TESTNET][chainType][chainSymbol].decimals;
+      const result = await web3.getBalance(address);
+      const resultInWei = convertToWei(result, decimalsEth) || '0';
+      setPresaleContractBalance(resultInWei);
+      console.log('Pool getPresaleContractBalance:', resultInWei);
+      return;
+    } catch (e) {
+      console.error('Pool getPresaleContractBalance:', e);
+    }
+  }, [address, web3, chainType]);
 
   const getWinners = useCallback(async () => {
     try {
@@ -1347,8 +1369,9 @@ const Pool: React.FC = () => {
     if (!info) return;
     if (!ContractPresaleCertified) return;
     getWhitelist();
+    getPresaleContractBalance();
     getWinners();
-  }, [info, ContractPresaleCertified, getWhitelist, getWinners]);
+  }, [info, ContractPresaleCertified, getWhitelist, getWinners, getPresaleContractBalance]);
 
   const row1 = [
     {
@@ -2053,7 +2076,8 @@ const Pool: React.FC = () => {
     isPresaleClosed &&
     !cancelled &&
     isPresaleSuccessful &&
-    liquidityAdded;
+    liquidityAdded &&
+    !didCreatorCollectFunds;
 
   // ===================== Certified presale ============================
 
