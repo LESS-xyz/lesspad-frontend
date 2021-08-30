@@ -1020,6 +1020,42 @@ const Pool: React.FC = () => {
     handleTransactionWentWrong,
   ]);
 
+  // для создателя забрать собранные средства после добавления ликвидности или без нее, если такой пресейл
+  const collectFunds = useCallback(async () => {
+    try {
+      let ContractPresale = ContractPresalePublicWithMetamask;
+      if (isCertified) ContractPresale = ContractPresaleCertifiedWithMetamask;
+      const result = ContractPresale.collectFundsRaised({
+        userAddress,
+        contractAddress: address,
+      });
+      result
+        .on('transactionHash', (txHash: string) => {
+          handleTransactionHash(txHash);
+        })
+        .on('error', (e) => {
+          console.error(e);
+          handleTransactionWentWrong();
+        })
+        .then((res) => {
+          console.log('PagePool collectFunds', res);
+          getInfo();
+        });
+      console.log('PagePool collectFunds:', result);
+    } catch (e) {
+      console.error(e);
+    }
+  }, [
+    getInfo,
+    isCertified,
+    ContractPresalePublicWithMetamask,
+    ContractPresaleCertifiedWithMetamask,
+    address,
+    userAddress,
+    handleTransactionHash,
+    handleTransactionWentWrong,
+  ]);
+
   // когда не набралось голосов, создатель пресейла может потребовать обратно свои 1000$ в эфирах и токены, которые были на продаже
   const collectFee = useCallback(async () => {
     try {
@@ -1842,6 +1878,27 @@ const Pool: React.FC = () => {
     </>
   );
 
+  const htmlCollectFunds = (
+    <>
+      <div className="item">
+        <div className="item-text-gradient" style={{ fontSize: 35, lineHeight: '45px' }}>
+          Collect funds
+        </div>
+        <div className="button-border">
+          <div
+            className="button"
+            role="button"
+            tabIndex={0}
+            onClick={collectFunds}
+            onKeyDown={() => {}}
+          >
+            <div className="gradient-button-text">Collect</div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+
   const isUserCreator =
     userAddress && creator && creator.toLowerCase() === userAddress.toLowerCase();
   const isUserOwner = userAddress && owner && owner.toLowerCase() === userAddress.toLowerCase();
@@ -1975,6 +2032,15 @@ const Pool: React.FC = () => {
     isPresaleClosed &&
     !cancelled &&
     isPresaleSuccessful &&
+    liquidityAdded; // todo: && didUserInvest ?
+  // Collect funds raised
+  // функция для создателя чтобы забрать заработанные средства (опять же после ликвидности и окончания пресейла)
+  const showHtmlCollectFunds =
+    !isCertified &&
+    isUserCreator &&
+    isPresaleClosed &&
+    !cancelled &&
+    isPresaleSuccessful &&
     liquidityAdded;
 
   // ===================== Certified presale ============================
@@ -2053,7 +2119,7 @@ const Pool: React.FC = () => {
     timeBeforeMyTier &&
     tier !== '4' &&
     tier !== '5';
-  console.log('Pool:', { isMyTierTime, isWhitelist, tier });
+  // console.log('Pool:', { isMyTierTime, isWhitelist, tier });
   const showHtmlInvestmentEndsForCreatorOnCertified =
     isCertified && isUserCreator && isInvestmentTime && approved;
   const showHtmlYouNeedToBeRegisteredToInvestOnCertified =
@@ -2158,6 +2224,18 @@ const Pool: React.FC = () => {
     isPresaleSuccessful &&
     didUserInvest &&
     !isPresaleWithLiquidity;
+  // Collect funds raised
+  // функция для создателя чтобы забрать заработанные средства (опять же после ликвидности и окончания пресейла)
+  const showHtmlCollectFundsOnCertifiedWithLiquidity =
+    !isCertified &&
+    isUserCreator &&
+    isPresaleClosed &&
+    !cancelled &&
+    isPresaleSuccessful &&
+    liquidityAdded;
+  // функция для создателя чтобы забрать заработанные средства (после окончания пресейла, который без добавлнеия ликвидности)
+  const showHtmlCollectFundsOnCertifiedWithoutLiquidity =
+    !isCertified && isUserCreator && isPresaleClosed && !cancelled && isPresaleSuccessful;
 
   // Presale is private
   if (!isUserOwner && !isUserCreator && isCertified && isWhitelist && !userAddress)
@@ -2418,6 +2496,8 @@ const Pool: React.FC = () => {
                 {showHtmlCancelPresale && htmlCancelPresale}
                 {/*Withdraw investment*/}
                 {showHtmlWithdrawInvestment && htmlWithdrawInvestment}
+                {/*Collect funds*/}
+                {showHtmlCollectFunds && htmlCollectFunds}
 
                 {/*=============== Certified presale ================*/}
 
@@ -2442,6 +2522,9 @@ const Pool: React.FC = () => {
                 {showHtmlCollectFeeOnCertified && htmlCollectFeeWhenNotApproved}
                 {/*Withdraw investment*/}
                 {showHtmlWithdrawInvestmentOnCertified && htmlWithdrawInvestment}
+                {/*Collect funds*/}
+                {showHtmlCollectFundsOnCertifiedWithLiquidity && htmlCollectFunds}
+                {showHtmlCollectFundsOnCertifiedWithoutLiquidity && htmlCollectFunds}
               </div>
             </div>
           ) : null}
