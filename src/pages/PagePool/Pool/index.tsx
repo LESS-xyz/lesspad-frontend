@@ -2227,7 +2227,7 @@ const Pool: React.FC = () => {
   // Collect funds raised
   // функция для создателя чтобы забрать заработанные средства (опять же после ликвидности и окончания пресейла)
   const showHtmlCollectFundsOnCertifiedWithLiquidity =
-    !isCertified &&
+    isCertified &&
     isUserCreator &&
     isPresaleClosed &&
     !cancelled &&
@@ -2235,7 +2235,7 @@ const Pool: React.FC = () => {
     liquidityAdded;
   // функция для создателя чтобы забрать заработанные средства (после окончания пресейла, который без добавлнеия ликвидности)
   const showHtmlCollectFundsOnCertifiedWithoutLiquidity =
-    !isCertified && isUserCreator && isPresaleClosed && !cancelled && isPresaleSuccessful;
+    isCertified && isUserCreator && isPresaleClosed && !cancelled && isPresaleSuccessful;
 
   // Presale is private
   if (!isUserOwner && !isUserCreator && isCertified && isWhitelist && !userAddress)
