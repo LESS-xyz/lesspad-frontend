@@ -67,6 +67,7 @@ export default class ContractCalculations1Service {
           decimalsNativeToken,
         )
         .call();
+      console.log('ContractCalculations1Service countAmountOfTokens:', resultArray);
       return resultArray[2];
     } catch (e) {
       console.error('ContractCalculations1Service countAmountOfTokens:', e);

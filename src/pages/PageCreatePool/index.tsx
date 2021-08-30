@@ -37,6 +37,7 @@ const {
   CERTIFIED_PRESALE_CURRENCIES,
   APPROVE_DURATION_ON_CERTIFIED,
   PRESALE_DURATION_ON_CERTIFIED,
+  CHAIN_SYMBOLS,
 } = config;
 
 const checkIfExists = (value: any) => value;
@@ -676,21 +677,15 @@ const CreatePoolPage: React.FC = () => {
 
   const countAmountOfTokensToCreate = async () => {
     try {
+      const chainSymbol = CHAIN_SYMBOLS[chainType];
       const decimalsToken = await ContractERC20.decimals({ contractAddress: tokenAddress });
       const decimalsNativeToken =
         CERTIFIED_PRESALE_CURRENCIES[IS_MAINNET_OR_TESTNET][chainType][nativeTokenSymbol].decimals;
-      const hardCapInWei = convertToWei(
-        hardCap,
-        CERTIFIED_PRESALE_CURRENCIES[IS_MAINNET_OR_TESTNET][chainType][nativeTokenSymbol].decimals,
-      );
-      const tokenPriceInWei = convertToWei(
-        tokenPrice,
-        CERTIFIED_PRESALE_CURRENCIES[IS_MAINNET_OR_TESTNET][chainType][nativeTokenSymbol].decimals,
-      );
-      const listingPriceInWei = convertToWei(
-        listingPrice,
-        CERTIFIED_PRESALE_CURRENCIES[IS_MAINNET_OR_TESTNET][chainType][nativeTokenSymbol].decimals,
-      );
+      const decimalsEth =
+        CERTIFIED_PRESALE_CURRENCIES[IS_MAINNET_OR_TESTNET][chainType][chainSymbol].decimals;
+      const hardCapInWei = convertToWei(hardCap, decimalsNativeToken);
+      const tokenPriceInWei = convertToWei(tokenPrice, decimalsNativeToken);
+      const listingPriceInWei = convertToWei(listingPrice, decimalsEth); // пара ETH/TOKEN
       let result;
       if (isPublic) {
         result = await ContractCalculations.countAmountOfTokens({
