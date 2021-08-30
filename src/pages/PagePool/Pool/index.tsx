@@ -2058,7 +2058,12 @@ const Pool: React.FC = () => {
   //   В случае  ненабора голосов используется метод collect fee для того чтоб овнер пресейла мог вывести не только бабло в токенах, но и свои 1000$
   // Создатель может отменять ТОЛЬКО свой пресейл и ТОЛЬКО после инвеста, если не набран софткап
   const showHtmlCancelPresale =
-    !isCertified && isUserCreator && isPresaleClosed && !isPresaleSuccessful && !cancelled;
+    !isCertified &&
+    isUserCreator &&
+    isPresaleClosed &&
+    isVotingSuccessful &&
+    !isPresaleSuccessful &&
+    !cancelled;
   // Claim tokens
   // инвестор может (создатель не может) забрать токены после окончания пресейла и добавления ликвидности (если она есть)
   const showHtmlClaimTokens =
