@@ -258,13 +258,13 @@ export default {
     testnet: {
       Ethereum: {
         Calculations: '0x9Cdb409D0bE7442f3398ec196988813C35Cc0b57',
-        Calculations1: '0xA9cC76A913B7fFac6EE279ad987Df57a2b184d35',
+        Calculations1: '0xF19f6118184AF92a4Ed8b77fCf47B91f98A07418',
         LessToken: '0x87feef975fd65f32A0836f910Fd13d9Cf4553690',
         LPToken: '0x4fe142c6cbd294ef96dbba8a837cde3035850a97',
         Staking: '0xE4D00cA4eceFB3bEE229FFf97ffF3de3bBAD4B4B',
         LessLibrary: '0xa78C93A963C7C1d786EFf8CFbf54f37E0E9c12E1',
         PresaleFactory: '0xa8FD2169DFf71c22cB011c07196728B9FB75C58f',
-        PresaleFactoryCertified: '0xf4c136cd63cec88ee81b9f8deaffff9b56bb1c82',
+        PresaleFactoryCertified: '0xf8aD5Fb021c88404cE92eC7BAAE1Cf4778a3941a',
       },
     },
   },
