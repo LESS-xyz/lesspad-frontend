@@ -980,7 +980,7 @@ const CreatePoolPage: React.FC = () => {
           isLiquidity,
           // isAutomatically,
           false,
-          vestingPercent,
+          isVesting ? vestingPercent : '0',
           whiteListArray,
           nativeTokenAddress,
         ];
