@@ -901,7 +901,7 @@ const CreatePoolPage: React.FC = () => {
       const presalePancakeSwapInfo = [
         listingPriceInWei,
         lpTokensLockDurationInDays,
-        liquidityPercentageAllocation,
+        isLiquidity ? liquidityPercentageAllocation : '0',
         (liquidityAllocationTime / 1000).toFixed(),
       ];
       // bytes32 saleTitle;      // название
