@@ -228,7 +228,7 @@ const Pool: React.FC = () => {
   const isInfo = token !== '...';
   const isPresaleWithLiquidity = liquidity;
 
-  const isBeforeVotimgTime = openTimeVoting > NOW;
+  const isBeforeVotingTime = openTimeVoting > NOW;
   const isVotingTime = openTimeVoting <= NOW && closeTimeVoting > NOW;
   const isBeforeRegistrationTime =
     openTimeVoting <= NOW && openTimePresale - REGISTRATION_DURATION > NOW;
@@ -1624,6 +1624,14 @@ const Pool: React.FC = () => {
     </div>
   );
 
+  const htmlCreatorCantParticipate = (
+    <div className="container-presale-status">
+      <div className="container-presale-status-inner">
+        <div className="gradient-header">Presale creator cannot participate in it</div>
+      </div>
+    </div>
+  );
+
   // ======================= Buttons =========================
 
   // Voting
@@ -1943,7 +1951,7 @@ const Pool: React.FC = () => {
 
   // Voting
   // console.log('Pool:', { myVote, isUserBalanceLtNeededToVote });
-  const showHtmlVotingWillStart = !isCertified && isBeforeVotimgTime;
+  const showHtmlVotingWillStart = !isCertified && isBeforeVotingTime;
   const showHtmlVotingStarted = !isCertified && isVotingTime;
   const showHtmlYouNeed500LessToVote =
     !isCertified && isVotingTime && !isUserCreator && !myVote && isUserBalanceLtNeededToVote;
@@ -1991,7 +1999,6 @@ const Pool: React.FC = () => {
     isVotingSuccessful &&
     !isPresaleSuccessful &&
     cancelled;
-
   // Registration
   const showHtmlRegistrationWillStart = isBeforeRegistrationTime;
   const showHtmlRegistrationStarted = isRegistrationTime && isVotingSuccessful;
@@ -2011,7 +2018,6 @@ const Pool: React.FC = () => {
     timeBeforeRegistration &&
     isVotingSuccessful &&
     isUserRegister;
-
   // Investment
   const showHtmlYouNeedToBeRegisteredToInvest =
     !isCertified &&
@@ -2050,6 +2056,19 @@ const Pool: React.FC = () => {
     isMyTierTime;
   const showHtmlInvestmentEndsForCreator =
     !isCertified && isUserCreator && isInvestmentTime && isVotingSuccessful;
+  // Creator cant participate
+  // Рамочка появляется сразу после создания (то есть еще до начала голосования, для сертифицированных - с момента начала аудита)
+  const showHtmlCreatorCantParticipate =
+    !isCertified && isUserCreator && (isBeforeVotingTime || isVotingTime) && !cancelled;
+  // Рамочка пропадает если пресейл не прошел голосование, тогда отображается кнопка collect fee (кнопка сделана)
+  const showHtmlCreatorCantParticipateInRegTime =
+    !isCertified && isUserCreator && isRegistrationTime && isVotingSuccessful && !cancelled;
+  // Рамочка пропадает если не набран софткап, тогда отображается кнопка cancel presale (кнопка сделана)
+  const showHtmlCreatorCantParticipateInInvestmentTime =
+    !isCertified && isUserCreator && isInvestmentTime && !cancelled;
+  // Рамочка пропадает в тот момент, если пресейл завершился успешно и у овнера появляется кнопка которой он выводит крипту (вроде бы она зовется claim, она тоже сделана)
+  const showHtmlCreatorCantParticipateInClosedTime =
+    !isCertified && isUserCreator && isPresaleClosed && isPresaleSuccessful && !cancelled;
   // Withdraw investment
   const showHtmlWithdrawInvestment =
     !isCertified &&
@@ -2167,6 +2186,24 @@ const Pool: React.FC = () => {
   // console.log('Pool:', { isMyTierTime, isWhitelist, tier });
   const showHtmlInvestmentEndsForCreatorOnCertified =
     isCertified && isUserCreator && isInvestmentTime && approved;
+  // Creator cant participate // todo
+  // Рамочка появляется сразу после создания (для сертифицированных - с момента начала аудита)
+  const showHtmlCreatorCantParticipateOnCertified =
+    isCertified &&
+    isUserCreator &&
+    !isRegistrationTime &&
+    !isInvestmentTime &&
+    !isPresaleClosed &&
+    !cancelled;
+  // Рамочка пропадает если пресейл не прошел голосование, тогда отображается кнопка collect fee (кнопка сделана)
+  const showHtmlCreatorCantParticipateInRegTimeOnCertified =
+    isCertified && isUserCreator && isRegistrationTime && approved && !cancelled;
+  // Рамочка пропадает если не набран софткап, тогда отображается кнопка cancel presale (кнопка сделана)
+  const showHtmlCreatorCantParticipateInInvestmentTimeOnCertified =
+    isCertified && isUserCreator && isInvestmentTime && approved && !cancelled;
+  // Рамочка пропадает в тот момент, если пресейл завершился успешно и у овнера появляется кнопка которой он выводит крипту (вроде бы она зовется claim, она тоже сделана)
+  const showHtmlCreatorCantParticipateInClosedTimeOnCertified =
+    isCertified && isUserCreator && isPresaleClosed && isPresaleSuccessful && !cancelled;
   const showHtmlYouNeedToBeRegisteredToInvestOnCertified =
     isCertified &&
     !isUserCreator &&
@@ -2515,6 +2552,11 @@ const Pool: React.FC = () => {
             htmlPresaleIsNotSuccessfulAndIsClosedForCreator}
           {/*Investment ends*/}
           {showHtmlInvestmentEndsForCreator && htmlInvestmentEnds}
+          {/*Investment: creator cant participate*/}
+          {showHtmlCreatorCantParticipate && htmlCreatorCantParticipate}
+          {showHtmlCreatorCantParticipateInRegTime && htmlCreatorCantParticipate}
+          {showHtmlCreatorCantParticipateInInvestmentTime && htmlCreatorCantParticipate}
+          {showHtmlCreatorCantParticipateInClosedTime && htmlCreatorCantParticipate}
 
           {/*=============== Certified presale ================*/}
 
@@ -2533,6 +2575,11 @@ const Pool: React.FC = () => {
             htmlPresaleIsNotSuccessfulAndIsClosedForCreator}
           {/*Investment ends*/}
           {showHtmlInvestmentEndsForCreatorOnCertified && htmlInvestmentEnds}
+          {/*Investment: creator cant participate*/}
+          {showHtmlCreatorCantParticipateOnCertified && htmlCreatorCantParticipate}
+          {showHtmlCreatorCantParticipateInRegTimeOnCertified && htmlCreatorCantParticipate}
+          {showHtmlCreatorCantParticipateInInvestmentTimeOnCertified && htmlCreatorCantParticipate}
+          {showHtmlCreatorCantParticipateInClosedTimeOnCertified && htmlCreatorCantParticipate}
           {/*Presale ended*/}
           {showHtmlPresaleEndedOnCertifiedForCreator && htmlPresaleEnded}
           {showHtmlPresaleEndedOnCertifiedForInvestor && htmlPresaleEnded}
