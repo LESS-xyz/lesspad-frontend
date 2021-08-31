@@ -10,15 +10,15 @@ import PresalePublicAbi from '../data/abi/PresalePublicAbi';
 import StakingAbi from '../data/abi/StakingAbi';
 import UniswapRouterAbi from '../data/abi/UniswapRouterAbi';
 
-const IS_PRODUCTION = false;
+const IS_PRODUCTION = true;
 const IS_LOCALHOST = window.location.hostname === 'localhost';
 const IS_TESTING_ON_ROPSTEN = false;
-const SHOW_CONSOLE_LOGS = true;
-const SHOW_FORM_VALUES = true;
+const SHOW_CONSOLE_LOGS = false;
+const SHOW_FORM_VALUES = false;
 const SHOW_FORM_VALUES_MINE = IS_LOCALHOST;
 const SHOW_CERTIFIED_PRESALE = true;
-const IS_FORM_EXISTING_VALUES_VALIDATION_ENABLED = false;
-const IS_FORM_TIME_VALIDATION_ENABLED = false;
+const IS_FORM_EXISTING_VALUES_VALIDATION_ENABLED = true;
+const IS_FORM_TIME_VALIDATION_ENABLED = true;
 
 const INFURA_KEY = 'bf1db577e6bb42bf93893e1ea5dd1630';
 
@@ -246,13 +246,13 @@ export default {
     mainnet: {
       Ethereum: {
         Calculations: '0x3561A02e1192B89e2415724f43521f898e867013',
-        Calculations1: '',
+        Calculations1: '0x9DB15416434dFdc51eEe98693d4937Fe1C8d3DA3',
         LessToken: '0x62786eeacc9246b4018e0146cb7a3efeacd9459d',
         LPToken: '0x432dbbd09fee1dfb2cae40c5abc1a301a2ef76ee',
         LessLibrary: '0x8ea0A4FC09cb381E18CE58673250ad47b6bED9cA',
         Staking: '0xE751ffdC2a684EEbcaB9Dc95fEe05c083F963Bf1',
         PresaleFactory: '0x2223af5287833BDC0c811Fb40AA37bE05401589c',
-        PresaleFactoryCertified: '',
+        PresaleFactoryCertified: '0x46a40458e99DdF610B9184cFF86faB96a31568Bd',
       },
     },
     testnet: {
