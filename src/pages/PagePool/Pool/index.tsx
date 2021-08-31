@@ -303,6 +303,7 @@ const Pool: React.FC = () => {
     // const minus = new BN(beginingAmount).minus(tokensForSaleLeft);
     return new BN(raisedAmount).div(hardCap).multipliedBy(100).toString(10);
   }, [hardCap, raisedAmount]);
+  console.log('Pool:', { raisedAmount, hardCap });
 
   const percentageOfTokensSoldInCurrentTier = useMemo(() => {
     const percentagesShouldBeSold: any = [];
@@ -507,7 +508,7 @@ const Pool: React.FC = () => {
 
   const getIntermediateInfo = useCallback(async () => {
     try {
-      if (!token || token === '...') return;
+      if (!nativeToken || nativeToken === '') return;
       if (!address) return;
       let newInfo;
       if (userAddress) {
@@ -515,7 +516,7 @@ const Pool: React.FC = () => {
           if (!ContractPresaleCertifiedWithMetamask) return;
           newInfo = await ContractPresaleCertifiedWithMetamask.getIntermediateInfo({
             contractAddress: address,
-            tokenAddress: token,
+            nativeTokenAddress: nativeToken,
           });
           console.log('PagePool getIntermediateInfo certified:', newInfo);
         } else {
@@ -530,7 +531,7 @@ const Pool: React.FC = () => {
         if (!ContractPresaleCertified) return;
         newInfo = await ContractPresaleCertified.getIntermediateInfo({
           contractAddress: address,
-          tokenAddress: token,
+          nativeTokenAddress: nativeToken,
         });
         console.log('PagePool getIntermediateInfo certified:', newInfo);
       } else {
@@ -554,6 +555,7 @@ const Pool: React.FC = () => {
     address,
     isCertified,
     token,
+    nativeToken,
   ]);
 
   const getMyVote = useCallback(async () => {
@@ -1306,7 +1308,7 @@ const Pool: React.FC = () => {
     // return () => {
     //   clearInterval(interval);
     // };
-  }, [ContractPresalePublic, ContractPresaleCertified, isCertified, getIntermediateInfo]);
+  }, [ContractPresalePublic, ContractPresaleCertified, isCertified, getIntermediateInfo, info]);
 
   useEffect(() => {
     if (!ContractLessToken) return;

@@ -5,6 +5,8 @@ import config from '../../config';
 import ERC20Abi from '../../data/abi/ERC20Abi';
 import { convertHexToString, convertToWei } from '../../utils/ethereum';
 
+const { ZERO_ADDRESS } = config;
+
 type TypeConstructorProps = {
   web3Provider: any;
   chainType: string;
@@ -15,7 +17,7 @@ type TypeGetInfoProps = {
 };
 
 type TypeGetIntermediateInfoProps = {
-  tokenAddress: string;
+  nativeTokenAddress: string;
   contractAddress: string;
 };
 
@@ -213,18 +215,20 @@ export default class ContractPresaleCertifiedService {
     }
   };
 
-  public getIntermediateInfo = async ({
-    tokenAddress,
-    contractAddress,
-  }: TypeGetIntermediateInfoProps): Promise<any> => {
+  public getIntermediateInfo = async (props: TypeGetIntermediateInfoProps): Promise<any> => {
     try {
+      const { nativeTokenAddress, contractAddress } = props;
       const contract = new this.web3.eth.Contract(this.contractAbi, contractAddress);
       const intermediate = await contract.methods.intermediate().call();
       console.log('ContractPresaleCertified getIntermediateInfo:', {
         intermediate,
+        nativeTokenAddress,
       });
-      const contractToken = new this.web3.eth.Contract(ERC20Abi, tokenAddress);
-      const decimals = await contractToken.methods.decimals().call();
+      let decimalsNativeToken = 18;
+      if (nativeTokenAddress !== ZERO_ADDRESS) {
+        const contractNativeToken = new this.web3.eth.Contract(ERC20Abi, nativeTokenAddress);
+        decimalsNativeToken = await contractNativeToken.methods.decimals().call();
+      }
       const {
         withdrawedFunds,
         approved,
@@ -235,9 +239,9 @@ export default class ContractPresaleCertifiedService {
         participants,
       } = intermediate;
       // format
-      const pow = new BN(10).pow(new BN(decimals));
+      const pow = new BN(10).pow(new BN(decimalsNativeToken));
       const beginingAmountInEth = +new BN(beginingAmount).div(pow);
-      const raisedAmountInEth = +new BN(raisedAmount).div(pow); // todo: decimals of native token
+      const raisedAmountInEth = +new BN(raisedAmount).div(pow);
       // result
       return {
         withdrawedFunds,
