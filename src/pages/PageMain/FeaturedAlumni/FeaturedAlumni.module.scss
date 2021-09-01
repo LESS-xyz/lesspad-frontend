@@ -1,0 +1,49 @@
+@import '../../../styles/mixins/container.scss';
+@import '../../../styles/mixins/grid';
+@import '../../../styles/mixins/media';
+
+.block {
+  padding-top: 90px;
+}
+
+.container {
+  @include container;
+}
+
+.title {
+  font-size: 40px;
+  text-align: center;
+  color: var(--grey);
+  margin-bottom: 70px;
+
+  @include b('mobile') {
+    font-size: 26px;
+    line-height: 33px;
+    margin-bottom: 40px;
+  }
+}
+
+.logos {
+  @include grid(repeat(4, 1fr), auto, 90px);
+  grid-row-gap: 90px;
+  grid-column-gap: 45px;
+  margin-bottom: 90px;
+  @include b(mobile) {
+    @include grid(repeat(3, 1fr));
+    grid-row-gap: 45px;
+    grid-column-gap: 25px;
+  }
+}
+
+.logo {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+
+  img {
+    max-width: 100%;
+    @include b(mobile) {
+      height: 55px;
+    }
+  }
+}

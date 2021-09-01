@@ -1,0 +1,39 @@
+.input {
+  width: 100%;
+  position: relative;
+  &_img {
+    position: absolute;
+    top: 9px;
+    left: 24px;
+    width: 24px;
+    height: 24px;
+  }
+  input {
+    box-sizing: border-box;
+    color: var(--input-color);
+    font-size: 15px;
+    line-height: 20px;
+    padding: 10px 20px 10px 55px;
+    width: 100%;
+    border: 1px solid var(--blue);
+    border-radius: 1px;
+    background-color: transparent;
+    letter-spacing: 0.035em;
+    &::placeholder {
+      color: var(--blue);
+    }
+  }
+  input::placeholder {
+    font-size: 15px;
+    line-height: 20px;
+  }
+
+  &.big {
+    input {
+      padding: 20px 20px 20px 55px;
+    }
+    .input_img {
+      top: 17px;
+    }
+  }
+}

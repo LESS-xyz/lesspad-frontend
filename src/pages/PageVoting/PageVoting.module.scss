@@ -1,0 +1,66 @@
+@import '../../styles/mixins/flex.scss';
+@import '../../styles/mixins/container.scss';
+@import '../../styles/mixins/media';
+
+.page {
+  padding-top: 160px;
+  min-height: 100vh;
+  background: var(--gradient-background);
+
+  @include b('mobile') {
+    padding-top: 120px;
+  }
+}
+
+.container {
+  @include container;
+}
+
+.title {
+  font-size: 40px;
+  line-height: 51px;
+  text-align: center;
+  color: var(--grey);
+  margin-bottom: 20px;
+
+  @include b('mobile') {
+    font-size: 26px;
+    line-height: 33px;
+    margin-bottom: 40px;
+  }
+}
+
+.subtitle {
+  text-align: center;
+  margin-bottom: 40px;
+  span {
+    background-color: var(--blue);
+    padding: 8px 17px;
+    border-radius: 30px;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    &::before {
+      content: '';
+      height: 20px;
+      width: 20px;
+      margin-right: 5px;
+      background: url('../../assets/img/icons/info.svg') no-repeat;
+    }
+  }
+}
+
+.input {
+  margin-bottom: 30px;
+}
+
+.messageContainer {
+  @include flex(row, center);
+  height: 100%;
+}
+
+.messageContainerButtons {
+  @include flex(row, center, center);
+  width: 100%;
+  margin: 10px 0 0 0;
+}

@@ -1,0 +1,108 @@
+@import '../../../styles/mixins/container.scss';
+@import '../../../styles/mixins/gradient-text.scss';
+
+.container {
+  @include container;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  grid-column-gap: 38px;
+  grid-row-gap: 62px;
+  margin-bottom: 150px;
+}
+
+.card {
+  min-height: 467px;
+
+  &_title {
+    font-weight: 500;
+    font-size: 43px;
+    @include gradient-text;
+    margin-bottom: 37px;
+  }
+
+  &_subtitle {
+    font-size: 20px;
+    line-height: 1.2;
+
+    p {
+      margin-bottom: 25px;
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    margin-bottom: 42px;
+  }
+}
+
+.tier_card {
+  background: var(--about-fivetiers-tier-card-background);
+
+  &__inner {
+    padding: 45px 20px 20px;
+  }
+
+  &__img {
+    max-height: 207px;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 37px;
+    img {
+      max-width: 100%;
+    }
+  }
+
+  &__tier {
+    font-size: 23px;
+    margin-bottom: 5px;
+  }
+
+  &__title {
+    font-weight: 500;
+    font-size: 37px;
+    margin-bottom: 14px;
+  }
+
+  &__subtitle {
+    font-size: 16px;
+    line-height: 1.2;
+    p {
+      margin-bottom: 10px;
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+.info {
+  padding: 40px 60px;
+  border: var(--about-fivetiers-info-border);
+  margin-bottom: 86px;
+
+  &_inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &_left {
+    font-weight: 500;
+    max-width: 378px;
+    font-size: 30px;
+    line-height: 1.2;
+    @include gradient-text;
+  }
+
+  &_right {
+    &__text {
+      font-size: 22px;
+      line-height: 1.2;
+      margin-bottom: 33px;
+    }
+  }
+}

@@ -1,0 +1,84 @@
+@import '../../styles/mixins/container.scss';
+@import '../../styles/mixins/flex.scss';
+@import '../../styles/mixins/media.scss';
+@import '../../styles/mixins/grid';
+
+.container {
+  @include container;
+}
+
+.page {
+  padding-top: 170px;
+  padding-bottom: 100px;
+  background: var(--gradient-background);
+
+  @include b('mobile') {
+    padding-top: 120px;
+  }
+}
+
+.title {
+  font-size: 40px;
+  text-align: center;
+  color: var(--grey);
+  margin-bottom: 62px;
+
+  @include b('mobile') {
+    font-size: 26px;
+    line-height: 33px;
+    margin-bottom: 40px;
+  }
+}
+
+.cards {
+  @include grid(1fr 1fr 1fr, 1fr, 30px);
+  width: 100%;
+
+  @include b('tablet') {
+    @include grid(1fr 1fr, 1fr, 30px);
+  }
+
+  @include b('mobile') {
+    @include grid(1fr, 1fr, 30px);
+  }
+}
+
+.control_panel {
+  @include flex(row, center, space-between);
+  margin-bottom: 50px;
+
+  @include b('mobile') {
+    @include flex(column, center, normal, nowrap);
+    width: 100%;
+  }
+}
+
+.input {
+  width: 72%;
+
+  @include b('mobile') {
+    width: 100%;
+    margin: 10px 0 !important;
+  }
+}
+
+.selector {
+  width: 25%;
+  height: 42px;
+
+  @include b('mobile') {
+    width: 100%;
+    margin: 10px 0;
+  }
+}
+
+.pagination {
+  @include flex(row, center, center);
+  margin: 50px 0 0 0;
+}
+
+.status {
+  @include flex(row, center, center);
+  width: 100%;
+  margin: 150px 0;
+}

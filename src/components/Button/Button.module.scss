@@ -1,0 +1,32 @@
+.button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #000;
+  border: 1px solid var(--blue);
+  border-radius: 2px;
+  color: var(--blue);
+  padding: 10px;
+  height: 42px;
+  font-size: 16px;
+  letter-spacing: -0.531474px;
+  cursor: pointer;
+  transition: background-color 0.4s ease, color 0.4s ease;
+  text-decoration: none;
+  box-sizing: border-box;
+
+  &.filled,
+  &:hover {
+    background-color: var(--blue);
+    color: #fff;
+  }
+
+  &.big {
+    padding: 20px;
+    height: inherit;
+  }
+}
+
+.fullWidth {
+  width: 100%;
+}

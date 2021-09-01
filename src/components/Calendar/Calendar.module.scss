@@ -1,0 +1,98 @@
+@import '../../styles/mixins/grid.scss';
+@import '../../styles/mixins/flex.scss';
+@import '../../styles/mixins/gradient-text.scss';
+
+.calendar {
+  display: inline-block;
+  width: 300px;
+  background: linear-gradient(90deg, #040404 0%, #1c0e40 100%);
+  padding: 10px;
+  z-index: 999;
+
+  &_header {
+    @include flex(row, center, space-between);
+    margin-bottom: 10px;
+
+    &__currentDate {
+      @include gradient-text;
+      font-size: 18px;
+    }
+    &__arrows {
+      @include flex(row, center);
+    }
+    &__arrow {
+      cursor: pointer;
+      height: 16px;
+
+      &:last-child {
+        transform: rotate(180deg);
+        margin-left: 12px;
+      }
+    }
+  }
+
+  &_weekDays {
+    @include grid(repeat(7, 1fr), 1fr, 0px);
+
+    &__day {
+      @include flex(row, center, center);
+      width: 40px;
+      height: 40px;
+      color: var(--blue);
+      font-weight: 700;
+      font-size: 14px;
+    }
+  }
+
+  &_body {
+    @include grid(repeat(7, 1fr), 1fr, 0px);
+    border-left: 1px solid var(--blue);
+    border-top: 1px solid var(--blue);
+
+    &__cell {
+      border-right: 1px solid var(--blue);
+      border-bottom: 1px solid var(--blue);
+      width: 40px;
+      height: 40px;
+      @include flex(row, center, center);
+      font-size: 12px;
+
+      &:not(.nullish):hover {
+        cursor: pointer;
+        background: var(--gradient);
+        font-weight: 700;
+      }
+    }
+  }
+}
+
+.active {
+  cursor: pointer;
+  background: var(--gradient);
+  font-weight: 700;
+}
+
+.time {
+  @include flex(row, center);
+  padding: 20px 0 10px 0;
+}
+
+.hours {
+  @include flex(row, center);
+  margin: 0 10px 0 0;
+}
+
+.minutes {
+  @include flex(row, center);
+  margin: 0 10px 0 0;
+}
+
+.inputHours {
+  max-width: 50px;
+  margin: 0 10px 0 0;
+}
+
+.inputMinutes {
+  max-width: 50px;
+  margin: 0 10px 0 0;
+}

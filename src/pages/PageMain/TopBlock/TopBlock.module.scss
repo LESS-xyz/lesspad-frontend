@@ -1,0 +1,93 @@
+@import '../../../styles/mixins/container.scss';
+@import '../../../styles/mixins/flex.scss';
+@import '../../../styles/mixins/gradient-text.scss';
+@import '../../../styles/mixins/media';
+
+.container {
+  @include container;
+  z-index: 1;
+}
+
+.inner {
+  @include flex(row, center);
+  height: 100vh;
+  z-index: 1;
+
+  @include b('mobile') {
+    @include flex(row, normal);
+    padding: 100px 0 0 0;
+    height: 60vh;
+  }
+}
+
+.top {
+  background: var(--gradient-background);
+
+  @include b('mobile') {
+    height: 400px;
+  }
+
+  @include b('400') {
+    height: 500px;
+  }
+}
+
+.bg_img {
+  position: relative;
+  z-index: 0;
+}
+
+.bg_img::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background: url('../../../assets/img/sections/home/bg-main.svg') right top no-repeat;
+  background-size: contain;
+  filter: opacity(0.5);
+
+  @include b('tablet') {
+    background: url('../../../assets/img/sections/home/bg-adaptive.svg') right top no-repeat;
+    background-size: contain;
+    filter: opacity(0.3);
+  }
+
+  @include b('mobile') {
+    background-size: cover;
+    height: 400px;
+  }
+}
+
+.title {
+  font-size: 70px;
+  margin-bottom: 30px;
+  line-height: 1.3;
+  @include gradient-text;
+
+  @include b('mobile') {
+    font-size: 40px;
+    line-height: 46px;
+  }
+}
+
+.subtitle {
+  font-size: 23px;
+  line-height: 1.5;
+  max-width: 500px;
+  margin-bottom: 30px;
+
+  @include b('mobile') {
+    font-size: 16px;
+    line-height: 24px;
+  }
+}
+
+.buttons {
+  @include flex(row, center, normal, nowrap);
+  @include b('mobile') {
+    width: 100%;
+  }
+}

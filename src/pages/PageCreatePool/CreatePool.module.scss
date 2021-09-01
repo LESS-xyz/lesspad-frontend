@@ -1,0 +1,109 @@
+@import '../../styles/mixins/container.scss';
+@import '../../styles/mixins/flex.scss';
+@import '../../styles/mixins/grid.scss';
+
+.page {
+  background: var(--gradient-background);
+  padding-top: 160px;
+  padding-bottom: 100px;
+  min-height: 100vh;
+}
+
+.container {
+  @include container(600px);
+}
+
+.title {
+  text-align: center;
+  font-size: 40px;
+  color: var(--grey);
+  margin-bottom: 70px;
+}
+
+.calender {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.4);
+  width: 100%;
+  height: 100%;
+  @include flex(row, center, center);
+}
+
+.datePicker {
+  margin-bottom: 40px;
+
+  &_inner {
+    width: 100%;
+    background-color: #000;
+    border: 2px solid var(--blue);
+    border-radius: 2px;
+    padding: 17px 19px;
+    @include flex(row, center);
+  }
+
+  &_title {
+    font-weight: 700;
+    font-size: 16px;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 8px;
+  }
+
+  &_subtitle {
+    margin-top: 10px;
+    font-size: 15px;
+  }
+
+  &_value {
+    flex-grow: 1;
+  }
+
+  &_img {
+    height: 24px;
+    cursor: pointer;
+  }
+}
+
+.small_inputs {
+  @include grid(repeat(2, 1fr), 1fr, 20px);
+}
+
+.button {
+  @include flex(row, center, center);
+
+  &_submit {
+    padding: 16px 80px;
+    background: var(--gradient);
+    border-radius: 2px;
+    border: none;
+    font-weight: 500;
+    font-size: 20px;
+    color: #fff;
+    margin: 0 auto;
+  }
+
+  &_loading {
+    padding: 16px 80px;
+    background: var(--gradient);
+    opacity: 0.5;
+    border-radius: 2px;
+    border: none;
+    font-weight: 500;
+    font-size: 20px;
+    color: #fff;
+    margin: 0 auto;
+  }
+}
+
+.messageContainer {
+  @include flex(row, center, center);
+  height: 100%;
+}
+
+.messageContainerButtons {
+  @include flex(row, center, center);
+  width: 100%;
+  margin: 10px 0 0 0;
+}

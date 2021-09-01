@@ -1,0 +1,62 @@
+@import '../../../styles/mixins/gradient-text.scss';
+@import '../../../styles/mixins/flex';
+
+.popup {
+  position: absolute;
+  right: 0;
+  top: 45px;
+  opacity: 0;
+  transform: scale(0.7);
+  transition: 0.4s ease;
+  transform-origin: 100% 0;
+
+  background: #0e071f;
+  border: 1px solid var(--blue);
+  border-radius: 2px;
+
+  &.active {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.inner {
+  padding: 10px 0;
+}
+.option {
+  @include flex(row, center);
+  position: relative;
+  cursor: pointer;
+  padding: 10px 20px;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: -0.468947px;
+  color: var(--blue);
+  &:hover {
+    @include gradient-text;
+    &::after {
+      background-color: var(--header-popup-option-background);
+    }
+  }
+  &::after {
+    transition: 0.1s ease;
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    z-index: -1;
+  }
+
+  &_img {
+    margin-right: 11px;
+  }
+}
+
+.disabled {
+  color: #BFBFBF;
+  cursor: default;
+  filter: grayscale(1);
+}
